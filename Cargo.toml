@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/rcs-diag",
     "crates/vl-syntax",
+    "crates/vl-sim",
     "crates/vl-cli",
 ]
 
@@ -15,6 +16,7 @@ authors = ["rust-cad-suite contributors"]
 [workspace.dependencies]
 rcs-diag = { path = "crates/rcs-diag" }
 vl-syntax = { path = "crates/vl-syntax" }
+vl-sim = { path = "crates/vl-sim" }
 
 [profile.release]
 debug = 1

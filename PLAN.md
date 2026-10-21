@@ -51,9 +51,9 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 |---|---|---|---|
 | M0 | workspace + rcs-diag + lexer | 字面量/directive/punct 測試;--version | ✅ 2026-10-21 |
 | M1 | preprocessor | object+單層 function-like 巨集/`` `` ``/`` `" ``/ifdef 族/include(-I,環=硬錯)/timescale/__LINE__;`verilator -E` 對拍正規化 | 核心 ✅(pp 測試 17 條綠);-E 對拍待 |
-| M2 | parser + **垂直切片** | 全 V2005 文法;多錯誤恢復;**組合邏輯常量折疊 smoke 提前**(對抗審 #10);fuzz | parser ✅ 核心;恢復/fuzz/smoke 待 |
+| M2 | parser + **垂直切片** | 全 V2005 文法;多錯誤恢復;**組合邏輯 smoke 提前**(對抗審 #10);fuzz | parser ✅;**垂直切片 ✅ 2026-10-21**(crates/vl-sim:4-state 值/求值器/union-find 迷你 elab/組合收斂/initial+$display;`--binary` 已可跑;corpus/fulladd 與 Verilator 5.050 **byte-diff 全綠**,測試 sim_gate 釘死);fuzz 待 |
 | M3 | elab + lint-only | 符號/參數/generate/寬度;picorv32+serv 零假 WIDTH;**lint 提前為第一可用產物** | |
-| M4 | 解釋器核(無時序) | 4-state 值(IEEE §5 表格單測為準,對抗審 #2);tb_race 確定序;加法器 TB 與 oracle stdout byte-diff | |
+| M4 | 解釋器核(無時序) | 4-state 值(IEEE §5 表格單測為準,對抗審 #2);tb_race 確定序;加法器 TB 與 oracle stdout byte-diff | 值核心 ✅(切片帶入;算術 X 仍為保守全-x,§5 逐算子表待);加法器 diff ✅(fulladd);tb_race/函式/任務待 |
 | M5 | timing+調度 | **counter8 fixture `PASS` byte-exact**(corpus/counter8/,oracle 已錄;含 NBA 區讀值細節);UNOPTFLAT;TIMESCALEMOD 對等硬錯 | fixture 就緒 |
 | M6 | VCD | 規則=逐時間戳 (canonical name→value) 集合比對+**alias 組折疊**(oracle 實證多網同碼),禁裸字節 diff(對抗審 #4);參考 VCD 走 --cc+手寫 main 腳本 | |
 | M7-M9 | 語言廣度/SV 階梯/perf gate + tier-B ADR | 見 PLAN-DRAFT §5 | |
@@ -67,10 +67,12 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 ## 7. 測試策略
 單元(值真值表=IEEE 1364-2005 §5 為 oracle;lexer/pp/parser)→ golden(`corpus/<case>/expected.*`)→ **差分 vs 5.050**(stdout 過濾白名單+`--timescale` 統一+VCD 規則化比對;詳細規則=`corpus/counter8/README.md`)→ fuzz(M2 起)。上游 test_regress 永不入 git(LGPL/Artistic),僅本地唯讀。
 
-## 8. Open questions(使用者裁決點)
-1. tier B(--gen-rust)是否要作為產品面(M9 ADR)?——建議要。
-2. `verilator` 同名別名是否要(M9 後)?
-3. 性能目標:建議解釋器 ≤100× 上游(picorv32 boot);tier B ≤10×。
-4. SV interfaces 提前與否(現 M10)。
-5. P7 cocotb 類:Rust-only 約束 vs Python 生態。
-6. suite license 確認 MIT OR Apache-2.0(README 待蓋章)。
+## 8. Open questions — 裁決建議已「暫定採納」(2026-10-21;使用者隨時可翻案,翻案=改本表+對應 ADR)
+| # | 問題 | 暫定裁決 | 理由 |
+|---|---|---|---|
+| 1 | tier B(--gen-rust 生成 Rust 模型)要不要作產品面 | **要**,M9 ADR-0002 後落地 | 貼近 verilator「Verilog→C++ 編譯」哲學;解釋器先保正確性,tier B 以解釋器為差分 oracle |
+| 2 | `verilator` 同名別名 | **M9 後再議**,現用 `rverilator` | PATH 安全(免毒化自家 oracle);別名必帶自標識 `--version` |
+| 3 | 性能目標 | 解釋器 ≤100× 上游(picorv32 boot)、tier B ≤10× | 工作目標;M6 bench 後複核 |
+| 4 | SV interfaces 時點 | **維持 M10** | 複雜度最高、早期收益最低 |
+| 5 | P7 cocotb/Python 生態 | **出範圍;屆時改提 Rust 原生 cosim API**(rverilator 作為庫) | Rust-only 約束下硬搬 Python 是偽命題 |
+| 6 | License | **MIT OR Apache-2.0 雙授** | 自寫件全同授;ISC 外部快照保留原證 |

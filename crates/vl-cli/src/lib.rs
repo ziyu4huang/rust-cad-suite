@@ -1,10 +1,13 @@
 //! `rverilator` driver: flag handling, per-file preprocess→parse pipeline,
-//! diagnostic rendering. v0 modes: `--version`, `-E` (preprocess only),
-//! `--dump-ast`, and the default parse/lint gate (M2 acceptance).
-//! Simulation (`--binary`) lands at M4-M5 per PLAN §5.
+//! diagnostic rendering. Modes: `--version`, `-E` (preprocess only),
+//! `--dump-ast`, the default parse/lint gate, and `--binary` — simulate now
+//! (v0 slice: combinational + `initial` blocks; the event scheduler lands at
+//! M5 per PLAN §5).
 
 use rcs_diag::{DiagSink, SourceMap};
+use std::collections::HashSet;
 use std::path::PathBuf;
+use vl_syntax::ast::ModuleItem;
 use vl_syntax::parser;
 use vl_syntax::pp::{self, PpOptions};
 use vl_syntax::token::{DirKind, Punct, Tok};
@@ -19,13 +22,14 @@ Usage: rverilator [options] <file.v>...
 
 Options:
   --version            Print version and exit
-  --lint-only          Parse + lint only, do not simulate (v0 default)
+  --lint-only          Parse + lint only, do not simulate
   -E                   Preprocess only, print result
+  --binary             Simulate now (v0 slice: combinational + initial blocks;
+                       always/#delay scheduling lands at M5)
   --dump-ast           Print the parsed AST
   -I <dir>, -I<dir>    Add include search directory
   -D <NAME[=VAL]>      Predefine a preprocessor macro (default 1)
-  --top-module <mod>   Top module name (accepted; used from M3)
-  --binary             Simulate now (not yet implemented — M4/M5)
+  --top-module <mod>   Top module (default: auto-detect the un-instantiated one)
   --timing, --no-timing, --trace, --Mdir <dir>, -o <name>,
   --build-jobs <n>, -Wall, -Wno-<CODE>
                        Accepted for compatibility; no-op in v0
@@ -38,6 +42,7 @@ pub struct Options {
     pub lint_only: bool,
     pub preprocess_only: bool,
     pub dump_ast: bool,
+    pub top_module: Option<String>,
     pub include_dirs: Vec<PathBuf>,
     pub predefines: Vec<String>,
     pub files: Vec<String>,
@@ -48,6 +53,7 @@ pub fn run(argv: &[String]) -> i32 {
         lint_only: false,
         preprocess_only: false,
         dump_ast: false,
+        top_module: None,
         include_dirs: Vec::new(),
         predefines: Vec::new(),
         files: Vec::new(),
@@ -69,17 +75,27 @@ pub fn run(argv: &[String]) -> i32 {
             "-E" => o.preprocess_only = true,
             "--dump-ast" => o.dump_ast = true,
             "--binary" => want_binary = true,
-            "-Wall" | "--timing" | "--no-timing" | "--trace" => {}
-            "-Wno-FATAL" | "-Wno-fatal" => {}
-            s if s.starts_with("-Wno-") => {}
-            "--top-module" | "--Mdir" | "-o" | "--build-jobs" => {
+            "--top-module" => {
+                i += 1;
+                if i >= argv.len() {
+                    eprintln!("error[VL-E030]: option `--top-module` requires a value");
+                    return 1;
+                }
+                o.top_module = Some(argv[i].clone());
+            }
+            "--Mdir" | "-o" | "--build-jobs" => {
                 i += 1;
                 if i >= argv.len() {
                     eprintln!("error[VL-E030]: option `{a}` requires a value");
                     return 1;
                 }
             }
-            s if s.starts_with("--top-module=") || s.starts_with("--Mdir=") => {}
+            s if s.starts_with("--top-module=") => {
+                o.top_module = Some(s["--top-module=".len()..].to_string());
+            }
+            s if s.starts_with("--Mdir=") => {}
+            "-Wall" | "--timing" | "--no-timing" | "--trace" => {}
+            s if s.starts_with("-Wno-") => {}
             s if s.starts_with("-I") && s.len() > 2 => o.include_dirs.push(PathBuf::from(&s[2..])),
             "-I" => {
                 i += 1;
@@ -121,40 +137,54 @@ pub fn run(argv: &[String]) -> i32 {
         eprintln!("error[VL-E030]: no input files (try `rverilator --help`)");
         return 1;
     }
-    if want_binary {
-        eprintln!(
-            "note: `--binary` simulation is not yet implemented — lands at milestones M4/M5 (PLAN §5); running parse/lint gate only"
-        );
-    }
-    compile(&o)
-}
-
-fn compile(o: &Options) -> i32 {
     let mut sm = SourceMap::new();
     let mut diags = DiagSink::new();
-    let opts = PpOptions {
+    if want_binary && !o.preprocess_only {
+        simulate(&o, &mut sm, &mut diags)
+    } else {
+        compile(&o, &mut sm, &mut diags)
+    }
+}
+
+fn pp_options(o: &Options) -> PpOptions {
+    PpOptions {
         include_dirs: o.include_dirs.clone(),
         predefines: o.predefines.clone(),
-    };
+    }
+}
+
+fn preprocess_and_parse(
+    o: &Options,
+    sm: &mut SourceMap,
+    diags: &mut DiagSink,
+) -> Vec<vl_syntax::ast::Module> {
+    let opts = pp_options(o);
+    let mut modules = Vec::new();
     for f in &o.files {
         let path = PathBuf::from(f);
-        let Some(out) = pp::preprocess_file(&path, &mut sm, &mut diags, &opts) else {
+        let Some(out) = pp::preprocess_file(&path, sm, diags, &opts) else {
             continue;
         };
         if o.preprocess_only {
             println!("{}", render_preprocessed(&out.tokens));
             continue;
         }
-        let file = parser::parse_source_file(out.tokens, &mut diags);
+        let file = parser::parse_source_file(out.tokens, diags);
         if o.dump_ast {
             println!("{:#?}", file);
         }
+        modules.extend(file.modules);
     }
+    modules
+}
+
+fn compile(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
+    preprocess_and_parse(o, sm, diags);
     if o.preprocess_only {
         return if diags.has_errors() { 1 } else { 0 };
     }
     let mut out = String::new();
-    rcs_diag::render_diags(&mut out, &sm, &diags.diags);
+    rcs_diag::render_diags(&mut out, sm, &diags.diags);
     // Verilator writes diagnostics to stdout; match that for diffability.
     print!("{out}");
     let n_err = diags.error_count();
@@ -164,6 +194,70 @@ fn compile(o: &Options) -> i32 {
     } else {
         println!("%Info: parse ok (lint gate; elaboration lands at M3)");
         0
+    }
+}
+
+/// Top-module auto-detection: the module no other module instantiates
+/// (mirrors upstream's behavior when `--top-module` is omitted).
+pub fn detect_top(modules: &[vl_syntax::ast::Module]) -> Result<String, Vec<String>> {
+    let instantiated: HashSet<String> = modules
+        .iter()
+        .flat_map(|m| m.items.iter())
+        .filter_map(|it| match it {
+            ModuleItem::Instance(i) => Some(i.mod_name.clone()),
+            _ => None,
+        })
+        .collect();
+    let cands: Vec<String> = modules
+        .iter()
+        .map(|m| m.name.clone())
+        .filter(|n| !instantiated.contains(n))
+        .collect();
+    match cands.as_slice() {
+        [only] => Ok(only.clone()),
+        _ => Err(cands),
+    }
+}
+
+fn simulate(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
+    let modules = preprocess_and_parse(o, sm, diags);
+    if diags.has_errors() {
+        let mut out = String::new();
+        rcs_diag::render_diags(&mut out, sm, &diags.diags);
+        print!("{out}");
+        println!("%Error: cannot simulate while parsing has errors");
+        return 1;
+    }
+    let top = match &o.top_module {
+        Some(t) => t.clone(),
+        None => match detect_top(&modules) {
+            Ok(t) => t,
+            Err(cands) => {
+                println!(
+                    "%Error: cannot auto-detect top module (candidates: {}); pass --top-module",
+                    if cands.is_empty() { "none".to_string() } else { cands.join(", ") }
+                );
+                return 1;
+            }
+        },
+    };
+    let mut sim = match vl_sim::Sim::build(&modules, &top) {
+        Ok(s) => s,
+        Err(e) => {
+            println!("%Error: {}", e.message);
+            return 1;
+        }
+    };
+    match sim.run() {
+        Ok(()) => {
+            print!("{}", sim.take_output());
+            0
+        }
+        Err(e) => {
+            print!("{}", sim.take_output());
+            println!("%Error: {}", e.message);
+            1
+        }
     }
 }
 

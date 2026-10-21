@@ -330,7 +330,7 @@ fn op_at_level(level: usize, t: &crate::token::Token) -> Option<(BinOp, bool)> {
 }
 
 /// Parse a `BasedLit` token text (`8'sh3f`, `'b01x`) into a NumLit.
-pub(crate) fn parse_based(text: &str, span: rcs_diag::Span) -> NumLit {
+pub fn parse_based(text: &str, span: rcs_diag::Span) -> NumLit {
     let Some(q) = text.find('\'') else {
         // Unreachable for lexer output; treat as decimal to stay total.
         return NumLit {
