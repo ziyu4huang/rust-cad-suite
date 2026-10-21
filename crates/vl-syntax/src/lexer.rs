@@ -84,7 +84,10 @@ impl<'a, 'd> Lexer<'a, 'd> {
 
     fn skip_trivia(&mut self) {
         loop {
-            while !self.eof() && (self.cur() as char).is_whitespace() {
+            // ASCII whitespace only: casting a raw byte to char would treat
+            // UTF-8 continuation bytes 0x85/0xA0 (NEL/NBSP) as whitespace and
+            // strand `pos` inside a multi-byte character (found by fuzz).
+            while !self.eof() && self.cur().is_ascii_whitespace() {
                 self.pos += 1;
             }
             if self.eof() {
@@ -190,6 +193,16 @@ impl<'a, 'd> Lexer<'a, 'd> {
                     if self.eof() {
                         self.err(start, "VL-E002", "unterminated string literal");
                         break;
+                    }
+                    // Non-ASCII escape target: copy the whole character.
+                    if !self.cur().is_ascii() {
+                        let cs = self.pos;
+                        self.pos += 1;
+                        while !self.eof() && (self.src.as_bytes()[self.pos] & 0xC0) == 0x80 {
+                            self.pos += 1;
+                        }
+                        val.push_str(&self.src[cs..self.pos]);
+                        continue;
                     }
                     let e = self.bump();
                     match e {
@@ -381,7 +394,15 @@ impl<'a, 'd> Lexer<'a, 'd> {
             self.bump();
             text.push('s');
         }
-        let base_ch = if self.eof() { 0 } else { self.bump() };
+        // Only consume an ASCII base letter; a non-ASCII byte must not be
+        // bumped (it would strand `pos` inside a UTF-8 sequence — fuzz find).
+        let base_ch = match self.peek(0) {
+            Some(b) if b.is_ascii() => {
+                self.pos += 1;
+                b
+            }
+            _ => 0,
+        };
         let class: &[u8] = match base_ch.to_ascii_lowercase() {
             b'd' => {
                 text.push('d');
@@ -567,15 +588,19 @@ impl<'a, 'd> Lexer<'a, 'd> {
                 }
             }
             _ => {
-                self.pos = start + 1;
+                // Advance over the WHOLE character: a 1-byte step would leave
+                // `pos` inside a multi-byte UTF-8 sequence and the next slice
+                // would panic (found by fuzz_smoke).
                 let ch = self.src[start..].chars().next().unwrap_or('?');
+                let len = ch.len_utf8().max(1);
+                self.pos = start + len;
                 self.err(start, "VL-E001", format!("unexpected character `{ch}`"));
                 return Token::new(
                     Tok::Error,
                     Span::new(
                         self.file,
                         (start + self.base as usize) as u32,
-                        (start + 1 + self.base as usize) as u32,
+                        (start + len + self.base as usize) as u32,
                     ),
                     String::new(),
                 );

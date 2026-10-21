@@ -13,9 +13,9 @@
  .meta{color:#555;font-size:.85rem}
 </style></head><body>
 <h1>rverilator E2E differential report</h1>
-<p class="big pass">49/50 = 98.0%</p>
+<p class="big pass">50/51 = 98.0%</p>
 <div class="meta">
- git <code>e5880a1</code> · oracle <code>Verilator 5.050 2026-07-01 rev vUNKNOWN-built20260701</code> · corpus <code>/Users/huangziyu/proj/rust-cad-suite/crates/vl-difftest/../../corpus/e2e</code><br>
+ git <code>f11a219</code> · oracle <code>Verilator 5.050 2026-07-01 rev vUNKNOWN-built20260701</code> · corpus <code>/Users/huangziyu/proj/rust-cad-suite/crates/vl-difftest/../../corpus/e2e</code><br>
  gate: <code>cargo test -p vl-difftest</code> asserts rate ≥ 80% (expectations committed — no verilator needed)
 </div>
 
@@ -51,7 +51,7 @@ cargo run -p vl-difftest                      # this report's numbers
 cargo test -p vl-difftest                     # the ≥80% gate
 cargo run -p vl-difftest -- --record          # re-record from the oracle</pre>
 
-<h2>Per-case results (50)</h2>
+<h2>Per-case results (51)</h2>
 <table><tr><th>case</th><th>result</th><th>detail</th></tr>
 <tr class="pass"><td>01_arith_widths</td><td>PASS</td><td></td></tr>
 <tr class="pass"><td>02_div_mod_signed</td><td>PASS</td><td></td></tr>
@@ -103,6 +103,7 @@ cargo run -p vl-difftest -- --record          # re-record from the oracle</pre>
 <tr class="pass"><td>48_frac_delay</td><td>PASS</td><td></td></tr>
 <tr class="pass"><td>49_multi_initial</td><td>PASS</td><td></td></tr>
 <tr class="pass"><td>50_forever_finish</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>51_vcd_counter</td><td>PASS</td><td></td></tr>
 </table>
 
 <h2>Corpus coverage</h2>

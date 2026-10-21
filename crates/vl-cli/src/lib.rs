@@ -252,13 +252,18 @@ fn simulate(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
             return 1;
         }
     };
-    match sim.run() {
-        Ok(()) => {
-            print!("{}", sim.take_output());
-            0
+    let r = sim.run();
+    print!("{}", sim.take_output());
+    if let Some((path, text)) = sim.take_vcd() {
+        let path = path.unwrap_or_else(|| "dump.vcd".to_string());
+        if let Err(e) = std::fs::write(&path, text) {
+            println!("%Error: cannot write VCD `{path}`: {e}");
+            return 1;
         }
+    }
+    match r {
+        Ok(()) => 0,
         Err(e) => {
-            print!("{}", sim.take_output());
             println!("%Error: {}", e.message);
             1
         }

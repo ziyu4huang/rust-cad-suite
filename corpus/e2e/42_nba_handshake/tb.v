@@ -7,6 +7,7 @@ module tb;
   always @(posedge clk) a <= ~a;
   always @(posedge clk) if (a) tick <= tick + 1;
   initial begin
+    $dumpfile("dump.vcd"); $dumpvars(0, tb);
     repeat (6) @(posedge clk);
     #1 $display("tick=%0d", tick);
     $finish;

@@ -22,6 +22,12 @@ pub struct CaseResult {
     pub detail: String,
 }
 
+/// Output of one simulation: stdout plus the VCD text if the TB dumped one.
+pub struct SimOut {
+    pub stdout: String,
+    pub vcd: Option<String>,
+}
+
 pub fn corpus_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../../corpus/e2e")
 }
@@ -40,7 +46,7 @@ fn collect_v_files(dir: &Path) -> Vec<PathBuf> {
 
 /// Run one case through the same pipeline as `rverilator --binary`.
 /// Returns the normalized stdout (or an error message).
-pub fn run_ours(dir: &Path) -> Result<String, String> {
+pub fn run_ours(dir: &Path) -> Result<SimOut, String> {
     let files = collect_v_files(dir);
     if files.is_empty() {
         return Err(format!("no .v files in {}", dir.display()));
@@ -85,12 +91,22 @@ pub fn run_ours(dir: &Path) -> Result<String, String> {
     let mut sim = vl_sim::Sim::build(&modules, &top, timescale.as_deref())
         .map_err(|e| format!("elaborate: {}", e.message))?;
     sim.run().map_err(|e| format!("run: {}", e.message))?;
-    Ok(sim.take_output())
+    let stdout = sim.take_output();
+    let vcd = sim.take_vcd().map(|(_, text)| text);
+    Ok(SimOut { stdout, vcd })
 }
 
 pub fn normalize_oracle_stdout(raw: &str) -> String {
+    // Tool-internal reporting only: `- ` (Simulation Report / $finish
+    // marker lines) and `-Info:`/`-Warning`/`-Error` notes. A design may
+    // legitimately print lines starting with `-` (e.g. `-7div2=-3`).
     raw.lines()
-        .filter(|l| !l.starts_with("- "))
+        .filter(|l| {
+            !(l.starts_with("- ")
+                || l.starts_with("-Info")
+                || l.starts_with("-Warning")
+                || l.starts_with("-Error"))
+        })
         .collect::<Vec<_>>()
         .join("\n")
         .trim_end_matches('\n')
@@ -117,23 +133,34 @@ pub fn check_case(dir: &Path) -> CaseResult {
             pass: false,
             detail: e,
         },
-        Ok(actual) => {
-            if actual == expected {
-                CaseResult {
-                    name,
-                    pass: true,
-                    detail: String::new(),
-                }
-            } else {
-                let mut d = String::from("output mismatch\n--- expected ---\n");
+        Ok(out) => {
+            let mut d = String::new();
+            if out.stdout != expected {
+                d.push_str("output mismatch\n--- expected ---\n");
                 d.push_str(&expected);
                 d.push_str("--- actual ---\n");
-                d.push_str(&actual);
-                CaseResult {
-                    name,
-                    pass: false,
-                    detail: d,
+                d.push_str(&out.stdout);
+            }
+            // M6: a committed expect.vcd is a byte-exact golden of our own
+            // writer (stability gate); oracle parity is checked separately
+            // by `--vcd-xcheck` (alias/suffix-folded value comparison).
+            if let Ok(exp_vcd) = std::fs::read_to_string(dir.join("expect.vcd")) {
+                match &out.vcd {
+                    None => d.push_str("vcd expected but the TB produced none\n"),
+                    Some(v) if *v != exp_vcd => {
+                        d.push_str(&format!(
+                            "vcd mismatch ({} vs {} bytes)\n",
+                            v.len(),
+                            exp_vcd.len()
+                        ));
+                    }
+                    _ => {}
                 }
+            }
+            CaseResult {
+                name,
+                pass: d.is_empty(),
+                detail: d,
             }
         }
     }
@@ -180,6 +207,7 @@ pub fn record_with_oracle(corpus: &Path, verilator: &Path) -> anyhow_none::Resul
         let status = std::process::Command::new(verilator)
             .arg("--binary")
             .arg("--timing")
+            .arg("--trace")
             .arg("--Mdir")
             .arg(work.join("obj"))
             .arg("-o")
@@ -207,6 +235,13 @@ pub fn record_with_oracle(corpus: &Path, verilator: &Path) -> anyhow_none::Resul
                 let raw = String::from_utf8_lossy(&o.stdout).to_string();
                 std::fs::write(d.join("expected.oracle-stdout.txt"), &raw).unwrap();
                 std::fs::write(d.join("expected.stdout"), normalize_oracle_stdout(&raw)).unwrap();
+                // Self-golden VCD (writer stability); oracle VCD parity is
+                // a separate manual crosscheck (see docs/e2e-report/).
+                if let Ok(ours) = run_ours(&d) {
+                    if let Some(v) = ours.vcd {
+                        std::fs::write(d.join("expect.vcd"), v).unwrap();
+                    }
+                }
             }
             Ok(o) => {
                 failures.push(format!(
@@ -226,6 +261,239 @@ pub fn record_with_oracle(corpus: &Path, verilator: &Path) -> anyhow_none::Resul
     }
 }
 
+// ---------- M6: VCD parsing + oracle crosscheck ----------
+
+/// Parsed VCD: var id → full dotted path(s) + width, and the change timeline.
+pub struct VcdData {
+    /// id → list of full paths (aliases share an id).
+    pub id_paths: std::collections::BTreeMap<String, Vec<String>>,
+    pub id_width: std::collections::BTreeMap<String, u32>,
+    /// (time, id, normalized value)
+    pub changes: Vec<(u64, String, String)>,
+}
+
+pub fn parse_vcd(text: &str) -> VcdData {
+    let mut scope: Vec<String> = Vec::new();
+    let mut id_paths: std::collections::BTreeMap<String, Vec<String>> = Default::default();
+    let mut id_width: std::collections::BTreeMap<String, u32> = Default::default();
+    let mut changes = Vec::new();
+    let mut now: u64 = 0;
+    let mut in_defs = true;
+    for raw in text.lines() {
+        let line = raw.trim();
+        if line.is_empty() {
+            continue;
+        }
+        if in_defs {
+            if line.starts_with("$scope") {
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                if parts.len() >= 3 {
+                    scope.push(parts[2].to_string());
+                }
+            } else if line.starts_with("$upscope") {
+                scope.pop();
+            } else if line.starts_with("$var") {
+                // $var wire 8 $ q [7:0] $end
+                let parts: Vec<&str> = line.split_whitespace().collect();
+                if parts.len() >= 5 {
+                    let w: u32 = parts[2].parse().unwrap_or(1);
+                    let id = parts[3].to_string();
+                    let name = parts[4].to_string();
+                    let mut path = scope.clone();
+                    path.push(name);
+                    id_paths.entry(id.clone()).or_default().push(path.join("."));
+                    id_width.insert(id, w);
+                }
+            } else if line.starts_with("$enddefinitions") {
+                in_defs = false;
+            }
+            continue;
+        }
+        if let Some(t) = line.strip_prefix('#') {
+            now = t.trim().parse().unwrap_or(now);
+        } else if line.starts_with('$') {
+            // $dumpvars / $end — values inside the block are plain lines.
+            continue;
+        } else if let Some(rest) = line.strip_prefix('b') {
+            let mut it = rest.split_whitespace();
+            let v = it.next().unwrap_or("").to_string();
+            let id = it.next().unwrap_or("").to_string();
+            changes.push((now, id, v));
+        } else {
+            let (v, id) = line.split_at(1);
+            changes.push((now, id.to_string(), v.to_string()));
+        }
+    }
+    VcdData {
+        id_paths,
+        id_width,
+        changes,
+    }
+}
+
+/// Left-extend a VCD vector value to `w` bits (x/z extend with themselves).
+fn norm_val(v: &str, w: u32) -> String {
+    let w = w as usize;
+    if v.len() >= w {
+        return v[v.len() - w..].to_string();
+    }
+    let fill = match v.chars().next() {
+        Some('x') => 'x',
+        Some('z') => 'z',
+        _ => '0',
+    };
+    let mut s: String = std::iter::repeat(fill).take(w - v.len()).collect();
+    s.push_str(v);
+    s
+}
+
+/// Per-path step function: path → [(t, value)].
+fn step_functions(d: &VcdData) -> std::collections::BTreeMap<String, Vec<(u64, String)>> {
+    let mut m: std::collections::BTreeMap<String, Vec<(u64, String)>> = Default::default();
+    for (t, id, v) in &d.changes {
+        let w = *d.id_width.get(id).unwrap_or(&1);
+        let nv = norm_val(v, w);
+        if let Some(paths) = d.id_paths.get(id) {
+            for p in paths {
+                m.entry(p.clone()).or_default().push((*t, nv.clone()));
+            }
+        }
+    }
+    m
+}
+
+fn value_at(f: &[(u64, String)], t: u64) -> Option<&str> {
+    let mut cur: Option<&str> = None;
+    for (ct, v) in f {
+        if *ct <= t {
+            cur = Some(v);
+        } else {
+            break;
+        }
+    }
+    cur
+}
+
+/// Compare our VCD against the oracle's: names are matched by prefixing our
+/// paths with the oracle's top scope (auto-detected as the prefix matching
+/// the most of our paths); alias groups fold naturally because every alias
+/// path receives the shared id's values. Values are compared as step
+/// functions on the union of change times (dump-frequency independent).
+pub fn vcd_crosscheck(ours: &str, oracle: &str) -> (String, bool) {
+    let a = parse_vcd(ours);
+    let b = parse_vcd(oracle);
+    let fa = step_functions(&a);
+    let fb = step_functions(&b);
+    let mut prefixes: std::collections::BTreeSet<String> = Default::default();
+    prefixes.insert(String::new());
+    for p in fb.keys() {
+        let comps: Vec<&str> = p.split('.').collect();
+        for k in 1..comps.len() {
+            prefixes.insert(comps[..k].join("."));
+        }
+    }
+    let score = |pre: &str| -> usize {
+        fa.keys()
+            .filter(|p| {
+                let full = if pre.is_empty() {
+                    (*p).clone()
+                } else {
+                    format!("{pre}.{p}")
+                };
+                fb.contains_key(&full)
+            })
+            .count()
+    };
+    let best = prefixes
+        .iter()
+        .max_by_key(|p| (score(p), std::cmp::Reverse(p.len())))
+        .cloned()
+        .unwrap_or_default();
+    let mut report = String::new();
+    report.push_str(&format!(
+        "oracle top-scope prefix: `{}`\n",
+        if best.is_empty() { "<none>" } else { &best }
+    ));
+    let mut matched = 0usize;
+    let mut points = 0usize;
+    let mut mismatches = 0usize;
+    let mut unmatched_ours = Vec::new();
+    for (p, fa_p) in &fa {
+        let full = if best.is_empty() {
+            p.clone()
+        } else {
+            format!("{best}.{p}")
+        };
+        let Some(fb_p) = fb.get(&full) else {
+            unmatched_ours.push(p.clone());
+            continue;
+        };
+        matched += 1;
+        let mut times: std::collections::BTreeSet<u64> = Default::default();
+        for (t, _) in fa_p {
+            times.insert(*t);
+        }
+        for (t, _) in fb_p {
+            times.insert(*t);
+        }
+        let mut bad = 0usize;
+        for t in &times {
+            points += 1;
+            let va = value_at(fa_p, *t);
+            let vb = value_at(fb_p, *t);
+            if va != vb {
+                bad += 1;
+                if bad <= 3 {
+                    report.push_str(&format!(
+                        "  MISMATCH {p} @#{t}: ours={:?} oracle={:?}\n",
+                        va.unwrap_or("<none>"),
+                        vb.unwrap_or("<none>")
+                    ));
+                }
+            }
+        }
+        mismatches += bad;
+        report.push_str(&format!(
+            "  {p}: {} sample points, {bad} mismatches\n",
+            times.len()
+        ));
+    }
+    let oracle_only: Vec<String> = fb
+        .keys()
+        .filter(|k| {
+            let stripped = if best.is_empty() {
+                (*k).clone()
+            } else {
+                k.strip_prefix(&format!("{best}.")).unwrap_or(k).to_string()
+            };
+            !fa.contains_key(&stripped)
+        })
+        .cloned()
+        .collect();
+    report.push_str(&format!(
+        "matched vars: {matched}/{} ours; sample points: {points}; mismatches: {mismatches}\n",
+        fa.len()
+    ));
+    if !unmatched_ours.is_empty() {
+        report.push_str(&format!(
+            "ours-only (no oracle counterpart): {unmatched_ours:?}\n"
+        ));
+    }
+    if !oracle_only.is_empty() {
+        report.push_str(&format!(
+            "oracle-only (not dumped by us, e.g. parameters): {oracle_only:?}\n"
+        ));
+    }
+    let ok = mismatches == 0 && matched == fa.len() && matched > 0;
+    report.push_str(if ok {
+        "VCD CROSSCHECK: OK\n"
+    } else {
+        "VCD CROSSCHECK: FAIL\n"
+    });
+    (report, ok)
+}
+
+/// Mechanically generated HTML evidence report.
 /// Mechanically generated HTML evidence report. Every number comes from
 /// `run_suite` output, not from hand-authoring — the "why" is reproducible
 /// from the two commands printed in the report itself.

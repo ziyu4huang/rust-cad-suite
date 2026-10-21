@@ -6,6 +6,7 @@ module tb;
   always @* s = a + b;
   always @(a or b) p = a * b;
   initial begin
+    $dumpfile("dump.vcd"); $dumpvars(0, tb);
     #1 $display("w=%0d s=%0d p=%0d", w, s, p);
     a = 4'd6;
     #1 $display("w=%0d s=%0d p=%0d", w, s, p);

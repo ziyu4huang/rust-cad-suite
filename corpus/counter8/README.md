@@ -23,7 +23,9 @@ verilator --binary --timing --Mdir obj_dir counter.v tb_counter.v -o sim
 1. Always run both sides with the same explicit `--timescale` (oracle default
    makes `$monitor("%0t")` print in precision units — internal time scale must
    match, not be guessed).
-2. Filter from oracle stdout: lines starting `- ` (Simulation Report block),
+2. Filter from oracle stdout: lines starting `- ` (Simulation Report block)
+   and `-Info:`/`-Warning`/`-Error` tool notes — never a bare `-` prefix
+   (designs legitimately print `-7div2=-3`),
    any line containing `Verilator:`, `%Warning`, `%Error` (env-dependent).
 3. Mixed-timescale modules are a hard error upstream (TIMESCALEMOD, exit 1) —
    replicate, don't silently pick a default.

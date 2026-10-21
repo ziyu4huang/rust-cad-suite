@@ -18,10 +18,12 @@ and [docs/adr/](docs/adr/).
 | M2 vertical slice (`--binary`) | done — 4-state values, evaluator, union-find mini-elaboration, combinational convergence, `initial` + `$display`/`$finish`; `corpus/fulladd` **byte-identical to Verilator 5.050** (test `sim_gate`) |
 | M3/M4 elaboration, functions/tasks, generate | done — scope-chain resolution, parameter overrides, static functions, inlined tasks, generate for/if/case |
 | M5 event scheduler | done — process VM with suspend points, time wheel, NBA region, edge wakes, `$time`/`%t`; `always`/`#delay`/NBA/`@*` all live |
-| E2E differential regression | **31/32 = 96.9% vs Verilator 5.050** (`corpus/e2e`, ≥80% gate in `cargo test`; sole FAIL = memory arrays, declared M7 hard-error) |
-| M6 VCD tracing | next |
+| E2E differential regression | **50/51 = 98.0% vs Verilator 5.050** (`corpus/e2e`, ≥80% gate in `cargo test`; sole FAIL = memory arrays, declared M7 hard-error) |
+| M6 VCD tracing | done — `$dumpfile/$dumpvars` writer; 4 cases cross-checked against Verilator-recorded VCDs (16/16 signals, 0 mismatches; `vcd_gate` in `cargo test`) |
+| Frontend fuzz | done — 600-iteration deterministic mutation/random-bytes smoke in `cargo test` (caught 3 UTF-8 robustness bugs on first run) |
+| Lint track (WIDTH family) | next |
 
-41 tests green + E2E gate at 96.9%, zero warnings, zero external dependencies.
+47 tests green (incl. E2E 98.0%, VCD cross-check, fuzz), zero warnings, zero external dependencies.
 
 ## Quick start
 ```sh

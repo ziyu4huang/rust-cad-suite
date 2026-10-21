@@ -31,7 +31,8 @@
 | 多 initial 確定序 | ✅ | 32,49 |
 | generate for/if/case | ✅ | 28,29,36,37 |
 | 存儲器陣列 | M7 硬錯 | 30(聲明 FAIL) |
-| VCD | M6 未開工 | — |
+| VCD | ✅(M6) | 51_vcd_counter(+21/27/42 加 dump);oracle-ref.vcd 交叉對拍=vcd_gate |
+| 前端 fuzz | ✅ | vl-syntax/tests/fuzz_smoke.rs(600 迭代;三個 UTF-8 bug 在案) |
 | lint-only(WIDTH 族) | 未開工 | — |
 
 ## 閘(Gates)
@@ -39,6 +40,7 @@
 | 閘 | 觸發 | 斷言 |
 |---|---|---|
 | `cargo test`(全量) | 每次提交 | 41 tests 全綠 + E2E ≥80% |
-| `bash scripts/regress.sh` | 交付前 | fmt→build→test→difftest 四連 |
+| `bash scripts/regress.sh` | 交付前 | build→test→difftest→report 四連 |
+| `cargo test --test fuzz_smoke` | 每次提交 | 語料變異+隨機字節無 panic/無掛死 |
 | `vl-difftest --html` | 報告需求 | 生成 docs/e2e-report/index.html |
 | `vl-difftest --record` | 語義變更後 | 重錄 oracle 期望(人工讀 diff) |

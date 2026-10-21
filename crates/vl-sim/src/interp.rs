@@ -137,6 +137,14 @@ pub struct Sim {
     out: String,
     finished: bool,
     genblk_counter: HashMap<String, u32>,
+    /// Declared net/reg vars eligible for VCD dump (params/genvars/statics excluded).
+    dumpable: std::collections::BTreeSet<String>,
+    /// union-find alias groups: root → all member names (VCD records each).
+    alias_groups: HashMap<String, Vec<String>>,
+    vcd: Option<crate::vcd::VcdWriter>,
+    dump_path: Option<String>,
+    /// Simulation precision, for the VCD `$timescale` header.
+    prec_name: &'static str,
 }
 
 // ---------- build / elaboration ----------
@@ -144,6 +152,7 @@ pub struct Sim {
 impl Sim {
     pub fn build(modules: &[Module], top: &str, timescale: Option<&str>) -> SResult<Sim> {
         let (unit_fs, prec_fs) = parse_timescale(timescale);
+        let prec_name = fs_name(prec_fs);
         let mut sim = Sim {
             parent: HashMap::new(),
             cells: HashMap::new(),
@@ -162,6 +171,11 @@ impl Sim {
             out: String::new(),
             finished: false,
             genblk_counter: HashMap::new(),
+            dumpable: std::collections::BTreeSet::new(),
+            alias_groups: HashMap::new(),
+            vcd: None,
+            dump_path: None,
+            prec_name,
         };
         let m = sim
             .modules
@@ -237,6 +251,7 @@ impl Sim {
             if self.cells.contains_key(&name) {
                 continue;
             }
+            self.dumpable.insert(name.clone());
             let (w, msb, lsb) = match &p.range {
                 Some(r) => {
                     let mpe = self.prefix_expr(&r.msb, scope)?;
@@ -352,6 +367,9 @@ impl Sim {
                     }
                     // Declarations always land in the innermost scope.
                     let name = format!("{}{}", scope.innermost(), e.name);
+                    if !name.contains('[') {
+                        self.dumpable.insert(name.clone());
+                    }
                     self.cells.insert(
                         name.clone(),
                         Cell {
@@ -1325,10 +1343,17 @@ impl Sim {
                 }
             }
             Stmt::SysCall { name, args, .. } => {
-                let pargs = args
-                    .iter()
-                    .map(|a| self.prefix_expr(a, scope))
-                    .collect::<SResult<_>>()?;
+                let pargs: Vec<Expr> = if matches!(
+                    name.as_str(),
+                    "$dumpvars" | "$dumpoff" | "$dumpon" | "$dumpall"
+                ) {
+                    // Arguments are dump levels / scope names, not expressions.
+                    Vec::new()
+                } else {
+                    args.iter()
+                        .map(|a| self.prefix_expr(a, scope))
+                        .collect::<SResult<_>>()?
+                };
                 out.push(Instr::SysCall(name.clone(), pargs));
             }
             Stmt::SubCall { span, name, args } => {
@@ -1409,9 +1434,20 @@ impl Sim {
     fn union(&mut self, a: &str, b: &str) {
         let ra = self.find(a);
         let rb = self.find(b);
-        if ra != rb {
-            self.parent.insert(ra, rb);
+        if ra == rb {
+            return;
         }
+        // Merge alias groups under the new root (VCD records every member).
+        let ga = self
+            .alias_groups
+            .remove(&ra)
+            .unwrap_or_else(|| vec![ra.clone()]);
+        let gb = self
+            .alias_groups
+            .entry(rb.clone())
+            .or_insert_with(|| vec![rb.clone()]);
+        gb.extend(ga);
+        self.parent.insert(ra, rb);
     }
 
     fn read_name(&mut self, name: &str, span: Span) -> SResult<(Bits, bool)> {
@@ -1427,17 +1463,89 @@ impl Sim {
 
     fn set_name(&mut self, name: &str, bits: Bits, signed: bool) -> SResult<()> {
         let root = self.find(name);
-        match self.cells.get_mut(&root) {
+        let stored = match self.cells.get_mut(&root) {
             Some(c) => {
                 c.bits = if c.signed && signed {
                     bits.sadjust(c.bits.width)?
                 } else {
                     bits.uadjust(c.bits.width)?
                 };
-                Ok(())
+                c.bits
             }
-            None => Err(SimError::new(format!("undeclared identifier `{name}`"), None)),
+            None => {
+                return Err(SimError::new(
+                    format!("undeclared identifier `{name}`"),
+                    None,
+                ))
+            }
+        };
+        if let Some(w) = self.vcd.as_mut() {
+            if w.started() {
+                match self.alias_groups.get(&root) {
+                    Some(members) => {
+                        for m in members {
+                            w.record_change(m, stored);
+                        }
+                    }
+                    None => w.record_change(&root, stored),
+                }
+            }
         }
+        Ok(())
+    }
+
+    /// Build the VCD writer from every dumpable declared variable.
+    fn vcd_begin(&mut self) {
+        if self.vcd.is_none() {
+            let vars: Vec<(String, Vec<String>, u32)> = self
+                .dumpable
+                .iter()
+                .filter_map(|n| {
+                    let root = self.parent.get(n).cloned().unwrap_or_else(|| n.clone());
+                    let w = self.cells.get(&root).or_else(|| self.cells.get(n))?.bits.width;
+                    Some((n.clone(), n.split('.').map(|s| s.to_string()).collect(), w))
+                })
+                .collect();
+            let mut w = crate::vcd::VcdWriter::new(vars, self.prec_name);
+            w.start();
+            self.vcd = Some(w);
+        }
+        if let Some(w) = self.vcd.as_mut() {
+            w.start();
+        }
+        let snapshot = self.vcd_snapshot();
+        if let Some(w) = self.vcd.as_mut() {
+            w.dump_t0(&snapshot);
+        }
+    }
+
+    fn vcd_snapshot(&mut self) -> std::collections::BTreeMap<String, Bits> {
+        let names: Vec<String> = self.dumpable.iter().cloned().collect();
+        let mut m = std::collections::BTreeMap::new();
+        for n in names {
+            let root = self.find(&n);
+            if let Some(c) = self.cells.get(&root) {
+                m.insert(n, c.bits);
+            }
+        }
+        m
+    }
+
+    fn vcd_flush(&mut self) {
+        let now = self.now;
+        if let Some(w) = self.vcd.as_mut() {
+            w.flush_at(now);
+        }
+    }
+
+    /// The VCD text (if `$dumpvars` ran) and the `$dumpfile` path.
+    pub fn take_vcd(&mut self) -> Option<(Option<String>, String)> {
+        let w = self.vcd.take()?;
+        let text = w.finish();
+        if text.is_empty() {
+            return None;
+        }
+        Some((self.dump_path.take(), text))
     }
 
     // ---------- lvalues ----------
@@ -1650,6 +1758,7 @@ impl Sim {
                 self.step_process(pid)?;
             }
             if self.finished {
+                self.vcd_flush();
                 return Ok(());
             }
             if !self.inactive.is_empty() {
@@ -1665,6 +1774,8 @@ impl Sim {
                 self.wake_check()?;
                 continue;
             }
+            // End of this time slot: dump what changed, then advance.
+            self.vcd_flush();
             match self.delayed.keys().next().copied() {
                 Some(t) => {
                     self.now = t;
@@ -1902,7 +2013,19 @@ impl Sim {
                 self.finished = true;
                 Ok(Flow::Finish)
             }
-            "$dumpfile" | "$dumpvars" | "$dumpoff" | "$dumpon" | "$dumpall" => Ok(Flow::Next),
+            "$dumpfile" => {
+                if let Some(a) = args.first() {
+                    if let Val::Str(p) = eval(a, self)? {
+                        self.dump_path = Some(p);
+                    }
+                }
+                Ok(Flow::Next)
+            }
+            "$dumpvars" => {
+                self.vcd_begin();
+                Ok(Flow::Next)
+            }
+            "$dumpoff" | "$dumpon" | "$dumpall" => Ok(Flow::Next),
             _ => Err(SimError::new(
                 format!("system task `{name}` is not yet supported"),
                 None,
@@ -2118,6 +2241,19 @@ fn parse_timescale(ts: Option<&str>) -> (u64, u64) {
     }
     // No `timescale anywhere → upstream default 1ps/1ps.
     (1_000, 1_000)
+}
+
+/// Human name for a femtosecond magnitude (VCD `$timescale` header).
+fn fs_name(fs: u64) -> &'static str {
+    match fs {
+        1_000_000_000_000_000 => "1s",
+        1_000_000_000_000 => "1ms",
+        1_000_000_000 => "1us",
+        1_000_000 => "1ns",
+        1_000 => "1ps",
+        1 => "1fs",
+        _ => "1ps",
+    }
 }
 
 fn stmt_span(s: &Stmt) -> Span {

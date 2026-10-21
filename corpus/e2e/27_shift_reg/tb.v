@@ -5,6 +5,7 @@ module tb;
   always #5 clk = ~clk;
   always @(posedge clk) sr <= {sr[6:0], ~sr[7]};
   initial begin
+    $dumpfile("dump.vcd"); $dumpvars(0, tb);
     sr = 8'b10000001;
     repeat (3) @(posedge clk);
     #1;

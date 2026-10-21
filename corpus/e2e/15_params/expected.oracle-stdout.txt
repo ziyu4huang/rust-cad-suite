@@ -1,5 +1,5 @@
 y4=8 y8=11 cw=9
 - /Users/huangziyu/proj/rust-cad-suite/crates/vl-difftest/../../corpus/e2e/15_params/tb.v:19: Verilog $finish
 - S i m u l a t i o n   R e p o r t: Verilator 5.050 2026-07-01
-- Verilator: $finish at 1ns; walltime 0.000 s; speed 20.408 us/s
+- Verilator: $finish at 1ns; walltime 0.000 s; speed 47.619 us/s
 - Verilator: cpu 0.000 s on 1 threads; allocated 2 MB

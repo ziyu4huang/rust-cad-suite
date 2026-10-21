@@ -6,7 +6,7 @@
 ## O1: Verilator 等价模拟器(Phase 1)达到可用的兼容性
 
 - **KR1.1 E2E 差分通过率 ≥95%(对 Verilator 5.050,byte-level)**
-  当前:49/50 = **98.0%**(2026-10-21)。
+  当前:50/51 = **98.0%**(2026-10-21,51 例含 VCD case)。
   证据:`cargo run -p vl-difftest`(exit 0);报告 [docs/e2e-report/index.html](e2e-report/index.html)
   (由 `--html` 机械生成);期望文件 `corpus/e2e/*/expected.stdout` 已入 git(7e68cdd 之后的 commit)。
   唯一 FAIL=30_gen_mux 存储器数组,声明的 M7 硬错(非缺陷)。
@@ -18,7 +18,10 @@
   证据:`cargo test`(全绿);`crates/vl-sim/src/value.rs#tests`。
 - **KR1.4 里程碑指針契约:未支持構造 100% 硬錯(exit≠0)且帶 `milestone Mx`**
   证据:corpus/e2e/30(M7 指針);`counter8` 早期指針實錄;AGENTS §3。
-- **KR1.5 M6 VCD 對拍(alias 折疊規則化比對)** — 未開工,計劃項。
+- **KR1.5 M6 VCD 對拍(alias 折疊規則化比對)** ✅ 2026-10-21。
+  證據:`cargo test -p vl-difftest --test vcd_gate`(4 例 oracle-ref.vcd,16/16 訊號、90 采樣點零失配);`vl-difftest --vcd-xcheck ours oracle`;參考錄製=scripts/oracle_vcd.sh。
+- **KR1.6 前端 fuzz 閘(語料變異+隨機字節,無 panic/無掛死)** ✅ 2026-10-21。
+  證據:`cargo test -p vl-syntax --test fuzz_smoke`(600 迭代固定種子;首輪抓三個 UTF-8 健壯性 bug 並修復)。
 
 ## O2: 開發 agent 能力硬化(EDA 工具域)
 

@@ -11,6 +11,7 @@ fn main() {
     let mut verilator = String::from("/opt/homebrew/bin/verilator");
     let mut only: Option<String> = None;
     let mut html_path: Option<String> = None;
+    let mut xcheck: Option<(String, String)> = None;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -31,6 +32,12 @@ fn main() {
                     only = Some(v.clone());
                 }
             }
+            "--vcd-xcheck" => {
+                let a = args.get(i + 1).cloned().unwrap_or_default();
+                let b = args.get(i + 2).cloned().unwrap_or_default();
+                xcheck = Some((a, b));
+                i += 2;
+            }
             "--html" => {
                 i += 1;
                 if let Some(v) = args.get(i) {
@@ -43,6 +50,13 @@ fn main() {
             }
         }
         i += 1;
+    }
+    if let Some((a, b)) = xcheck {
+        let ours = std::fs::read_to_string(&a).unwrap_or_else(|e| panic!("read {a}: {e}"));
+        let oracle = std::fs::read_to_string(&b).unwrap_or_else(|e| panic!("read {b}: {e}"));
+        let (rep, ok) = vl_difftest::vcd_crosscheck(&ours, &oracle);
+        print!("{rep}");
+        std::process::exit(if ok { 0 } else { 1 });
     }
     let corpus = vl_difftest::corpus_dir();
     if record {
