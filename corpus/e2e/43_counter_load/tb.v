@@ -12,7 +12,7 @@ module tb;
   // Control changes happen mid-cycle (#1 after an edge) — no same-edge
   // write/read race (IEEE nondeterministic; see corpus README policy).
   initial begin
-    @(posedge clk); rst = 0; #1;
+    @(posedge clk); #1; rst = 0;
     @(posedge clk); #1; ld = 1;
     @(posedge clk); #1; ld = 0;
     repeat (3) @(posedge clk);

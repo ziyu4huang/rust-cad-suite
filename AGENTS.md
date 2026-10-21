@@ -85,6 +85,27 @@
   `verilator --binary --timing` 并排跑;oracle 输出即答案。
 - /tmp 会被外部清理:关键复现文件放 repo corpus/,复现脚本可弃。
 
+## 10.5 第二輪補強(2026-10-22,M6/fuzz 弧實錄)
+
+- **歸一化=契約**:diff 期望的過濾只用精確前綴(`- ` 報告塊、`-Info/`
+  `-Warning`/`-Error`);裸 `-` 開頭是設計輸出(`-7div2=-3` 實錄)。歸一化
+  由單測釘死(含敵意 fixture)。錄製必帶 `--trace`(oracle 才執行
+  \$dumpvars,否則混入 `-Info ignored`)。
+- **re-record=語義事件**:錄完必讀 `git diff --stat corpus/e2e` 逐 case 對帳;
+  期望變了而模擬器沒變=必須能解釋,否則停。
+- **競爭免疫模式機械化**:TB 中 `@(posedge..)` 語句窗內對「被邊沿 always 讀取
+  的變量」的阻塞寫=違例(corpus_lint R1;43 號兩改一漏實錄)。正典寫法
+  `@(posedge clk); #1; <寫>;`。`// race-ok` 顯式豁免。
+- **代碼片段跨語言插入必走檔案**(Write 片段檔→插入),禁把 Rust 代碼內嵌在
+  Python 字符串字面量裡(r#"…"# 誤用實錄)。
+- **gate 鏈裡的計數 grep 加 `|| true`**(`grep -c` 零匹配 exit 1 斷鏈,
+  PLAN.md 漏提交實錄);commit 後終檢 `git status --short` 必須為空。
+- **分歧登記簿**:凡是「我方與 oracle 已知且接受的不同」(參數不入 VCD、
+  競爭序=宣告序、2-state X、超長字面量報錯跟 verilator……)記入
+  docs/REGISTRY.md「Divergence register」,帶證據與政策;新分歧先登記再繼續。
+- **事故登記簿**:工具鏈開發中的每次 panic/hang/假綠按五欄
+  (日期/症狀/根因/修法/硬化層)記入 docs/REGISTRY.md「Incident register」。
+
 ## 10. 质量体系 3-tiers+1(与 OKR/登记簿联动)
 
 - 任何新铁则必须**同轮落四层**,缺一不算改规则:

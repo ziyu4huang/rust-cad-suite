@@ -107,3 +107,80 @@ Silent fallbacks are banned; a `not yet supported` error is a feature.
 - Single-oracle risk: everything is pinned to Verilator 5.050 behavior;
   iverilog as a second oracle would catch Verilator-specific quirks being
   copied as "spec".
+
+---
+
+# Round 2 (2026-10-22): corpus expansion → M6 VCD → fuzz arc
+
+Evidence: commits e5880a1 → f87abf1 + 7c282d3. Corpus 32→51 cases, rate held
+at 98.0%; VCD cross-check 16/16 signals; fuzz gate landed.
+
+## 8. The normalization filter is a contract with production output
+
+Three iterations in one arc: `- ` filter → ate the oracle's `-Info: $dumpvar
+ignored` line; blanket `-` filter → ate the DESIGN's own `-7div2=-3` output
+line. Final: exact prefixes (`- `, `-Info`, `-Warning`, `-Error`), pinned by a
+unit test that includes a design line starting with a dash.
+
+**Rule (AGENTS §2/§8):** normalizers are specified by exact prefix and pinned
+by tests containing hostile fixtures. Recording also runs with `--trace` so
+the oracle's `$dumpvars` is honored instead of producing tool notes.
+
+## 9. Re-record is a semantic event
+
+Switching record flags silently rewrote expectations and dropped the pass
+rate 98→90. The fix was normalization, but the *lesson*: expectations changed
+without any simulator change — that must always be explainable.
+
+**Rule (AGENTS §10):** after `--record`, `git diff --stat corpus/e2e` is read
+line-by-line; every changed case must map to an intended semantic delta.
+`regress.sh --with-record` prints the diff; blind re-record+commit is banned.
+
+## 10. Pass-rate hides robustness; fuzz covers the orthogonal axis
+
+51/51-style passing cases are all well-formed ASCII Verilog. A 600-iteration
+deterministic fuzz (corpus mutation + random bytes, watchdog per mutant)
+immediately found three UTF-8 robustness bugs: (1) error recovery advanced 1
+byte through multi-byte characters, (2) `skip_trivia` treated continuation
+bytes 0x85/0xA0 as Unicode whitespace (NEL/NBSP via byte→char cast), (3)
+based-literal base letters / string escapes bumped non-ASCII bytes blindly.
+None could ever be reached by expanding the corpus.
+
+**Rule (AGENTS §4b):** a robustness gate (deterministic fuzz with watchdog +
+repro-saving) runs beside the pass-rate gate. The two axes are independent;
+a green pass-rate says nothing about hostile input.
+
+## 11. LRM re-read can retire planned work
+
+The plan carried "replace conservative all-x arithmetic with bit-serial
+tables" as a milestone-sized item. Re-reading IEEE 1364-2005 §5.1.4: *if any
+operand bit is x/z, the entire result is x* — the implementation was already
+LRM-exact; only Verilator (2-state) differs. One citation retired a milestone.
+
+**Rule (AGENTS §1b):** every planned semantics item cites its LRM clause at
+planning time. If the clause says the naive implementation is exact, the work
+item dies before spending effort.
+
+## 12. The race-free TB pattern needed two attempts — mechanize it
+
+Case 43 was rewritten "race-free" twice: `@(posedge clk); ld = 1; #1;` still
+writes at the edge (the `#1` came after the write), and the residual `rst = 0;`
+was a third latent race both oracles agreed on by luck. The final mechanical
+pattern is `@(posedge clk); #1; <write>;` — write strictly mid-cycle.
+
+**Rule (AGENTS §2b):** the pattern is enforced by a corpus lint
+(`vl-difftest/tests/corpus_lint.rs`): blocking write in the window of an
+edge-wait where the variable is read by an edge-triggered always → FAIL
+(`// race-ok` to suppress a justified case). The lint caught a real residual
+race on its first run over the corpus.
+
+## 13. Meta: tooling of the agent, by the agent
+
+- A Rust raw string literal pasted into a Python heredoc wasted a round —
+  multi-language edits must go file→file (Write the snippet, insert it), never
+  inline in another language's string literal (AGENTS §7b).
+- `grep -c` exits 1 on zero matches and silently broke an `&&` commit chain,
+  leaving PLAN.md uncommitted. Counting greps in gate chains need `|| true`,
+  and the chain ends with `git status --short` empty (AGENTS §8b).
+- `/tmp` is cleaned externally twice-daily on this machine: evidence artifacts
+  (oracle-ref.vcd, fuzz repro) live in the repo or do not exist (AGENTS §9).

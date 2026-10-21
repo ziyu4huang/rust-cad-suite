@@ -24,6 +24,15 @@ description: rust-cad-suite 开发正典——AI agent 做 EDA/IC 工具(模拟�
    格式化(%d/%b/%t)是契约,golden 钉死。
 6. **未解析即硬错**:名字/模块/函数解析未命中=报错带 span;禁盲字符串前缀。
 
+7. **归一化=契约**:只用精确前缀过滤 oracle 输出(`- `/`-Info`/`-Warning`/
+   `-Error`),裸 `-` 是设计输出;录制带 `--trace`;re-record 后逐 case 读
+   `git diff --stat corpus/e2e`。
+8. **竞争免疫模式**:`@(posedge clk); #1; <写>;`——corpus_lint R1 机械执法,
+   `// race-ok` 显式豁免。
+9. **robustness 轨独立**:fuzz_smoke 常驻;pass-rate 绿≠健壮。
+10. **计划项必带 LRM 条号**:条文已说明实现精确时,工作项作废(§5.1.4 实录)。
+11. **分歧/事故先登记**:docs/REGISTRY.md 的 Divergence / Incident 两簿。
+
 ## 标准循环(语义开发)
 
 ```

@@ -42,5 +42,35 @@
 | `cargo test`(全量) | 每次提交 | 41 tests 全綠 + E2E ≥80% |
 | `bash scripts/regress.sh` | 交付前 | build→test→difftest→report 四連 |
 | `cargo test --test fuzz_smoke` | 每次提交 | 語料變異+隨機字節無 panic/無掛死 |
+| `cargo test --test corpus_lint` | 每次提交 | R1 同邊沿競爭模式 / R2 期望在場 / R3 dump↔oracle-ref 一致 / 歸一化契約 |
+| `cargo test --test vcd_gate` | 每次提交 | 有 oracle-ref.vcd 的 case 與 oracle 逐訊號零失配 |
+
+## Divergence register(我方 vs oracle 已知且接受的差異 — 新分歧先登記再動工)
+
+| # | 領域 | oracle(Verilator 5.050) | 我方 | 政策 | 證據 |
+|---|---|---|---|---|---|
+| D1 | X/Z 傳播 | 2-state:x 折成 0(`1x00+1=1001`) | IEEE §5 4-state(算術整體-x §5.1.4) | byte-diff 語料 X-clean;4-state 走單測軌 | corpus/oracle-fixtures/xprobe.sv;ADR-0001 |
+| D2 | 同邊沿競爭序 | 內部排序(實錄 43 初版 q=54) | 宣告序(ADR-0001) | 語料禁競爭(corpus_lint R1) | corpus/e2e/26,43 歷史 |
+| D3 | VCD 參數 | 參數作為 var dump(`W [31:0]`) | 不 dump 參數 | 交叉對拍只比匹配訊號,oracle-only 列報告 | vcd_gate 輸出 `oracle-only: ["tb.dut.W"]` |
+| D4 | VCD 終時戳 | `$finish` 時刻也打 `#t`(無變化) | 只在有變化時打 `#t` | 步函數比對與 dump 頻率無關 | 51 號 17 vs 16 標記 |
+| D5 | 超長 sized 字面量 | 報錯 | 報錯(跟 oracle,非 LRM 截斷) | oracle 即 spec | value.rs from_numlit |
+| D6 | 二元 `~&`/`~|` | 拒收(Annex A 無) | 拒收 | 同上 | parser/expr.rs |
+| D7 | 電平敏感 always t0 | t0 先執行一次 | 同 oracle | 同上 | 21 號 |
+| D8 | `$display` 診斷前綴 | `%Error:` 等 | 相同前綴;lint 文案不逐字對齊 | exit code+類別對齊,文案自由 | PLAN §6 |
+
+## Incident register(工具鏈開發事故;五欄制)
+
+| 日期 | 症狀 | 根因 | 修法 | 硬化層 |
+|---|---|---|---|---|
+| 10-21 | `task one(input integer n)` 解析器掛死 | sync 停結構關鍵字不消費+外層不強制前進 | 模組循環 pos 守衛;ANSI 端口收類型關鍵字 | AGENTS §4 + corpus(fuzz 覆蓋) |
+| 10-21 | counter8 期望 `q=5` 錯 | NBA 區語義(讀到 4) | TB `#1` 後讀;oracle 即 spec | AGENTS §1 |
+| 10-21 | `%0d` 補位/`%0Nd` 零填充兩次改 | 格式契約手猜 | golden 釘死 | corpus 11 號 |
+| 10-21 | 36 號誤判 M7 | 語料殘留存儲器聲明 | 刪;R2/oracle warning 當語料審稿 | corpus_lint |
+| 10-21 | 43 號競爭兩改一漏 | 寫在邊沿活躍區 | `@(posedge); #1; 寫` 模式 | corpus_lint R1 |
+| 10-22 | 98→90% 回歸 | 錄製無 --trace 混入 `-Info` 行 | 錄製帶 --trace;歸一化精確前綴 | normalization_contract 測試 |
+| 10-22 | 02 號被歸一化吃掉 | 過寬的裸 `-` 過濾 | 精確前綴 | 同上 |
+| 10-22 | fuzz:lexer 三處 UTF-8 panic | 單字節步進/續字節當空白/盲 bump | 按字符處理 | fuzz_smoke 常駐 |
+| 10-22 | oracle VCD 只有 2 標記 | 自寫 main 多此一舉 | `--binary --trace` 原生 \$dumpvars | scripts/oracle_vcd.sh |
+| 10-22 | PLAN.md 漏提交 | `grep -c` 零匹配斷 && 鏈 | `|| true`+終檢 git status | AGENTS §10.5 |
 | `vl-difftest --html` | 報告需求 | 生成 docs/e2e-report/index.html |
 | `vl-difftest --record` | 語義變更後 | 重錄 oracle 期望(人工讀 diff) |

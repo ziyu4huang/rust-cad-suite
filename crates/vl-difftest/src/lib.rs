@@ -600,8 +600,14 @@ contract (11, 45) · signedness (12, 34) · loops (14) · parameters &amp;
 $clog2 (15, 38) · hierarchy &amp; generate (16, 28-30, 36-37) · functions
 (17-18, 39-40) · tasks (19-20, 41) · always @*/comb (21) · sequential/NBA
 (22-23, 27, 42-44, 50) · clock &amp; $time (24, 48) · edges (25) · process
-order determinism (32) · multi-initial interleaving (49). Declared not-yet:
-memory arrays (30), gates (M7), SVA, VPI.</p>
+order determinism (32) · multi-initial interleaving (49) · VCD dump (51, with
+oracle cross-check on 21/27/42/51). Declared not-yet: memory arrays (30),
+gates (M7), SVA, VPI.</p>
+<p>Known, accepted divergences from the oracle (parameters not dumped,
+declaration-order scheduling under races, 4-state X vs 2-state, …) are
+registered with evidence in <code>docs/REGISTRY.md</code> → Divergence
+register; corpus policy (X-clean, race-free, dump↔oracle-ref) is enforced by
+<code>cargo test -p vl-difftest --test corpus_lint</code>.</p>
 </body></html>
 "#,
         rate = rate,

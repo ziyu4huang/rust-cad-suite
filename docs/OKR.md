@@ -33,5 +33,13 @@
   證據:本 commit 同輪四件齊;AGENTS §10。
 - **KR2.3 定位流程機械化**:掛死=sample;分歧=最小復現並排跑;
   runner 帶 `--only` 二分與每例看門狗。證據:AGENTS §9(實錄兩起)。
+- **KR2.4 第二輪反思落四層**(2026-10-22):REFLECTION §8-§13 六條新規則各有
+  機械閘(corpus_lint R1-R3 + normalization_contract + fuzz_smoke)、skill、
+  AGENTS §10.5、報告頁;證據:`cargo test -p vl-difftest --test corpus_lint`
+  (首跑抓 43 號殘留競爭)。✅
+- **KR2.5 分歧登記簿與事故登記簿常態化**:docs/REGISTRY.md D1-D8 / 10 起事故
+  五欄入帳;新分歧「先登記再動工」。✅(2026-10-22 建簿)
+- **KR2.6 robustness 軌與 pass-rate 軌分立**:fuzz 600 迭代入 cargo test,
+  失敗自動落盤復現;首輪三 bug 在事故簿。✅
 
 ## O3(Phase 2+,未開工): yosys 等价綜合核
