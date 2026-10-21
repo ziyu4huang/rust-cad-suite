@@ -10,6 +10,7 @@ fn main() {
     let mut min_pass = 80.0f64;
     let mut verilator = String::from("/opt/homebrew/bin/verilator");
     let mut only: Option<String> = None;
+    let mut html_path: Option<String> = None;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -28,6 +29,12 @@ fn main() {
                 i += 1;
                 if let Some(v) = args.get(i) {
                     only = Some(v.clone());
+                }
+            }
+            "--html" => {
+                i += 1;
+                if let Some(v) = args.get(i) {
+                    html_path = Some(v.clone());
                 }
             }
             other => {
@@ -67,6 +74,12 @@ fn main() {
         results.len(),
         rate * 100.0
     );
+    if let Some(hp) = html_path {
+        let full = vl_difftest::run_suite(&corpus);
+        std::fs::write(hp.clone(), vl_difftest::html_report(&corpus, &full))
+            .expect("write html report");
+        println!("html report → {hp}");
+    }
     if rate * 100.0 < min_pass {
         std::process::exit(1);
     }

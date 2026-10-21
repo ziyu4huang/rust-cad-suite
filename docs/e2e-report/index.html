@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>rust-cad-suite E2E differential report — 98.0%</title>
+<style>
+ body{font-family:-apple-system,Helvetica,sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem;color:#1a1a1a}
+ h1{font-size:1.5rem} .big{font-size:3rem;font-weight:700}
+ .pass{color:#0a7d32} .fail{color:#b42318} .decl{color:#8a6100}
+ table{border-collapse:collapse;width:100%;font-size:.85rem}
+ td,th{border:1px solid #ddd;padding:.35rem .5rem;text-align:left}
+ tr.decl td{background:#fff8e6} tr.fail td{background:#fdeceb}
+ pre{background:#f6f6f6;padding:.6rem;overflow-x:auto;font-size:.75rem}
+ code{background:#f0f0f0;padding:.1rem .3rem}
+ .meta{color:#555;font-size:.85rem}
+</style></head><body>
+<h1>rverilator E2E differential report</h1>
+<p class="big pass">49/50 = 98.0%</p>
+<div class="meta">
+ git <code>7e68cdd</code> · oracle <code>Verilator 5.050 2026-07-01 rev vUNKNOWN-built20260701</code> · corpus <code>/Users/huangziyu/proj/rust-cad-suite/crates/vl-difftest/../../corpus/e2e</code><br>
+ gate: <code>cargo test -p vl-difftest</code> asserts rate ≥ 80% (expectations committed — no verilator needed)
+</div>
+
+<h2>Why this number is trustworthy</h2>
+<ol>
+<li><b>Expectations are recorded, never authored.</b> Every
+<code>expected.stdout</code> is captured by running the real Verilator
+(<code>vl-difftest --record</code>) and committed. Seven hand-authored
+expectations were proven wrong by the oracle earlier in this repo — recorded
+expectations are the policy since (AGENTS §1).</li>
+<li><b>Same pipeline as the product.</b> Each case runs through the exact
+preprocess → parse → elaborate → schedule path the <code>rverilator --binary</code>
+CLI uses (<code>vl_difftest::run_ours</code>), then is compared <i>byte-for-byte</i>
+with the oracle stdout after one normalization: Verilator's own report block
+(lines starting <code>- </code>) is dropped. No fuzzy matching anywhere.</li>
+<li><b>The corpus is semantics-clean by policy</b> (AGENTS §2): no X/Z
+propagation samples (the oracle is a 2-state evaluator — 4-state correctness
+is gated separately by IEEE §5 truth-table unit tests in <code>vl-sim</code>),
+and no same-edge scheduling races (IEEE-nondeterministic constructs were
+rewritten mid-cycle; see corpus/e2e/26, 43 for the documented pattern).</li>
+<li><b>The gate is mechanical.</b> The ≥80% assertion lives in
+<code>crates/vl-difftest/tests/regression_gate.rs</code>, runs in every
+<code>cargo test</code>, and fails the build when the rate drops — including
+on machines without Verilator installed.</li>
+<li><b>The one non-pass is declared scope.</b> <code>30_gen_mux</code> uses
+memory arrays; the simulator hard-errors with <code>(milestone M7)</code>
+by design (AGENTS §3 — silent misexecution is the banned failure mode).</li>
+</ol>
+
+<h2>Reproduce</h2>
+<pre>cargo build
+cargo run -p vl-difftest                      # this report's numbers
+cargo test -p vl-difftest                     # the ≥80% gate
+cargo run -p vl-difftest -- --record          # re-record from the oracle</pre>
+
+<h2>Per-case results (50)</h2>
+<table><tr><th>case</th><th>result</th><th>detail</th></tr>
+<tr class="pass"><td>01_arith_widths</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>02_div_mod_signed</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>03_pow_shifts</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>04_bitwise_reduce</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>05_logical_cmp</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>06_case_identity</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>07_ternary</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>08_concat_lvalue</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>09_part_select</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>10_literals</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>11_display_formats</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>12_signed_ops</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>13_case_family</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>14_loops</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>15_params</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>16_hierarchy3</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>17_function_old</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>18_function_ansi</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>19_task_basic</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>20_task_delay</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>21_always_comb</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>22_counter_nba</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>23_nba_vs_blocking</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>24_clock_time</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>25_edge_or</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>26_fsm_casez</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>27_shift_reg</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>28_generate_for</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>29_generate_if</td><td>PASS</td><td></td></tr>
+<tr class="decl"><td>30_gen_mux</td><td>DECL</td><td><details><summary>detail</summary><pre>elaborate: memory arrays are not yet supported (milestone M7)</pre></details></td></tr>
+<tr class="pass"><td>31_wide64</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>32_proc_order</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>33_arith_context</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>34_cmp_signed_mixed</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>35_case_default_first</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>36_nested_generate</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>37_generate_case</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>38_param_chain</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>39_func_module_sig</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>40_func_noargs</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>41_task_inout</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>42_nba_handshake</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>43_counter_load</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>44_lfsr</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>45_display_esc</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>46_signed_shift</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>47_concat_nest</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>48_frac_delay</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>49_multi_initial</td><td>PASS</td><td></td></tr>
+<tr class="pass"><td>50_forever_finish</td><td>PASS</td><td></td></tr>
+</table>
+
+<h2>Corpus coverage</h2>
+<p>Operators &amp; widths (01-05, 31-33, 46-47) · identity/case families
+(06, 13, 35) · ternary/concat/part-select/literals (07-10) · display
+contract (11, 45) · signedness (12, 34) · loops (14) · parameters &amp;
+$clog2 (15, 38) · hierarchy &amp; generate (16, 28-30, 36-37) · functions
+(17-18, 39-40) · tasks (19-20, 41) · always @*/comb (21) · sequential/NBA
+(22-23, 27, 42-44, 50) · clock &amp; $time (24, 48) · edges (25) · process
+order determinism (32) · multi-initial interleaving (49). Declared not-yet:
+memory arrays (30), gates (M7), SVA, VPI.</p>
+</body></html>

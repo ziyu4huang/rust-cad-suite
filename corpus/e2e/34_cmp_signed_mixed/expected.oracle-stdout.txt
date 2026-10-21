@@ -1,0 +1,8 @@
+s=-1 u=15
+s_lt0=1
+mixed=0
+slit=1
+- /Users/huangziyu/proj/rust-cad-suite/crates/vl-difftest/../../corpus/e2e/34_cmp_signed_mixed/tb.v:10: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.050 2026-07-01
+- Verilator: $finish at 0s; walltime 0.000 s; speed 0.000 s/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 2 MB

@@ -84,3 +84,15 @@
 - 语义分歧:直接在 /tmp 写最小复现,`rverilator --binary` vs
   `verilator --binary --timing` 并排跑;oracle 输出即答案。
 - /tmp 会被外部清理:关键复现文件放 repo corpus/,复现脚本可弃。
+
+## 10. 质量体系 3-tiers+1(与 OKR/登记簿联动)
+
+- 任何新铁则必须**同轮落四层**,缺一不算改规则:
+  ①机械闸(`scripts/regress.sh` 或 vl-difftest 内断言,exit≠0 才有执法力)
+  ②正典(`.agents/skills/eda-dev/SKILL.md` 条文)
+  ③本文件对应节
+  ④证据页(`vl-difftest --html` 生成的 docs/e2e-report/index.html,机械生成禁手改)。
+- 质量目标与证据指针=`docs/OKR.md`(KR 证据只指可重跑命令/工件,反灌水);
+  组件×能力×閘×證據的關係表=`docs/REGISTRY.md`(改組件職責同輪更新)。
+- 提交前必跑 `bash scripts/regress.sh`;`--with-record` 轮之后必须人工读
+  `git diff corpus/e2e`(期望变更=语义变更的收据,不许盲提交)。

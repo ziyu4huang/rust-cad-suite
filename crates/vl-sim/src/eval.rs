@@ -89,7 +89,7 @@ pub trait Lookup {
 
 fn sys_func_info(func: &str) -> Option<(u32, bool)> {
     match func {
-        "$clog2" => Some((32, true)),
+        "$clog2" | "$bits" => Some((32, true)),
         "$time" | "$stime" => Some((64, false)),
         "$realtime" => Some((64, false)),
         "$random" | "$urandom" => Some((32, true)),
@@ -504,6 +504,11 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
         }
         Expr::Call { span, func, args } => {
             let r = match func.as_str() {
+                "$bits" => {
+                    let a = args.first().ok_or_else(|| SimError::at("$bits needs 1 argument", *span))?;
+                    let w = nat_width(a, ctx)?;
+                    Bits::from_u64(32, w as u64)?
+                }
                 "$clog2" => {
                     let a = args.first().ok_or_else(|| SimError::at("$clog2 needs 1 argument", *span))?;
                     let (b, _) = eval(a, ctx)?.to_bits(*span)?;
