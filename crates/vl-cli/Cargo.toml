@@ -1,0 +1,18 @@
+[package]
+name = "vl-cli"
+description = "`rverilator` — rust-cad-suite Verilator-equivalent CLI (Phase 1)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "vl_cli"
+path = "src/lib.rs"
+
+[[bin]]
+name = "rverilator"
+path = "src/main.rs"
+
+[dependencies]
+vl-syntax = { workspace = true }
+rcs-diag = { workspace = true }

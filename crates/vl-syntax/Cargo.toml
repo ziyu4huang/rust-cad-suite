@@ -1,0 +1,9 @@
+[package]
+name = "vl-syntax"
+description = "Verilog/SystemVerilog preprocessor, lexer, parser and AST for rust-cad-suite"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+rcs-diag = { workspace = true }

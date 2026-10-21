@@ -1,0 +1,6 @@
+[package]
+name = "rcs-diag"
+description = "Shared source spans, source maps and diagnostics for rust-cad-suite tools"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
