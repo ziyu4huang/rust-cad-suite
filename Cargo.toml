@@ -5,6 +5,7 @@ members = [
     "crates/vl-syntax",
     "crates/vl-sim",
     "crates/vl-cli",
+    "crates/vl-difftest",
 ]
 
 [workspace.package]

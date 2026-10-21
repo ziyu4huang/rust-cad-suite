@@ -1,0 +1,7 @@
+lt=1 le=1 gt=0 ge=0
+eq=0 ne=1
+land=1 lor=1 lnot=0
+- /Users/huangziyu/proj/rust-cad-suite/crates/vl-difftest/../../corpus/e2e/05_logical_cmp/tb.v:8: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.050 2026-07-01
+- Verilator: $finish at 0s; walltime 0.000 s; speed 0.000 s/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 2 MB

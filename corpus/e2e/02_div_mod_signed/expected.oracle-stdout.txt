@@ -1,0 +1,7 @@
+-7div2=-3 -7mod2=-1
+7div-2=3 7mod-2=1
+neg-div-zero-is-x=1
+- /Users/huangziyu/proj/rust-cad-suite/crates/vl-difftest/../../corpus/e2e/02_div_mod_signed/tb.v:9: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.050 2026-07-01
+- Verilator: $finish at 0s; walltime 0.000 s; speed 0.000 s/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 2 MB

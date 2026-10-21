@@ -585,6 +585,28 @@ pub fn from_numlit(n: &vl_syntax::ast::NumLit) -> VResult<Bits> {
     let nat_width = digits.len() as u32 * per;
     let full = n.width.unwrap_or_else(|| nat_width.max(32));
     chk(full)?;
+    // Unsized literal made only of x/z/? digits: the unknown fills the whole
+    // (≥32-bit) value (`'hx` → 32 x's), per §2.5.1 and the oracle.
+    if n.width.is_none()
+        && digits.chars().all(|c| matches!(c, 'x' | 'X' | 'z' | 'Z' | '?'))
+    {
+        let w = full.min(MAX_WIDTH);
+        let mut b = Bits::all_x(w)?;
+        if matches!(digits.chars().next(), Some('z' | 'Z' | '?')) {
+            b.data = b.mask;
+        }
+        return Ok(b);
+    }
+    // Upstream (Verilator) errors on more digit-bits than the declared size
+    // rather than truncating — match it (found by the E2E differential run).
+    if let Some(declared) = n.width {
+        if nat_width > declared {
+            return Err(ValueError(format!(
+                "too many digits for {declared}-bit number: `{}`",
+                n.digits
+            )));
+        }
+    }
     let mut data = 0u64;
     let mut mask = 0u64;
     for c in digits.chars() {
@@ -631,7 +653,8 @@ mod tests {
     fn literals_round_trip() {
         assert_eq!(lit("8'sh3f").to_u64_lossy(), 0x3f);
         assert_eq!(lit("4'b01x?").fmt_bin(), "01xz");
-        assert_eq!(lit("12'hDEAD_BEEF").fmt_hex(), "eef"); // low 12 bits
+        assert!(from_numlit(&parse_based("12'hDEAD_BEEF", Default::default())).is_err(),
+                "oversized sized literal errors (oracle parity)");
         assert_eq!(lit("'h3x").fmt_hex(), "0000003x"); // unsized ≥32 bits (§2.5.1)
         assert_eq!(lit("'sd15").to_i64_lossy(), 15);
         assert_eq!(from_numlit(&NumLit {

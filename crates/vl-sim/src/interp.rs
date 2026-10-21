@@ -1,18 +1,22 @@
-//! The M2 vertical-slice interpreter: flat elaboration (union-find port
-//! connections, parameter overrides), combinational-assign convergence, and
-//! sequential `initial` execution with `$display`/`$finish`.
+//! The Phase-1 interpreter: flat elaboration (scope-chain name resolution,
+//! union-find port connections, generate unrolling) and the event scheduler
+//! (IEEE 1364-2005 ch.9/§11-inspired): processes (initial/always) lowered to
+//! jump-code with suspend points, a time wheel, the NBA region, and edge
+//! sensitivity wakes.
 //!
-//! Deliberate v0-slice limitations (each errors loudly, pointing at its
-//! milestone): always/event controls/NBA (M5), generate (M3), functions/tasks
-//! (M4), memories/reals/gates (M7). All initials run sequentially to
-//! completion — correct for delay-free TBs, superseded by the M5 scheduler.
+//! ADR-0001 "segments": every process body lowers to a straight instruction
+//! list whose suspend points are exactly `#delay`/`@(...)` — tier B can emit
+//! async code per segment chain from the same lowering.
 
-use crate::eval::{eval, Lookup, SimError, SResult, Val};
+use crate::eval::{self, eval, eval_ctx, Lookup, SimError, SResult, Val};
 use crate::value::{low_bits, Bits};
 use rcs_diag::Span;
-use std::collections::HashMap;
-use vl_syntax::ast::{self, CaseItem, CaseKind, DeclKind, Expr, Module, Stmt};
+use std::collections::{BTreeMap, HashMap, VecDeque};
+use vl_syntax::ast::{self, CaseItem, CaseKind, DeclKind, Direction, EventEdge, Expr, Module, Stmt};
 
+// ---------- data model ----------
+
+#[derive(Clone)]
 pub struct Cell {
     pub bits: Bits,
     pub signed: bool,
@@ -23,44 +27,149 @@ pub struct Cell {
 struct Assign {
     lhs: Expr,
     rhs: Expr,
+    lhs_w: u32,
 }
 
-pub struct Sim {
-    /// union-find over flat names (port connections alias child nets to the
-    /// parent's nets); maps name → parent name (roots map to themselves).
-    parent: HashMap<String, String>,
-    cells: HashMap<String, Cell>,
-    assigns: Vec<Assign>,
-    initials: Vec<Stmt>,
-    modules: HashMap<String, Module>,
-    out: String,
-    finished: bool,
+#[derive(Clone)]
+struct FuncDef {
+    instrs: std::rc::Rc<Vec<Instr>>,
+    inputs: Vec<(String, u32, bool)>,
+    ret: String,
+    ret_w: u32,
+    ret_s: bool,
+}
+
+#[derive(Clone)]
+struct TaskDef {
+    /// Raw body + task-local scope (lowered inline at each call site).
+    body: Vec<Stmt>,
+    scope: Scope,
+    ports: Vec<(String, Direction, u32, bool)>,
+}
+
+/// Name-resolution scope chain, innermost last: `{prefix}{name}` is tried
+/// from the innermost scope outward; the first registered cell/def wins.
+#[derive(Clone)]
+struct Scope {
+    chain: Vec<String>,
+}
+
+impl Scope {
+    fn new(root: String) -> Scope {
+        Scope { chain: vec![root] }
+    }
+    #[allow(dead_code)]
+    fn push(&self, prefix: String) -> Scope {
+        let mut c = self.chain.clone();
+        c.push(prefix);
+        Scope { chain: c }
+    }
+    fn innermost(&self) -> &str {
+        self.chain.last().map(|s| s.as_str()).unwrap_or("")
+    }
+}
+
+// ---------- process VM ----------
+
+#[derive(Clone, Debug)]
+enum Instr {
+    BAssign(Expr, Expr),
+    NbAssign(Expr, Expr),
+    JumpIfFalse(Expr, usize),
+    Jump(usize),
+    Case {
+        kind: CaseKind,
+        expr: Expr,
+        arms: Vec<(Vec<Expr>, usize)>,
+        default: usize,
+    },
+    RepeatInit(Expr),
+    RepeatLoop {
+        end: usize,
+    },
+    Delay(ast::DelayVal),
+    Wait(Vec<EventEdge>),
+    SysCall(String, Vec<Expr>),
+}
+
+#[derive(PartialEq, Clone, Copy, Debug)]
+enum PState {
+    Runnable,
+    Waiting,
+    Delayed,
+    Done,
+}
+
+struct Process {
+    instrs: std::rc::Rc<Vec<Instr>>,
+    pc: usize,
+    counters: Vec<u64>,
+    state: PState,
+    waits: Vec<(EventEdge, Bits)>,
+    #[allow(dead_code)]
+    label: String,
 }
 
 #[derive(PartialEq)]
-pub enum Flow {
-    Normal,
+enum Flow {
+    Next,
+    Suspend,
     Finish,
+    End,
 }
 
+pub struct Sim {
+    parent: HashMap<String, String>,
+    cells: HashMap<String, Cell>,
+    assigns: Vec<Assign>,
+    modules: HashMap<String, Module>,
+    funcs: HashMap<String, FuncDef>,
+    tasks: HashMap<String, TaskDef>,
+    procs: Vec<Process>,
+    runnable: VecDeque<usize>,
+    inactive: VecDeque<usize>,
+    delayed: BTreeMap<u64, Vec<usize>>,
+    nba: Vec<(Expr, Val)>,
+    now: u64,
+    /// `#d` advances the clock by `d * (unit_fs / prec_fs)` precision ticks.
+    unit_fs: u64,
+    prec_fs: u64,
+    out: String,
+    finished: bool,
+    genblk_counter: HashMap<String, u32>,
+}
+
+// ---------- build / elaboration ----------
+
 impl Sim {
-    /// Elaborate `top` from parsed modules (slice: top auto-detected upstream).
-    pub fn build(modules: &[Module], top: &str) -> SResult<Sim> {
+    pub fn build(modules: &[Module], top: &str, timescale: Option<&str>) -> SResult<Sim> {
+        let (unit_fs, prec_fs) = parse_timescale(timescale);
         let mut sim = Sim {
             parent: HashMap::new(),
             cells: HashMap::new(),
             assigns: Vec::new(),
-            initials: Vec::new(),
             modules: modules.iter().map(|m| (m.name.clone(), m.clone())).collect(),
+            funcs: HashMap::new(),
+            tasks: HashMap::new(),
+            procs: Vec::new(),
+            runnable: VecDeque::new(),
+            inactive: VecDeque::new(),
+            delayed: BTreeMap::new(),
+            nba: Vec::new(),
+            now: 0,
+            unit_fs,
+            prec_fs,
             out: String::new(),
             finished: false,
+            genblk_counter: HashMap::new(),
         };
         let m = sim
             .modules
             .get(top)
             .ok_or_else(|| SimError::new(format!("top module `{top}` not found"), None))?
             .clone();
-        sim.elab_module(&m, "", &HashMap::new(), &HashMap::new())?;
+        let scope = Scope::new(String::new());
+        sim.elab_module(&m, &scope, &HashMap::new(), &HashMap::new())?;
         Ok(sim)
     }
 
@@ -68,7 +177,1223 @@ impl Sim {
         std::mem::take(&mut self.out)
     }
 
-    // ---- union-find ----
+    fn elab_module(
+        &mut self,
+        m: &Module,
+        scope: &Scope,
+        param_overrides: &HashMap<String, Bits>,
+        param_override_signed: &HashMap<String, bool>,
+    ) -> SResult<()> {
+        // Pass 1a: header parameters (later params may reference earlier ones).
+        for p in &m.params {
+            let full = format!("{}{}", scope.innermost(), p.name);
+            if let Some(v) = param_overrides.get(&p.name) {
+                self.cells.insert(
+                    full,
+                    Cell {
+                        bits: *v,
+                        signed: *param_override_signed.get(&p.name).unwrap_or(&false),
+                        msb: v.to_i64_lossy(),
+                        lsb: 0,
+                    },
+                );
+                continue;
+            }
+            let pe = self.prefix_expr(&p.init, scope)?;
+            let v = eval(&pe, self)?;
+            let (bits, signed) = v.to_bits(p.span)?;
+            self.cells.insert(
+                full,
+                Cell {
+                    bits,
+                    signed,
+                    msb: bits.to_i64_lossy(),
+                    lsb: 0,
+                },
+            );
+        }
+        // Pass 1b: item parameters, then nets/regs, then functions/tasks.
+        for it in &m.items {
+            if let ast::ModuleItem::Decl(d) = it {
+                if matches!(d.kind, DeclKind::Parameter | DeclKind::Localparam) {
+                    self.elab_param_decl(d, scope)?;
+                }
+            }
+        }
+        for it in &m.items {
+            if let ast::ModuleItem::Decl(d) = it {
+                if !matches!(d.kind, DeclKind::Parameter | DeclKind::Localparam) {
+                    self.elab_var_decl(d, scope)?;
+                }
+            }
+        }
+        // ANSI header ports are declarations too — register any that no item
+        // declared (non-ANSI ports get their cells from dir-decl items).
+        for p in &m.ports {
+            if p.dir.is_none() {
+                continue;
+            }
+            let name = format!("{}{}", scope.innermost(), p.name);
+            if self.cells.contains_key(&name) {
+                continue;
+            }
+            let (w, msb, lsb) = match &p.range {
+                Some(r) => {
+                    let mpe = self.prefix_expr(&r.msb, scope)?;
+                    let lpe = self.prefix_expr(&r.lsb, scope)?;
+                    let msv = eval(&mpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                    let lsv = eval(&lpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                    let w = (msv - lsv).unsigned_abs() as u32 + 1;
+                    (w, msv, lsv)
+                }
+                None => (1, 0, 0),
+            };
+            self.cells.insert(
+                name,
+                Cell {
+                    bits: Bits::zeros(w)?,
+                    signed: p.signed,
+                    msb,
+                    lsb,
+                },
+            );
+        }
+        for it in &m.items {
+            match it {
+                ast::ModuleItem::Function(f) => self.register_func(f, scope)?,
+                ast::ModuleItem::Task(t) => self.register_task(t, scope)?,
+                _ => {}
+            }
+        }
+        // Pass 2: behaviors — generate constructs first (they may declare
+        // nets that other module-level behaviors reference hierarchically).
+        for it in &m.items {
+            if matches!(
+                it,
+                ast::ModuleItem::GenerateRegion(_)
+                    | ast::ModuleItem::GenIf { .. }
+                    | ast::ModuleItem::GenFor { .. }
+                    | ast::ModuleItem::GenCase { .. }
+            ) {
+                self.elab_item(it, scope)?;
+            }
+        }
+        for it in &m.items {
+            if !matches!(
+                it,
+                ast::ModuleItem::GenerateRegion(_)
+                    | ast::ModuleItem::GenIf { .. }
+                    | ast::ModuleItem::GenFor { .. }
+                    | ast::ModuleItem::GenCase { .. }
+                    | ast::ModuleItem::Decl(_)
+                    | ast::ModuleItem::Function(_)
+                    | ast::ModuleItem::Task(_)
+            ) {
+                self.elab_item(it, scope)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn elab_param_decl(&mut self, d: &ast::Decl, scope: &Scope) -> SResult<()> {
+        for e in &d.entries {
+            let init = e
+                .init
+                .as_ref()
+                .ok_or_else(|| SimError::at("parameter without initializer", e.span))?;
+            let pe = self.prefix_expr(init, scope)?;
+            let v = eval(&pe, self)?;
+            let (bits, signed) = v.to_bits(e.span)?;
+            let name = format!("{}{}", scope.innermost(), e.name);
+            self.cells.insert(
+                name,
+                Cell {
+                    bits,
+                    signed,
+                    msb: bits.to_i64_lossy(),
+                    lsb: 0,
+                },
+            );
+        }
+        Ok(())
+    }
+
+    fn elab_var_decl(&mut self, d: &ast::Decl, scope: &Scope) -> SResult<()> {
+        match d.kind {
+            DeclKind::Genvar | DeclKind::Event => {}
+            DeclKind::Real | DeclKind::Realtime => {
+                return Err(SimError::at(
+                    "real variables are not yet supported (milestone M7)",
+                    d.span,
+                ))
+            }
+            _ => {
+                let (width, signed, msb, lsb) = match &d.range {
+                    Some(r) => {
+                        let mpe = self.prefix_expr(&r.msb, scope)?;
+                        let lpe = self.prefix_expr(&r.lsb, scope)?;
+                        let msv = eval(&mpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                        let lsv = eval(&lpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                        let w = (msv - lsv).unsigned_abs() as u32 + 1;
+                        (w, d.signed, msv, lsv)
+                    }
+                    None => match d.kind {
+                        DeclKind::Integer => (32, true, 31, 0),
+                        DeclKind::Time | DeclKind::Realtime => (64, false, 63, 0),
+                        _ => (1, d.signed, 0, 0),
+                    },
+                };
+                for e in &d.entries {
+                    if !e.unpacked.is_empty() {
+                        return Err(SimError::at(
+                            "memory arrays are not yet supported (milestone M7)",
+                            e.span,
+                        ));
+                    }
+                    // Declarations always land in the innermost scope.
+                    let name = format!("{}{}", scope.innermost(), e.name);
+                    self.cells.insert(
+                        name.clone(),
+                        Cell {
+                            bits: Bits::zeros(width)?,
+                            signed,
+                            msb,
+                            lsb,
+                        },
+                    );
+                    if let Some(init) = &e.init {
+                        let pe = self.prefix_expr(init, scope)?;
+                        if matches!(d.kind, DeclKind::Net(_)) {
+                            // `wire w = expr` is a continuous assignment with
+                            // context-determined width (upstream semantics).
+                            self.assigns.push(Assign {
+                                lhs: Expr::Ident {
+                                    span: e.span,
+                                    name: name.clone(),
+                                },
+                                rhs: pe,
+                                lhs_w: width,
+                            });
+                        } else {
+                            let v = eval_ctx(&pe, self, width)?;
+                            let (b, s) = v.to_bits(e.span)?;
+                            self.set_name(&name, b, s)?;
+                        }
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn register_func(&mut self, f: &ast::Function, scope: &Scope) -> SResult<()> {
+        let fname = f.name.clone();
+        let fscope = scope.push(format!("{fname}."));
+        let ret_w = match (&f.ret_range, f.ret_type) {
+            (Some(r), _) => {
+                let mpe = self.prefix_expr(&r.msb, scope)?;
+                let lpe = self.prefix_expr(&r.lsb, scope)?;
+                let msv = eval(&mpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                let lsv = eval(&lpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                (msv - lsv).unsigned_abs() as u32 + 1
+            }
+            (None, Some(ast::ParamType::Integer)) => 32,
+            (None, Some(ast::ParamType::Time | ast::ParamType::Realtime)) => 64,
+            (None, _) => 1,
+        };
+        let ret_s = f.ret_signed
+            || matches!(
+                f.ret_type,
+                Some(ast::ParamType::Integer | ast::ParamType::Realtime)
+            );
+        // Return variable (static storage, named after the function).
+        let ret_flat = format!("{}{}", fscope.innermost(), fname);
+        self.cells.insert(
+            ret_flat.clone(),
+            Cell {
+                bits: Bits::zeros(ret_w)?,
+                signed: ret_s,
+                msb: ret_w as i64 - 1,
+                lsb: 0,
+            },
+        );
+        let mut inputs = Vec::new();
+        // ANSI ports + old-style `input` declarations.
+        let input_decls = f.ports.iter().chain(
+            f.decls
+                .iter()
+                .filter(|d| d.dir == Some(Direction::Input)),
+        );
+        for p in input_decls {
+            let ty_w: Option<(u32, bool)> = match p.ty {
+                Some(ast::ParamType::Integer) => Some((32, true)),
+                Some(ast::ParamType::Time | ast::ParamType::Realtime) => Some((64, false)),
+                _ => None,
+            };
+            let (w, msb, lsb) = match (&p.range, ty_w) {
+                (Some(r), _) => {
+                    let mpe = self.prefix_expr(&r.msb, scope)?;
+                    let lpe = self.prefix_expr(&r.lsb, scope)?;
+                    let msv = eval(&mpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                    let lsv = eval(&lpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                    let w = (msv - lsv).unsigned_abs() as u32 + 1;
+                    (w, msv, lsv)
+                }
+                (None, Some((tw, _))) => (tw, tw as i64 - 1, 0),
+                (None, None) => (1, 0, 0),
+            };
+            let psigned = p.signed || matches!(p.ty, Some(ast::ParamType::Integer | ast::ParamType::Realtime));
+            for e in &p.entries {
+                let flat = format!("{}{}", fscope.innermost(), e.name);
+                self.cells.insert(
+                    flat.clone(),
+                    Cell {
+                        bits: Bits::zeros(w)?,
+                        signed: psigned,
+                        msb,
+                        lsb,
+                    },
+                );
+                inputs.push((flat, w, psigned));
+            }
+        }
+        // Function-body variable declarations (static locals).
+        for d in &f.decls {
+            if d.dir.is_none() {
+                self.elab_var_decl(d, &fscope)?;
+            }
+        }
+        // Lower the body synchronously (timing → hard error at exec time).
+        let mut instrs = Vec::new();
+        for st in &f.body {
+            self.lower_stmt(&mut instrs, st, &fscope, 0)?;
+        }
+        let flat = self
+            .resolve_name(&fname, scope)
+            .unwrap_or_else(|| format!("{}{}", scope.innermost(), fname));
+        self.funcs.insert(
+            flat,
+            FuncDef {
+                instrs: std::rc::Rc::new(instrs),
+                inputs,
+                ret: ret_flat,
+                ret_w,
+                ret_s,
+            },
+        );
+        Ok(())
+    }
+
+    fn register_task(&mut self, t: &ast::Function, scope: &Scope) -> SResult<()> {
+        let tscope = scope.push(format!("{}.", t.name));
+        let mut ports = Vec::new();
+        let port_decls = t.ports.iter().chain(t.decls.iter().filter(|d| d.dir.is_some()));
+        for p in port_decls {
+            let ty_w: Option<(u32, bool)> = match p.ty {
+                Some(ast::ParamType::Integer) => Some((32, true)),
+                Some(ast::ParamType::Time | ast::ParamType::Realtime) => Some((64, false)),
+                _ => None,
+            };
+            let (w, msb, lsb) = match (&p.range, ty_w) {
+                (Some(r), _) => {
+                    let mpe = self.prefix_expr(&r.msb, scope)?;
+                    let lpe = self.prefix_expr(&r.lsb, scope)?;
+                    let msv = eval(&mpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                    let lsv = eval(&lpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
+                    let w = (msv - lsv).unsigned_abs() as u32 + 1;
+                    (w, msv, lsv)
+                }
+                (None, Some((tw, _))) => (tw, tw as i64 - 1, 0),
+                (None, None) => (1, 0, 0),
+            };
+            let psigned = p.signed || matches!(p.ty, Some(ast::ParamType::Integer | ast::ParamType::Realtime));
+            for e in &p.entries {
+                let flat = format!("{}{}", tscope.innermost(), e.name);
+                self.cells.insert(
+                    flat.clone(),
+                    Cell {
+                        bits: Bits::zeros(w)?,
+                        signed: psigned,
+                        msb,
+                        lsb,
+                    },
+                );
+                ports.push((flat, p.dir.unwrap_or(Direction::Input), w, psigned));
+            }
+        }
+        for d in &t.decls {
+            if d.dir.is_none() {
+                self.elab_var_decl(d, &tscope)?;
+            }
+        }
+        let flat = self
+            .resolve_name(&t.name, scope)
+            .unwrap_or_else(|| format!("{}{}", scope.innermost(), t.name));
+        self.tasks.insert(
+            flat,
+            TaskDef {
+                body: t.body.clone(),
+                scope: tscope,
+                ports,
+            },
+        );
+        Ok(())
+    }
+
+    fn elab_item(&mut self, it: &ast::ModuleItem, scope: &Scope) -> SResult<()> {
+        match it {
+            ast::ModuleItem::ContAssign(pairs) => {
+                for p in pairs {
+                    let lhs = self.prefix_expr(&p.lhs, scope)?;
+                    let rhs = self.prefix_expr(&p.rhs, scope)?;
+                    let lhs_w = self.lvalue_width(&lhs)?;
+                    self.assigns.push(Assign { lhs, rhs, lhs_w });
+                }
+            }
+            ast::ModuleItem::Initial { body, .. } => {
+                let mut instrs = Vec::new();
+                self.lower_stmt(&mut instrs, body, scope, 0)?;
+                self.procs.push(Process {
+                    instrs: std::rc::Rc::new(instrs),
+                    pc: 0,
+                    counters: Vec::new(),
+                    state: PState::Runnable,
+                    waits: Vec::new(),
+                    label: "initial".to_string(),
+                });
+            }
+            ast::ModuleItem::Always { span, ctrl, body } => {
+                let mut instrs = Vec::new();
+                let mut level_edges: Option<Vec<EventEdge>> = None;
+                match ctrl {
+                    Some(ec) if ec.edges.is_empty() => {
+                        // always @* — sensitivity = identifiers read in body.
+                        let mut names = Vec::new();
+                        self.collect_reads(body, &mut names);
+                        names.sort();
+                        names.dedup();
+                        if names.is_empty() {
+                            return Err(SimError::at(
+                                "always @* has no readable signals in its body",
+                                *span,
+                            ));
+                        }
+                        let edges: Vec<EventEdge> = names
+                            .into_iter()
+                            .map(|n| EventEdge {
+                                kind: ast::EdgeKind::Any,
+                                expr: Expr::Ident {
+                                    span: *span,
+                                    name: n,
+                                },
+                            })
+                            .collect();
+                        level_edges = Some(edges);
+                    }
+                    Some(ec) => {
+                        // Pure level-sensitive lists (all `Any`) evaluate once
+                        // at t0 before waiting (upstream parity, E2E finding).
+                        let level = ec.edges.iter().all(|e| e.kind == ast::EdgeKind::Any);
+                        if level {
+                            level_edges = Some(self.prefix_edges(&ec.edges, scope)?);
+                        } else {
+                            instrs.push(Instr::Wait(self.prefix_edges(&ec.edges, scope)?));
+                        }
+                    }
+                    None => {}
+                }
+                self.lower_stmt(&mut instrs, body, scope, 0)?;
+                if let Some(edges) = level_edges {
+                    instrs.push(Instr::Wait(edges));
+                    instrs.push(Instr::Jump(0));
+                } else {
+                    instrs.push(Instr::Jump(0));
+                }
+                self.procs.push(Process {
+                    instrs: std::rc::Rc::new(instrs),
+                    pc: 0,
+                    counters: Vec::new(),
+                    state: PState::Runnable,
+                    waits: Vec::new(),
+                    label: "always".to_string(),
+                });
+            }
+            ast::ModuleItem::Instance(inst) => self.elab_instance(inst, scope)?,
+            ast::ModuleItem::GenerateRegion(items) => {
+                for it2 in items {
+                    self.elab_item(it2, scope)?;
+                }
+            }
+            ast::ModuleItem::GenIf {
+                cond,
+                then,
+                els,
+                ..
+            } => {
+                let pe = self.prefix_expr(cond, scope)?;
+                let (b, _) = eval(&pe, self)?.to_bits(cond.span())?;
+                let n = self.next_genblk(scope);
+                let sub = scope.push(format!("genblk{n}."));
+                if b.truthy()? == Some(true) {
+                    for it2 in then {
+                        self.elab_item(it2, &sub)?;
+                    }
+                } else if let Some(els) = els {
+                    for it2 in els {
+                        self.elab_item(it2, &sub)?;
+                    }
+                }
+            }
+            ast::ModuleItem::GenFor {
+                var,
+                init,
+                cond,
+                step,
+                block,
+                items,
+                ..
+            } => {
+                let start = self.eval_gen_const(init, scope)?;
+                let mut i = start;
+                loop {
+                    // Bind the genvar as a scoped constant per iteration.
+                    let blk = block.clone().unwrap_or_default();
+                    let iterscope = scope.push(format!("{blk}[{i}]."));
+                    let gname = format!("{}{}", iterscope.innermost(), var);
+                    self.cells.insert(
+                        gname,
+                        Cell {
+                            bits: Bits::from_u64(32, i as u64)?,
+                            signed: true,
+                            msb: 31,
+                            lsb: 0,
+                        },
+                    );
+                    let pe = self.prefix_expr(cond, &iterscope)?;
+                    let (b, _) = eval(&pe, self)?.to_bits(cond.span())?;
+                    if b.truthy()? != Some(true) {
+                        break;
+                    }
+                    for it2 in items {
+                        self.elab_item(it2, &iterscope)?;
+                    }
+                    let pe_rhs = self.prefix_expr(&step.rhs, &iterscope)?;
+                    let (nb, _) = eval(&pe_rhs, self)?.to_bits(step.span)?;
+                    let next = nb.to_i64_lossy();
+                    if next == i {
+                        return Err(SimError::at(
+                            "generate-for step does not advance the genvar",
+                            step.span,
+                        ));
+                    }
+                    i = next;
+                }
+            }
+            ast::ModuleItem::GenCase {
+                expr,
+                items,
+                default,
+                ..
+            } => {
+                let pe = self.prefix_expr(expr, scope)?;
+                let (b, _) = eval(&pe, self)?.to_bits(expr.span())?;
+                let mut chosen: Option<&Vec<ast::ModuleItem>> = None;
+                'outer: for (labels, its) in items {
+                    for l in labels {
+                        let ple = self.prefix_expr(l, scope)?;
+                        let (lb, _) = eval(&ple, self)?.to_bits(l.span())?;
+                        if b.case_eq(&lb)?.to_u64_lossy() == 1 {
+                            chosen = Some(its);
+                            break 'outer;
+                        }
+                    }
+                }
+                let picked = chosen.or(default.as_ref());
+                if let Some(its) = picked {
+                    let n = self.next_genblk(scope);
+                    let sub = scope.push(format!("genblk{n}."));
+                    for it2 in its {
+                        self.elab_item(it2, &sub)?;
+                    }
+                }
+            }
+            ast::ModuleItem::GenBlock { name, items, .. } => {
+                let sub = match name {
+                    Some(n) => scope.push(format!("{n}.")),
+                    None => {
+                        let n = self.next_genblk(scope);
+                        scope.push(format!("genblk{n}."))
+                    }
+                };
+                for it2 in items {
+                    self.elab_item(it2, &sub)?;
+                }
+            }
+            ast::ModuleItem::Decl(d) => match d.kind {
+                DeclKind::Parameter | DeclKind::Localparam => self.elab_param_decl(d, scope)?,
+                _ => self.elab_var_decl(d, scope)?,
+            },
+            ast::ModuleItem::Function(_) | ast::ModuleItem::Task(_) => {}
+            ast::ModuleItem::Defparam(_) => {
+                return Err(SimError::at(
+                    "defparam is not yet supported (use #(.PARAM()) instance overrides)",
+                    it_span(it),
+                ))
+            }
+            ast::ModuleItem::Empty => {}
+        }
+        Ok(())
+    }
+
+    fn next_genblk(&mut self, scope: &Scope) -> u32 {
+        let key = scope.innermost().to_string();
+        let c = self.genblk_counter.entry(key).or_insert(0);
+        *c += 1;
+        *c
+    }
+
+    fn eval_gen_const(&mut self, e: &Expr, scope: &Scope) -> SResult<i64> {
+        let pe = self.prefix_expr(e, scope)?;
+        let (b, _) = eval(&pe, self)?.to_bits(e.span())?;
+        if b.has_unknown() {
+            return Err(SimError::at("generate constant contains x/z", e.span()));
+        }
+        Ok(b.to_i64_lossy())
+    }
+
+    fn elab_instance(&mut self, inst: &ast::Instance, scope: &Scope) -> SResult<()> {
+        let child = self
+            .modules
+            .get(&inst.mod_name)
+            .ok_or_else(|| {
+                SimError::at(
+                    format!(
+                        "unknown module `{}` (gate primitives land at M7)",
+                        inst.mod_name
+                    ),
+                    inst.span,
+                )
+            })?
+            .clone();
+        for unit in &inst.insts {
+            let child_prefix = format!("{}{}.", scope.innermost(), unit.name);
+            let child_scope = Scope::new(child_prefix.clone());
+            let mut overrides: HashMap<String, Bits> = HashMap::new();
+            let mut ovs_signed: HashMap<String, bool> = HashMap::new();
+            if !inst.params.is_empty() {
+                let named: Vec<&ast::ParamConn> =
+                    inst.params.iter().filter(|p| p.name.is_some()).collect();
+                if !named.is_empty() {
+                    for p in named {
+                        if let Some(e) = &p.expr {
+                            let pe = self.prefix_expr(e, scope)?;
+                            let (bits, signed) = eval(&pe, self)?.to_bits(p.span)?;
+                            overrides.insert(p.name.clone().unwrap(), bits);
+                            ovs_signed.insert(p.name.clone().unwrap(), signed);
+                        }
+                    }
+                } else {
+                    for (i, p) in inst.params.iter().enumerate() {
+                        let Some(formal) = child.params.get(i) else {
+                            return Err(SimError::at(
+                                "positional parameter override out of range",
+                                p.span,
+                            ));
+                        };
+                        if let Some(e) = &p.expr {
+                            let pe = self.prefix_expr(e, scope)?;
+                            let (bits, signed) = eval(&pe, self)?.to_bits(p.span)?;
+                            overrides.insert(formal.name.clone(), bits);
+                            ovs_signed.insert(formal.name.clone(), signed);
+                        }
+                    }
+                }
+            }
+            self.elab_module(&child, &child_scope, &overrides, &ovs_signed)?;
+            for (i, conn) in unit.conns.iter().enumerate() {
+                let formal_name = match &conn.name {
+                    Some(n) => n.clone(),
+                    None => {
+                        let Some(p) = child.ports.get(i) else {
+                            return Err(SimError::at(
+                                "positional port connection out of range",
+                                conn.span,
+                            ));
+                        };
+                        p.name.clone()
+                    }
+                };
+                let formal = format!("{child_prefix}{formal_name}");
+                let dir = self.port_direction(&child, &formal_name);
+                match &conn.expr {
+                    None => {}
+                    Some(Expr::Ident { name, .. }) => {
+                        let actual = self.resolve_name(name, scope).ok_or_else(|| {
+                            SimError::at(
+                                format!("undeclared identifier `{name}` in port connection"),
+                                conn.span,
+                            )
+                        })?;
+                        self.union(&formal, &actual);
+                    }
+                    Some(e) => match dir {
+                        Some(Direction::Output) => {
+                            let pe = self.prefix_expr(e, scope)?;
+                            let lhs_w = self.lvalue_width(&pe)?;
+                            self.assigns.push(Assign {
+                                lhs: pe,
+                                rhs: Expr::Ident {
+                                    span: conn.span,
+                                    name: formal,
+                                },
+                                lhs_w,
+                            });
+                        }
+                        Some(Direction::Inout) => {
+                            return Err(SimError::at(
+                                "inout ports connected to expressions are not yet supported (M7)",
+                                conn.span,
+                            ))
+                        }
+                        _ => {
+                            let pe = self.prefix_expr(e, scope)?;
+                            let lhs_w = self.cells.get(&formal).map(|c| c.bits.width).unwrap_or(1);
+                            self.assigns.push(Assign {
+                                lhs: Expr::Ident {
+                                    span: conn.span,
+                                    name: formal,
+                                },
+                                rhs: pe,
+                                lhs_w,
+                            });
+                        }
+                    },
+                }
+            }
+        }
+        Ok(())
+    }
+
+    fn port_direction(&self, m: &Module, port: &str) -> Option<Direction> {
+        for p in &m.ports {
+            if p.name == port {
+                return p.dir;
+            }
+        }
+        for it in &m.items {
+            if let ast::ModuleItem::Decl(d) = it {
+                if let Some(dir) = d.dir {
+                    for e in &d.entries {
+                        if e.name == port {
+                            return Some(dir);
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    // ---------- naming ----------
+
+    fn resolve_name(&self, name: &str, scope: &Scope) -> Option<String> {
+        for p in scope.chain.iter().rev() {
+            let cand = format!("{p}{name}");
+            if self.cells.contains_key(&cand)
+                || self.funcs.contains_key(&cand)
+                || self.tasks.contains_key(&cand)
+            {
+                return Some(cand);
+            }
+        }
+        None
+    }
+
+    fn prefix_expr(&self, e: &Expr, scope: &Scope) -> SResult<Expr> {
+        Ok(match e {
+            Expr::Ident { span, name } => Expr::Ident {
+                span: *span,
+                name: self.resolve_name(name, scope).ok_or_else(|| {
+                    SimError::at(format!("undeclared identifier `{name}`"), *span)
+                })?,
+            },
+            Expr::HierIdent { span, parts } => {
+                let joined = parts.join(".");
+                Expr::Ident {
+                    span: *span,
+                    name: self.resolve_name(&joined, scope).ok_or_else(|| {
+                        SimError::at(
+                            format!("undeclared hierarchical identifier `{joined}`"),
+                            *span,
+                        )
+                    })?,
+                }
+            }
+            Expr::NumLit(_) | Expr::RealLit { .. } | Expr::StrLit { .. } => e.clone(),
+            Expr::Unary { span, op, expr } => Expr::Unary {
+                span: *span,
+                op: *op,
+                expr: Box::new(self.prefix_expr(expr, scope)?),
+            },
+            Expr::Binary { span, op, lhs, rhs } => Expr::Binary {
+                span: *span,
+                op: *op,
+                lhs: Box::new(self.prefix_expr(lhs, scope)?),
+                rhs: Box::new(self.prefix_expr(rhs, scope)?),
+            },
+            Expr::Ternary {
+                span,
+                cond,
+                then,
+                els,
+            } => Expr::Ternary {
+                span: *span,
+                cond: Box::new(self.prefix_expr(cond, scope)?),
+                then: Box::new(self.prefix_expr(then, scope)?),
+                els: Box::new(self.prefix_expr(els, scope)?),
+            },
+            Expr::Concat { span, parts } => Expr::Concat {
+                span: *span,
+                parts: parts
+                    .iter()
+                    .map(|p| self.prefix_expr(p, scope))
+                    .collect::<SResult<_>>()?,
+            },
+            Expr::Repeat { span, count, value } => Expr::Repeat {
+                span: *span,
+                count: Box::new(self.prefix_expr(count, scope)?),
+                value: Box::new(self.prefix_expr(value, scope)?),
+            },
+            Expr::Index { span, base, index } => Expr::Index {
+                span: *span,
+                base: Box::new(self.prefix_expr(base, scope)?),
+                index: Box::new(self.prefix_expr(index, scope)?),
+            },
+            Expr::PartSelect {
+                span,
+                base,
+                msb,
+                lsb,
+            } => Expr::PartSelect {
+                span: *span,
+                base: Box::new(self.prefix_expr(base, scope)?),
+                msb: Box::new(self.prefix_expr(msb, scope)?),
+                lsb: Box::new(self.prefix_expr(lsb, scope)?),
+            },
+            Expr::IndexedPart {
+                span,
+                base,
+                offset,
+                width,
+                plus,
+            } => Expr::IndexedPart {
+                span: *span,
+                base: Box::new(self.prefix_expr(base, scope)?),
+                offset: Box::new(self.prefix_expr(offset, scope)?),
+                width: Box::new(self.prefix_expr(width, scope)?),
+                plus: *plus,
+            },
+            Expr::Call { span, func, args } => {
+                let func2 = if func.starts_with('$') {
+                    func.clone()
+                } else {
+                    self.resolve_name(func, scope)
+                        .ok_or_else(|| SimError::at(format!("unknown function `{func}`"), *span))?
+                };
+                Expr::Call {
+                    span: *span,
+                    func: func2,
+                    args: args
+                        .iter()
+                        .map(|a| self.prefix_expr(a, scope))
+                        .collect::<SResult<_>>()?,
+                }
+            }
+        })
+    }
+
+    fn prefix_edges(&self, edges: &[EventEdge], scope: &Scope) -> SResult<Vec<EventEdge>> {
+        edges
+            .iter()
+            .map(|ed| {
+                Ok(EventEdge {
+                    kind: ed.kind,
+                    expr: self.prefix_expr(&ed.expr, scope)?,
+                })
+            })
+            .collect()
+    }
+
+    fn collect_reads(&self, s: &Stmt, out: &mut Vec<String>) {
+        match s {
+            Stmt::Block { body, .. } => {
+                for b in body {
+                    self.collect_reads(b, out);
+                }
+            }
+            Stmt::BAssign { lhs, rhs, .. } | Stmt::NbAssign { lhs, rhs, .. } => {
+                self.collect_expr_reads(rhs, out);
+                self.collect_expr_reads(lhs, out);
+            }
+            Stmt::If {
+                cond,
+                then,
+                els,
+                ..
+            } => {
+                self.collect_expr_reads(cond, out);
+                self.collect_reads(then, out);
+                if let Some(e) = els {
+                    self.collect_reads(e, out);
+                }
+            }
+            Stmt::Case { expr, items, .. } => {
+                self.collect_expr_reads(expr, out);
+                for it in items {
+                    match it {
+                        CaseItem::Items(labels, st) => {
+                            for l in labels {
+                                self.collect_expr_reads(l, out);
+                            }
+                            self.collect_reads(st, out);
+                        }
+                        CaseItem::Default(st) => self.collect_reads(st, out),
+                    }
+                }
+            }
+            Stmt::For {
+                init,
+                cond,
+                step,
+                body,
+                ..
+            } => {
+                for p in init.iter().chain(step.iter()) {
+                    self.collect_expr_reads(&p.rhs, out);
+                    self.collect_expr_reads(&p.lhs, out);
+                }
+                self.collect_expr_reads(cond, out);
+                self.collect_reads(body, out);
+            }
+            Stmt::While { cond, body, .. } => {
+                self.collect_expr_reads(cond, out);
+                self.collect_reads(body, out);
+            }
+            Stmt::Repeat { count, body, .. } => {
+                self.collect_expr_reads(count, out);
+                self.collect_reads(body, out);
+            }
+            Stmt::Forever { body, .. } => self.collect_reads(body, out),
+            Stmt::DelayCtrl { body, .. } => {
+                if let Some(b) = body {
+                    self.collect_reads(b, out);
+                }
+            }
+            Stmt::EventCtrl { ctrl, body, .. } => {
+                for e in &ctrl.edges {
+                    self.collect_expr_reads(&e.expr, out);
+                }
+                if let Some(b) = body {
+                    self.collect_reads(b, out);
+                }
+            }
+            Stmt::SysCall { args, .. } | Stmt::SubCall { args, .. } => {
+                for a in args {
+                    self.collect_expr_reads(a, out);
+                }
+            }
+            Stmt::Disable { .. } | Stmt::Null { .. } => {}
+        }
+    }
+
+    fn collect_expr_reads(&self, e: &Expr, out: &mut Vec<String>) {
+        match e {
+            Expr::Ident { name, .. } => out.push(name.clone()),
+            Expr::HierIdent { parts, .. } => out.push(parts.join(".")),
+            Expr::Unary { expr, .. } => self.collect_expr_reads(expr, out),
+            Expr::Binary { lhs, rhs, .. } => {
+                self.collect_expr_reads(lhs, out);
+                self.collect_expr_reads(rhs, out);
+            }
+            Expr::Ternary {
+                cond,
+                then,
+                els,
+                ..
+            } => {
+                self.collect_expr_reads(cond, out);
+                self.collect_expr_reads(then, out);
+                self.collect_expr_reads(els, out);
+            }
+            Expr::Concat { parts, .. } | Expr::Call { args: parts, .. } => {
+                for p in parts {
+                    self.collect_expr_reads(p, out);
+                }
+            }
+            Expr::Repeat { count, value, .. } => {
+                self.collect_expr_reads(count, out);
+                self.collect_expr_reads(value, out);
+            }
+            Expr::Index { base, index, .. } => {
+                self.collect_expr_reads(base, out);
+                self.collect_expr_reads(index, out);
+            }
+            Expr::PartSelect {
+                base,
+                msb,
+                lsb,
+                ..
+            } => {
+                self.collect_expr_reads(base, out);
+                self.collect_expr_reads(msb, out);
+                self.collect_expr_reads(lsb, out);
+            }
+            Expr::IndexedPart {
+                base,
+                offset,
+                ..
+            } => {
+                self.collect_expr_reads(base, out);
+                self.collect_expr_reads(offset, out);
+            }
+            _ => {}
+        }
+    }
+
+    // ---------- lowering ----------
+
+    fn lower_stmt(
+        &mut self,
+        out: &mut Vec<Instr>,
+        s: &Stmt,
+        scope: &Scope,
+        depth: usize,
+    ) -> SResult<()> {
+        if depth > 64 {
+            return Err(SimError::at("statement nesting too deep", stmt_span(s)));
+        }
+        match s {
+            Stmt::Block { body, .. } => {
+                for b in body {
+                    self.lower_stmt(out, b, scope, depth + 1)?;
+                }
+            }
+            Stmt::BAssign { lhs, rhs, .. } => {
+                let pl = self.prefix_expr(lhs, scope)?;
+                let pr = self.prefix_expr(rhs, scope)?;
+                out.push(Instr::BAssign(pl, pr));
+            }
+            Stmt::NbAssign { lhs, rhs, .. } => {
+                let pl = self.prefix_expr(lhs, scope)?;
+                let pr = self.prefix_expr(rhs, scope)?;
+                out.push(Instr::NbAssign(pl, pr));
+            }
+            Stmt::If {
+                cond,
+                then,
+                els,
+                ..
+            } => {
+                let pc_ = self.prefix_expr(cond, scope)?;
+                let j = out.len();
+                out.push(Instr::JumpIfFalse(pc_.clone(), 0));
+                self.lower_stmt(out, then, scope, depth + 1)?;
+                if let Some(e) = els {
+                    let j2 = out.len();
+                    out.push(Instr::Jump(0));
+                    out[j] = Instr::JumpIfFalse(pc_, out.len());
+                    self.lower_stmt(out, e, scope, depth + 1)?;
+                    out[j2] = Instr::Jump(out.len());
+                } else {
+                    out[j] = Instr::JumpIfFalse(pc_, out.len());
+                }
+            }
+            Stmt::Case {
+                kind,
+                expr,
+                items,
+                ..
+            } => {
+                let pe = self.prefix_expr(expr, scope)?;
+                let cidx = out.len();
+                out.push(Instr::Case {
+                    kind: *kind,
+                    expr: pe.clone(),
+                    arms: Vec::new(),
+                    default: 0,
+                });
+                let mut arm_targets = Vec::new();
+                let mut end_jumps = Vec::new();
+                let mut default_target = usize::MAX;
+                for it in items {
+                    match it {
+                        CaseItem::Items(labels, body) => {
+                            let mut pls = Vec::new();
+                            for l in labels {
+                                pls.push(self.prefix_expr(l, scope)?);
+                            }
+                            arm_targets.push((pls, out.len()));
+                            self.lower_stmt(out, body, scope, depth + 1)?;
+                            end_jumps.push(out.len());
+                            out.push(Instr::Jump(0));
+                        }
+                        CaseItem::Default(body) => {
+                            default_target = out.len();
+                            self.lower_stmt(out, body, scope, depth + 1)?;
+                            end_jumps.push(out.len());
+                            out.push(Instr::Jump(0));
+                        }
+                    }
+                }
+                let end = out.len();
+                for j in end_jumps {
+                    out[j] = Instr::Jump(end);
+                }
+                if default_target == usize::MAX {
+                    default_target = end;
+                }
+                out[cidx] = Instr::Case {
+                    kind: *kind,
+                    expr: pe,
+                    arms: arm_targets,
+                    default: default_target,
+                };
+            }
+            Stmt::For {
+                init,
+                cond,
+                step,
+                body,
+                ..
+            } => {
+                for p in init {
+                    let pl = self.prefix_expr(&p.lhs, scope)?;
+                    let pr = self.prefix_expr(&p.rhs, scope)?;
+                    out.push(Instr::BAssign(pl, pr));
+                }
+                let top = out.len();
+                let pc_ = self.prefix_expr(cond, scope)?;
+                let j = out.len();
+                out.push(Instr::JumpIfFalse(pc_.clone(), 0));
+                self.lower_stmt(out, body, scope, depth + 1)?;
+                for p in step {
+                    let pl = self.prefix_expr(&p.lhs, scope)?;
+                    let pr = self.prefix_expr(&p.rhs, scope)?;
+                    out.push(Instr::BAssign(pl, pr));
+                }
+                out.push(Instr::Jump(top));
+                out[j] = Instr::JumpIfFalse(pc_, out.len());
+            }
+            Stmt::While { cond, body, .. } => {
+                let top = out.len();
+                let pc_ = self.prefix_expr(cond, scope)?;
+                let j = out.len();
+                out.push(Instr::JumpIfFalse(pc_.clone(), 0));
+                self.lower_stmt(out, body, scope, depth + 1)?;
+                out.push(Instr::Jump(top));
+                out[j] = Instr::JumpIfFalse(pc_, out.len());
+            }
+            Stmt::Repeat { count, body, .. } => {
+                let pc_ = self.prefix_expr(count, scope)?;
+                out.push(Instr::RepeatInit(pc_));
+                let top = out.len();
+                let r = out.len();
+                out.push(Instr::RepeatLoop { end: 0 });
+                self.lower_stmt(out, body, scope, depth + 1)?;
+                out.push(Instr::Jump(top));
+                out[r] = Instr::RepeatLoop { end: out.len() };
+            }
+            Stmt::Forever { body, .. } => {
+                let top = out.len();
+                self.lower_stmt(out, body, scope, depth + 1)?;
+                out.push(Instr::Jump(top));
+            }
+            Stmt::DelayCtrl { delay, body, .. } => {
+                let d = match delay {
+                    ast::DelayVal::Lit(t) => ast::DelayVal::Lit(t.clone()),
+                    ast::DelayVal::Expr(e) => ast::DelayVal::Expr(self.prefix_expr(e, scope)?),
+                };
+                out.push(Instr::Delay(d));
+                if let Some(b) = body {
+                    self.lower_stmt(out, b, scope, depth + 1)?;
+                }
+            }
+            Stmt::EventCtrl { ctrl, body, .. } => {
+                out.push(Instr::Wait(self.prefix_edges(&ctrl.edges, scope)?));
+                if let Some(b) = body {
+                    self.lower_stmt(out, b, scope, depth + 1)?;
+                }
+            }
+            Stmt::SysCall { name, args, .. } => {
+                let pargs = args
+                    .iter()
+                    .map(|a| self.prefix_expr(a, scope))
+                    .collect::<SResult<_>>()?;
+                out.push(Instr::SysCall(name.clone(), pargs));
+            }
+            Stmt::SubCall { span, name, args } => {
+                let flat = self
+                    .resolve_name(name, scope)
+                    .ok_or_else(|| SimError::at(format!("unknown task `{name}`"), *span))?;
+                let def = self.tasks.get(&flat).cloned().ok_or_else(|| {
+                    SimError::at(
+                        format!("`{name}` is not a task (function calls are expressions)"),
+                        *span,
+                    )
+                })?;
+                if depth > 16 {
+                    return Err(SimError::at(
+                        "task call nesting too deep (recursion?)",
+                        *span,
+                    ));
+                }
+                let mut ai = 0usize;
+                for (pname, dir, _w, _s) in &def.ports {
+                    let Some(arg) = args.get(ai) else {
+                        return Err(SimError::at(
+                            format!("task `{name}` expects {} arguments", def.ports.len()),
+                            *span,
+                        ));
+                    };
+                    ai += 1;
+                    if matches!(dir, Direction::Input | Direction::Inout) {
+                        let pport = Expr::Ident {
+                            span: *span,
+                            name: pname.clone(),
+                        };
+                        out.push(Instr::BAssign(pport, self.prefix_expr(arg, scope)?));
+                    }
+                }
+                for st in &def.body {
+                    self.lower_stmt(out, st, &def.scope, depth + 1)?;
+                }
+                let mut ai = 0usize;
+                for (pname, dir, _w, _s) in &def.ports {
+                    let arg = args.get(ai).cloned();
+                    ai += 1;
+                    if matches!(dir, Direction::Output | Direction::Inout) {
+                        if let Some(arg) = arg {
+                            let pport = Expr::Ident {
+                                span: *span,
+                                name: pname.clone(),
+                            };
+                            out.push(Instr::BAssign(self.prefix_expr(&arg, scope)?, pport));
+                        }
+                    }
+                }
+            }
+            Stmt::Disable { span, name } => {
+                return Err(SimError::at(
+                    format!("`disable {name}` lands at milestone M7"),
+                    *span,
+                ))
+            }
+            Stmt::Null { .. } => {}
+        }
+        Ok(())
+    }
+
+    // ---------- union-find / cells ----------
 
     fn find(&mut self, name: &str) -> String {
         match self.parent.get(name).cloned() {
@@ -89,584 +1414,14 @@ impl Sim {
         }
     }
 
-    // ---- elaboration ----
-
-    fn elab_module(
-        &mut self,
-        m: &Module,
-        prefix: &str,
-        param_overrides: &HashMap<String, Bits>,
-        param_override_signed: &HashMap<String, bool>,
-    ) -> SResult<()> {
-        // Header parameters first (later params may reference earlier ones).
-        for p in &m.params {
-            let full = format!("{prefix}{}", p.name);
-            if let Some(v) = param_overrides.get(&p.name) {
-                self.cells.insert(
-                    full,
-                    Cell {
-                        bits: *v,
-                        signed: *param_override_signed.get(&p.name).unwrap_or(&false),
-                        msb: v.to_i64_lossy(),
-                        lsb: 0,
-                    },
-                );
-                continue;
-            }
-            let v = eval(&self.prefix_expr(&p.init, prefix)?, self)?;
-            let (bits, signed) = match v {
-                Val::Bits { bits, signed } => (bits, signed),
-                Val::Str(_) => {
-                    return Err(SimError::at("string parameter (M7)", p.span))
-                }
-            };
-            self.cells.insert(
-                full,
-                Cell {
-                    bits,
-                    signed,
-                    msb: bits.to_i64_lossy(),
-                    lsb: 0,
-                },
-            );
-        }
-        for it in &m.items {
-            self.elab_item(it, prefix, m)?;
-        }
-        Ok(())
-    }
-
-    fn elab_item(&mut self, it: &ast::ModuleItem, prefix: &str, m: &Module) -> SResult<()> {
-        match it {
-            ast::ModuleItem::Decl(d) => match d.kind {
-                DeclKind::Parameter | DeclKind::Localparam => {
-                    for e in &d.entries {
-                        let v = eval(&self.prefix_expr(
-                            e.init.as_ref().ok_or_else(|| {
-                                SimError::at("parameter without initializer", e.span)
-                            })?,
-                            prefix,
-                        )?, self)?;
-                        let (bits, signed) = match v {
-                            Val::Bits { bits, signed } => (bits, signed),
-                            Val::Str(_) => {
-                                return Err(SimError::at("string parameter (M7)", e.span))
-                            }
-                        };
-                        self.cells.insert(
-                            format!("{prefix}{}", e.name),
-                            Cell {
-                                bits,
-                                signed,
-                                msb: bits.to_i64_lossy(),
-                                lsb: 0,
-                            },
-                        );
-                    }
-                }
-                DeclKind::Genvar | DeclKind::Event => {}
-                DeclKind::Real | DeclKind::Realtime => {
-                    return Err(SimError::at(
-                        "real variables are not yet supported (milestone M7)",
-                        d.span,
-                    ))
-                }
-                _ => {
-                    let (width, signed, msb, lsb) = match &d.range {
-                        Some(r) => {
-                            let msv = self.const_i64(&r.msb, prefix)?;
-                            let lsv = self.const_i64(&r.lsb, prefix)?;
-                            let w = (msv - lsv).unsigned_abs() as u32 + 1;
-                            (w, d.signed, msv, lsv)
-                        }
-                        None => match d.kind {
-                            DeclKind::Integer => (32, true, 31, 0),
-                            DeclKind::Time | DeclKind::Realtime => (64, false, 63, 0),
-                            _ => (1, d.signed, 0, 0),
-                        },
-                    };
-                    for e in &d.entries {
-                        if !e.unpacked.is_empty() {
-                            return Err(SimError::at(
-                                "memory arrays are not yet supported (milestone M7)",
-                                e.span,
-                            ));
-                        }
-                        self.cells.insert(
-                            format!("{prefix}{}", e.name),
-                            Cell {
-                                bits: Bits::zeros(width)?,
-                                signed,
-                                msb,
-                                lsb,
-                            },
-                        );
-                        if let Some(init) = &e.init {
-                            let v = eval(&self.prefix_expr(init, prefix)?, self)?;
-                            let (b, _) = match v {
-                                Val::Bits { bits, signed } => (bits, signed),
-                                Val::Str(_) => {
-                                    return Err(SimError::at("string initializer (M7)", e.span))
-                                }
-                            };
-                            let name = format!("{prefix}{}", e.name);
-                            self.set_name(&name, b, signed)?;
-                        }
-                    }
-                }
-            },
-            ast::ModuleItem::ContAssign(pairs) => {
-                for p in pairs {
-                    self.assigns.push(Assign {
-                        lhs: self.prefix_expr(&p.lhs, prefix)?,
-                        rhs: self.prefix_expr(&p.rhs, prefix)?,
-                    });
-                }
-            }
-            ast::ModuleItem::Initial { body, .. } => {
-                self.initials.push(self.prefix_stmt(body, prefix)?);
-            }
-            ast::ModuleItem::Always { span, .. } => {
-                return Err(SimError::at(
-                    "always blocks need the event scheduler (milestone M5); \
-                     this v0 slice runs delay-free combinational TBs only",
-                    *span,
-                ))
-            }
-            ast::ModuleItem::Instance(inst) => {
-                self.elab_instance(inst, prefix, m)?;
-            }
-            ast::ModuleItem::GenerateRegion(_)
-            | ast::ModuleItem::GenIf { .. }
-            | ast::ModuleItem::GenFor { .. }
-            | ast::ModuleItem::GenCase { .. }
-            | ast::ModuleItem::GenBlock { .. } => {
-                return Err(SimError::at(
-                    "generate constructs are elaborated at milestone M3",
-                    prefix_span(prefix),
-                ))
-            }
-            ast::ModuleItem::Function(_) | ast::ModuleItem::Task(_) => {
-                return Err(SimError::at(
-                    "functions/tasks are supported from milestone M4",
-                    prefix_span(prefix),
-                ))
-            }
-            ast::ModuleItem::Defparam(_) => {
-                return Err(SimError::at(
-                    "defparam is elaborated at milestone M3",
-                    prefix_span(prefix),
-                ))
-            }
-            ast::ModuleItem::Empty => {}
-        }
-        Ok(())
-    }
-
-    fn elab_instance(
-        &mut self,
-        inst: &ast::Instance,
-        prefix: &str,
-        _m: &Module,
-    ) -> SResult<()> {
-        let child = self
-            .modules
-            .get(&inst.mod_name)
-            .ok_or_else(|| {
-                SimError::at(
-                    format!("unknown module `{}` (gate primitives land at M7)", inst.mod_name),
-                    inst.span,
-                )
-            })?
-            .clone();
-        for unit in &inst.insts {
-            let child_prefix = format!("{prefix}{}.", unit.name);
-            // Parameter overrides, evaluated in the *caller's* scope.
-            let mut overrides: HashMap<String, Bits> = HashMap::new();
-            let mut ovs_signed: HashMap<String, bool> = HashMap::new();
-            if !inst.params.is_empty() {
-                let named: Vec<&ast::ParamConn> =
-                    inst.params.iter().filter(|p| p.name.is_some()).collect();
-                if !named.is_empty() {
-                    for p in named {
-                        let name = p.name.clone().unwrap();
-                        match &p.expr {
-                            Some(e) => {
-                                let v = eval(&self.prefix_expr(e, prefix)?, self)?;
-                                if let Val::Bits { bits, signed } = v {
-                                    overrides.insert(name.clone(), bits);
-                                    ovs_signed.insert(name, signed);
-                                }
-                            }
-                            None => {} // `.P()` — keep default
-                        }
-                    }
-                } else {
-                    for (i, p) in inst.params.iter().enumerate() {
-                        let Some(formal) = child.params.get(i) else {
-                            return Err(SimError::at(
-                                "positional parameter override out of range",
-                                p.span,
-                            ));
-                        };
-                        if let Some(e) = &p.expr {
-                            let v = eval(&self.prefix_expr(e, prefix)?, self)?;
-                            if let Val::Bits { bits, signed } = v {
-                                overrides.insert(formal.name.clone(), bits);
-                                ovs_signed.insert(formal.name.clone(), signed);
-                            }
-                        }
-                    }
-                }
-            }
-            self.elab_module(&child, &child_prefix, &overrides, &ovs_signed)?;
-            // Port connections.
-            for (i, conn) in unit.conns.iter().enumerate() {
-                let formal_name = match &conn.name {
-                    Some(n) => n.clone(),
-                    None => {
-                        let Some(p) = child.ports.get(i) else {
-                            return Err(SimError::at(
-                                "positional port connection out of range",
-                                conn.span,
-                            ));
-                        };
-                        p.name.clone()
-                    }
-                };
-                let formal = format!("{child_prefix}{formal_name}");
-                let dir = self.port_direction(&child, &formal_name);
-                match &conn.expr {
-                    None => {} // unconnected port
-                    Some(Expr::Ident { name, .. }) => {
-                        // Simple net connection: alias (both directions).
-                        let actual = format!("{prefix}{name}");
-                        self.union(&formal, &actual);
-                    }
-                    Some(e) => match dir {
-                        Some(ast::Direction::Output) => {
-                            self.assigns.push(Assign {
-                                lhs: self.prefix_expr(e, prefix)?,
-                                rhs: Expr::Ident {
-                                    span: conn.span,
-                                    name: formal.clone(),
-                                },
-                            });
-                        }
-                        Some(ast::Direction::Inout) => {
-                            return Err(SimError::at(
-                                "inout ports connected to expressions are not yet supported (M7)",
-                                conn.span,
-                            ))
-                        }
-                        _ => {
-                            // input (or unknown direction): drive the formal
-                            self.assigns.push(Assign {
-                                lhs: Expr::Ident {
-                                    span: conn.span,
-                                    name: formal.clone(),
-                                },
-                                rhs: self.prefix_expr(e, prefix)?,
-                            });
-                        }
-                    },
-                }
-            }
-        }
-        Ok(())
-    }
-
-    fn port_direction(&self, m: &Module, port: &str) -> Option<ast::Direction> {
-        for p in &m.ports {
-            if p.name == port {
-                return p.dir;
-            }
-        }
-        // Non-ANSI: direction lives on a dir declaration item.
-        for it in &m.items {
-            if let ast::ModuleItem::Decl(d) = it {
-                if let Some(dir) = d.dir {
-                    for e in &d.entries {
-                        if e.name == port {
-                            return Some(dir);
-                        }
-                    }
-                }
-            }
-        }
-        None
-    }
-
-    // ---- const evaluation helper ----
-
-    fn const_i64(&mut self, e: &Expr, prefix: &str) -> SResult<i64> {
-        let pe = self.prefix_expr(e, prefix)?;
-        let v = eval(&pe, self)?;
-        match v {
-            Val::Bits { bits, .. } if bits.is_known() => Ok(bits.to_i64_lossy()),
-            Val::Bits { .. } => Err(SimError::at("constant expression contains x/z", e.span())),
-            Val::Str(_) => Err(SimError::at("string where constant expected", e.span())),
-        }
-    }
-
-    // ---- expression/statement prefixing (name rewriting into flat space) ----
-
-    fn prefix_expr(&self, e: &Expr, prefix: &str) -> SResult<Expr> {
-        Ok(match e {
-            Expr::Ident { span, name } => Expr::Ident {
-                span: *span,
-                name: format!("{prefix}{name}"),
-            },
-            Expr::HierIdent { span, parts } => Expr::Ident {
-                span: *span,
-                name: format!("{prefix}{}", parts.join(".")),
-            },
-            Expr::NumLit(_) | Expr::RealLit { .. } | Expr::StrLit { .. } => e.clone(),
-            Expr::Unary { span, op, expr } => Expr::Unary {
-                span: *span,
-                op: *op,
-                expr: Box::new(self.prefix_expr(expr, prefix)?),
-            },
-            Expr::Binary {
-                span,
-                op,
-                lhs,
-                rhs,
-            } => Expr::Binary {
-                span: *span,
-                op: *op,
-                lhs: Box::new(self.prefix_expr(lhs, prefix)?),
-                rhs: Box::new(self.prefix_expr(rhs, prefix)?),
-            },
-            Expr::Ternary {
-                span,
-                cond,
-                then,
-                els,
-            } => Expr::Ternary {
-                span: *span,
-                cond: Box::new(self.prefix_expr(cond, prefix)?),
-                then: Box::new(self.prefix_expr(then, prefix)?),
-                els: Box::new(self.prefix_expr(els, prefix)?),
-            },
-            Expr::Concat { span, parts } => Expr::Concat {
-                span: *span,
-                parts: parts
-                    .iter()
-                    .map(|p| self.prefix_expr(p, prefix))
-                    .collect::<SResult<_>>()?,
-            },
-            Expr::Repeat {
-                span,
-                count,
-                value,
-            } => Expr::Repeat {
-                span: *span,
-                count: Box::new(self.prefix_expr(count, prefix)?),
-                value: Box::new(self.prefix_expr(value, prefix)?),
-            },
-            Expr::Index {
-                span,
-                base,
-                index,
-            } => Expr::Index {
-                span: *span,
-                base: Box::new(self.prefix_expr(base, prefix)?),
-                index: Box::new(self.prefix_expr(index, prefix)?),
-            },
-            Expr::PartSelect {
-                span,
-                base,
-                msb,
-                lsb,
-            } => Expr::PartSelect {
-                span: *span,
-                base: Box::new(self.prefix_expr(base, prefix)?),
-                msb: Box::new(self.prefix_expr(msb, prefix)?),
-                lsb: Box::new(self.prefix_expr(lsb, prefix)?),
-            },
-            Expr::IndexedPart { .. } => {
-                return Err(SimError::at(
-                    "indexed part-selects land at milestone M7",
-                    e.span(),
-                ))
-            }
-            Expr::Call {
-                span,
-                func,
-                args,
-            } => Expr::Call {
-                span: *span,
-                func: func.clone(),
-                args: args
-                    .iter()
-                    .map(|a| self.prefix_expr(a, prefix))
-                    .collect::<SResult<_>>()?,
-            },
-        })
-    }
-
-    fn prefix_stmt(&self, s: &Stmt, prefix: &str) -> SResult<Stmt> {
-        Ok(match s {
-            Stmt::Block { span, name, body } => Stmt::Block {
-                span: *span,
-                name: name.clone(),
-                body: body
-                    .iter()
-                    .map(|b| self.prefix_stmt(b, prefix))
-                    .collect::<SResult<_>>()?,
-            },
-            Stmt::BAssign { span, lhs, rhs } => Stmt::BAssign {
-                span: *span,
-                lhs: self.prefix_expr(lhs, prefix)?,
-                rhs: self.prefix_expr(rhs, prefix)?,
-            },
-            Stmt::NbAssign { span, lhs, rhs } => Stmt::NbAssign {
-                span: *span,
-                lhs: self.prefix_expr(lhs, prefix)?,
-                rhs: self.prefix_expr(rhs, prefix)?,
-            },
-            Stmt::If {
-                span,
-                cond,
-                then,
-                els,
-            } => Stmt::If {
-                span: *span,
-                cond: self.prefix_expr(cond, prefix)?,
-                then: Box::new(self.prefix_stmt(then, prefix)?),
-                els: match els {
-                    Some(e) => Some(Box::new(self.prefix_stmt(e, prefix)?)),
-                    None => None,
-                },
-            },
-            Stmt::Case {
-                span,
-                kind,
-                expr,
-                items,
-            } => Stmt::Case {
-                span: *span,
-                kind: *kind,
-                expr: self.prefix_expr(expr, prefix)?,
-                items: items
-                    .iter()
-                    .map(|it| match it {
-                        CaseItem::Items(labels, st) => Ok(CaseItem::Items(
-                            labels
-                                .iter()
-                                .map(|l| self.prefix_expr(l, prefix))
-                                .collect::<SResult<_>>()?,
-                            self.prefix_stmt(st, prefix)?,
-                        )),
-                        CaseItem::Default(st) => Ok(CaseItem::Default(self.prefix_stmt(st, prefix)?)),
-                    })
-                    .collect::<SResult<_>>()?,
-            },
-            Stmt::For {
-                span,
-                init,
-                cond,
-                step,
-                body,
-            } => Stmt::For {
-                span: *span,
-                init: self.prefix_pairs(init, prefix)?,
-                cond: self.prefix_expr(cond, prefix)?,
-                step: self.prefix_pairs(step, prefix)?,
-                body: Box::new(self.prefix_stmt(body, prefix)?),
-            },
-            Stmt::While {
-                span,
-                cond,
-                body,
-            } => Stmt::While {
-                span: *span,
-                cond: self.prefix_expr(cond, prefix)?,
-                body: Box::new(self.prefix_stmt(body, prefix)?),
-            },
-            Stmt::Repeat {
-                span,
-                count,
-                body,
-            } => Stmt::Repeat {
-                span: *span,
-                count: self.prefix_expr(count, prefix)?,
-                body: Box::new(self.prefix_stmt(body, prefix)?),
-            },
-            Stmt::Forever { span, body } => Stmt::Forever {
-                span: *span,
-                body: Box::new(self.prefix_stmt(body, prefix)?),
-            },
-            Stmt::DelayCtrl { span, delay, body } => Stmt::DelayCtrl {
-                span: *span,
-                delay: self.prefix_delay(delay, prefix)?,
-                body: match body {
-                    Some(b) => Some(Box::new(self.prefix_stmt(b, prefix)?)),
-                    None => None,
-                },
-            },
-            Stmt::EventCtrl { span, .. } => {
-                return Err(SimError::at(
-                    "event controls need the scheduler (milestone M5)",
-                    *span,
-                ))
-            }
-            Stmt::SysCall {
-                span,
-                name,
-                args,
-            } => Stmt::SysCall {
-                span: *span,
-                name: name.clone(),
-                args: args
-                    .iter()
-                    .map(|a| self.prefix_expr(a, prefix))
-                    .collect::<SResult<_>>()?,
-            },
-            Stmt::SubCall { span, .. } => {
-                return Err(SimError::at(
-                    "task calls land at milestone M4",
-                    *span,
-                ))
-            }
-            Stmt::Disable { span, .. } => {
-                return Err(SimError::at(
-                    "disable lands at milestone M4",
-                    *span,
-                ))
-            }
-            Stmt::Null { span } => Stmt::Null { span: *span },
-        })
-    }
-
-    fn prefix_pairs(&self, pairs: &[ast::AssignPair], prefix: &str) -> SResult<Vec<ast::AssignPair>> {
-        pairs
-            .iter()
-            .map(|p| {
-                Ok(ast::AssignPair {
-                    span: p.span,
-                    lhs: self.prefix_expr(&p.lhs, prefix)?,
-                    rhs: self.prefix_expr(&p.rhs, prefix)?,
-                })
-            })
-            .collect()
-    }
-
-    fn prefix_delay(&self, d: &ast::DelayVal, prefix: &str) -> SResult<ast::DelayVal> {
-        Ok(match d {
-            ast::DelayVal::Lit(t) => ast::DelayVal::Lit(t.clone()),
-            ast::DelayVal::Expr(e) => ast::DelayVal::Expr(self.prefix_expr(e, prefix)?),
-        })
-    }
-
-    // ---- reading / writing through the union-find ----
-
     fn read_name(&mut self, name: &str, span: Span) -> SResult<(Bits, bool)> {
         let root = self.find(name);
         match self.cells.get(&root) {
             Some(c) => Ok((c.bits, c.signed)),
-            None => Err(SimError::at(format!("undeclared identifier `{name}`"), span)),
+            None => Err(SimError::at(
+                format!("undeclared identifier `{name}`"),
+                span,
+            )),
         }
     }
 
@@ -674,7 +1429,6 @@ impl Sim {
         let root = self.find(name);
         match self.cells.get_mut(&root) {
             Some(c) => {
-                // Adjust to the declared width (RHS signedness decides ext).
                 c.bits = if c.signed && signed {
                     bits.sadjust(c.bits.width)?
                 } else {
@@ -682,77 +1436,70 @@ impl Sim {
                 };
                 Ok(())
             }
-            None => Err(SimError::new(
-                format!("undeclared identifier `{name}`"),
-                None,
-            )),
+            None => Err(SimError::new(format!("undeclared identifier `{name}`"), None)),
         }
     }
 
+    // ---------- lvalues ----------
+
     fn assign_lvalue(&mut self, lhs: &Expr, v: Val) -> SResult<()> {
-        let (bits, signed) = match v {
-            Val::Bits { bits, signed } => (bits, signed),
-            Val::Str(_) => return Err(SimError::at("cannot assign a string here", lhs.span())),
-        };
+        let (bits, signed) = v.to_bits(lhs.span())?;
         match lhs {
             Expr::Ident { name, .. } => self.set_name(name, bits, signed),
-            Expr::HierIdent { parts, .. } => {
-                self.set_name(&parts.join("."), bits, signed)
-            }
+            Expr::HierIdent { parts, .. } => self.set_name(&parts.join("."), bits, signed),
             Expr::Index { base, index, .. } => {
                 let (cur, cs) = self.read_lvalue_base(base)?;
-                let (i, _) = match eval(index, self)? {
-                    Val::Bits { bits, .. } => (bits, false),
-                    Val::Str(_) => return Err(SimError::at("bad index", lhs.span())),
-                };
+                let (i, _) = eval(index, self)?.to_bits(index.span())?;
                 if i.has_unknown() {
-                    return Ok(()); // x-indexed write: no effect (§5.2.1)
+                    return Ok(());
                 }
-                let pos = self.bit_position(base, i.to_i64_lossy());
+                let pos = eval::bit_position(base, i.to_i64_lossy(), self);
                 let cur2 = match pos {
                     Some(p) if p >= 0 && (p as u32) < cur.width => {
                         cur.set_part(p as u32, p as u32, &bits)?
                     }
-                    _ => cur, // out-of-range write: no effect
+                    _ => cur,
                 };
                 self.write_base(base, cur2, cs)
             }
-            Expr::PartSelect { base, msb, lsb, .. } => {
+            Expr::PartSelect {
+                base,
+                msb,
+                lsb,
+                ..
+            } => {
                 let (cur, cs) = self.read_lvalue_base(base)?;
-                let (m, _) = match eval(msb, self)? {
-                    Val::Bits { bits, .. } => (bits, false),
-                    Val::Str(_) => return Err(SimError::at("bad part-select", lhs.span())),
-                };
-                let (l, _) = match eval(lsb, self)? {
-                    Val::Bits { bits, .. } => (bits, false),
-                    Val::Str(_) => return Err(SimError::at("bad part-select", lhs.span())),
-                };
+                let (m, _) = eval(msb, self)?.to_bits(msb.span())?;
+                let (l, _) = eval(lsb, self)?.to_bits(lsb.span())?;
                 if m.has_unknown() || l.has_unknown() {
                     return Ok(());
                 }
-                let hi = self.bit_position(base, m.to_i64_lossy());
-                let lo = self.bit_position(base, l.to_i64_lossy());
+                let hi = eval::bit_position(base, m.to_i64_lossy(), self);
+                let lo = eval::bit_position(base, l.to_i64_lossy(), self);
                 let cur2 = match (hi, lo) {
-                    (Some(h), Some(l))
-                        if h >= 0 && l >= 0 && (h.max(l) as u32) < cur.width =>
-                    {
-                        cur.set_part(h as u32, l as u32, &bits)?
+                    (Some(h), Some(l2)) if h >= 0 && l2 >= 0 && (h.max(l2) as u32) < cur.width => {
+                        cur.set_part(h as u32, l2 as u32, &bits)?
                     }
                     _ => cur,
                 };
                 self.write_base(base, cur2, cs)
             }
             Expr::Concat { parts, .. } => {
-                // Split rhs MSB-first across the targets (§5.1.14 lvalue).
                 let mut off = bits.width;
                 for p in parts {
                     let w = self.lvalue_width(p)?;
                     if off < w {
-                        return Err(SimError::at("concat lvalue wider than rhs", lhs.span()));
+                        return Err(SimError::at(
+                            "concat lvalue wider than rhs",
+                            lhs.span(),
+                        ));
                     }
                     off -= w;
                     let slice = bits.part(off + w - 1, off)?;
-                    self.assign_lvalue(p, Val::Bits { bits: slice, signed: false })?;
+                    self.assign_lvalue(p, Val::Bits {
+                        bits: slice,
+                        signed: false,
+                    })?;
                 }
                 Ok(())
             }
@@ -767,10 +1514,7 @@ impl Sim {
         match e {
             Expr::Ident { name, .. } => self.read_name(name, e.span()),
             Expr::HierIdent { parts, .. } => self.read_name(&parts.join("."), e.span()),
-            other => Err(SimError::at(
-                "unsupported selection base (M7)",
-                other.span(),
-            )),
+            other => Err(SimError::at("unsupported selection base (M7)", other.span())),
         }
     }
 
@@ -782,7 +1526,7 @@ impl Sim {
         }
     }
 
-    fn lvalue_width(&mut self, e: &Expr) -> SResult<u32> {
+    pub fn lvalue_width(&mut self, e: &Expr) -> SResult<u32> {
         match e {
             Expr::Ident { name, .. } => {
                 let root = self.find(name);
@@ -795,14 +1539,8 @@ impl Sim {
             }
             Expr::Index { .. } => Ok(1),
             Expr::PartSelect { msb, lsb, .. } => {
-                let (m, _) = match eval(msb, self)? {
-                    Val::Bits { bits, .. } => (bits, false),
-                    Val::Str(_) => return Err(SimError::at("bad part-select", e.span())),
-                };
-                let (l, _) = match eval(lsb, self)? {
-                    Val::Bits { bits, .. } => (bits, false),
-                    Val::Str(_) => return Err(SimError::at("bad part-select", e.span())),
-                };
+                let (m, _) = eval(msb, self)?.to_bits(msb.span())?;
+                let (l, _) = eval(lsb, self)?.to_bits(lsb.span())?;
                 Ok((m.to_i64_lossy() - l.to_i64_lossy()).unsigned_abs() as u32 + 1)
             }
             Expr::Concat { parts, .. } => {
@@ -816,45 +1554,25 @@ impl Sim {
         }
     }
 
-    fn bit_position(&mut self, base: &Expr, index: i64) -> Option<i64> {
-        let name = match base {
-            Expr::Ident { name, .. } => Some(name.clone()),
-            Expr::HierIdent { parts, .. } => Some(parts.join(".")),
-            _ => None,
-        };
-        match name.and_then(|n| self.decl_range(&n)) {
-            Some((msb, lsb)) => {
-                if msb >= lsb {
-                    Some(index - lsb)
-                } else {
-                    Some(lsb - index)
-                }
-            }
-            None => Some(index),
-        }
-    }
-
-    // ---- combinational convergence ----
+    // ---------- combinational settle + sensitivity wake ----------
 
     fn settle(&mut self) -> SResult<()> {
         for _ in 0..100 {
             let mut changed = false;
-            let assigns: Vec<(Expr, Expr)> = self
+            let assigns: Vec<(Expr, Expr, u32)> = self
                 .assigns
                 .iter()
-                .map(|a| (a.lhs.clone(), a.rhs.clone()))
+                .map(|a| (a.lhs.clone(), a.rhs.clone(), a.lhs_w))
                 .collect();
-            for (lhs, rhs) in &assigns {
-                let v = eval(rhs, self)?;
-                let (bits, signed) = match v {
-                    Val::Bits { bits, signed } => (bits, signed),
-                    Val::Str(_) => {
-                        return Err(SimError::at("assign produced a string", rhs.span()))
-                    }
-                };
+            for (lhs, rhs, w) in &assigns {
+                let v = eval_ctx(rhs, self, *w)?;
+                let (bits, signed) = v.to_bits(rhs.span())?;
                 let cur = self.read_lvalue_base_quiet(lhs)?;
-                // Continuous-assign extension follows the RHS's own signedness.
-                let target = if signed { bits.sadjust(cur.0.width)? } else { bits.uadjust(cur.0.width)? };
+                let target = if cur.1 {
+                    bits.sadjust(cur.0.width)?
+                } else {
+                    bits.uadjust(cur.0.width)?
+                };
                 if cur.0 != target {
                     self.assign_lvalue(lhs, Val::Bits { bits, signed })?;
                     changed = true;
@@ -865,12 +1583,13 @@ impl Sim {
             }
         }
         Err(SimError::new(
-            "combinational network did not converge after 100 iterations \
-             (combinational loop — upstream reports this as UNOPTFLAT)",
+            "combinational network did not converge after 100 iterations (combinational loop — upstream reports UNOPTFLAT)",
             None,
         ))
     }
 
+    /// Current value of an assignment target (any lvalue form is also a
+    /// valid rvalue, so evaluate it): used by settle() for change detection.
     fn read_lvalue_base_quiet(&mut self, e: &Expr) -> SResult<(Bits, bool)> {
         match e {
             Expr::Ident { name, .. } => {
@@ -880,219 +1599,263 @@ impl Sim {
                     None => (Bits::zeros(1)?, false),
                 })
             }
-            other => self.read_lvalue_base(other),
+            other => eval(other, self)?.to_bits(other.span()),
         }
     }
 
-    // ---- statement execution ----
-
-    pub fn run(&mut self) -> SResult<()> {
-        self.settle()?;
-        let initials = self.initials.clone();
-        for stmt in &initials {
-            if self.finished {
-                break;
+    /// Re-sample every waiting process's sensitivity list; woken processes
+    /// join the runnable queue in declaration order (determinism, ADR-0001).
+    fn wake_check(&mut self) -> SResult<()> {
+        let waiting: Vec<usize> = (0..self.procs.len())
+            .filter(|&i| self.procs[i].state == PState::Waiting)
+            .collect();
+        for pid in waiting {
+            let mut waits = std::mem::take(&mut self.procs[pid].waits);
+            let mut triggered = false;
+            for w in waits.iter_mut() {
+                let (nb, _) = eval(&w.0.expr, self)?.to_bits(w.0.expr.span())?;
+                if edge_fired(w.0.kind, &w.1, &nb) {
+                    triggered = true;
+                }
+                w.1 = nb;
             }
-            self.exec(stmt)?;
+            self.procs[pid].waits = waits;
+            if triggered {
+                self.procs[pid].state = PState::Runnable;
+                self.runnable.push_back(pid);
+            }
         }
         Ok(())
     }
 
-    fn exec(&mut self, s: &Stmt) -> SResult<Flow> {
-        const LOOP_CAP: u64 = 10_000_000;
-        match s {
-            Stmt::Block { body, .. } => {
-                for st in body {
-                    if self.exec(st)? == Flow::Finish {
-                        return Ok(Flow::Finish);
+    // ---------- the scheduler ----------
+
+    pub fn run(&mut self) -> SResult<()> {
+        self.settle()?;
+        self.wake_check()?;
+        self.runnable = (0..self.procs.len()).collect();
+        let mut budget: u64 = 0;
+        loop {
+            while let Some(pid) = self.runnable.pop_front() {
+                if self.finished {
+                    break;
+                }
+                budget += 1;
+                if budget > 50_000_000 {
+                    return Err(SimError::new(
+                        "scheduler executed >50M process steps (runaway simulation?)",
+                        None,
+                    ));
+                }
+                self.step_process(pid)?;
+            }
+            if self.finished {
+                return Ok(());
+            }
+            if !self.inactive.is_empty() {
+                self.runnable.extend(self.inactive.drain(..));
+                continue;
+            }
+            if !self.nba.is_empty() {
+                let items = std::mem::take(&mut self.nba);
+                for (lhs, v) in items {
+                    self.assign_lvalue(&lhs, v)?;
+                }
+                self.settle()?;
+                self.wake_check()?;
+                continue;
+            }
+            match self.delayed.keys().next().copied() {
+                Some(t) => {
+                    self.now = t;
+                    if let Some(v) = self.delayed.remove(&t) {
+                        for pid in v {
+                            self.procs[pid].state = PState::Runnable;
+                            self.runnable.push_back(pid);
+                        }
                     }
                 }
-                Ok(Flow::Normal)
+                None => return Ok(()),
             }
-            Stmt::BAssign { lhs, rhs, .. } => {
-                let v = eval(rhs, self)?;
+        }
+    }
+
+    fn step_process(&mut self, pid: usize) -> SResult<()> {
+        let instrs = self.procs[pid].instrs.clone();
+        let mut counters = std::mem::take(&mut self.procs[pid].counters);
+        let mut pc = self.procs[pid].pc;
+        let mut guard: u64 = 0;
+        let flow = loop {
+            guard += 1;
+            if guard > 10_000_000 {
+                return Err(SimError::new(
+                    "process executed >10M instructions without suspending (zero-delay loop?)",
+                    None,
+                ));
+            }
+            if pc >= instrs.len() {
+                break Flow::End;
+            }
+            match self.exec_one(&instrs, &mut pc, &mut counters, Some(pid))? {
+                Flow::Next => {}
+                f => break f,
+            }
+        };
+        let p = &mut self.procs[pid];
+        p.pc = pc;
+        p.counters = counters;
+        match flow {
+            Flow::End | Flow::Finish => p.state = PState::Done,
+            Flow::Next => unreachable!(),
+            Flow::Suspend => {} // state set by exec_one
+        }
+        Ok(())
+    }
+
+    /// Execute one instruction; suspends on delay/wait (process mode) or
+    /// errors on them (sync mode, `pid: None`).
+    fn exec_one(
+        &mut self,
+        instrs: &[Instr],
+        pc: &mut usize,
+        counters: &mut Vec<u64>,
+        pid: Option<usize>,
+    ) -> SResult<Flow> {
+        let instr = instrs[*pc].clone();
+        match &instr {
+            Instr::BAssign(lhs, rhs) => {
+                let w = self.lvalue_width(lhs)?;
+                let v = eval_ctx(rhs, self, w)?;
                 self.assign_lvalue(lhs, v)?;
                 self.settle()?;
-                Ok(Flow::Normal)
+                self.wake_check()?;
+                *pc += 1;
+                Ok(Flow::Next)
             }
-            Stmt::NbAssign { span, .. } => Err(SimError::at(
-                "nonblocking assignments need the scheduler (milestone M5)",
-                *span,
-            )),
-            Stmt::If {
-                cond,
-                then,
-                els,
-                ..
-            } => {
-                let (c, _) = match eval(cond, self)? {
-                    Val::Bits { bits, .. } => (bits, false),
-                    Val::Str(_) => {
-                        return Err(SimError::at("string as condition", cond.span()))
-                    }
-                };
-                // x/z condition takes the else branch (IEEE 1364-2005 §9.4).
-                let take = matches!(c.truthy()?, Some(true));
-                if take {
-                    self.exec(then)
-                } else if let Some(e) = els {
-                    self.exec(e)
-                } else {
-                    Ok(Flow::Normal)
-                }
+            Instr::NbAssign(lhs, rhs) => {
+                let w = self.lvalue_width(lhs)?;
+                let v = eval_ctx(rhs, self, w)?;
+                self.nba.push((lhs.clone(), v));
+                *pc += 1;
+                Ok(Flow::Next)
             }
-            Stmt::Case {
+            Instr::JumpIfFalse(cond, target) => {
+                let (b, _) = eval(cond, self)?.to_bits(cond.span())?;
+                *pc = if b.truthy()? == Some(true) { *pc + 1 } else { *target };
+                Ok(Flow::Next)
+            }
+            Instr::Jump(t) => {
+                *pc = *t;
+                Ok(Flow::Next)
+            }
+            Instr::Case {
                 kind,
                 expr,
-                items,
-                ..
+                arms,
+                default,
             } => {
-                let (v, _) = match eval(expr, self)? {
-                    Val::Bits { bits, .. } => (bits, false),
-                    Val::Str(s) => {
-                        return Err(SimError::at(format!("string in case expr `{s}`"), expr.span()))
-                    }
-                };
-                for it in items {
-                    match it {
-                        CaseItem::Items(labels, body) => {
-                            for l in labels {
-                                let (lv, _) = match eval(l, self)? {
-                                    Val::Bits { bits, .. } => (bits, false),
-                                    Val::Str(_) => {
-                                        return Err(SimError::at("string case label", l.span()))
-                                    }
-                                };
-                                if self.case_matches(*kind, &v, &lv)? {
-                                    return self.exec(body);
-                                }
-                            }
+                let (v, _) = eval(expr, self)?.to_bits(expr.span())?;
+                let mut target = *default;
+                'outer: for (labels, t) in arms {
+                    for l in labels {
+                        let (lv, _) = eval(l, self)?.to_bits(l.span())?;
+                        if self.case_matches(*kind, &v, &lv)? {
+                            target = *t;
+                            break 'outer;
                         }
-                        CaseItem::Default(_) => {}
                     }
                 }
-                for it in items {
-                    if let CaseItem::Default(body) = it {
-                        return self.exec(body);
-                    }
-                }
-                Ok(Flow::Normal)
+                *pc = target;
+                Ok(Flow::Next)
             }
-            Stmt::For {
-                init,
-                cond,
-                step,
-                body,
-                ..
-            } => {
-                for p in init {
-                    let v = eval(&p.rhs, self)?;
-                    self.assign_lvalue(&p.lhs, v)?;
-                }
-                self.settle()?;
-                let mut n = 0u64;
-                loop {
-                    let (c, _) = match eval(cond, self)? {
-                        Val::Bits { bits, .. } => (bits, false),
-                        Val::Str(_) => {
-                            return Err(SimError::at("string as for-condition", cond.span()))
-                        }
-                    };
-                    if c.truthy()? != Some(true) {
-                        break;
-                    }
-                    n += 1;
-                    if n > LOOP_CAP {
-                        return Err(SimError::at(
-                            "for loop exceeded 10M iterations (slice has no time wheel)",
-                            s_stmt_span(s),
-                        ));
-                    }
-                    if self.exec(body)? == Flow::Finish {
-                        return Ok(Flow::Finish);
-                    }
-                    for p in step {
-                        let v = eval(&p.rhs, self)?;
-                        self.assign_lvalue(&p.lhs, v)?;
-                    }
-                    self.settle()?;
-                }
-                Ok(Flow::Normal)
-            }
-            Stmt::While { cond, body, .. } => {
-                let mut n = 0u64;
-                loop {
-                    let (c, _) = match eval(cond, self)? {
-                        Val::Bits { bits, .. } => (bits, false),
-                        Val::Str(_) => {
-                            return Err(SimError::at("string as while-condition", cond.span()))
-                        }
-                    };
-                    if c.truthy()? != Some(true) {
-                        break;
-                    }
-                    n += 1;
-                    if n > LOOP_CAP {
-                        return Err(SimError::at("while loop exceeded cap", s_stmt_span(s)));
-                    }
-                    if self.exec(body)? == Flow::Finish {
-                        return Ok(Flow::Finish);
-                    }
-                }
-                Ok(Flow::Normal)
-            }
-            Stmt::Repeat { count, body, .. } => {
-                let (c, _) = match eval(count, self)? {
-                    Val::Bits { bits, .. } => (bits, false),
-                    Val::Str(_) => return Err(SimError::at("string repeat count", count.span())),
-                };
+            Instr::RepeatInit(count) => {
+                let (c, _) = eval(count, self)?.to_bits(count.span())?;
                 if c.has_unknown() {
                     return Err(SimError::at("unknown repeat count", count.span()));
                 }
-                for _ in 0..c.to_u64_lossy().min(LOOP_CAP) {
-                    if self.exec(body)? == Flow::Finish {
-                        return Ok(Flow::Finish);
+                counters.push(c.to_u64_lossy());
+                *pc += 1;
+                Ok(Flow::Next)
+            }
+            Instr::RepeatLoop { end } => {
+                match counters.last_mut() {
+                    Some(c) if *c > 0 => {
+                        *c -= 1;
+                        *pc += 1;
+                    }
+                    Some(_) => {
+                        counters.pop();
+                        *pc = *end;
+                    }
+                    None => *pc = *end,
+                }
+                Ok(Flow::Next)
+            }
+            Instr::Delay(d) => {
+                let ticks = self.delay_ticks(d)?;
+                match pid {
+                    None => Err(SimError::new(
+                        "timing control inside a function is illegal (IEEE 1364-2005 §10.3)",
+                        None,
+                    )),
+                    Some(pid) => {
+                        let target = self.now.saturating_add(ticks);
+                        if ticks == 0 {
+                            self.inactive.push_back(pid);
+                        } else {
+                            self.delayed.entry(target).or_default().push(pid);
+                        }
+                        self.procs[pid].state = PState::Delayed;
+                        *pc += 1;
+                        Ok(Flow::Suspend)
                     }
                 }
-                Ok(Flow::Normal)
             }
-            Stmt::Forever { body, .. } => {
-                let mut n = 0u64;
-                loop {
-                    n += 1;
-                    if n > LOOP_CAP {
-                        return Err(SimError::at(
-                            "forever loop without $finish (slice has no time wheel)",
-                            s_stmt_span(s),
-                        ));
-                    }
-                    if self.exec(body)? == Flow::Finish {
-                        return Ok(Flow::Finish);
+            Instr::Wait(edges) => {
+                let mut waits = Vec::with_capacity(edges.len());
+                for e in edges {
+                    let (b, _) = eval(&e.expr, self)?.to_bits(e.expr.span())?;
+                    waits.push((e.clone(), b));
+                }
+                match pid {
+                    None => Err(SimError::new(
+                        "event control inside a function is illegal (IEEE 1364-2005 §10.3)",
+                        None,
+                    )),
+                    Some(pid) => {
+                        self.procs[pid].waits = waits;
+                        self.procs[pid].state = PState::Waiting;
+                        *pc += 1;
+                        Ok(Flow::Suspend)
                     }
                 }
             }
-            Stmt::DelayCtrl { body, .. } => {
-                // No time model in the slice; a delay just settles comb logic.
-                self.settle()?;
-                match body {
-                    Some(b) => self.exec(b),
-                    None => Ok(Flow::Normal),
-                }
+            Instr::SysCall(name, args) => {
+                let f = self.syscall(name, args)?;
+                *pc += 1;
+                Ok(f)
             }
-            Stmt::EventCtrl { span, .. } => Err(SimError::at(
-                "event controls need the scheduler (milestone M5)",
-                *span,
-            )),
-            Stmt::SysCall { name, args, .. } => self.syscall(name, args),
-            Stmt::SubCall { span, name, .. } => Err(SimError::at(
-                format!("task call `{name}` lands at milestone M4"),
-                *span,
-            )),
-            Stmt::Disable { span, name } => Err(SimError::at(
-                format!("disable `{name}` lands at milestone M4"),
-                *span,
-            )),
-            Stmt::Null { .. } => Ok(Flow::Normal),
+        }
+    }
+
+    fn delay_ticks(&mut self, d: &ast::DelayVal) -> SResult<u64> {
+        let ratio = self.unit_fs / self.prec_fs.max(1);
+        match d {
+            ast::DelayVal::Lit(text) => {
+                let f: f64 = text
+                    .parse()
+                    .map_err(|_| SimError::new(format!("bad delay literal `{text}`"), None))?;
+                Ok((f * ratio as f64).round() as u64)
+            }
+            ast::DelayVal::Expr(e) => {
+                let (b, _) = eval(e, self)?.to_bits(e.span())?;
+                if b.has_unknown() {
+                    return Err(SimError::at("unknown delay value", e.span()));
+                }
+                let v = b.to_u64_lossy();
+                v.checked_mul(ratio)
+                    .ok_or_else(|| SimError::at("delay overflow", e.span()))
+            }
         }
     }
 
@@ -1103,12 +1866,11 @@ impl Sim {
         match kind {
             CaseKind::Case => Ok(a.case_eq(&b)?.to_u64_lossy() == 1),
             CaseKind::Casez => {
-                // x AND z in the case item are don't-care (IEEE 1364-2005 §9.5.2).
+                // x AND z in the case item are don't-care (§9.5.2).
                 let care = !b.mask & low_bits(w);
                 Ok(((a.data ^ b.data) & care) == 0 && ((a.mask ^ b.mask) & care) == 0)
             }
             CaseKind::Casex => {
-                // x/z in either value or item are don't-care.
                 let care = !(a.mask | b.mask) & low_bits(w);
                 Ok(((a.data ^ b.data) & care) == 0)
             }
@@ -1117,7 +1879,7 @@ impl Sim {
 
     fn syscall(&mut self, name: &str, args: &[Expr]) -> SResult<Flow> {
         match name {
-            "$display" | "$write" | "$error" | "$warning" | "$info" | "$fatal" => {
+            "$display" | "$write" | "$error" | "$warning" | "$info" | "$fatal" | "$strobe" => {
                 let text = self.format_display(args)?;
                 let prefix = match name {
                     "$error" | "$fatal" => "%Error: ",
@@ -1134,13 +1896,13 @@ impl Sim {
                     self.finished = true;
                     return Ok(Flow::Finish);
                 }
-                Ok(Flow::Normal)
+                Ok(Flow::Next)
             }
             "$finish" | "$stop" => {
                 self.finished = true;
                 Ok(Flow::Finish)
             }
-            "$dumpfile" | "$dumpvars" | "$dumpoff" | "$dumpon" | "$dumpall" => Ok(Flow::Normal), // M6
+            "$dumpfile" | "$dumpvars" | "$dumpoff" | "$dumpon" | "$dumpall" => Ok(Flow::Next),
             _ => Err(SimError::new(
                 format!("system task `{name}` is not yet supported"),
                 None,
@@ -1148,7 +1910,7 @@ impl Sim {
         }
     }
 
-    /// `$display("%b", x)` formatting per IEEE 1364-2005 §17.1.1.
+    /// `$display` formatting per IEEE 1364-2005 §17.1.1.
     fn format_display(&mut self, args: &[Expr]) -> SResult<String> {
         let mut vals: Vec<Val> = Vec::with_capacity(args.len());
         for a in args {
@@ -1204,19 +1966,27 @@ impl Sim {
                 return Err(SimError::new("format string ends with `%`", None));
             };
             i += 1;
+            // `%t` without an argument prints the current time (§17.1.1).
+            if matches!(conv, 't' | 'T') && ai >= vals.len() {
+                let (now, _ratio) = self.now();
+                let mut s = now.to_string();
+                let pad = if zero_pad { s.len() } else { width.unwrap_or(20).max(s.len()) };
+                while s.len() < pad {
+                    s.insert(0, ' ');
+                }
+                out.push_str(&s);
+                continue;
+            }
             let Some(arg) = vals.get(ai) else {
                 return Err(SimError::new("not enough $display arguments", None));
             };
             ai += 1;
             let piece = match (conv, arg) {
                 ('s', Val::Str(s)) => s.clone(),
-                ('c', Val::Bits { bits, .. }) => {
-                    char::from_u32(bits.to_u64_lossy() as u32).unwrap_or('?').to_string()
-                }
-                (
-                    'd' | 'D',
-                    Val::Bits { bits, signed },
-                ) => {
+                ('c', Val::Bits { bits, .. }) => char::from_u32(bits.to_u64_lossy() as u32)
+                    .unwrap_or('?')
+                    .to_string(),
+                ('d' | 'D', Val::Bits { bits, signed }) => {
                     let natural = if *signed {
                         bits.to_i64_lossy().abs().to_string().len()
                             + (bits.to_i64_lossy() < 0) as usize
@@ -1228,23 +1998,23 @@ impl Sim {
                         };
                         maxv.to_string().len()
                     };
-                    let mut s = bits.fmt_dec();
-                    // `%0d` = no padding at all; plain `%d` pads to the
-                    // natural width (digits of the type's max value).
-                    let pad = if zero_pad {
-                        s.chars().count()
+                    let mut s = if *signed {
+                        if bits.has_unknown() { "x".to_string() } else { bits.to_i64_lossy().to_string() }
                     } else {
-                        width.unwrap_or(natural).max(s.chars().count())
+                        bits.fmt_dec()
                     };
+                    let pad = match (zero_pad, width) {
+                        (true, None) => s.chars().count(),
+                        (true, Some(w)) => w.max(s.chars().count()),
+                        (false, w) => w.unwrap_or(natural).max(s.chars().count()),
+                    };
+                    let fill = if zero_pad && width.is_some() { '0' } else { ' ' };
                     while s.chars().count() < pad {
-                        s.insert(0, ' ');
+                        s.insert(0, fill);
                     }
                     s
                 }
-                (
-                    'b' | 'B',
-                    Val::Bits { bits, .. },
-                ) => {
+                ('b' | 'B', Val::Bits { bits, .. }) => {
                     let mut s = bits.fmt_bin();
                     let pad = width.unwrap_or(bits.width as usize).max(s.len());
                     while s.len() < pad {
@@ -1252,10 +2022,7 @@ impl Sim {
                     }
                     s
                 }
-                (
-                    'h' | 'H' | 'x' | 'X',
-                    Val::Bits { bits, .. },
-                ) => {
+                ('h' | 'H' | 'x' | 'X', Val::Bits { bits, .. }) => {
                     let nib = bits.width.div_ceil(4) as usize;
                     let mut s = bits.fmt_hex();
                     let pad = width.unwrap_or(nib).max(s.len());
@@ -1264,20 +2031,25 @@ impl Sim {
                     }
                     s
                 }
-                (
-                    'o' | 'O',
-                    Val::Bits { bits, .. },
-                ) => {
+                ('o' | 'O', Val::Bits { bits, .. }) => {
                     if bits.has_unknown() {
                         "x".to_string()
                     } else {
                         format!("{:o}", bits.to_u64_lossy())
                     }
                 }
-                (
-                    't' | 'T',
-                    Val::Bits { bits, .. },
-                ) => bits.fmt_dec(),
+                ('t' | 'T', Val::Bits { bits, .. }) => {
+                    // %t prints in time-precision units; the argument ($time)
+                    // is in time-unit units (§17.1.1/§17.3.3).
+                    let (_now, ratio) = self.now();
+                    let v = bits.to_u64_lossy() * ratio;
+                    let mut s = v.to_string();
+                    let pad = if zero_pad { s.len() } else { width.unwrap_or(20).max(s.len()) };
+                    while s.len() < pad {
+                        s.insert(0, ' ');
+                    }
+                    s
+                }
                 ('s', Val::Bits { .. }) => {
                     return Err(SimError::new("%s needs a string argument", None))
                 }
@@ -1300,23 +2072,55 @@ impl Sim {
     }
 }
 
-impl Lookup for Sim {
-    fn lookup(&mut self, name: &str, span: Span) -> SResult<Val> {
-        let (bits, signed) = self.read_name(name, span)?;
-        Ok(Val::Bits { bits, signed })
-    }
-
-    fn decl_range(&mut self, name: &str) -> Option<(i64, i64)> {
-        let root = self.find(name);
-        self.cells.get(&root).map(|c| (c.msb, c.lsb))
+/// IEEE 1364-2005 §9.7.2 edge transition tables (x-aware).
+fn edge_fired(kind: ast::EdgeKind, old: &Bits, new: &Bits) -> bool {
+    let bit = |b: &Bits| -> u8 {
+        let l = b.width.max(1);
+        match b.part(l - 1, l - 1) {
+            Ok(x) if !x.has_unknown() => x.to_u64_lossy() as u8, // 0 or 1
+            Ok(_) => 2,                                          // x/z
+            Err(_) => 2,
+        }
+    };
+    let (o, n) = (bit(old), bit(new));
+    match kind {
+        ast::EdgeKind::Posedge => (o == 0 && n != 0) || (o == 2 && n == 1),
+        ast::EdgeKind::Negedge => (o == 1 && n != 1) || (o == 2 && n == 0),
+        ast::EdgeKind::Edge | ast::EdgeKind::Any => old != new,
     }
 }
 
-fn prefix_span(_prefix: &str) -> Span {
-    Span::default()
+fn parse_timescale(ts: Option<&str>) -> (u64, u64) {
+    let fs = |mag: u64, unit: &str| -> u64 {
+        let base: u64 = match unit {
+            "s" => 1_000_000_000_000_000,
+            "ms" => 1_000_000_000_000,
+            "us" => 1_000_000_000,
+            "ns" => 1_000_000,
+            "ps" => 1_000,
+            "fs" => 1,
+            _ => 1_000_000,
+        };
+        base * mag
+    };
+    let parse_one = |s: &str| -> Option<u64> {
+        let idx = s.find(|c: char| c.is_ascii_alphabetic()).unwrap_or(s.len());
+        let (num, unit) = s.split_at(idx);
+        let mag: u64 = num.parse().ok()?;
+        Some(fs(mag, unit))
+    };
+    if let Some(t) = ts {
+        if let Some((u, p)) = t.split_once('/') {
+            if let (Some(u), Some(p)) = (parse_one(u.trim()), parse_one(p.trim())) {
+                return (u, p);
+            }
+        }
+    }
+    // No `timescale anywhere → upstream default 1ps/1ps.
+    (1_000, 1_000)
 }
 
-fn s_stmt_span(s: &Stmt) -> Span {
+fn stmt_span(s: &Stmt) -> Span {
     match s {
         Stmt::Block { span, .. }
         | Stmt::BAssign { span, .. }
@@ -1336,5 +2140,102 @@ fn s_stmt_span(s: &Stmt) -> Span {
     }
 }
 
-#[allow(unused)]
-fn _todo_span_marker() {}
+fn it_span(it: &ast::ModuleItem) -> Span {
+    match it {
+        ast::ModuleItem::Decl(d) => d.span,
+        ast::ModuleItem::ContAssign(p) | ast::ModuleItem::Defparam(p) => {
+            p.first().map(|x| x.span).unwrap_or_default()
+        }
+        ast::ModuleItem::Always { span, .. } | ast::ModuleItem::Initial { span, .. } => *span,
+        ast::ModuleItem::Instance(i) => i.span,
+        ast::ModuleItem::GenerateRegion(items) => items.first().map(it_span).unwrap_or_default(),
+        ast::ModuleItem::GenIf { span, .. }
+        | ast::ModuleItem::GenFor { span, .. }
+        | ast::ModuleItem::GenCase { span, .. }
+        | ast::ModuleItem::GenBlock { span, .. } => *span,
+        ast::ModuleItem::Function(f) | ast::ModuleItem::Task(f) => f.span,
+        ast::ModuleItem::Empty => Span::default(),
+    }
+}
+
+impl Lookup for Sim {
+    fn lookup(&mut self, name: &str, span: Span) -> SResult<Val> {
+        let (bits, signed) = self.read_name(name, span)?;
+        Ok(Val::Bits { bits, signed })
+    }
+
+    fn decl_range(&mut self, name: &str) -> Option<(i64, i64)> {
+        let root = self.find(name);
+        self.cells.get(&root).map(|c| (c.msb, c.lsb))
+    }
+
+    fn var_info(&mut self, name: &str) -> Option<(u32, bool)> {
+        let root = self.find(name);
+        self.cells.get(&root).map(|c| (c.bits.width, c.signed))
+    }
+
+    fn function_info(&mut self, name: &str) -> Option<(u32, bool)> {
+        self.funcs.get(name).map(|f| (f.ret_w, f.ret_s))
+    }
+
+    fn call_function(&mut self, name: &str, args: &[Val], span: Span) -> SResult<Val> {
+        let def = self
+            .funcs
+            .get(name)
+            .cloned()
+            .ok_or_else(|| SimError::at(format!("unknown function `{name}`"), span))?;
+        if args.len() != def.inputs.len() {
+            return Err(SimError::at(
+                format!(
+                    "function `{name}` expects {} argument(s), got {}",
+                    def.inputs.len(),
+                    args.len()
+                ),
+                span,
+            ));
+        }
+        for (i, (pname, w, ps)) in def.inputs.iter().enumerate() {
+            let (b, _asg) = args[i].to_bits(span)?;
+            let adj = if *ps { b.sadjust(*w)? } else { b.uadjust(*w)? };
+            let root = self.find(pname);
+            if let Some(c) = self.cells.get_mut(&root) {
+                c.bits = adj;
+            }
+        }
+        // Zero the return cell (static storage; upstream policy = 0-init).
+        {
+            let root = self.find(&def.ret);
+            if let Some(c) = self.cells.get_mut(&root) {
+                c.bits = Bits::zeros(c.bits.width)?;
+            }
+        }
+        let instrs = def.instrs.clone();
+        let mut pc = 0usize;
+        let mut counters = Vec::new();
+        loop {
+            if pc >= instrs.len() {
+                break;
+            }
+            match self.exec_one(&instrs, &mut pc, &mut counters, None)? {
+                Flow::Next => {}
+                Flow::End | Flow::Finish => break,
+                Flow::Suspend => unreachable!("sync mode errors on suspend"),
+            }
+        }
+        let root = self.find(&def.ret);
+        let (bits, signed) = match self.cells.get(&root) {
+            Some(c) => (c.bits, c.signed),
+            None => (Bits::zeros(def.ret_w)?, def.ret_s),
+        };
+        Ok(Val::Bits { bits, signed })
+    }
+
+    fn now(&self) -> (u64, u64) {
+        let ratio = if self.prec_fs == 0 {
+            1
+        } else {
+            self.unit_fs / self.prec_fs
+        };
+        (self.now, ratio)
+    }
+}

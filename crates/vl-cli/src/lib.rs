@@ -157,14 +157,18 @@ fn preprocess_and_parse(
     o: &Options,
     sm: &mut SourceMap,
     diags: &mut DiagSink,
-) -> Vec<vl_syntax::ast::Module> {
+) -> (Vec<vl_syntax::ast::Module>, Option<String>) {
     let opts = pp_options(o);
     let mut modules = Vec::new();
+    let mut timescale: Option<String> = None;
     for f in &o.files {
         let path = PathBuf::from(f);
         let Some(out) = pp::preprocess_file(&path, sm, diags, &opts) else {
             continue;
         };
+        if timescale.is_none() {
+            timescale = out.timescale.clone();
+        }
         if o.preprocess_only {
             println!("{}", render_preprocessed(&out.tokens));
             continue;
@@ -175,11 +179,11 @@ fn preprocess_and_parse(
         }
         modules.extend(file.modules);
     }
-    modules
+    (modules, timescale)
 }
 
 fn compile(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
-    preprocess_and_parse(o, sm, diags);
+    let _ = preprocess_and_parse(o, sm, diags);
     if o.preprocess_only {
         return if diags.has_errors() { 1 } else { 0 };
     }
@@ -220,7 +224,7 @@ pub fn detect_top(modules: &[vl_syntax::ast::Module]) -> Result<String, Vec<Stri
 }
 
 fn simulate(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
-    let modules = preprocess_and_parse(o, sm, diags);
+    let (modules, timescale) = preprocess_and_parse(o, sm, diags);
     if diags.has_errors() {
         let mut out = String::new();
         rcs_diag::render_diags(&mut out, sm, &diags.diags);
@@ -241,7 +245,7 @@ fn simulate(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
             }
         },
     };
-    let mut sim = match vl_sim::Sim::build(&modules, &top) {
+    let mut sim = match vl_sim::Sim::build(&modules, &top, timescale.as_deref()) {
         Ok(s) => s,
         Err(e) => {
             println!("%Error: {}", e.message);

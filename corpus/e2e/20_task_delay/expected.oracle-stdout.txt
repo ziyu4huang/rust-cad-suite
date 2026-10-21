@@ -1,0 +1,5 @@
+cnt=3 done=1
+- /Users/huangziyu/proj/rust-cad-suite/crates/vl-difftest/../../corpus/e2e/20_task_delay/tb.v:20: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.050 2026-07-01
+- Verilator: $finish at 26ns; walltime 0.000 s; speed 722.222 us/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 2 MB

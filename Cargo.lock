@@ -16,6 +16,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "vl-difftest"
+version = "0.1.0"
+dependencies = [
+ "rcs-diag",
+ "vl-sim",
+ "vl-syntax",
+]
+
+[[package]]
 name = "vl-sim"
 version = "0.1.0"
 dependencies = [

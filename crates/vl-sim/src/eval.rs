@@ -1,4 +1,8 @@
-//! Expression evaluation (IEEE 1364-2005 §5 width/sign rules, 4-state).
+//! Expression evaluation with IEEE 1364-2005 §5.4/§5.5 width and sign
+//! rules: context-determined operands are coerced to the expression width
+//! (sign-extended only when the whole expression is signed), self-determined
+//! operands (comparison sides, shift amounts, concat parts, conditions) start
+//! a fresh context.
 
 use crate::value::{self, Bits, ValueError};
 use rcs_diag::Span;
@@ -20,6 +24,27 @@ impl Val {
     pub fn bool1(b: bool) -> Val {
         Val::unsigned(Bits::from_u64(1, b as u64).expect("1-bit"))
     }
+    /// Bits view (strings pack as ASCII, MSB = first char; §2.6.1).
+    pub fn to_bits(&self, span: Span) -> SResult<(Bits, bool)> {
+        match self {
+            Val::Bits { bits, signed } => Ok((*bits, *signed)),
+            Val::Str(s) => Ok((str_bits(s, span)?, false)),
+        }
+    }
+}
+
+pub fn str_bits(s: &str, span: Span) -> SResult<Bits> {
+    if s.len() > 8 {
+        return Err(SimError::at(
+            "string literals longer than 8 characters are not yet supported in expressions (M7)",
+            span,
+        ));
+    }
+    let mut v: u64 = 0;
+    for b in s.bytes() {
+        v = (v << 8) | b as u64;
+    }
+    Ok(Bits::from_u64((s.len() as u32 * 8).max(8), v)?)
 }
 
 #[derive(Debug, Clone)]
@@ -48,232 +73,389 @@ impl From<ValueError> for SimError {
 
 pub type SResult<T> = Result<T, SimError>;
 
-/// Name resolution + declared ranges for the evaluator.
+/// Name resolution + declared ranges + calls for the evaluator.
 pub trait Lookup {
     fn lookup(&mut self, name: &str, span: Span) -> SResult<Val>;
     /// Declared `[msb:lsb]` of a vector, if any (scalars → None).
     fn decl_range(&mut self, name: &str) -> Option<(i64, i64)>;
+    /// `(width, signed)` of a declared variable/parameter.
+    fn var_info(&mut self, name: &str) -> Option<(u32, bool)>;
+    /// `(return width, signed)` of a user function, if declared.
+    fn function_info(&mut self, name: &str) -> Option<(u32, bool)>;
+    fn call_function(&mut self, name: &str, args: &[Val], span: Span) -> SResult<Val>;
+    /// Current simulation time in precision units, and unit/precision ratio.
+    fn now(&self) -> (u64, u64);
 }
 
-fn bits_of(v: Val, span: Span) -> SResult<(Bits, bool)> {
-    match v {
-        Val::Bits { bits, signed } => Ok((bits, signed)),
-        Val::Str(_) => Err(SimError::at(
-            "string literal used where a bit-vector value is required",
-            span,
-        )),
+fn sys_func_info(func: &str) -> Option<(u32, bool)> {
+    match func {
+        "$clog2" => Some((32, true)),
+        "$time" | "$stime" => Some((64, false)),
+        "$realtime" => Some((64, false)),
+        "$random" | "$urandom" => Some((32, true)),
+        _ => None,
     }
 }
 
-/// Extend both operands to a common width per §5.4 (signed only if both are).
-fn align(a: Bits, sa: bool, b: Bits, sb: bool) -> SResult<(Bits, Bits, bool, u32)> {
-    let w = a.width.max(b.width);
-    let signed = sa && sb;
-    let (a2, b2) = if signed {
-        (a.sadjust(w)?, b.sadjust(w)?)
-    } else {
-        (a.uadjust(w)?, b.uadjust(w)?)
-    };
-    Ok((a2, b2, signed, w))
+/// Self-determined width (IEEE 1364-2005 Table 5-22).
+pub fn nat_width(e: &Expr, ctx: &mut dyn Lookup) -> SResult<u32> {
+    Ok(match e {
+        Expr::Ident { span, name } => ctx
+            .var_info(name)
+            .ok_or_else(|| SimError::at(format!("undeclared identifier `{name}`"), *span))?
+            .0,
+        Expr::HierIdent { span, parts } => {
+            let n = parts.join(".");
+            ctx.var_info(&n)
+                .ok_or_else(|| SimError::at(format!("undeclared identifier `{n}`"), *span))?
+                .0
+        }
+        Expr::NumLit(n) => value::from_numlit(n).map_err(|e| SimError::at(e.0, n.span))?.width,
+        Expr::RealLit { span, .. } => {
+            return Err(SimError::at("real literals land at milestone M7", *span))
+        }
+        Expr::StrLit { value, .. } => (value.len() as u32 * 8).max(8),
+        Expr::Unary { op, expr, .. } => match op {
+            UnOp::Not | UnOp::And | UnOp::Nand | UnOp::Or | UnOp::Nor | UnOp::Xor | UnOp::Xnor => 1,
+            UnOp::BitNot | UnOp::Plus | UnOp::Minus => nat_width(expr, ctx)?,
+        },
+        Expr::Binary { op, lhs, rhs, .. } => match op {
+            BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div | BinOp::Mod
+            | BinOp::BitAnd | BinOp::BitOr | BinOp::BitXor => {
+                nat_width(lhs, ctx)?.max(nat_width(rhs, ctx)?)
+            }
+            BinOp::Pow | BinOp::Shl | BinOp::Shr | BinOp::AShl | BinOp::AShr => nat_width(lhs, ctx)?,
+            BinOp::Eq | BinOp::Ne | BinOp::EqCase | BinOp::NeCase | BinOp::Lt | BinOp::Le
+            | BinOp::Gt | BinOp::Ge | BinOp::LogAnd | BinOp::LogOr => 1,
+        },
+        Expr::Ternary { then, els, .. } => nat_width(then, ctx)?.max(nat_width(els, ctx)?),
+        Expr::Concat { parts, .. } => {
+            let mut w = 0;
+            for p in parts {
+                w += nat_width(p, ctx)?;
+            }
+            w
+        }
+        Expr::Repeat { span, count, value } => {
+            let c = const_u64(count, ctx, *span)?;
+            (nat_width(value, ctx)? as u64 * c) as u32
+        }
+        Expr::Index { .. } => 1,
+        Expr::PartSelect { span, msb, lsb, .. } => {
+            let m = const_i64_expr(msb, ctx, *span)?;
+            let l = const_i64_expr(lsb, ctx, *span)?;
+            (m - l).unsigned_abs() as u32 + 1
+        }
+        Expr::IndexedPart { span, width, .. } => const_u64(width, ctx, *span)? as u32,
+        Expr::Call { span, func, args } => match func.as_str() {
+            "$signed" | "$unsigned" => {
+                let a = args
+                    .first()
+                    .ok_or_else(|| SimError::at(format!("{func} needs 1 argument"), *span))?;
+                nat_width(a, ctx)?
+            }
+            f if f.starts_with('$') => {
+                sys_func_info(f)
+                    .ok_or_else(|| SimError::at(format!("system function `{f}` is not yet supported"), *span))?
+                    .0
+            }
+            f => ctx
+                .function_info(f)
+                .ok_or_else(|| SimError::at(format!("unknown function `{f}`"), *span))?
+                .0,
+        },
+    })
 }
 
-pub fn eval(e: &Expr, ctx: &mut dyn Lookup) -> SResult<Val> {
-    match e {
-        Expr::Ident { span, name } => ctx.lookup(name, *span),
-        Expr::HierIdent { span, parts } => ctx.lookup(&parts.join("."), *span),
-        Expr::NumLit(n) => Ok(Val::Bits {
-            bits: value::from_numlit(n).map_err(|e| SimError::at(e.0, n.span))?,
-            signed: n.signed,
-        }),
-        Expr::RealLit { span, .. } => Err(SimError::at(
-            "real-number literals are not yet supported (milestone M7)",
-            *span,
-        )),
-        Expr::StrLit { value, .. } => Ok(Val::Str(value.clone())),
-        Expr::Unary { span, op, expr } => {
-            let (b, signed) = bits_of(eval(expr, ctx)?, *span)?;
-            let r = match op {
-                UnOp::Not => match b.truthy()? {
-                    Some(v) => Val::bool1(!v),
-                    None => Val::unsigned(Bits::all_x(1)?),
-                },
-                UnOp::BitNot => Val::Bits {
-                    bits: b.bit_not(),
-                    signed,
-                },
-                UnOp::Plus => Val::Bits { bits: b, signed },
-                UnOp::Minus => Val::Bits {
-                    bits: Bits::zeros(b.width)?.sub(&b)?,
-                    signed,
-                },
-                UnOp::And => Val::unsigned(b.reduce_and()?),
-                UnOp::Nand => Val::unsigned(b.reduce_and()?.bit_not()),
-                UnOp::Or => Val::unsigned(b.reduce_or()?),
-                UnOp::Nor => Val::unsigned(b.reduce_or()?.bit_not()),
-                UnOp::Xor => Val::unsigned(b.reduce_xor()?),
-                UnOp::Xnor => Val::unsigned(b.reduce_xor()?.bit_not()),
-            };
-            Ok(r)
-        }
-        Expr::Binary { span, op, lhs, rhs } => {
-            // Logical ops short-circuit on known operands (§5.1.9).
-            if matches!(op, BinOp::LogAnd | BinOp::LogOr) {
-                let (a, _) = bits_of(eval(lhs, ctx)?, *span)?;
-                let ta = a.truthy()?;
-                if *op == BinOp::LogAnd && ta == Some(false) {
-                    return Ok(Val::bool1(false));
-                }
-                if *op == BinOp::LogOr && ta == Some(true) {
-                    return Ok(Val::bool1(true));
-                }
-                let (b, _) = bits_of(eval(rhs, ctx)?, *span)?;
-                let tb = b.truthy()?;
-                return Ok(match (op, ta, tb) {
-                    (BinOp::LogAnd, Some(true), Some(v)) => Val::bool1(v),
-                    (BinOp::LogAnd, _, Some(false)) => Val::bool1(false),
-                    (BinOp::LogOr, Some(false), Some(v)) => Val::bool1(v),
-                    (BinOp::LogOr, _, Some(true)) => Val::bool1(true),
-                    _ => Val::unsigned(Bits::all_x(1)?),
-                });
+/// Expression signedness (§5.5.1): any unsigned operand → unsigned.
+pub fn is_signed(e: &Expr, ctx: &mut dyn Lookup) -> SResult<bool> {
+    Ok(match e {
+        Expr::Ident { name, .. } => ctx.var_info(name).map(|v| v.1).unwrap_or(false),
+        Expr::HierIdent { parts, .. } => ctx.var_info(&parts.join(".")).map(|v| v.1).unwrap_or(false),
+        Expr::NumLit(n) => n.signed,
+        Expr::RealLit { .. } => true,
+        Expr::StrLit { .. } => false,
+        Expr::Unary { op, expr, .. } => match op {
+            UnOp::BitNot | UnOp::Plus | UnOp::Minus => is_signed(expr, ctx)?,
+            _ => false,
+        },
+        Expr::Binary { op, lhs, rhs, .. } => match op {
+            BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div | BinOp::Mod | BinOp::Pow
+            | BinOp::BitAnd | BinOp::BitOr | BinOp::BitXor => {
+                is_signed(lhs, ctx)? && is_signed(rhs, ctx)?
             }
-            let (a, sa) = bits_of(eval(lhs, ctx)?, *span)?;
-            let (b, sb) = bits_of(eval(rhs, ctx)?, *span)?;
-            let r = match op {
-                BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div | BinOp::Mod | BinOp::Pow => {
-                    let (a2, b2, signed, _) = align(a, sa, b, sb)?;
-                    let bits = match op {
-                        BinOp::Add => a2.add(&b2)?,
-                        BinOp::Sub => a2.sub(&b2)?,
-                        BinOp::Mul => a2.mul(&b2)?,
-                        BinOp::Div => {
-                            if signed && a2.is_known() && b2.is_known() && b2.to_u64_lossy() != 0 {
-                                let q = a2.to_i64_lossy().wrapping_div(b2.to_i64_lossy());
-                                Bits::from_u64(a2.width, (q as u64) & value::low_bits(a2.width))?
-                            } else {
-                                a2.div(&b2)?
-                            }
-                        }
-                        BinOp::Mod => {
-                            if signed && a2.is_known() && b2.is_known() && b2.to_u64_lossy() != 0 {
-                                let q = a2.to_i64_lossy().wrapping_rem(b2.to_i64_lossy());
-                                Bits::from_u64(a2.width, (q as u64) & value::low_bits(a2.width))?
-                            } else {
-                                a2.rem(&b2)?
-                            }
-                        }
-                        _ => a2.pow(&b2)?,
-                    };
-                    Val::Bits { bits, signed }
-                }
-                BinOp::BitAnd | BinOp::BitOr | BinOp::BitXor => {
-                    let (a2, b2, signed, _) = align(a, sa, b, sb)?;
-                    let bits = match op {
-                        BinOp::BitAnd => a2.bit_and(&b2)?,
-                        BinOp::BitOr => a2.bit_or(&b2)?,
-                        _ => a2.bit_xor(&b2)?,
-                    };
-                    Val::Bits { bits, signed }
-                }
-                BinOp::Eq | BinOp::Ne => {
-                    let (a2, b2, _, _) = align(a, sa, b, sb)?;
-                    let r = a2.logic_eq(&b2)?;
-                    Val::unsigned(if *op == BinOp::Ne { r.bit_not() } else { r })
-                }
-                BinOp::EqCase | BinOp::NeCase => {
-                    let (a2, b2, _, _) = align(a, sa, b, sb)?;
-                    let r = a2.case_eq(&b2)?;
-                    Val::unsigned(if *op == BinOp::NeCase { r.bit_not() } else { r })
-                }
-                BinOp::Lt | BinOp::Le | BinOp::Gt | BinOp::Ge => {
-                    let (a2, b2, signed, _) = align(a, sa, b, sb)?;
-                    if a2.has_unknown() || b2.has_unknown() {
-                        Val::unsigned(Bits::all_x(1)?)
-                    } else {
-                        let res = if signed {
-                            let (x, y) = (a2.to_i64_lossy(), b2.to_i64_lossy());
-                            match op {
-                                BinOp::Lt => x < y,
-                                BinOp::Le => x <= y,
-                                BinOp::Gt => x > y,
-                                _ => x >= y,
-                            }
-                        } else {
-                            let (x, y) = (a2.to_u64_lossy(), b2.to_u64_lossy());
-                            match op {
-                                BinOp::Lt => x < y,
-                                BinOp::Le => x <= y,
-                                BinOp::Gt => x > y,
-                                _ => x >= y,
-                            }
-                        };
-                        Val::bool1(res)
-                    }
-                }
-                BinOp::Shl | BinOp::AShl => Val::Bits {
-                    bits: a.shl(&b)?,
-                    signed: sa,
-                },
-                BinOp::Shr => Val::Bits {
-                    bits: a.shr(&b)?,
-                    signed: sa,
-                },
-                BinOp::AShr => Val::Bits {
-                    bits: a.ashr(&b, sa)?,
-                    signed: sa,
-                },
-                BinOp::LogAnd | BinOp::LogOr => unreachable!(),
-            };
-            Ok(r)
+            BinOp::Shl | BinOp::Shr | BinOp::AShl | BinOp::AShr => is_signed(lhs, ctx)?,
+            _ => false,
+        },
+        Expr::Ternary { then, els, .. } => is_signed(then, ctx)? && is_signed(els, ctx)?,
+        Expr::Concat { .. } | Expr::Repeat { .. } | Expr::Index { .. } | Expr::PartSelect { .. }
+        | Expr::IndexedPart { .. } => false,
+        Expr::Call { func, .. } => match func.as_str() {
+            "$signed" => true,
+            "$unsigned" => false,
+            f if f.starts_with('$') => sys_func_info(f).map(|v| v.1).unwrap_or(false),
+            f => ctx.function_info(f).map(|v| v.1).unwrap_or(false),
+        },
+    })
+}
+
+/// Self-determined evaluation.
+pub fn eval(e: &Expr, ctx: &mut dyn Lookup) -> SResult<Val> {
+    if let Expr::StrLit { value, .. } = e {
+        return Ok(Val::Str(value.clone()));
+    }
+    let w = nat_width(e, ctx)?;
+    let s = is_signed(e, ctx)?;
+    Ok(Val::Bits {
+        bits: eval_w(e, ctx, w, s)?,
+        signed: s,
+    })
+}
+
+/// Context-determined evaluation for an assignment to a `lhs_w`-bit target:
+/// the whole expression is evaluated at `max(lhs_w, natural width)` and the
+/// result adjusted to `lhs_w`.
+pub fn eval_ctx(e: &Expr, ctx: &mut dyn Lookup, lhs_w: u32) -> SResult<Val> {
+    if let Expr::StrLit { value, .. } = e {
+        return Ok(Val::Str(value.clone()));
+    }
+    let nw = nat_width(e, ctx)?;
+    let s = is_signed(e, ctx)?;
+    let w = lhs_w.max(nw).min(value::MAX_WIDTH);
+    let bits = eval_w(e, ctx, w, s)?;
+    let bits = if s { bits.sadjust(lhs_w)? } else { bits.uadjust(lhs_w)? };
+    Ok(Val::Bits { bits, signed: s })
+}
+
+fn ext(b: Bits, signed: bool, w: u32) -> SResult<Bits> {
+    if signed {
+        b.sadjust(w)
+    } else {
+        b.uadjust(w)
+    }
+    .map_err(Into::into)
+}
+
+/// Evaluate `e` as a context-determined operand of width `w`; `signed` is the
+/// propagated expression type (§5.5.1 step 2).
+fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits> {
+    match e {
+        Expr::Ident { span, name } => {
+            let (b, _) = ctx.lookup(name, *span)?.to_bits(*span)?;
+            // A leaf is extended using its OWN signedness only if the whole
+            // expression is signed (otherwise zero-extended).
+            ext(b, signed, w)
         }
+        Expr::HierIdent { span, parts } => {
+            let (b, _) = ctx.lookup(&parts.join("."), *span)?.to_bits(*span)?;
+            ext(b, signed, w)
+        }
+        Expr::NumLit(n) => {
+            let b = value::from_numlit(n).map_err(|e| SimError::at(e.0, n.span))?;
+            ext(b, signed, w)
+        }
+        Expr::RealLit { span, .. } => Err(SimError::at("real literals land at milestone M7", *span)),
+        Expr::StrLit { span, value } => ext(str_bits(value, *span)?, false, w),
+        Expr::Unary { span, op, expr } => match op {
+            UnOp::Not => {
+                let (b, _) = eval(expr, ctx)?.to_bits(*span)?;
+                let r = match b.truthy()? {
+                    Some(v) => Bits::from_u64(1, (!v) as u64)?,
+                    None => Bits::all_x(1)?,
+                };
+                ext(r, false, w)
+            }
+            UnOp::BitNot => Ok(eval_w(expr, ctx, w, signed)?.bit_not()),
+            UnOp::Plus => eval_w(expr, ctx, w, signed),
+            UnOp::Minus => {
+                let b = eval_w(expr, ctx, w, signed)?;
+                Ok(Bits::zeros(w)?.sub(&b)?)
+            }
+            UnOp::And | UnOp::Nand | UnOp::Or | UnOp::Nor | UnOp::Xor | UnOp::Xnor => {
+                let (b, _) = eval(expr, ctx)?.to_bits(*span)?;
+                let r = match op {
+                    UnOp::And => b.reduce_and()?,
+                    UnOp::Nand => b.reduce_and()?.bit_not(),
+                    UnOp::Or => b.reduce_or()?,
+                    UnOp::Nor => b.reduce_or()?.bit_not(),
+                    UnOp::Xor => b.reduce_xor()?,
+                    _ => b.reduce_xor()?.bit_not(),
+                };
+                ext(r, false, w)
+            }
+        },
+        Expr::Binary { span, op, lhs, rhs } => match op {
+            BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div | BinOp::Mod | BinOp::Pow => {
+                let a = eval_w(lhs, ctx, w, signed)?;
+                let b = if *op == BinOp::Pow {
+                    // Exponent is self-determined.
+                    let (bb, bs) = eval(rhs, ctx)?.to_bits(*span)?;
+                    let _ = bs;
+                    bb
+                } else {
+                    eval_w(rhs, ctx, w, signed)?
+                };
+                Ok(match op {
+                    BinOp::Add => a.add(&b)?,
+                    BinOp::Sub => a.sub(&b)?,
+                    BinOp::Mul => a.mul(&b)?,
+                    BinOp::Div => {
+                        if signed && a.is_known() && b.is_known() && b.to_u64_lossy() != 0 {
+                            let q = a.to_i64_lossy().wrapping_div(b.to_i64_lossy());
+                            Bits::from_u64(w, (q as u64) & value::low_bits(w))?
+                        } else {
+                            a.div(&b)?
+                        }
+                    }
+                    BinOp::Mod => {
+                        if signed && a.is_known() && b.is_known() && b.to_u64_lossy() != 0 {
+                            let q = a.to_i64_lossy().wrapping_rem(b.to_i64_lossy());
+                            Bits::from_u64(w, (q as u64) & value::low_bits(w))?
+                        } else {
+                            a.rem(&b)?
+                        }
+                    }
+                    _ => {
+                        if signed && a.is_known() && b.is_known() {
+                            // Signed power per §5.1.5 table (base/exponent sign cases).
+                            let base = a.to_i64_lossy();
+                            let exp = b.to_i64_lossy();
+                            let r: i64 = if exp < 0 {
+                                match base {
+                                    1 => 1,
+                                    -1 => if exp % 2 == 0 { 1 } else { -1 },
+                                    0 => return Ok(Bits::all_x(w)?),
+                                    _ => 0,
+                                }
+                            } else {
+                                (base as i128).checked_pow(exp.min(63) as u32).unwrap_or(0) as i64
+                            };
+                            Bits::from_u64(w, (r as u64) & value::low_bits(w))?
+                        } else {
+                            a.pow(&b)?
+                        }
+                    }
+                })
+            }
+            BinOp::BitAnd | BinOp::BitOr | BinOp::BitXor => {
+                let a = eval_w(lhs, ctx, w, signed)?;
+                let b = eval_w(rhs, ctx, w, signed)?;
+                Ok(match op {
+                    BinOp::BitAnd => a.bit_and(&b)?,
+                    BinOp::BitOr => a.bit_or(&b)?,
+                    _ => a.bit_xor(&b)?,
+                })
+            }
+            BinOp::Shl | BinOp::AShl | BinOp::Shr | BinOp::AShr => {
+                let a = eval_w(lhs, ctx, w, signed)?;
+                let (amt, _) = eval(rhs, ctx)?.to_bits(*span)?;
+                Ok(match op {
+                    BinOp::Shl | BinOp::AShl => a.shl(&amt)?,
+                    BinOp::Shr => a.shr(&amt)?,
+                    _ => a.ashr(&amt, signed)?,
+                })
+            }
+            BinOp::Eq | BinOp::Ne | BinOp::EqCase | BinOp::NeCase | BinOp::Lt | BinOp::Le
+            | BinOp::Gt | BinOp::Ge => {
+                // Comparison operands form their own context (§5.4.1).
+                let cw = nat_width(lhs, ctx)?.max(nat_width(rhs, ctx)?);
+                let cs = is_signed(lhs, ctx)? && is_signed(rhs, ctx)?;
+                let a = eval_w(lhs, ctx, cw, cs)?;
+                let b = eval_w(rhs, ctx, cw, cs)?;
+                let r = match op {
+                    BinOp::Eq => a.logic_eq(&b)?,
+                    BinOp::Ne => a.logic_eq(&b)?.bit_not(),
+                    BinOp::EqCase => a.case_eq(&b)?,
+                    BinOp::NeCase => a.case_eq(&b)?.bit_not(),
+                    _ => {
+                        if a.has_unknown() || b.has_unknown() {
+                            Bits::all_x(1)?
+                        } else {
+                            let res = if cs {
+                                let (x, y) = (a.to_i64_lossy(), b.to_i64_lossy());
+                                match op {
+                                    BinOp::Lt => x < y,
+                                    BinOp::Le => x <= y,
+                                    BinOp::Gt => x > y,
+                                    _ => x >= y,
+                                }
+                            } else {
+                                let (x, y) = (a.to_u64_lossy(), b.to_u64_lossy());
+                                match op {
+                                    BinOp::Lt => x < y,
+                                    BinOp::Le => x <= y,
+                                    BinOp::Gt => x > y,
+                                    _ => x >= y,
+                                }
+                            };
+                            Bits::from_u64(1, res as u64)?
+                        }
+                    }
+                };
+                ext(r, false, w)
+            }
+            BinOp::LogAnd | BinOp::LogOr => {
+                let (a, _) = eval(lhs, ctx)?.to_bits(*span)?;
+                let ta = a.truthy()?;
+                let r = if *op == BinOp::LogAnd && ta == Some(false) {
+                    Bits::from_u64(1, 0)?
+                } else if *op == BinOp::LogOr && ta == Some(true) {
+                    Bits::from_u64(1, 1)?
+                } else {
+                    let (b, _) = eval(rhs, ctx)?.to_bits(*span)?;
+                    let tb = b.truthy()?;
+                    match (op, ta, tb) {
+                        (BinOp::LogAnd, Some(true), Some(v)) => Bits::from_u64(1, v as u64)?,
+                        (BinOp::LogAnd, _, Some(false)) => Bits::from_u64(1, 0)?,
+                        (BinOp::LogOr, Some(false), Some(v)) => Bits::from_u64(1, v as u64)?,
+                        (BinOp::LogOr, _, Some(true)) => Bits::from_u64(1, 1)?,
+                        _ => Bits::all_x(1)?,
+                    }
+                };
+                ext(r, false, w)
+            }
+        },
         Expr::Ternary {
             span,
             cond,
             then,
             els,
         } => {
-            let (c, _) = bits_of(eval(cond, ctx)?, *span)?;
+            let (c, _) = eval(cond, ctx)?.to_bits(*span)?;
             match c.truthy()? {
-                Some(true) => eval(then, ctx),
-                Some(false) => eval(els, ctx),
+                Some(true) => eval_w(then, ctx, w, signed),
+                Some(false) => eval_w(els, ctx, w, signed),
                 None => {
-                    let (t, st) = bits_of(eval(then, ctx)?, *span)?;
-                    let (e, se) = bits_of(eval(els, ctx)?, *span)?;
-                    let (t2, e2, signed, _) = align(t, st, e, se)?;
-                    Ok(Val::Bits {
-                        bits: t2.merge(&e2)?,
-                        signed,
-                    })
+                    let t = eval_w(then, ctx, w, signed)?;
+                    let e2 = eval_w(els, ctx, w, signed)?;
+                    Ok(t.merge(&e2)?)
                 }
             }
         }
         Expr::Concat { span, parts } => {
             let mut bs = Vec::with_capacity(parts.len());
             for p in parts {
-                bs.push(bits_of(eval(p, ctx)?, *span)?.0);
+                bs.push(eval(p, ctx)?.to_bits(*span)?.0);
             }
-            Ok(Val::unsigned(Bits::concat(&bs)?))
+            ext(Bits::concat(&bs)?, false, w)
         }
-        Expr::Repeat { span, count, value } => {
-            let (c, _) = bits_of(eval(count, ctx)?, *span)?;
-            if c.has_unknown() {
-                return Err(SimError::at("replication count is unknown (x/z)", *span));
-            }
-            let (v, _) = bits_of(eval(value, ctx)?, *span)?;
-            Ok(Val::unsigned(v.replicate(c.to_u64_lossy())?))
+        Expr::Repeat { span, count, value: v } => {
+            let c = const_u64(count, ctx, *span)?;
+            let (b, _) = eval(v, ctx)?.to_bits(*span)?;
+            ext(b.replicate(c)?, false, w)
         }
         Expr::Index { span, base, index } => {
-            let (b, _) = bits_of(eval(base, ctx)?, *span)?;
-            let (i, _) = bits_of(eval(index, ctx)?, *span)?;
-            if i.has_unknown() {
-                return Ok(Val::unsigned(Bits::all_x(1)?));
-            }
-            let pos = bit_position(base, i.to_i64_lossy(), ctx);
-            match pos {
-                Some(p) if p >= 0 && (p as u32) < b.width => {
-                    Ok(Val::unsigned(b.part(p as u32, p as u32)?))
+            let (b, _) = eval(base, ctx)?.to_bits(*span)?;
+            let (i, _) = eval(index, ctx)?.to_bits(*span)?;
+            let r = if i.has_unknown() {
+                Bits::all_x(1)?
+            } else {
+                match bit_position(base, i.to_i64_lossy(), ctx) {
+                    Some(p) if p >= 0 && (p as u32) < b.width => b.part(p as u32, p as u32)?,
+                    _ => Bits::all_x(1)?, // out of range → x (§5.2.1)
                 }
-                _ => Ok(Val::unsigned(Bits::all_x(1)?)), // out of range → x (§5.2.1)
-            }
+            };
+            ext(r, false, w)
         }
         Expr::PartSelect {
             span,
@@ -281,67 +463,114 @@ pub fn eval(e: &Expr, ctx: &mut dyn Lookup) -> SResult<Val> {
             msb,
             lsb,
         } => {
-            let (b, _) = bits_of(eval(base, ctx)?, *span)?;
-            let (m, _) = bits_of(eval(msb, ctx)?, *span)?;
-            let (l, _) = bits_of(eval(lsb, ctx)?, *span)?;
-            if m.has_unknown() || l.has_unknown() {
-                return Err(SimError::at("part-select bounds must be constant", *span));
-            }
-            let hi = bit_position(base, m.to_i64_lossy(), ctx);
-            let lo = bit_position(base, l.to_i64_lossy(), ctx);
-            match (hi, lo) {
-                (Some(h), Some(l)) if h >= 0 && l >= 0 && (h.max(l) as u32) < b.width => {
-                    Ok(Val::unsigned(b.part(h as u32, l as u32)?))
+            let (b, _) = eval(base, ctx)?.to_bits(*span)?;
+            let m = const_i64_expr(msb, ctx, *span)?;
+            let l = const_i64_expr(lsb, ctx, *span)?;
+            let hi = bit_position(base, m, ctx);
+            let lo = bit_position(base, l, ctx);
+            let r = match (hi, lo) {
+                (Some(h), Some(l2)) if h >= 0 && l2 >= 0 && (h.max(l2) as u32) < b.width => {
+                    b.part(h as u32, l2 as u32)?
                 }
-                _ => {
-                    let w = (m.to_i64_lossy() - l.to_i64_lossy()).unsigned_abs() as u32 + 1;
-                    Ok(Val::unsigned(Bits::all_x(w)?))
-                }
-            }
+                _ => Bits::all_x((m - l).unsigned_abs() as u32 + 1)?,
+            };
+            ext(r, false, w)
         }
-        Expr::IndexedPart { span, .. } => Err(SimError::at(
-            "indexed part-selects `+:`/`-:` are not yet supported (milestone M7)",
-            *span,
-        )),
-        Expr::Call { span, func, args } => match func.as_str() {
-            "$clog2" => {
-                let a = args.first().ok_or_else(|| SimError::at("$clog2 needs 1 argument", *span))?;
-                let (b, _) = bits_of(eval(a, ctx)?, *span)?;
-                if b.has_unknown() {
-                    return Ok(Val::unsigned(Bits::all_x(32)?));
+        Expr::IndexedPart {
+            span,
+            base,
+            offset,
+            width,
+            plus,
+        } => {
+            let (b, _) = eval(base, ctx)?.to_bits(*span)?;
+            let (o, _) = eval(offset, ctx)?.to_bits(*span)?;
+            let fw = const_u64(width, ctx, *span)? as u32;
+            let r = if o.has_unknown() {
+                Bits::all_x(fw)?
+            } else {
+                let o = o.to_i64_lossy();
+                let (lo_idx, hi_idx) = if *plus { (o, o + fw as i64 - 1) } else { (o - fw as i64 + 1, o) };
+                let hi = bit_position(base, hi_idx, ctx);
+                let lo = bit_position(base, lo_idx, ctx);
+                match (hi, lo) {
+                    (Some(h), Some(l2)) if h >= 0 && l2 >= 0 && (h.max(l2) as u32) < b.width => {
+                        b.part(h as u32, l2 as u32)?
+                    }
+                    _ => Bits::all_x(fw)?,
                 }
-                let v = b.to_u64_lossy();
-                let r = if v <= 1 { 0 } else { 64 - (v - 1).leading_zeros() as u64 };
-                Ok(Val::unsigned(Bits::from_u64(32, r)?))
-            }
-            "$time" | "$stime" | "$realtime" => {
-                // v0 slice has no time model; M5 wires the scheduler clock.
-                Ok(Val::unsigned(Bits::from_u64(64, 0)?))
-            }
-            "$signed" | "$unsigned" => {
-                let a = args.first().ok_or_else(|| SimError::at(format!("{func} needs 1 argument"), *span))?;
-                let (b, _) = bits_of(eval(a, ctx)?, *span)?;
-                Ok(Val::Bits {
-                    bits: b,
-                    signed: func == "$signed",
-                })
-            }
-            _ if func.starts_with('$') => Err(SimError::at(
-                format!("system function `{func}` is not yet supported"),
-                *span,
-            )),
-            _ => Err(SimError::at(
-                format!("user function `{func}` calls are not yet supported (milestone M4)"),
-                *span,
-            )),
-        },
+            };
+            ext(r, false, w)
+        }
+        Expr::Call { span, func, args } => {
+            let r = match func.as_str() {
+                "$clog2" => {
+                    let a = args.first().ok_or_else(|| SimError::at("$clog2 needs 1 argument", *span))?;
+                    let (b, _) = eval(a, ctx)?.to_bits(*span)?;
+                    if b.has_unknown() {
+                        Bits::all_x(32)?
+                    } else {
+                        let v = b.to_u64_lossy();
+                        let r = if v <= 1 { 0 } else { 64 - (v - 1).leading_zeros() as u64 };
+                        Bits::from_u64(32, r)?
+                    }
+                }
+                "$time" | "$stime" => {
+                    let (now, ratio) = ctx.now();
+                    let t = if ratio == 0 { now } else { (now + ratio / 2) / ratio };
+                    Bits::from_u64(64, t)?
+                }
+                "$realtime" => {
+                    let (now, ratio) = ctx.now();
+                    Bits::from_u64(64, if ratio == 0 { now } else { now / ratio })?
+                }
+                "$signed" | "$unsigned" => {
+                    let a = args.first().ok_or_else(|| SimError::at(format!("{func} needs 1 argument"), *span))?;
+                    let (b, _) = eval(a, ctx)?.to_bits(*span)?;
+                    // Re-typed operand: extend per the propagated expression type.
+                    return ext(b, signed, w);
+                }
+                f if f.starts_with('$') => {
+                    return Err(SimError::at(
+                        format!("system function `{f}` is not yet supported"),
+                        *span,
+                    ))
+                }
+                f => {
+                    let mut vals = Vec::with_capacity(args.len());
+                    for a in args {
+                        vals.push(eval(a, ctx)?);
+                    }
+                    let v = ctx.call_function(f, &vals, *span)?;
+                    v.to_bits(*span)?.0
+                }
+            };
+            ext(r, signed, w)
+        }
     }
+}
+
+fn const_u64(e: &Expr, ctx: &mut dyn Lookup, span: Span) -> SResult<u64> {
+    let (b, _) = eval(e, ctx)?.to_bits(span)?;
+    if b.has_unknown() {
+        return Err(SimError::at("constant expression contains x/z", span));
+    }
+    Ok(b.to_u64_lossy())
+}
+
+fn const_i64_expr(e: &Expr, ctx: &mut dyn Lookup, span: Span) -> SResult<i64> {
+    let v = eval(e, ctx)?;
+    let (b, signed) = v.to_bits(span)?;
+    if b.has_unknown() {
+        return Err(SimError::at("constant expression contains x/z", span));
+    }
+    Ok(if signed { b.to_i64_lossy() } else { b.to_u64_lossy() as i64 })
 }
 
 /// Map a Verilog index onto a bit position using the declared `[msb:lsb]`
 /// of the base identifier (`[7:0]` → index 3 is bit 3; `[0:7]` → index 3 is
 /// bit 4). Non-identifier bases are 0-based ascending.
-fn bit_position(base: &Expr, index: i64, ctx: &mut dyn Lookup) -> Option<i64> {
+pub fn bit_position(base: &Expr, index: i64, ctx: &mut dyn Lookup) -> Option<i64> {
     let name = match base {
         Expr::Ident { name, .. } => Some(name.clone()),
         Expr::HierIdent { parts, .. } => Some(parts.join(".")),

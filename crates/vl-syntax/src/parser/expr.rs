@@ -58,7 +58,7 @@ impl<'d> Parser<'d> {
             lhs = if negate {
                 Expr::Unary {
                     span,
-                    op: UnOp::Not,
+                    op: UnOp::BitNot,
                     expr: Box::new(core),
                 }
             } else {
@@ -101,10 +101,11 @@ impl<'d> Parser<'d> {
         match t.kind {
             Tok::IntLit => {
                 self.pos += 1;
+                // Unsized, unbased integers are signed (IEEE 1364-2005 §4.8).
                 Ok(Expr::NumLit(NumLit {
                     span: t.span,
                     width: None,
-                    signed: false,
+                    signed: true,
                     base: Base::Dec,
                     digits: t.text,
                 }))
@@ -302,9 +303,10 @@ fn op_at_level(level: usize, t: &crate::token::Token) -> Option<(BinOp, bool)> {
         (1, Punct::LogAnd) => BinOp::LogAnd,
         (2, Punct::Pipe) => BinOp::BitOr,
         (3, Punct::Caret) => BinOp::BitXor,
-        (3, Punct::Xnor) => BinOp::BitXor, // ^~ / ~^
+        (3, Punct::Xnor) => BinOp::BitXor, // ^~ / ~^ (binary xnor is legal)
+        // NOTE: binary `~&`/`~|` do NOT exist in IEEE 1364-2005 Annex A —
+        // the oracle (Verilator) rejects them; `nand`/`nor` are unary only.
         (4, Punct::Amp) => BinOp::BitAnd,
-        (4, Punct::Nand) => BinOp::BitAnd, // ~&
         (5, Punct::EqEq) => BinOp::Eq,
         (5, Punct::NotEq) => BinOp::Ne,
         (5, Punct::EqEqEq) => BinOp::EqCase,
@@ -325,7 +327,7 @@ fn op_at_level(level: usize, t: &crate::token::Token) -> Option<(BinOp, bool)> {
         (10, Punct::Pow) => BinOp::Pow,
         _ => return None,
     };
-    let negate = matches!((level, p), (3, Punct::Xnor) | (4, Punct::Nand));
+    let negate = matches!((level, p), (3, Punct::Xnor));
     Some((op, negate))
 }
 

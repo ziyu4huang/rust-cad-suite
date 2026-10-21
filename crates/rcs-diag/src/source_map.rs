@@ -60,6 +60,11 @@ impl SourceMap {
         &self.files[id.0 as usize]
     }
 
+    /// True when `id` names a registered file (default spans don't).
+    pub fn has(&self, id: FileId) -> bool {
+        (id.0 as usize) < self.files.len()
+    }
+
     pub fn file_name(&self, id: FileId) -> &str {
         &self.file(id).name
     }

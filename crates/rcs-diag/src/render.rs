@@ -22,6 +22,14 @@ pub fn render_diags(out: &mut String, sm: &SourceMap, diags: &[Diagnostic]) {
 }
 
 fn render_location(out: &mut String, sm: &SourceMap, d: &Diagnostic) {
+    if !sm.has(d.span.file) {
+        // Default/unmapped span (e.g. a driver-level failure before any
+        // source was registered): render the message without a location.
+        for (msg, _) in &d.notes {
+            let _ = writeln!(out, "  = note: {msg}");
+        }
+        return;
+    }
     let (line, col) = sm.line_col(d.span.file, d.span.start);
     let _ = writeln!(
         out,

@@ -1,0 +1,8 @@
+and=0010 or=1111 xor=0100
+nand=0100 nor=0100 xnor=1111
+red_and=0 red_or=1 red_xor=1
+not=0100
+- /Users/huangziyu/proj/rust-cad-suite/crates/vl-difftest/../../corpus/e2e/04_bitwise_reduce/tb.v:9: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.050 2026-07-01
+- Verilator: $finish at 0s; walltime 0.000 s; speed 0.000 s/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 2 MB

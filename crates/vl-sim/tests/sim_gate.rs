@@ -13,13 +13,20 @@ fn run_case(files: &[(&str, &str)], top: &str) -> (String, Result<(), vl_sim::Si
     let mut diags = rcs_diag::DiagSink::new();
     let opts = PpOptions::default();
     let mut modules = Vec::new();
+    let mut timescale: Option<String> = None;
     for (name, src) in files {
         let out = pp::preprocess_source(name, src, &mut sm, &mut diags, &opts);
+        if timescale.is_none() {
+            timescale = out.timescale.clone();
+        }
         let parsed = parser::parse_source_file(out.tokens, &mut diags);
         modules.extend(parsed.modules);
     }
     assert!(!diags.has_errors(), "{:#?}", diags.diags);
-    let mut sim = Sim::build(&modules, top).expect("elaborate");
+    let mut sim = match Sim::build(&modules, top, timescale.as_deref()) {
+        Ok(s) => s,
+        Err(e) => panic!("elaborate: {}", e.message),
+    };
     let r = sim.run();
     (sim.take_output(), r)
 }
@@ -37,23 +44,16 @@ fn fulladd_matches_oracle_bytes() {
     assert_eq!(out, expected, "byte-diff vs Verilator 5.050 oracle failed");
 }
 
+/// M5 acceptance (PLAN §5): the counter8 fixture, including the NBA-region
+/// read subtlety documented in corpus/counter8/README.md.
 #[test]
-fn always_block_errors_with_milestone_pointer() {
+fn counter8_matches_oracle_bytes() {
     let design = include_str!("../../../corpus/counter8/counter.v");
-    let mut sm = rcs_diag::SourceMap::new();
-    let mut diags = rcs_diag::DiagSink::new();
-    let opts = PpOptions::default();
-    let parsed = parser::parse_source_file(
-        pp::preprocess_source("counter.v", design, &mut sm, &mut diags, &opts).tokens,
-        &mut diags,
-    );
-    let e = match Sim::build(&parsed.modules, "counter") {
-        Ok(_) => panic!("always must be rejected at elab time in the slice"),
-        Err(e) => e,
-    };
-    assert!(
-        e.message.contains("M5"),
-        "error must point at the milestone: {}",
-        e.message
-    );
+    let tb = include_str!("../../../corpus/counter8/tb_counter.v");
+    let expected = include_str!("../../../corpus/counter8/expected.stdout");
+    let (out, r) = run_case(&[("counter.v", design), ("tb_counter.v", tb)], "tb_counter");
+    if let Err(e) = r {
+        panic!("simulation error: {} (output so far: {out:?})", e.message);
+    }
+    assert_eq!(out, expected, "byte-diff vs Verilator 5.050 oracle failed");
 }

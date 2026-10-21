@@ -91,10 +91,18 @@ impl<'d> Parser<'d> {
                     format!("unterminated module `{name}` (missing `endmodule`)"),
                 );
             }
+            let before = self.pos;
             match self.module_item() {
                 Ok(Some(it)) => items.push(it),
                 Ok(None) => {}
-                Err(super::ParseAbort) => self.sync_item(),
+                Err(super::ParseAbort) => {
+                    self.sync_item();
+                    if self.pos == before {
+                        // sync stopped on a structural keyword it won't
+                        // consume — force progress (INC hang fix).
+                        self.pos += 1;
+                    }
+                }
             }
         };
 
@@ -816,6 +824,28 @@ impl<'d> Parser<'d> {
                         );
                     };
                     let _ = self.take_net_or_reg_kind();
+                    // Type keywords are legal in task/function ports
+                    // (`input integer n`); carry them as Decl.ty.
+                    let mut ty: Option<ParamType> = None;
+                    match self.peek().kind {
+                        Tok::Keyword(Kw::Integer) => {
+                            self.pos += 1;
+                            ty = Some(ParamType::Integer);
+                        }
+                        Tok::Keyword(Kw::Real) => {
+                            self.pos += 1;
+                            ty = Some(ParamType::Real);
+                        }
+                        Tok::Keyword(Kw::Time) => {
+                            self.pos += 1;
+                            ty = Some(ParamType::Time);
+                        }
+                        Tok::Keyword(Kw::Realtime) => {
+                            self.pos += 1;
+                            ty = Some(ParamType::Realtime);
+                        }
+                        _ => {}
+                    }
                     let mut signed = false;
                     if self.eat_kw(Kw::Signed) {
                         signed = true;
@@ -829,7 +859,7 @@ impl<'d> Parser<'d> {
                     ports.push(ast::Decl {
                         span: dspan,
                         kind: ast::DeclKind::Reg,
-                        ty: None,
+                        ty,
                         signed,
                         range,
                         dir: Some(dir),
