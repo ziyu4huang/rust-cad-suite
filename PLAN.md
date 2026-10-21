@@ -53,8 +53,8 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 | M1 | preprocessor | object+單層 function-like 巨集/`` `` ``/`` `" ``/ifdef 族/include(-I,環=硬錯)/timescale/__LINE__;`verilator -E` 對拍正規化 | 核心 ✅(pp 測試 17 條綠);-E 對拍待 |
 | M2 | parser + **垂直切片** | 全 V2005 文法;多錯誤恢復;**組合邏輯 smoke 提前**(對抗審 #10);fuzz | parser ✅;**垂直切片 ✅ 2026-10-21**(crates/vl-sim:4-state 值/求值器/union-find 迷你 elab/組合收斂/initial+$display;`--binary` 已可跑;corpus/fulladd 與 Verilator 5.050 **byte-diff 全綠**,測試 sim_gate 釘死);fuzz 待 |
 | M3 | elab + lint-only | 符號/參數/generate/寬度;picorv32+serv 零假 WIDTH;**lint 提前為第一可用產物** | |
-| M4 | 解釋器核(無時序) | 4-state 值(IEEE §5 表格單測為準,對抗審 #2);tb_race 確定序;加法器 TB 與 oracle stdout byte-diff | 值核心 ✅(切片帶入;算術 X 仍為保守全-x,§5 逐算子表待);加法器 diff ✅(fulladd);tb_race/函式/任務待 |
-| M5 | timing+調度 | **counter8 fixture `PASS` byte-exact**(corpus/counter8/,oracle 已錄;含 NBA 區讀值細節);UNOPTFLAT;TIMESCALEMOD 對等硬錯 | fixture 就緒 |
+| M4 | 解釋器核(無時序) | 4-state 值(IEEE §5 表格單測為準,對抗審 #2);tb_race 確定序;加法器 TB 與 oracle stdout byte-diff | ✅ 2026-10-21:上下文位寬/符號(§5.4)、函式(靜態)/任務(內聯)、process 序=宣告序(32_proc_order 對拍);§5 逐算子精確 X 算術仍保守全-x(值單測軌持續) |
+| M5 | timing+調度 | **counter8 fixture `PASS` byte-exact**(corpus/counter8/,oracle 已錄;含 NBA 區讀值細節);UNOPTFLAT;TIMESCALEMOD 對等硬錯 | ✅ 2026-10-21:進程 VM+時間輪+NBA 區+邊沿喚醒;counter8 與 fulladd byte-diff 綠(sim_gate);UNOPTFLAT=組合 100 輪上限;TIMESCALEMOD 對等待 |
 | M6 | VCD | 規則=逐時間戳 (canonical name→value) 集合比對+**alias 組折疊**(oracle 實證多網同碼),禁裸字節 diff(對抗審 #4);參考 VCD 走 --cc+手寫 main 腳本 | |
 | M7-M9 | 語言廣度/SV 階梯/perf gate + tier-B ADR | 見 PLAN-DRAFT §5 | |
 
@@ -66,6 +66,8 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 
 ## 7. 測試策略
 單元(值真值表=IEEE 1364-2005 §5 為 oracle;lexer/pp/parser)→ golden(`corpus/<case>/expected.*`)→ **差分 vs 5.050**(stdout 過濾白名單+`--timescale` 統一+VCD 規則化比對;詳細規則=`corpus/counter8/README.md`)→ fuzz(M2 起)。上游 test_regress 永不入 git(LGPL/Artistic),僅本地唯讀。
+
+**E2E 回歸閘(2026-10-21 上線)**:`corpus/e2e/` 32 例×oracle 錄製期望已入 git;`cargo test` 內建 ≥80% 閘(`vl-difftest` crate;期望常駐,無需本機 oracle)。當前基線 **31/32=96.9%**(唯一 FAIL=30_gen_mux 存儲器陣列 M7 硬錯,屬聲明範圍)。錄製=`cargo run -p vl-difftest -- --record`。
 
 ## 8. Open questions — 裁決建議已「暫定採納」(2026-10-21;使用者隨時可翻案,翻案=改本表+對應 ADR)
 | # | 問題 | 暫定裁決 | 理由 |

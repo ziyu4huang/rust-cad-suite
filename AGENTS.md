@@ -1,0 +1,86 @@
+# AGENTS.md — rust-cad-suite 开发守则(所有 agent session 载入)
+
+本 repo 用纯 Rust 重写 oss-cad-suite 工具集;Phase 1 = `rverilator`
+(Verilator 等价模拟器)。以下铁则来自 2026-10-21 M0→M5+E2E 弧的实錄
+(详证 = docs/REFLECTION-agent-hardening.md),违反会产出「看起来绿、
+语义错」的工具。SSOT:PLAN.md(路线)、docs/adr/(决策)。
+
+## 1. Oracle 即 spec(最高优先)
+
+- 兼容产品的正确性标准 = 参考工具的可观测行为。语义分歧时**oracle 赢**,
+  即使 LRM 站你那边(实录:超长 sized 字面量 LRM 说截断,verilator 报错 →
+  跟 oracle)。LRM 只用来解释行为,不用来覆盖行为。
+- 期望输出一律 `cargo run -p vl-difftest -- --record` 从 oracle **录制**,
+  禁手写期望值。手写只允许错误路径形态(exit code / 里程碑指错信息)。
+- oracle 实例:本机 `/opt/homebrew/bin/verilator`(5.050),仅测试用,永不
+  随产品 ship;上游 test_regress 文件(LGPL/Artistic)禁入 git。
+- 改了语义(求值/调度/格式化)后必须重录受影响 case 并读一遍 diff——
+  期望变了要看是「修对了」还是「修偏了」。
+
+## 2. 差分语料纪律(两条验收轨分立)
+
+- byte-diff corpus(X-clean 政策):禁 x/z 传播样例、禁 z 字面量初始化、
+  禁同边沿调度竞争(两个进程对同一边沿一写一读=IEEE 非确定序,不是测试)。
+- 4-state 运算符正确性走独立轨:IEEE 1364-2005 §5 真值表单测(value.rs),
+  与 oracle diff 无关、不受其 2-state 性拖累。
+- 调度确定性契约:process 序=宣告序(ADR-0001);依赖未决顺序的 TB 按
+  无效测试处理,改写或标 known-diff。
+- corpus 文件必须过 oracle 的 warnings-as-errors(警告=代码质量信号,
+  先修样例再录)。
+- 每个新 case 落地三查:语义 X-clean?顺序确定?oracle 与我方都能终止?
+
+## 3. 不支持的功能=带里程碑的硬错
+
+未实现构造必须 `error ... (milestone Mx)` 硬错(exit 非 0),禁静默跑偏、
+禁空实现。E2E 失败因此自分类:报错带 Mx=范围外;崩溃/数值错=bug。
+新支持某功能时:删对应 corpus 的 fail、补 PASS case、更新 PLAN.md 里程碑表。
+
+## 4. 错误恢复必须保证前进(带挂死 fixture)
+
+- 每个恢复循环(sync_stmt/sync_item/模块循环/块循环)必须带
+  「pos 未动 → 强制前进」守卫;结构关键字(end/endtask/…)既不消费也不
+  终止外层循环 = 死循环(实录:`task one(input integer n);` 挂死)。
+- 每个恢复点配一个会触发的挂死形 fixture 进 corpus/tests。
+- 疑似挂死:先 `sample <pid>` 看栈,再改代码;E2E 运行带每例看门狗。
+
+## 5. 4-state 值语义:算子与真值表同生
+
+- 每个算子落地时同轮写 x/z kind 保全单测(~x 把 x 翻成 z、>>> 按值宽而非
+  64 位填充、merge 的 0 强迫须双方皆 0——三例都在案)。写法:IEEE §5 表
+  先行,算子后行。
+- 格式化是契约:`%0d`(极小)/`%d`(类型宽空格填充)/`%0Nd`(零填充)/
+  `%t`(precision 单位、缺省宽 20)…… 全部 golden 钉死,oracle 仲裁。
+- 位宽/符号传播按 §5.4/§5.5:上下文决定操作数强制到表达式宽(符号仅当
+  整体 signed);自决定子上下文(比较两侧/移位量/拼接/条件)各自开新上下文。
+  加法进位保留是验收项(`wire [8:0] s = a + b`)。
+
+## 6. 未解析即硬错
+
+名字解析走作用域链,未命中=报错(带 span)。禁盲字符串前缀——第一版
+盲前缀靠扁平命名空间碰撞蒙混过关,把 ANSI 端口未建 cell 的真洞埋了两周。
+每个声明形态(含 ANSI 端口、generate 作用域、函数静态局部)都必须注册。
+
+## 7. 语义敏感手术纪律(承主 repo 教训)
+
+- 改文件一律脚本化手术+命中计数断言(`count==1` 才写);脚本改过的文件
+  再用 Edit 前必须重读(staleness 拒写是常态不是事故)。
+- 跨目录引用(include_str/相对路径)先数层级:tests/ 到 repo 根=三层。
+- 语义重写(求值器/调度器级)完成后,先跑全量 cargo test 再跑 E2E;
+  两者都绿才算「改完」。
+
+## 8. 交付闸(合并前必过)
+
+1. `cargo build` 零 error 零 warning;
+2. `cargo test` 全绿——其中 `vl-difftest` 回归闸断言 E2E 通过率 ≥80%
+   (期望已入库,无需本机装 verilator;当前基线 31/32=96.9%,唯一 FAIL
+   = 30_gen_mux 存储器数组 M7 硬错,属声明范围);
+3. 新语义改动附:对应 diff 修复说明(哪条 oracle 证据)或新 case。
+- git 提交单文件精确 add;commit message 禁反引号与 `$(…)`。
+
+## 9. 定位工具箱(实录验证)
+
+- 挂死:`sample <pid> 1`(macOS)看栈,别猜;E2E runner 自带
+  `--only <case>` 二分。
+- 语义分歧:直接在 /tmp 写最小复现,`rverilator --binary` vs
+  `verilator --binary --timing` 并排跑;oracle 输出即答案。
+- /tmp 会被外部清理:关键复现文件放 repo corpus/,复现脚本可弃。

@@ -16,15 +16,18 @@ and [docs/adr/](docs/adr/).
 | M1 preprocessor | core done — object/function macros, `` `` `` paste, `` `" `` stringify, ifdef family, `` `include `` + `-I`, `` `timescale ``, `__FILE__/__LINE__` |
 | M2 parser | core done — Verilog-2005 modules (ANSI + non-ANSI ports), decls, assign, always/initial, if/case/casez/for/while/repeat/forever, timing controls, instances (named/positional/arrays), generate (if/for/case/blocks), functions/tasks, multi-error recovery |
 | M2 vertical slice (`--binary`) | done — 4-state values, evaluator, union-find mini-elaboration, combinational convergence, `initial` + `$display`/`$finish`; `corpus/fulladd` **byte-identical to Verilator 5.050** (test `sim_gate`) |
-| M3 elaboration + lint | next |
-| M4–M6 scheduler + VCD | planned; `always`/`#delay`/NBA error with milestone pointers until then; oracle fixtures recorded in `corpus/` |
+| M3/M4 elaboration, functions/tasks, generate | done — scope-chain resolution, parameter overrides, static functions, inlined tasks, generate for/if/case |
+| M5 event scheduler | done — process VM with suspend points, time wheel, NBA region, edge wakes, `$time`/`%t`; `always`/`#delay`/NBA/`@*` all live |
+| E2E differential regression | **31/32 = 96.9% vs Verilator 5.050** (`corpus/e2e`, ≥80% gate in `cargo test`; sole FAIL = memory arrays, declared M7 hard-error) |
+| M6 VCD tracing | next |
 
-40 tests green, zero warnings, zero external dependencies.
+41 tests green + E2E gate at 96.9%, zero warnings, zero external dependencies.
 
 ## Quick start
 ```sh
 cargo build
-./target/debug/rverilator --binary corpus/fulladd/fulladd.v corpus/fulladd/tb_fulladd.v   # simulate (slice)
+./target/debug/rverilator --binary corpus/fulladd/fulladd.v corpus/fulladd/tb_fulladd.v   # simulate
+cargo test -p vl-difftest    # E2E differential regression gate (>=80%)
 ./target/debug/rverilator --lint-only corpus/counter8/counter.v corpus/counter8/tb_counter.v
 ./target/debug/rverilator -E corpus/counter8/counter.v     # preprocess only
 ./target/debug/rverilator --dump-ast corpus/counter8/counter.v
