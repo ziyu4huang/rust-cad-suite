@@ -1,0 +1,47 @@
+name: xls-harvest
+# One-shot (workflow_dispatch) harvest: XLS DSLX -> IR -> Verilog codegen on
+# the linux-x64 release binary; generated Verilog uploaded as an artifact for
+# local corpus adoption (corpus-external/xls/). Apache-2.0: LICENSE travels
+# with every snapshot.
+on:
+  workflow_dispatch: {}
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch XLS release (linux-x64)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          URL=$(gh release view --repo google/xls --json assets --jq '.assets[] | select(.name | contains("linux-x64")) | .url')
+          curl -L "$URL" -o xls.tar.gz
+          mkdir xls-dist && tar xzf xls.tar.gz -C xls-dist
+          find xls-dist -type f -name '*main*' | head
+      - name: DSLX -> IR -> Verilog
+        run: |
+          mkdir -p out
+          BIN=$(find xls-dist -name ir_converter_main | head -1)
+          CGEN=$(find xls-dist -name codegen_main | head -1)
+          $BIN --top=add3 corpus-external/xls/dslx/add3.x > out/add3.ir
+          $CGEN --ir_path out/add3.ir --output_type=verilog --top=add3 > out/add3.v
+          # pipelined sample: best-effort at MVP (DSLX shape may need fixes)
+          $BIN --top=acc_pipe corpus-external/xls/dslx/acc_pipe.x > out/acc_pipe.ir \
+            || echo "WARN acc_pipe IR failed (acceptable for MVP)"
+          if [ -s out/acc_pipe.ir ]; then
+            $CGEN --ir_path out/acc_pipe.ir --output_type=verilog --top=acc_pipe > out/acc_pipe.v \
+              || echo "WARN acc_pipe codegen failed (acceptable for MVP)"
+          fi
+      - name: License
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/google/xls/license --jq '.content' | base64 -d > out/XLS-LICENSE.txt
+          echo "https://github.com/google/xls (Apache-2.0)" > out/XLS-NOTICE.txt
+          echo "Snapshot: generated Verilog via XLS codegen_main (release v0.0.0-$(date +%Y%m%d))" >> out/XLS-NOTICE.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: xls-generated
+          path: out/
