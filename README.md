@@ -42,6 +42,7 @@ cargo test
 - `crates/vl-syntax` — preprocessor, lexer, recursive-descent parser, AST.
 - `crates/vl-sim` — 4-state values, evaluator, interpreter (event scheduler) and the rVPI interface (`src/vpi.rs`).
 - `crates/vl-cli` — the `rverilator` binary.
+- `crates/vl-wasm` — WebAssembly facade over `vl-sim` (`wasm-pack build crates/vl-wasm --target web`, ~500KB; differential-gated from Bun).
 - `corpus/` — self-written fixtures with Verilator-5.050-recorded expected outputs.
 - `vendor-reference/` (gitignored) — upstream build scripts + binary release, reference only.
 

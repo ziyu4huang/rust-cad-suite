@@ -4,3 +4,4 @@ corpus-external/*
 !corpus-external/yosys-simple
 !corpus-external/sv-tests
 *.vcd
+crates/vl-wasm/pkg/

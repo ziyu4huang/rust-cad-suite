@@ -1,0 +1,17 @@
+[package]
+name = "vl-wasm"
+description = "WebAssembly facade for the rverilator simulator core (vl-sim)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
+
+[dependencies]
+vl-syntax = { workspace = true }
+vl-sim = { workspace = true }
+vl-cli = { workspace = true }
+rcs-diag = { workspace = true }
+wasm-bindgen = "0.2"
