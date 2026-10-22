@@ -3,5 +3,6 @@ vendor-reference/
 corpus-external/*
 !corpus-external/yosys-simple
 !corpus-external/sv-tests
+!corpus-external/xls
 *.vcd
 crates/vl-wasm/pkg/
