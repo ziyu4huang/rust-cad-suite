@@ -25,10 +25,11 @@ jobs:
           mkdir -p out
           BIN=$(find xls-dist -name ir_converter_main | head -1)
           CGEN=$(find xls-dist -name codegen_main | head -1)
+          $CGEN --helpfull > out/codegen-help.txt 2>&1 || true
           $BIN --top=add3 corpus-external/xls/dslx/add3.x > out/add3.ir
-          $CGEN --top=add3 --delay_model=unit out/add3.ir > out/add3.v \
+          $CGEN --top=add3 --delay_model=unit out/add3.ir > out/add3.v 2> out/add3.codegen.log \
             || echo "WARN add3 codegen failed (acceptable for MVP)"
-          $BIN --top=acc_pipe corpus-external/xls/dslx/acc_pipe.x > out/acc_pipe.ir \
+          $BIN --top=acc_pipe corpus-external/xls/dslx/acc_pipe.x > out/acc_pipe.ir 2> out/acc_pipe.ir.log \
             || echo "WARN acc_pipe IR failed (acceptable for MVP)"
           if [ -s out/acc_pipe.ir ]; then
             $CGEN --top=acc_pipe --generator pipeline --pipeline_stages=2 --delay_model=unit out/acc_pipe.ir > out/acc_pipe.v \
