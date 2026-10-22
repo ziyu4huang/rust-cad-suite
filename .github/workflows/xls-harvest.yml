@@ -36,6 +36,13 @@ jobs:
               || $CGEN --top=acc_pipe --generator combinational out/acc_pipe.ir > out/acc_pipe.v \
               || echo "WARN acc_pipe codegen failed (acceptable for MVP)"
           fi
+          # rverilator targets Verilog-2005: always_ff -> always (semantics
+          # identical for these single-clock flop blocks; raw copy kept).
+          for v in out/*.v; do
+            [ -s "$v" ] || continue
+            cp "$v" "$v.raw"
+            sed -i 's/always_ff @/always @/g' "$v"
+          done
           ls -la out/ || true
       - name: License
         env:
