@@ -5,6 +5,9 @@
 //! auto-detection. Compiled with `wasm-pack build crates/vl-wasm --target bun`
 //! (or `--target web`); consumed from JS/Bun, no toolchain in the browser.
 
+#[cfg(target_arch = "wasm32")]
+use vl_sim::vpi::CbReason;
+use vl_sim::vpi::{Format, VpiValue};
 use vl_syntax::parser;
 use vl_syntax::pp::{self, PpOptions};
 use wasm_bindgen::prelude::*;
@@ -83,6 +86,42 @@ pub fn run_verilog(top: &str, sources: Vec<String>) -> Result<RunResult, JsValue
     run_inner(top, sources)
 }
 
+fn sim_from_parts(
+    top: &str,
+    sources: Vec<String>,
+    file_names: Vec<String>,
+    file_contents: Vec<String>,
+) -> Result<vl_sim::interp::Sim, JsValue> {
+    let (modules, timescale) = compile_sources(&sources)?;
+    let top = resolve_top(&modules, top)?;
+    let mut sim = vl_sim::Sim::build(&modules, &top, timescale.as_deref())
+        .map_err(|e| JsValue::from_str(&format!("elaborate: {}", e.message)))?;
+    for (n, c) in file_names.into_iter().zip(file_contents) {
+        sim.inject_file(&n, &c);
+    }
+    Ok(sim)
+}
+
+/// `run_verilog` with `$readmem*` files injected virtually (browser hosts
+/// have no filesystem): `file_names[i]` -> `file_contents[i]`.
+#[wasm_bindgen]
+pub fn run_verilog_with_files(
+    top: &str,
+    sources: Vec<String>,
+    file_names: Vec<String>,
+    file_contents: Vec<String>,
+) -> Result<RunResult, JsValue> {
+    if file_names.len() != file_contents.len() {
+        return Err(JsValue::from_str("file_names/file_contents length mismatch"));
+    }
+    let mut sim = sim_from_parts(top, sources, file_names, file_contents)?;
+    sim.run()
+        .map_err(|e| JsValue::from_str(&format!("run: {}", e.message)))?;
+    let stdout = sim.take_output();
+    let vcd = sim.take_vcd().map(|(_, text)| text);
+    Ok(RunResult { stdout, vcd })
+}
+
 /// stdout-only convenience (the common corpus-check shape).
 #[wasm_bindgen]
 pub fn run_verilog_stdout(top: &str, sources: Vec<String>) -> Result<String, JsValue> {
@@ -96,15 +135,64 @@ pub struct WasmSim {
     inner: vl_sim::interp::Sim,
 }
 
+#[cfg(target_arch = "wasm32")]
+fn cb_closure(f: &js_sys::Function) -> vl_sim::vpi::CbFn {
+    let f = f.clone();
+    Box::new(move |sim, info| {
+        // Deliver {time, value, valueHex} as a plain JS object; a throwing
+        // JS callback is logged, never aborts the run (registered contract).
+        let obj = js_sys::Object::new();
+        let _ = js_sys::Reflect::set(&obj, &"time".into(), &info.time.into());
+        let _ = js_sys::Reflect::set(
+            &obj,
+            &"value".into(),
+            &match &info.value {
+                Some(b) => b.fmt_bin().into(),
+                None => JsValue::NULL,
+            },
+        );
+        let _ = js_sys::Reflect::set(
+            &obj,
+            &"valueHex".into(),
+            &match &info.value {
+                Some(b) => b.fmt_hex().into(),
+                None => JsValue::NULL,
+            },
+        );
+        if let Err(e) = f.call1(&JsValue::NULL, &obj) {
+            if let Some(err_fn) = js_sys::Reflect::get(&js_sys::global(), &"console".into())
+                .ok()
+                .and_then(|c| js_sys::Reflect::get(&c, &"error".into()).ok())
+                .and_then(|v| v.dyn_into::<js_sys::Function>().ok())
+            {
+                let _ = err_fn.call1(&JsValue::NULL, &e);
+            }
+        }
+        let _ = sim;
+    })
+}
+
 #[wasm_bindgen]
 impl WasmSim {
     #[wasm_bindgen(constructor)]
     pub fn new(top: &str, sources: Vec<String>) -> Result<WasmSim, JsValue> {
-        let (modules, timescale) = compile_sources(&sources)?;
-        let top = resolve_top(&modules, top)?;
-        let inner = vl_sim::Sim::build(&modules, &top, timescale.as_deref())
-            .map_err(|e| JsValue::from_str(&format!("elaborate: {}", e.message)))?;
+        WasmSim::with_files(top, sources, Vec::new(), Vec::new())
+    }
+
+    /// Constructor with virtual `$readmem*` files (browser: no filesystem).
+    pub fn with_files(
+        top: &str,
+        sources: Vec<String>,
+        file_names: Vec<String>,
+        file_contents: Vec<String>,
+    ) -> Result<WasmSim, JsValue> {
+        let inner = sim_from_parts(top, sources, file_names, file_contents)?;
         Ok(WasmSim { inner })
+    }
+
+    /// Inject a virtual file for `$readmem*` (must precede `run`).
+    pub fn inject_file(&mut self, name: &str, contents: &str) {
+        self.inner.inject_file(name, contents);
     }
 
     pub fn run(&mut self) -> Result<(), JsValue> {
@@ -120,4 +208,99 @@ impl WasmSim {
     pub fn take_vcd(&mut self) -> Option<String> {
         self.inner.take_vcd().map(|(_, text)| text)
     }
+
+    // ---------- rVPI surface ----------
+
+    /// Current value: fmt = "int" | "bin" | "hex" | "dec".
+    pub fn vpi_get(&mut self, path: &str, fmt: &str) -> Result<String, JsValue> {
+        let h = self
+            .inner
+            .vpi_handle_by_name(path)
+            .ok_or_else(|| JsValue::from_str(&format!("no object `{path}`")))?;
+        let f = match fmt {
+            "int" => Format::Int,
+            "bin" => Format::BinStr,
+            "hex" => {
+                let b = self.inner.vpi_bits(h).map_err(js_err)?;
+                return Ok(b.fmt_hex());
+            }
+            "dec" => {
+                let b = self.inner.vpi_bits(h).map_err(js_err)?;
+                return Ok(b.fmt_dec());
+            }
+            _ => return Err(JsValue::from_str("fmt: int|bin|hex|dec")),
+        };
+        match self.inner.vpi_get_as(h, f) {
+            Ok(v) => Ok(match v {
+                VpiValue::Int(i) => i.to_string(),
+                VpiValue::Scalar(s) => format!("{s:?}"),
+                VpiValue::Vector(b) => b.fmt_bin(),
+                VpiValue::BinStr(s) => s,
+                VpiValue::Time(t) => t.to_string(),
+            }),
+            Err(e) => Err(JsValue::from_str(&e.message)),
+        }
+    }
+
+    /// Blocking write (put_value NoDelay semantics).
+    pub fn vpi_put_int(&mut self, path: &str, value: i64) -> Result<(), JsValue> {
+        let h = self
+            .inner
+            .vpi_handle_by_name(path)
+            .ok_or_else(|| JsValue::from_str(&format!("no object `{path}`")))?;
+        self.inner
+            .vpi_put_value(h, VpiValue::Int(value))
+            .map_err(|e| JsValue::from_str(&e.message))
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn on_value_change(&mut self, path: &str, f: js_sys::Function) -> Result<(), JsValue> {
+        let h = self
+            .inner
+            .vpi_handle_by_name(path)
+            .ok_or_else(|| JsValue::from_str(&format!("no object `{path}`")))?;
+        self.inner.register_cb(CbReason::ValueChange(h), cb_closure(&f));
+        Ok(())
+    }
+
+    /// `ticks` are precision ticks (the TB timescale's precision unit).
+    #[cfg(target_arch = "wasm32")]
+    pub fn on_after_delay(&mut self, ticks: u64, f: js_sys::Function) {
+        self.inner
+            .register_cb(CbReason::AfterDelay(ticks), cb_closure(&f));
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn on_start_of_simulation(&mut self, f: js_sys::Function) {
+        self.inner
+            .register_cb(CbReason::StartOfSimulation, cb_closure(&f));
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn on_end_of_simulation(&mut self, f: js_sys::Function) {
+        self.inner
+            .register_cb(CbReason::EndOfSimulation, cb_closure(&f));
+    }
+
+    /// `vpi_control(vpiFinish)`.
+    pub fn finish(&mut self) {
+        self.inner.finish();
+    }
+
+    // The js-sys callback surface exists only under wasm32; the host build
+    // gets compiling stubs (this crate is built for wasm exclusively).
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn on_value_change(&mut self, _path: &str, _f: js_sys::Function) -> Result<(), JsValue> {
+        Err(JsValue::from_str("rVPI callbacks are wasm-only"))
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn on_after_delay(&mut self, _ticks: u64, _f: js_sys::Function) {}
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn on_start_of_simulation(&mut self, _f: js_sys::Function) {}
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn on_end_of_simulation(&mut self, _f: js_sys::Function) {}
+}
+
+fn js_err(e: vl_sim::SimError) -> JsValue {
+    JsValue::from_str(&e.message)
 }

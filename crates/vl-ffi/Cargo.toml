@@ -1,0 +1,15 @@
+[package]
+name = "vl-ffi"
+description = "C-ABI facade for the rverilator simulator core (host FFI: Bun/Python/...)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
+
+[dependencies]
+vl-syntax = { workspace = true }
+vl-sim = { workspace = true }
+rcs-diag = { workspace = true }

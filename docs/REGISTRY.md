@@ -13,6 +13,7 @@
 | `vl-cli` | bin `rverilator`(--version/-E/--lint-only/--dump-ast/--binary/--top-module) | 上全部 | verilator driver | 未知旗標=錯 exit1(對抗審 #8) |
 | `vl-difftest` | oracle 錄製/差分閘/HTML 報告(dev-only, publish=false) | vl-syntax, vl-sim, rcs-diag | —(自建) | regression_gate ≥80% 斷言 |
 | `vl-wasm` | WASM facade(cdylib):`run_verilog(_stdout)`/`WasmSim`,復用 CLI 頂層偵測;wasm-pack --target web,~500KB | `wasm-test/run.mjs` 差分閘(同 oracle goldens,6 例)入 regress.sh(pkg 過期自動重建) | ADR-0003 facade 慣例 |
+| `vl-ffi` | C-ABI host facade(cdylib):`rcs_run(manifest)/rcs_version/rcs_free`,行式 manifest(file/inject);Bun bun:ffi 兩式(FFI 進程內/spawn subprocess) | bun-example 差分閘同 goldens 入 regress(dylib 缺=略過提示) | ADR-0003 facade 慣例 |
 
 ## 語言能力 ↔ 里程碑 ↔ 證據 case
 

@@ -64,3 +64,18 @@ rVPI(`crates/vl-sim/src/vpi.rs`,Rust 原生 VPI 結構等價)新能力必須四�
 ①vpi_gate 單測(firing-point 斷言)②two-paths-vs-corpus(VPI 取樣==oracle 錄製行)
 ③rVPI×VCD 內部交叉 ④REGISTRY 分歧行。C-VPI 語義差異先判「語義 vs 嚴格度」,
 結構性差異(觸發點/投递語義)登記分歧而非硬仿;禁向 C ABI 兼容漂移(ADR-0003 圍欄)。
+
+## wasm/host facade 增補(2026-10-23,ADR-0003 延伸)
+
+模擬器對外三面(native CLI / vl-wasm 瀏覽器 / vl-ffi host FFI)的新能力,
+四證同落(繼承 rVPI 四證制):
+①wasm 差分+功能閘(`wasm-test/run|features|vcd_parser_check.mjs`,regress 自動)
+②host FFI 差分(`bun-example/run.mjs`+`spawn.mjs`,regress 自動;dylib 缺=閘略過並提示)
+③demo serve smoke(四資產 200+no-store,regress 自動)
+④**互動頁交付前必真瀏覽器目檢**(點 Run→stdout→canvas 波形;截圖存
+docs/e2e-report/,curl 不算目檢)。
+
+契約備忘:wasm 回調只收 `{time,value,valueHex}`(JS→sim 中途重入=禁,
+讀值在 run 前後);u64 跨界=BigInt;`$readmem` 在瀏覽器一律走虛擬注入
+(`inject_file`/`run_verilog_with_files`),不碰真 FS;js_sys 表面一律
+`#[cfg(target_arch = "wasm32")]`(host 構建用 stub)。

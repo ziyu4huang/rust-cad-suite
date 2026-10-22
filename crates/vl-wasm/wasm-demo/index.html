@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>rverilator.wasm — in-browser Verilog simulation</title>
+<style>
+  :root { color-scheme: dark; }
+  body { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin: 1rem auto; max-width: 1200px; color: #ddd; background: #101418; }
+  h1 { font-size: 1.1rem; color: #7fd; }
+  .cols { display: flex; gap: 1rem; align-items: flex-start; }
+  .col { flex: 1; min-width: 0; }
+  textarea { width: 100%; box-sizing: border-box; background: #0a0e12; color: #cde; border: 1px solid #345; min-height: 300px; font: inherit; font-size: .8rem; }
+  #files { min-height: 60px; }
+  button { background: #1d4436; color: #cfe; border: 1px solid #3a7; padding: .4rem 1.2rem; cursor: pointer; font: inherit; }
+  button:disabled { opacity: .5; }
+  pre { background: #0a0e12; border: 1px solid #345; padding: .5rem; min-height: 3rem; white-space: pre-wrap; font-size: .78rem; }
+  canvas { background: #0a0e12; border: 1px solid #345; width: 100%; }
+  .err { color: #f88; }
+  .small { font-size: .72rem; color: #889; }
+  label { display: block; margin: .4rem 0 .1rem; font-size: .78rem; color: #9ab; }
+</style>
+</head>
+<body>
+<h1>rverilator.wasm — Verilog-2005 simulation in your browser</h1>
+<p class="small">Same core as the native CLI (vl-sim compiled to WebAssembly, ~500KB).
+Expectations in <code>corpus/</code> were recorded from real Verilator 5.050 — the engine
+running here reproduces them byte-exactly.</p>
+<div class="cols">
+  <div class="col">
+    <label>Verilog source (top auto-detected if empty)</label>
+    <textarea id="src" spellcheck="false"></textarea>
+    <label>top module (optional) · $readmem files (JSON: name → content)</label>
+    <input id="top" placeholder="tb" style="width:8rem;background:#0a0e12;color:#cde;border:1px solid #345">
+    <textarea id="files" spellcheck="false" placeholder='{"data.hex": "11\n22"}'></textarea>
+    <p><button id="run">▶ Run</button> <span id="status" class="small"></span></p>
+    <label>stdout</label>
+    <pre id="out">(no run yet)</pre>
+  </div>
+  <div class="col">
+    <label>waveform (from the design's $dumpvars VCD; click names to toggle)</label>
+    <div id="siglist" class="small"></div>
+    <canvas id="wave" width="900" height="360"></canvas>
+  </div>
+</div>
+<script type="module">
+import init, { WasmSim } from "./pkg/vl_wasm.js";
+
+const DEFAULT_SRC = `\`timescale 1ns/1ps
+module tb;
+  reg clk = 0;
+  reg [7:0] q = 0;
+  always #5 clk = ~clk;
+  always @(posedge clk) q <= q + 1;
+  initial begin
+    $dumpfile("dump.vcd");
+    $dumpvars;
+    repeat (8) @(posedge clk);
+    #1 $display("q=%0d", q);
+    $finish;
+  end
+endmodule
+`;
+document.getElementById("src").value = DEFAULT_SRC;
+
+const $ = (id) => document.getElementById(id);
+let shown = new Set();
+let parsed = null;
+
+$("run").onclick = async () => {
+  $("run").disabled = true;
+  $("status").textContent = "running…";
+  try {
+    await init();
+    let files = [];
+    const filesText = $("files").value.trim();
+    if (filesText) {
+      const map = JSON.parse(filesText);
+      files = [Object.keys(map), Object.values(map)];
+    }
+    const sim = new WasmSim($("top").value.trim(), [$("src").value], files[0] ?? [], files[1] ?? []);
+    sim.run();
+    $("out").textContent = sim.take_output() || "(no output)";
+    const vcd = sim.take_vcd();
+    parsed = vcd ? render(vcd) : null;
+    $("status").textContent = `done · ${parsed ? parsed.signals.length + " signals" : "no dump"}`;
+  } catch (e) {
+    $("out").textContent = String(e);
+    $("out").className = "err";
+    $("status").textContent = "error";
+  }
+  $("run").disabled = false;
+};
+
+function render(vcdText) {
+  const { signals, tMax } = window.__parseVcd(vcdText);
+  shown = new Set(signals.slice(0, 8).map((s) => s.name));
+  const list = $("siglist");
+  list.innerHTML = "";
+  for (const s of signals) {
+    const el = document.createElement("span");
+    el.textContent = (shown.has(s.name) ? "■ " : "□ ") + s.name + "  ";
+    el.style.cursor = "pointer";
+    el.onclick = () => {
+      shown.has(s.name) ? shown.delete(s.name) : shown.add(s.name);
+      draw(signals, tMax);
+    };
+    list.appendChild(el);
+  }
+  draw(signals, tMax);
+  return { signals, tMax };
+}
+
+function draw(signals, tMax) {
+  const cv = $("wave"), ctx = cv.getContext("2d");
+  const W = cv.width, rowH = 34, top = 10;
+  ctx.clearRect(0, 0, W, cv.height);
+  const shownSigs = signals.filter((s) => shown.has(s.name));
+  const H = top + Math.max(1, shownSigs.length) * rowH;
+  cv.height = Math.max(120, H);
+  ctx.fillStyle = "#101418"; ctx.fillRect(0, 0, W, cv.height);
+  const x = (t) => 90 + (t / Math.max(1, tMax)) * (W - 110);
+  ctx.strokeStyle = "#234"; ctx.beginPath();
+  for (let g = 0; g <= 8; g++) { const gx = 90 + g * (W - 110) / 8; ctx.moveTo(gx, 4); ctx.lineTo(gx, cv.height - 4); }
+  ctx.stroke();
+  shownSigs.forEach((s, r) => {
+    const y0 = top + r * rowH + 8;
+    ctx.fillStyle = "#9cf"; ctx.font = "11px monospace";
+    ctx.fillText(s.name, 4, y0 + 8);
+    let prev = s.changes.length ? null : "x";
+    ctx.strokeStyle = "#4ec9b0"; ctx.fillStyle = "#b58"; ctx.beginPath();
+    s.changes.forEach(([t, v], i) => {
+      const nextT = i + 1 < s.changes.length ? s.changes[i + 1][0] : tMax;
+      const x0 = x(t), x1 = x(nextT);
+      if (v === "x" || v === "z") {
+        ctx.moveTo(x0, y0); ctx.lineTo(x1, y0); ctx.moveTo(x0, y0 + 16); ctx.lineTo(x1, y0 + 16);
+        ctx.fillStyle = v === "x" ? "#b55" : "#666"; ctx.fillRect(x0, y0, x1 - x0, 16);
+        ctx.fillStyle = "#b58";
+      } else {
+        const hi = v === "1" || (!isNaN(Number(v)) && Number(v) !== 0);
+        const yv = y0 + (hi ? 0 : 16);
+        if (prev !== null && prev !== v) {
+          const pv = prev === "1" || (!isNaN(Number(prev)) && Number(prev) !== 0);
+          ctx.moveTo(x0, y0 + (pv ? 0 : 16)); ctx.lineTo(x0, yv);
+        } else if (prev === null) {
+          ctx.moveTo(x0, yv);
+        }
+        ctx.lineTo(x1, yv);
+      }
+      prev = v;
+    });
+    ctx.stroke();
+  });
+}
+</script>
+<script type="module">
+  // expose the parser to the app module (single-file demo, no bundler)
+  import { parseVcd } from "./vcd.mjs";
+  window.__parseVcd = parseVcd;
+</script>

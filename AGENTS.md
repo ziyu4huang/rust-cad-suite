@@ -130,3 +130,7 @@
 - rVPI(`crates/vl-sim/src/vpi.rs`)能力變更:回調觸發點/投递語義的改動
   必同輪更新 ADR-0003 觸發點表+vpi_gate 斷言+REGISTRY 分歧行;
   禁向 C ABI 兼容方向漂移(非目標圍欄在 ADR-0003)。
+- 模擬器三面(native CLI/vl-wasm/vl-ffi)能力變更:regress.sh 的 wasm+ffi
+  差分閘與 demo serve smoke 必綠;互動頁交付必附真瀏覽器目檢截圖於
+  docs/e2e-report/;wasm-only 表面必 cfg 閘(u64 跨界=BigInt;
+  $readmem 瀏覽器走注入;回調契約見 SKILL wasm 增補)。

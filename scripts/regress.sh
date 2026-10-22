@@ -51,10 +51,39 @@ if command -v wasm-pack >/dev/null && command -v bun >/dev/null; then
             || { echo "GATE FAIL: wasm-pack build"; fail=1; }
     fi
     if [ -f crates/vl-wasm/pkg/vl_wasm_bg.wasm ]; then
-        bun crates/vl-wasm/wasm-test/run.mjs >/tmp/wasm-gate.out 2>&1 \
-            || { echo "GATE FAIL: wasm differential"; cat /tmp/wasm-gate.out; fail=1; }
-        tail -1 /tmp/wasm-gate.out
+        for t in run features vcd_parser_check; do
+            bun crates/vl-wasm/wasm-test/$t.mjs >/tmp/wasm-gate-$t.out 2>&1 \
+                || { echo "GATE FAIL: wasm $t"; cat /tmp/wasm-gate-$t.out; fail=1; }
+            tail -1 /tmp/wasm-gate-$t.out
+        done
     fi
+fi
+
+# Demo serve smoke: every asset 200 + no-store (repo rule for preview
+# servers); browser-rendered visual checks stay a documented manual step.
+if command -v bun >/dev/null && [ -f crates/vl-wasm/wasm-demo/index.html ]; then
+    bun crates/vl-wasm/wasm-demo/serve.ts >/dev/null 2>&1 &
+    DEMO_PID=$!
+    sleep 0.6
+    smoke=0
+    for a in index.html pkg/vl_wasm.js pkg/vl_wasm_bg.wasm vcd.mjs; do
+        code=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:8031/$a")
+        [ "$code" != "200" ] && smoke=1
+    done
+    cc=$(curl -sI http://127.0.0.1:8031/ | grep -ci "cache-control: no-store")
+    [ "$cc" -eq 0 ] && smoke=1
+    kill $DEMO_PID 2>/dev/null
+    if [ "$smoke" -ne 0 ]; then echo "GATE FAIL: demo serve smoke"; fail=1; else echo "demo serve smoke: 200+no-store"; fi
+fi
+
+# FFI gate: Bun→native dylib must reproduce the same goldens.
+if command -v bun >/dev/null && [ -f target/release/libvl_ffi.dylib ]; then
+    bun crates/vl-ffi/bun-example/run.mjs >/tmp/ffi-gate.out 2>&1 \
+        || { echo "GATE FAIL: ffi"; cat /tmp/ffi-gate.out; fail=1; }
+    echo "ffi golden gate: $(grep -m1 PASS /tmp/ffi-gate.out || echo MISSING)"
+    bun crates/vl-ffi/bun-example/spawn.mjs >/tmp/ffi-spawn.out 2>&1 \
+        || { echo "GATE FAIL: ffi spawn"; cat /tmp/ffi-spawn.out; fail=1; }
+    echo "ffi spawn gate: $(grep -m1 PASS /tmp/ffi-spawn.out || echo MISSING)"
 fi
 
 if [ "${1:-}" = "--with-record" ]; then

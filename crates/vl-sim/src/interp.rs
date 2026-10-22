@@ -164,6 +164,9 @@ pub struct Sim {
     pub(crate) mem_elems: HashMap<String, (String, usize)>,
     /// Base dir for `$readmemh/$readmemb` path resolution (default: cwd).
     file_base: std::path::PathBuf,
+    /// Injected files for `$readmem*` (wasm/browser hosts): name → contents;
+    /// checked before the real filesystem.
+    pub(crate) injected_files: HashMap<String, String>,
     /// `for (...) begin : NAME` — the iteration scope already carries
     /// `NAME[i].`; the inner GenBlock with the same name must not push again.
     pending_gen_block: Option<String>,
@@ -402,6 +405,7 @@ impl Sim {
             gates: Vec::new(),
             mem_elems: HashMap::new(),
             file_base: std::path::PathBuf::new(),
+            injected_files: HashMap::new(),
             pending_gen_block: None,
             vpi: VpiState::default(),
             top_name: top.to_string(),
@@ -438,6 +442,12 @@ impl Sim {
     /// Resolve `$readmem*` relative paths against `dir` (default: process cwd).
     pub fn set_file_base(&mut self, dir: std::path::PathBuf) {
         self.file_base = dir;
+    }
+
+    /// Provide a virtual file for `$readmem*` (checked before the real
+    /// filesystem — the wasm/browser host has none).
+    pub fn inject_file(&mut self, name: &str, contents: &str) {
+        self.injected_files.insert(name.to_string(), contents.to_string());
     }
 
     fn elab_module(
@@ -2589,8 +2599,12 @@ impl Sim {
         } else {
             self.file_base.join(&path)
         };
-        let text = std::fs::read_to_string(&fp)
-            .map_err(|e| SimError::new(format!("{name}: cannot open `{path}`: {e}"), None))?;
+        let text = match self.injected_files.get(&path) {
+            Some(t) => t.clone(),
+            None => std::fs::read_to_string(&fp).map_err(|e| {
+                SimError::new(format!("{name}: cannot open `{path}`: {e}"), None)
+            })?,
+        };
         let bin = name == "$readmemb";
         let chars: Vec<char> = text.chars().collect();
         let mut words = {
