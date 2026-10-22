@@ -57,3 +57,10 @@ description: rust-cad-suite 开发正典——AI agent 做 EDA/IC 工具(模拟�
 ②本 skill 的正典条文
 ③AGENTS.md 对应节
 ④证据页/报告(docs/e2e-report/)可核。
+
+## rVPI 增補(2026-10-23,ADR-0003)
+
+rVPI(`crates/vl-sim/src/vpi.rs`,Rust 原生 VPI 結構等價)新能力必須四證同落:
+①vpi_gate 單測(firing-point 斷言)②two-paths-vs-corpus(VPI 取樣==oracle 錄製行)
+③rVPI×VCD 內部交叉 ④REGISTRY 分歧行。C-VPI 語義差異先判「語義 vs 嚴格度」,
+結構性差異(觸發點/投递語義)登記分歧而非硬仿;禁向 C ABI 兼容漂移(ADR-0003 圍欄)。

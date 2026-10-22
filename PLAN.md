@@ -63,6 +63,7 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 | M6 | VCD | 規則=逐時間戳 (canonical name→value) 集合比對+**alias 組折疊**(oracle 實證多網同碼),禁裸字節 diff(對抗審 #4) | ✅ 2026-10-21:vl-sim/vcd.rs 寫出器(作用域樹/有序 id/時間槽 flush)+\$dumpfile/\$dumpvars 接線;閘=vcd_gate(4 例 oracle-ref.vcd 交叉對拍 16/16 訊號 90 采樣點零失配,入 cargo test);oracle 參考=`scripts/oracle_vcd.sh`(--binary --trace 原生支援 \$dumpvars,自寫 main 不需要) |
 | M7 | 記憶體陣列+\$readmem+閘原始件 | 30_gen_mux 轉綠+新例 oracle 錄製 | ✅ 2026-10-23:unpack 陣列(單 range)/逐字 VCD(mem[i] 元件變數=oracle 實證)/\$readmemh/\$readmemb(@addr 跳址+start/finish+註解;x-index 寫忽略/OOB 讀 x)/12 種閘原始件(§7 4-state 表,bufif/notif 停動驅 z);**E2E 55/55=100%**(52_mem_basic/53_readmem/54_gates/55_mem_nba oracle 錄製) |
 | M7b | lint-only 差分軌(yosys tests/simple 收編) | lint parity 對 verilator --lint-only -Wno-fatal | ✅ 2026-10-23 首輪:**44→66/87 (75.9%)**;harness=scripts/lint_diff.sh;TSV=corpus-external/yosys-simple/LINT-DIFF.tsv;餘 20 差異=M8 路線圖(見下) |
+| M7c | **rVPI**(Rust 原生 VPI 結構等價) | 句柄/值讀寫/回調/時間/控制,庫面測試直驅 | ✅ 2026-10-23 slice 1:`vl-sim::vpi`(凍結名表句柄+四類回調+get/put NoDelay+children 迭代);vpi_gate 8 測+two-paths-vs-corpus+rVPI×VCD 內部交叉;ADR-0003;分歧 D12-D15。切片 2=Synch 回調/延遲 put 模式/Ports 迭代 |
 | M8-M9 | 語言廣度/SV 階梯/perf gate + tier-B ADR | 見 PLAN-DRAFT §5;M8 首批候補=層級引用深化(unnamed genblk 鏈×5 檔)、SV fill literals '0/'1(≈11 檔)、>64-bit 多 limb(×6)、intra-assign delay、reals、>8 字元字串、宏貼字面量(`SIZE'ha) | |
 
 ## 6. CLI 契約(對抗審 #7/#8 修訂)

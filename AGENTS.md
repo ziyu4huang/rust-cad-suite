@@ -127,3 +127,6 @@
   精確字面量;探針寫成單行或用唯一標記註解(`// probe-xyz`)包裹,刪除按標記配對。
 - 外部語料收編(lint-diff)已入策略:每里程碑收編一批外部測試檔,
   accept/reject 差分=結構性 bug 最快探針(REFLECTION §14.1)。
+- rVPI(`crates/vl-sim/src/vpi.rs`)能力變更:回調觸發點/投递語義的改動
+  必同輪更新 ADR-0003 觸發點表+vpi_gate 斷言+REGISTRY 分歧行;
+  禁向 C ABI 兼容方向漂移(非目標圍欄在 ADR-0003)。

@@ -60,6 +60,10 @@
 | D9 | 讀入 x 值(2-state) | x→0(`readmem x2`→02) | 4-state 保留 x | 差分語料 X-clean;4-state 單測軌 | 53_readmem 實錄(1023) |
 | D10 | 值域字面量檢查位置 | 靜態全函數體 lint | 惰性求值(函數體調用才檢) | 未調用函數的字面量錯誤不攔(values.v) | LINT-DIFF.tsv |
 | D11 | 位置參數覆蓋超界 | 寬容(忽略) | 同(對齊 oracle,比 LRM 松) | oracle 即 spec | interp elab_instance |
+| D12 | rVPI ValueChange 投遞 | C-VPI 同步逐次排隊 | 槽邊界排水+寫爆發摺疊(VCD pending 同語義) | 結構等價;觀察面一致(內部交叉+corpus 對拍) | vpi_gate;ADR-0003 |
+| D13 | rVPI EndOfSimulation | C 於 $finish 後回調 | 兩個 Ok 出口觸發,SimError 路徑不觸發 | 註冊分歧 | vpi_gate |
+| D14 | rVPI finish/stop | vpiFinish/vpiStop 有別 | 合流(同 $stop 既有行為) | 與 TB 系統任務行為一致 | interp syscall |
+| D15 | rVPI Transport/Inertial put | 脈衝消除有別 | 切片 2:兩模式同義(事件模型無脈衝消除) | 註冊分歧,切片 2 落地 | ADR-0003 D4 |
 
 ## Incident register(工具鏈開發事故;五欄制)
 

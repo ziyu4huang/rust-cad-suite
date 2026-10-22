@@ -10,6 +10,7 @@
 
 use crate::eval::{self, eval, eval_ctx, Lookup, SimError, SResult, Val};
 use crate::value::{low_bits, Bits};
+pub use crate::vpi::{CellKind, VpiHandle, VpiState};
 use rcs_diag::Span;
 use std::collections::{BTreeMap, HashMap, VecDeque};
 use vl_syntax::ast::{self, CaseItem, CaseKind, DeclKind, Direction, EventEdge, Expr, Module, Stmt};
@@ -24,6 +25,8 @@ pub struct Cell {
     pub lsb: i64,
     /// Unpacked (memory) words; `bits` carries the element width/sign layout.
     pub mem: Option<Memory>,
+    /// Object class for the rVPI table (frozen at elaboration).
+    pub kind: CellKind,
 }
 
 #[derive(Clone)]
@@ -128,8 +131,8 @@ enum Flow {
 }
 
 pub struct Sim {
-    parent: HashMap<String, String>,
-    cells: HashMap<String, Cell>,
+    pub(crate) parent: HashMap<String, String>,
+    pub(crate) cells: HashMap<String, Cell>,
     assigns: Vec<Assign>,
     modules: HashMap<String, Module>,
     funcs: HashMap<String, FuncDef>,
@@ -139,18 +142,18 @@ pub struct Sim {
     inactive: VecDeque<usize>,
     delayed: BTreeMap<u64, Vec<usize>>,
     nba: Vec<(Expr, Val)>,
-    now: u64,
+    pub(crate) now: u64,
     /// `#d` advances the clock by `d * (unit_fs / prec_fs)` precision ticks.
-    unit_fs: u64,
-    prec_fs: u64,
+    pub(crate) unit_fs: u64,
+    pub(crate) prec_fs: u64,
     out: String,
-    finished: bool,
+    pub(crate) finished: bool,
     genblk_counter: HashMap<String, u32>,
     /// Declared net/reg vars eligible for VCD dump (params/genvars/statics excluded).
     dumpable: std::collections::BTreeSet<String>,
     /// union-find alias groups: root → all member names (VCD records each).
-    alias_groups: HashMap<String, Vec<String>>,
-    vcd: Option<crate::vcd::VcdWriter>,
+    pub(crate) alias_groups: HashMap<String, Vec<String>>,
+    pub(crate) vcd: Option<crate::vcd::VcdWriter>,
     dump_path: Option<String>,
     /// Simulation precision, for the VCD `$timescale` header.
     prec_name: &'static str,
@@ -158,12 +161,16 @@ pub struct Sim {
     /// outputs re-evaluated in the settle loop.
     gates: Vec<GateInst>,
     /// VCD element vars: full `root[i]` name -> (memory cell root, word index).
-    mem_elems: HashMap<String, (String, usize)>,
+    pub(crate) mem_elems: HashMap<String, (String, usize)>,
     /// Base dir for `$readmemh/$readmemb` path resolution (default: cwd).
     file_base: std::path::PathBuf,
     /// `for (...) begin : NAME` — the iteration scope already carries
     /// `NAME[i].`; the inner GenBlock with the same name must not push again.
     pending_gen_block: Option<String>,
+    /// rVPI state (frozen object table + callbacks), built by finish_elab.
+    pub(crate) vpi: VpiState,
+    /// Top module name (rVPI path-prefix stripping).
+    pub(crate) top_name: String,
 }
 
 // ---------- primitive gates ----------
@@ -396,6 +403,8 @@ impl Sim {
             mem_elems: HashMap::new(),
             file_base: std::path::PathBuf::new(),
             pending_gen_block: None,
+            vpi: VpiState::default(),
+            top_name: top.to_string(),
         };
         let m = sim
             .modules
@@ -404,7 +413,22 @@ impl Sim {
             .clone();
         let scope = Scope::new(String::new());
         sim.elab_module(&m, &scope, &HashMap::new(), &HashMap::new())?;
+        sim.finish_elab(top);
         Ok(sim)
+    }
+
+    /// Non-mutating union-find chase: `find()` path-compresses (needs
+    /// `&mut`); the rVPI read API is `&self`. Chains are frozen after
+    /// elaboration — `union` only runs during instance elab.
+    pub(crate) fn find_follow(&self, name: &str) -> String {
+        let mut cur = name.to_string();
+        while let Some(p) = self.parent.get(&cur) {
+            if p == &cur {
+                break;
+            }
+            cur = p.clone();
+        }
+        cur
     }
 
     pub fn take_output(&mut self) -> String {
@@ -435,6 +459,7 @@ impl Sim {
                         msb: v.to_i64_lossy(),
                         lsb: 0,
                         mem: None,
+                        kind: CellKind::Param,
                     },
                 );
                 continue;
@@ -450,6 +475,7 @@ impl Sim {
                     msb: bits.to_i64_lossy(),
                     lsb: 0,
                     mem: None,
+                    kind: CellKind::Param,
                 },
             );
         }
@@ -491,6 +517,7 @@ impl Sim {
                     msb,
                     lsb,
                     mem: None,
+                    kind: CellKind::Net,
                 },
             );
         }
@@ -556,6 +583,7 @@ impl Sim {
                     msb: bits.to_i64_lossy(),
                     lsb: 0,
                     mem: None,
+                    kind: if matches!(d.kind, DeclKind::Localparam) { CellKind::Localparam } else { CellKind::Param },
                 },
             );
         }
@@ -636,6 +664,7 @@ impl Sim {
                             msb,
                             lsb,
                             mem,
+                            kind: var_decl_kind(d.kind),
                         },
                     );
                     if let Some(init) = &e.init {
@@ -693,6 +722,7 @@ impl Sim {
                 msb: ret_w as i64 - 1,
                 lsb: 0,
                 mem: None,
+                kind: CellKind::FuncStatic,
             },
         );
         let mut inputs = Vec::new();
@@ -731,6 +761,7 @@ impl Sim {
                         msb,
                         lsb,
                         mem: None,
+                        kind: CellKind::FuncStatic,
                     },
                 );
                 inputs.push((flat, w, psigned));
@@ -796,6 +827,7 @@ impl Sim {
                         msb,
                         lsb,
                         mem: None,
+                        kind: CellKind::TaskStatic,
                     },
                 );
                 ports.push((flat, p.dir.unwrap_or(Direction::Input), w, psigned));
@@ -949,6 +981,7 @@ impl Sim {
                             msb: 31,
                             lsb: 0,
                             mem: None,
+                            kind: CellKind::Genvar,
                         },
                     );
                     let pe = self.prefix_expr(cond, &iterscope)?;
@@ -1845,7 +1878,7 @@ impl Sim {
         }
     }
 
-    fn set_name(&mut self, name: &str, bits: Bits, signed: bool) -> SResult<()> {
+    pub(crate) fn set_name(&mut self, name: &str, bits: Bits, signed: bool) -> SResult<()> {
         let root = self.find(name);
         let stored = match self.cells.get_mut(&root) {
             Some(c) => {
@@ -1873,6 +1906,11 @@ impl Sim {
                     }
                     None => w.record_change(&root, stored),
                 }
+            }
+        }
+        if self.vpi.has_vc_callbacks() {
+            if let Some(idx) = self.vpi.index.get(&root).copied() {
+                self.vpi.pending_vc.insert(idx, stored);
             }
         }
         Ok(())
@@ -1970,6 +2008,12 @@ impl Sim {
                         {
                             let c = self.cells.get_mut(&root).unwrap();
                             c.mem.as_mut().unwrap().words[wi as usize] = word.clone();
+                        }
+                        if self.vpi.has_vc_callbacks() {
+                            let en = format!("{root}[{}]", lsb + wi);
+                            if let Some(idx) = self.vpi.index.get(&en).copied() {
+                                self.vpi.pending_vc.insert(idx, word);
+                            }
                         }
                         if let Some(w) = self.vcd.as_mut() {
                             if w.started() {
@@ -2095,7 +2139,7 @@ impl Sim {
 
     // ---------- combinational settle + sensitivity wake ----------
 
-    fn settle(&mut self) -> SResult<()> {
+    pub(crate) fn settle(&mut self) -> SResult<()> {
         for _ in 0..100 {
             let mut changed = false;
             let assigns: Vec<(Expr, Expr, u32)> = self
@@ -2169,7 +2213,7 @@ impl Sim {
 
     /// Re-sample every waiting process's sensitivity list; woken processes
     /// join the runnable queue in declaration order (determinism, ADR-0001).
-    fn wake_check(&mut self) -> SResult<()> {
+    pub(crate) fn wake_check(&mut self) -> SResult<()> {
         let waiting: Vec<usize> = (0..self.procs.len())
             .filter(|&i| self.procs[i].state == PState::Waiting)
             .collect();
@@ -2197,6 +2241,8 @@ impl Sim {
     pub fn run(&mut self) -> SResult<()> {
         self.settle()?;
         self.wake_check()?;
+        self.fire_start_of_simulation()?;
+        self.drain_vc_callbacks()?;
         self.runnable = (0..self.procs.len()).collect();
         let mut budget: u64 = 0;
         loop {
@@ -2215,6 +2261,7 @@ impl Sim {
             }
             if self.finished {
                 self.vcd_flush();
+                self.fire_end_of_simulation()?;
                 return Ok(());
             }
             if !self.inactive.is_empty() {
@@ -2228,13 +2275,16 @@ impl Sim {
                 }
                 self.settle()?;
                 self.wake_check()?;
+                self.drain_vc_callbacks()?;
                 continue;
             }
             // End of this time slot: dump what changed, then advance.
             self.vcd_flush();
+            self.drain_vc_callbacks()?;
             match self.delayed.keys().next().copied() {
                 Some(t) => {
                     self.now = t;
+                    self.fire_due_timers()?;
                     if let Some(v) = self.delayed.remove(&t) {
                         for pid in v {
                             self.procs[pid].state = PState::Runnable;
@@ -2242,7 +2292,10 @@ impl Sim {
                         }
                     }
                 }
-                None => return Ok(()),
+                None => {
+                    self.fire_end_of_simulation()?;
+                    return Ok(());
+                }
             }
         }
     }
@@ -2837,6 +2890,17 @@ fn parse_timescale(ts: Option<&str>) -> (u64, u64) {
 }
 
 /// Human name for a femtosecond magnitude (VCD `$timescale` header).
+fn var_decl_kind(k: DeclKind) -> CellKind {
+    match k {
+        DeclKind::Reg => CellKind::Reg,
+        DeclKind::Integer => CellKind::Integer,
+        DeclKind::Time => CellKind::Time,
+        DeclKind::Genvar => CellKind::Genvar,
+        DeclKind::Event => CellKind::Event,
+        _ => CellKind::Net,
+    }
+}
+
 fn fs_name(fs: u64) -> &'static str {
     match fs {
         1_000_000_000_000_000 => "1s",
