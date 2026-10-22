@@ -269,6 +269,8 @@ pub enum Stmt {
     Block {
         span: Span,
         name: Option<String>,
+        /// Block-local declarations (`begin : b integer i; ... end`).
+        decls: Vec<Decl>,
         body: Vec<Stmt>,
     },
     BAssign {
@@ -396,6 +398,14 @@ pub enum Expr {
         span: Span,
         parts: Vec<String>,
     },
+    /// Generate-scope / instance hierarchical reference whose base is
+    /// indexed (`blk[I-1].z`, `netgen[4].in`) — indexes evaluate at
+    /// elaboration time, so this collapses to a canonical Ident.
+    HierDot {
+        span: Span,
+        base: Box<Expr>,
+        name: String,
+    },
     NumLit(NumLit),
     RealLit {
         span: Span,
@@ -520,6 +530,7 @@ impl Expr {
         match self {
             Expr::Ident { span, .. }
             | Expr::HierIdent { span, .. }
+            | Expr::HierDot { span, .. }
             | Expr::RealLit { span, .. }
             | Expr::StrLit { span, .. }
             | Expr::Unary { span, .. }
@@ -541,6 +552,7 @@ impl Expr {
             self,
             Expr::Ident { .. }
                 | Expr::HierIdent { .. }
+                | Expr::HierDot { .. }
                 | Expr::Index { .. }
                 | Expr::PartSelect { .. }
                 | Expr::IndexedPart { .. }

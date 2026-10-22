@@ -1,4 +1,5 @@
 /target
 vendor-reference/
-corpus-external/
+corpus-external/*
+!corpus-external/yosys-simple
 *.vcd

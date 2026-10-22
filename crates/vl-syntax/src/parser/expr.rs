@@ -67,7 +67,7 @@ impl<'d> Parser<'d> {
         }
     }
 
-    fn unary(&mut self) -> PResult<Expr> {
+    pub(crate) fn unary(&mut self) -> PResult<Expr> {
         let t = self.peek().clone();
         let op = match t.kind {
             Tok::Punct(Punct::Bang) => Some(UnOp::Not),
@@ -250,6 +250,29 @@ impl<'d> Parser<'d> {
     /// Indexing / part-select postfixes: `a[i]`, `a[3:0]`, `a[b+:8]`.
     fn postfix(&mut self, mut e: Expr) -> PResult<Expr> {
         loop {
+            if self.at_punct(Punct::Dot)
+                && matches!(
+                    e,
+                    Expr::Ident { .. }
+                        | Expr::HierIdent { .. }
+                        | Expr::Index { .. }
+                        | Expr::PartSelect { .. }
+                        | Expr::HierDot { .. }
+                )
+            {
+                // `.name` after a (possibly indexed) identifier: hierarchical
+                // reference into a generate block or instance
+                // (`netgen[4].in`, `blk[I-1].z`, `A.B.x` tail).
+                self.pos += 1;
+                let (nm, nspan) = self.expect_ident("hierarchical name")?;
+                let span = e.span().merge(nspan);
+                e = Expr::HierDot {
+                    span,
+                    base: Box::new(e),
+                    name: nm,
+                };
+                continue;
+            }
             if !self.at_punct(Punct::LBracket) {
                 return Ok(e);
             }

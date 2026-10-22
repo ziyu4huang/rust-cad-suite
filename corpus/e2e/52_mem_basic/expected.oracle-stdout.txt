@@ -1,0 +1,6 @@
+m=a0 b1 c2 d3 ix=c2 hi9=99
+ix3=d3
+- /tmp/rec4/52_mem_basic/tb.v:13: Verilog $finish
+- S i m u l a t i o n   R e p o r t: Verilator 5.050 2026-07-01
+- Verilator: $finish at 2ns; walltime 0.000 s; speed 32.787 us/s
+- Verilator: cpu 0.000 s on 1 threads; allocated 2 MB

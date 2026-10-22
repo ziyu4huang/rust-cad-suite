@@ -12,10 +12,17 @@ fn main() {
     let mut only: Option<String> = None;
     let mut html_path: Option<String> = None;
     let mut xcheck: Option<(String, String)> = None;
+    let mut corpus: Option<String> = None;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
             "--record" => record = true,
+            "--corpus" => {
+                i += 1;
+                if let Some(v) = args.get(i) {
+                    corpus = Some(v.clone());
+                }
+            }
             "--min-pass" => {
                 i += 1;
                 min_pass = args.get(i).and_then(|s| s.parse().ok()).unwrap_or(80.0);
@@ -45,7 +52,7 @@ fn main() {
                 }
             }
             other => {
-                eprintln!("unknown arg `{other}` (usage: vl-difftest [--record] [--min-pass N] [--verilator PATH])");
+                eprintln!("unknown arg `{other}` (usage: vl-difftest [--record] [--corpus DIR] [--min-pass N] [--verilator PATH])");
                 std::process::exit(2);
             }
         }
@@ -58,7 +65,10 @@ fn main() {
         print!("{rep}");
         std::process::exit(if ok { 0 } else { 1 });
     }
-    let corpus = vl_difftest::corpus_dir();
+    let corpus = match &corpus {
+        Some(c) => std::path::PathBuf::from(c),
+        None => vl_difftest::corpus_dir(),
+    };
     if record {
         if let Err(e) = vl_difftest::record_with_oracle(&corpus, Path::new(&verilator)) {
             eprintln!("record failures: {:?}", e.0);

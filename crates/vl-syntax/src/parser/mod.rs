@@ -403,6 +403,7 @@ impl<'d> Parser<'d> {
     /// `decl_tail` with the direction attached.
     pub(crate) fn dir_decl(&mut self, dir: ast::Direction, span: Span) -> PResult<ast::Decl> {
         let mut kind: Option<ast::DeclKind> = None;
+        let mut ty: Option<ast::ParamType> = None;
         if let Tok::Keyword(k) = self.peek().kind {
             if let Some(nk) = ast::NetKind::from_kw(k) {
                 self.pos += 1;
@@ -410,10 +411,26 @@ impl<'d> Parser<'d> {
             } else if k == Kw::Reg {
                 self.pos += 1;
                 kind = Some(ast::DeclKind::Reg);
+            } else if k == Kw::Integer {
+                self.pos += 1;
+                kind = Some(ast::DeclKind::Integer);
+                ty = Some(ast::ParamType::Integer);
+            } else if k == Kw::Time {
+                self.pos += 1;
+                kind = Some(ast::DeclKind::Time);
+                ty = Some(ast::ParamType::Time);
+            } else if k == Kw::Real {
+                self.pos += 1;
+                kind = Some(ast::DeclKind::Real);
+                ty = Some(ast::ParamType::Real);
+            } else if k == Kw::Realtime {
+                self.pos += 1;
+                kind = Some(ast::DeclKind::Realtime);
+                ty = Some(ast::ParamType::Realtime);
             }
         }
         let kind = kind.unwrap_or(ast::DeclKind::Net(ast::NetKind::Wire));
-        self.decl_tail(span, kind, None, Some(dir))
+        self.decl_tail(span, kind, ty, Some(dir))
     }
 
     /// True when the current token can start a new ANSI port group

@@ -1,0 +1,2 @@
+and=0 or=1 xor=1 xnor=0 nand=1 nor=0 not=0 buf=1 bufif=1
+and=1 xor=0

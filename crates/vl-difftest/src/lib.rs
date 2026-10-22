@@ -90,6 +90,7 @@ pub fn run_ours(dir: &Path) -> Result<SimOut, String> {
     };
     let mut sim = vl_sim::Sim::build(&modules, &top, timescale.as_deref())
         .map_err(|e| format!("elaborate: {}", e.message))?;
+    sim.set_file_base(dir.to_path_buf());
     sim.run().map_err(|e| format!("run: {}", e.message))?;
     let stdout = sim.take_output();
     let vcd = sim.take_vcd().map(|(_, text)| text);
@@ -225,6 +226,20 @@ pub fn record_with_oracle(corpus: &Path, verilator: &Path) -> anyhow_none::Resul
             Err(e) => {
                 failures.push(format!("{name}: {e}"));
                 continue;
+            }
+        }
+        // `$readmem*` resolves against the sim binary's cwd: copy every
+        // non-source data file (hex/mem/…) from the case dir into `work`.
+        for e in std::fs::read_dir(&d).into_iter().flatten().filter_map(|e| e.ok()) {
+            let n = e.file_name().to_string_lossy().to_string();
+            let p = e.path();
+            if p.is_file()
+                && !n.ends_with(".v")
+                && !n.starts_with("expected.")
+                && !n.ends_with(".vcd")
+                && !n.ends_with(".md")
+            {
+                let _ = std::fs::copy(&p, work.join(&n));
             }
         }
         let run = std::process::Command::new(&out_path)

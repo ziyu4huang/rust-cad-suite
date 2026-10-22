@@ -83,8 +83,23 @@ pub trait Lookup {
     /// `(return width, signed)` of a user function, if declared.
     fn function_info(&mut self, name: &str) -> Option<(u32, bool)>;
     fn call_function(&mut self, name: &str, args: &[Val], span: Span) -> SResult<Val>;
+    /// Unpacked-array (memory) info if `name` is one:
+    /// `(address of word 0, word count, element width, element signed)`.
+    fn mem_info(&mut self, name: &str) -> Option<(i64, usize, u32, bool)>;
+    /// Read one bounds-checked memory word.
+    fn read_mem_word(&mut self, name: &str, word: usize) -> SResult<Bits>;
     /// Current simulation time in precision units, and unit/precision ratio.
     fn now(&self) -> (u64, u64);
+}
+
+/// If `e` is a bare (possibly hierarchical) identifier, its canonical name —
+/// the only base form that can denote a memory word select.
+pub fn mem_base_name(e: &Expr) -> Option<String> {
+    match e {
+        Expr::Ident { name, .. } => Some(name.clone()),
+        Expr::HierIdent { parts, .. } => Some(parts.join(".")),
+        _ => None,
+    }
 }
 
 fn sys_func_info(func: &str) -> Option<(u32, bool)> {
@@ -140,7 +155,20 @@ pub fn nat_width(e: &Expr, ctx: &mut dyn Lookup) -> SResult<u32> {
             let c = const_u64(count, ctx, *span)?;
             (nat_width(value, ctx)? as u64 * c) as u32
         }
-        Expr::Index { .. } => 1,
+        Expr::HierDot { span, .. } => {
+            let _ = span;
+            1
+        }
+        Expr::Index { span, base, .. } => {
+            // Memory word select: self-determined width = element width (§5.2).
+            if let Some(mn) = mem_base_name(base) {
+                if let Some((_, _, w, _)) = ctx.mem_info(&mn) {
+                    return Ok(w);
+                }
+            }
+            let _ = span;
+            1
+        }
         Expr::PartSelect { span, msb, lsb, .. } => {
             let m = const_i64_expr(msb, ctx, *span)?;
             let l = const_i64_expr(lsb, ctx, *span)?;
@@ -188,7 +216,16 @@ pub fn is_signed(e: &Expr, ctx: &mut dyn Lookup) -> SResult<bool> {
             _ => false,
         },
         Expr::Ternary { then, els, .. } => is_signed(then, ctx)? && is_signed(els, ctx)?,
-        Expr::Concat { .. } | Expr::Repeat { .. } | Expr::Index { .. } | Expr::PartSelect { .. }
+        Expr::HierDot { .. } => false,
+        Expr::Index { base, .. } => {
+            // Memory word select keeps the element's declared signedness;
+            // plain bit-select results are unsigned (§5.5.1).
+            match mem_base_name(base) {
+                Some(mn) => ctx.mem_info(&mn).map(|(_, _, _, s)| s).unwrap_or(false),
+                None => false,
+            }
+        }
+        Expr::Concat { .. } | Expr::Repeat { .. } | Expr::PartSelect { .. }
         | Expr::IndexedPart { .. } => false,
         Expr::Call { func, .. } => match func.as_str() {
             "$signed" => true,
@@ -444,7 +481,30 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
             let (b, _) = eval(v, ctx)?.to_bits(*span)?;
             ext(b.replicate(c)?, false, w)
         }
+        Expr::HierDot { span, .. } => Err(SimError::at(
+            "hierarchical reference reached evaluation unresolved",
+            *span,
+        )),
         Expr::Index { span, base, index } => {
+            // Memory word select (§5.2): resolve against the memory table
+            // before falling back to bit-select.
+            if let Some(mn) = mem_base_name(base) {
+                if let Some((lsb, words, ew, _esigned)) = ctx.mem_info(&mn) {
+                    let (i, _) = eval(index, ctx)?.to_bits(index.span())?;
+                    let r = if i.has_unknown() {
+                        Bits::all_x(ew)?
+                    } else {
+                        // Word addresses are unsigned (§5.2): 2'b10 → word 2.
+                        let wi = i.to_u64_lossy() as i64 - lsb;
+                        if wi >= 0 && (wi as usize) < words {
+                            ctx.read_mem_word(&mn, wi as usize)?
+                        } else {
+                            Bits::all_x(ew)? // out-of-range word → x
+                        }
+                    };
+                    return Ok(ext(r, signed, w)?);
+                }
+            }
             let (b, _) = eval(base, ctx)?.to_bits(*span)?;
             let (i, _) = eval(index, ctx)?.to_bits(*span)?;
             let r = if i.has_unknown() {

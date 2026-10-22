@@ -22,6 +22,15 @@ pub struct Cell {
     pub signed: bool,
     pub msb: i64,
     pub lsb: i64,
+    /// Unpacked (memory) words; `bits` carries the element width/sign layout.
+    pub mem: Option<Memory>,
+}
+
+#[derive(Clone)]
+pub struct Memory {
+    /// Logical address of word 0 (normalized decl range bound).
+    pub addr_lsb: i64,
+    pub words: Vec<Bits>,
 }
 
 struct Assign {
@@ -145,6 +154,213 @@ pub struct Sim {
     dump_path: Option<String>,
     /// Simulation precision, for the VCD `$timescale` header.
     prec_name: &'static str,
+    /// Primitive gate instances (and/or/not/buf/bufif*/notif*): continuous
+    /// outputs re-evaluated in the settle loop.
+    gates: Vec<GateInst>,
+    /// VCD element vars: full `root[i]` name -> (memory cell root, word index).
+    mem_elems: HashMap<String, (String, usize)>,
+    /// Base dir for `$readmemh/$readmemb` path resolution (default: cwd).
+    file_base: std::path::PathBuf,
+    /// `for (...) begin : NAME` — the iteration scope already carries
+    /// `NAME[i].`; the inner GenBlock with the same name must not push again.
+    pending_gen_block: Option<String>,
+}
+
+// ---------- primitive gates ----------
+
+#[derive(Clone, Copy, PartialEq, Debug)]
+enum GateKind {
+    And,
+    Nand,
+    Or,
+    Nor,
+    Xor,
+    Xnor,
+    Not,
+    Buf,
+    Bufif0,
+    Bufif1,
+    Notif0,
+    Notif1,
+}
+
+fn gate_kind(s: &str) -> Option<GateKind> {
+    Some(match s {
+        "and" => GateKind::And,
+        "nand" => GateKind::Nand,
+        "or" => GateKind::Or,
+        "nor" => GateKind::Nor,
+        "xor" => GateKind::Xor,
+        "xnor" => GateKind::Xnor,
+        "not" => GateKind::Not,
+        "buf" => GateKind::Buf,
+        "bufif0" => GateKind::Bufif0,
+        "bufif1" => GateKind::Bufif1,
+        "notif0" => GateKind::Notif0,
+        "notif1" => GateKind::Notif1,
+        _ => return None,
+    })
+}
+
+struct GateInst {
+    kind: GateKind,
+    outs: Vec<Expr>,
+    ins: Vec<Expr>,
+}
+
+impl GateInst {
+    fn split(kind: GateKind, conns: &[Expr], span: Span) -> SResult<GateInst> {
+        use GateKind::*;
+        let (outs, ins): (Vec<Expr>, Vec<Expr>) = match kind {
+            And | Nand | Or | Nor | Xor | Xnor => {
+                if conns.len() < 3 {
+                    return Err(SimError::at("gate needs 1 output and >=2 inputs", span));
+                }
+                (vec![conns[0].clone()], conns[1..].to_vec())
+            }
+            Not | Buf => {
+                if conns.len() < 2 {
+                    return Err(SimError::at("not/buf needs >=1 output and 1 input", span));
+                }
+                (
+                    conns[..conns.len() - 1].to_vec(),
+                    vec![conns[conns.len() - 1].clone()],
+                )
+            }
+            Bufif0 | Bufif1 | Notif0 | Notif1 => {
+                if conns.len() != 3 {
+                    return Err(SimError::at(
+                        "bufif/notif needs output, data, enable terminals",
+                        span,
+                    ));
+                }
+                (vec![conns[0].clone()], vec![conns[1].clone(), conns[2].clone()])
+            }
+        };
+        Ok(GateInst { kind, outs, ins })
+    }
+}
+
+const GATE_X: Bits = Bits { width: 1, data: 0, mask: 1 };
+const GATE_Z: Bits = Bits { width: 1, data: 1, mask: 1 };
+const fn gate_b(t: bool) -> Bits {
+    Bits { width: 1, data: t as u64, mask: 0 }
+}
+
+/// IEEE 1364-2005 §7 primitive tables (4-state; no strengths — a disabled
+/// bufif/notif drives z; x control or x/z input yields x).
+fn gate_fold(kind: GateKind, ins: &[Bits]) -> Bits {
+    use GateKind::*;
+    let v = |b: &Bits| -> Option<bool> {
+        if b.has_unknown() { None } else { Some(b.to_u64_lossy() != 0) }
+    };
+    let xs: Vec<Option<bool>> = ins.iter().map(v).collect();
+    let any = |p: fn(&Option<bool>) -> bool| xs.iter().any(p);
+    match kind {
+        And | Nand => {
+            let b = if any(|x| *x == Some(false)) {
+                Some(false)
+            } else if any(|x| x.is_none()) {
+                None
+            } else {
+                Some(true)
+            };
+            b.map_or(GATE_X, |t| gate_b(if kind == And { t } else { !t }))
+        }
+        Or | Nor => {
+            let b = if any(|x| *x == Some(true)) {
+                Some(true)
+            } else if any(|x| x.is_none()) {
+                None
+            } else {
+                Some(false)
+            };
+            b.map_or(GATE_X, |t| gate_b(if kind == Or { t } else { !t }))
+        }
+        Xor | Xnor => {
+            if any(|x| x.is_none()) {
+                GATE_X
+            } else {
+                let odd = xs.iter().filter(|x| **x == Some(true)).count() % 2 == 1;
+                gate_b(if kind == Xor { odd } else { !odd })
+            }
+        }
+        Not | Buf => xs[0].map_or(GATE_X, |t| gate_b(if kind == Not { !t } else { t })),
+        Bufif1 | Bufif0 | Notif1 | Notif0 => {
+            let (data, en) = (xs[0], xs[1]);
+            let enabled = match en {
+                Some(true) => kind == Bufif1 || kind == Notif1,
+                Some(false) => kind == Bufif0 || kind == Notif0,
+                None => return GATE_X,
+            };
+            if !enabled {
+                return GATE_Z;
+            }
+            match data {
+                Some(t) => {
+                    let inv = kind == Notif1 || kind == Notif0;
+                    gate_b(if inv { !t } else { t })
+                }
+                None => GATE_X,
+            }
+        }
+    }
+}
+
+/// Parse one `$readmem*` value token: LSB-aligned into `w` bits, truncating
+/// extra high bits; `x/z/?` carry into the unknown mask (x → x, z → z).
+fn readmem_val(tok: &[char], bin: bool, w: u32, task: &str) -> SResult<Bits> {
+    let mut data: u64 = 0;
+    let mut mask: u64 = 0;
+    let mut nbits = 0usize;
+    for &c in tok {
+        if c == '_' {
+            continue;
+        }
+        let (d, m) = if bin {
+            match c {
+                '0' => (0u64, 0u64),
+                '1' => (1, 0),
+                'x' | 'X' => (0, 1),
+                'z' | 'Z' | '?' => (1, 1),
+                _ => {
+                    return Err(SimError::new(
+                        format!("{task}: bad binary digit `{c}`"),
+                        None,
+                    ))
+                }
+            }
+        } else {
+            match c {
+                '0'..='9' | 'a'..='f' | 'A'..='F' => (c.to_digit(16).unwrap() as u64, 0),
+                'x' | 'X' => (0, 1),
+                'z' | 'Z' | '?' => (1, 1),
+                _ => {
+                    return Err(SimError::new(
+                        format!("{task}: bad hex digit `{c}`"),
+                        None,
+                    ))
+                }
+            }
+        };
+        let sh = if bin { 1 } else { 4 };
+        data = (data << sh) | d;
+        mask = (mask << sh) | m;
+        nbits += sh;
+    }
+    let width = w as usize;
+    let (data, mask) = if nbits > width {
+        let drop = nbits - width;
+        (data >> drop, mask >> drop)
+    } else {
+        let pad = width - nbits;
+        (data << pad, mask << pad)
+    };
+    Ok(Bits {
+        width: w,
+        data,
+        mask,
+    })
 }
 
 // ---------- build / elaboration ----------
@@ -176,6 +392,10 @@ impl Sim {
             vcd: None,
             dump_path: None,
             prec_name,
+            gates: Vec::new(),
+            mem_elems: HashMap::new(),
+            file_base: std::path::PathBuf::new(),
+            pending_gen_block: None,
         };
         let m = sim
             .modules
@@ -189,6 +409,11 @@ impl Sim {
 
     pub fn take_output(&mut self) -> String {
         std::mem::take(&mut self.out)
+    }
+
+    /// Resolve `$readmem*` relative paths against `dir` (default: process cwd).
+    pub fn set_file_base(&mut self, dir: std::path::PathBuf) {
+        self.file_base = dir;
     }
 
     fn elab_module(
@@ -209,6 +434,7 @@ impl Sim {
                         signed: *param_override_signed.get(&p.name).unwrap_or(&false),
                         msb: v.to_i64_lossy(),
                         lsb: 0,
+                        mem: None,
                     },
                 );
                 continue;
@@ -223,6 +449,7 @@ impl Sim {
                     signed,
                     msb: bits.to_i64_lossy(),
                     lsb: 0,
+                    mem: None,
                 },
             );
         }
@@ -231,13 +458,6 @@ impl Sim {
             if let ast::ModuleItem::Decl(d) = it {
                 if matches!(d.kind, DeclKind::Parameter | DeclKind::Localparam) {
                     self.elab_param_decl(d, scope)?;
-                }
-            }
-        }
-        for it in &m.items {
-            if let ast::ModuleItem::Decl(d) = it {
-                if !matches!(d.kind, DeclKind::Parameter | DeclKind::Localparam) {
-                    self.elab_var_decl(d, scope)?;
                 }
             }
         }
@@ -270,8 +490,16 @@ impl Sim {
                     signed: p.signed,
                     msb,
                     lsb,
+                    mem: None,
                 },
             );
+        }
+        for it in &m.items {
+            if let ast::ModuleItem::Decl(d) = it {
+                if !matches!(d.kind, DeclKind::Parameter | DeclKind::Localparam) {
+                    self.elab_var_decl(d, scope)?;
+                }
+            }
         }
         for it in &m.items {
             match it {
@@ -327,6 +555,7 @@ impl Sim {
                     signed,
                     msb: bits.to_i64_lossy(),
                     lsb: 0,
+                    mem: None,
                 },
             );
         }
@@ -359,15 +588,44 @@ impl Sim {
                     },
                 };
                 for e in &d.entries {
-                    if !e.unpacked.is_empty() {
-                        return Err(SimError::at(
-                            "memory arrays are not yet supported (milestone M7)",
-                            e.span,
-                        ));
-                    }
+                    // Unpacked dims (memories): exactly one range supported.
+                    let mem = match e.unpacked.len() {
+                        0 => None,
+                        1 => {
+                            let ur = &e.unpacked[0];
+                            let mpe = self.prefix_expr(&ur.msb, scope)?;
+                            let lpe = self.prefix_expr(&ur.lsb, scope)?;
+                            let mb = eval(&mpe, self)?.to_bits(ur.span)?.0;
+                            let lb = eval(&lpe, self)?.to_bits(ur.span)?.0;
+                            if mb.has_unknown() || lb.has_unknown() {
+                                return Err(SimError::at(
+                                    "memory range bounds contain x/z",
+                                    ur.span,
+                                ));
+                            }
+                            let (m, l) = (mb.to_i64_lossy(), lb.to_i64_lossy());
+                            let (lo, hi) = (m.min(l), m.max(l));
+                            Some(Memory {
+                                addr_lsb: lo,
+                                words: vec![Bits::zeros(width)?; (hi - lo + 1).max(0) as usize],
+                            })
+                        }
+                        _ => {
+                            return Err(SimError::at(
+                                "multi-dimensional unpacked arrays are not yet supported (M8)",
+                                e.span,
+                            ))
+                        }
+                    };
                     // Declarations always land in the innermost scope.
                     let name = format!("{}{}", scope.innermost(), e.name);
-                    if !name.contains('[') {
+                    if let Some(m) = &mem {
+                        for i in 0..m.words.len() {
+                            let en = format!("{name}[{}]", m.addr_lsb + i as i64);
+                            self.dumpable.insert(en.clone());
+                            self.mem_elems.insert(en, (name.clone(), i));
+                        }
+                    } else if !name.contains('[') {
                         self.dumpable.insert(name.clone());
                     }
                     self.cells.insert(
@@ -377,6 +635,7 @@ impl Sim {
                             signed,
                             msb,
                             lsb,
+                            mem,
                         },
                     );
                     if let Some(init) = &e.init {
@@ -433,6 +692,7 @@ impl Sim {
                 signed: ret_s,
                 msb: ret_w as i64 - 1,
                 lsb: 0,
+                mem: None,
             },
         );
         let mut inputs = Vec::new();
@@ -470,6 +730,7 @@ impl Sim {
                         signed: psigned,
                         msb,
                         lsb,
+                        mem: None,
                     },
                 );
                 inputs.push((flat, w, psigned));
@@ -534,6 +795,7 @@ impl Sim {
                         signed: psigned,
                         msb,
                         lsb,
+                        mem: None,
                     },
                 );
                 ports.push((flat, p.dir.unwrap_or(Direction::Input), w, psigned));
@@ -651,7 +913,7 @@ impl Sim {
                 let pe = self.prefix_expr(cond, scope)?;
                 let (b, _) = eval(&pe, self)?.to_bits(cond.span())?;
                 let n = self.next_genblk(scope);
-                let sub = scope.push(format!("genblk{n}."));
+                let sub = scope.push(format!("{}genblk{n}.", scope.innermost()));
                 if b.truthy()? == Some(true) {
                     for it2 in then {
                         self.elab_item(it2, &sub)?;
@@ -676,7 +938,8 @@ impl Sim {
                 loop {
                     // Bind the genvar as a scoped constant per iteration.
                     let blk = block.clone().unwrap_or_default();
-                    let iterscope = scope.push(format!("{blk}[{i}]."));
+                    let iterscope =
+                        scope.push(format!("{}{blk}[{i}].", scope.innermost()));
                     let gname = format!("{}{}", iterscope.innermost(), var);
                     self.cells.insert(
                         gname,
@@ -685,6 +948,7 @@ impl Sim {
                             signed: true,
                             msb: 31,
                             lsb: 0,
+                            mem: None,
                         },
                     );
                     let pe = self.prefix_expr(cond, &iterscope)?;
@@ -692,9 +956,11 @@ impl Sim {
                     if b.truthy()? != Some(true) {
                         break;
                     }
+                    self.pending_gen_block = block.clone();
                     for it2 in items {
                         self.elab_item(it2, &iterscope)?;
                     }
+                    self.pending_gen_block = None;
                     let pe_rhs = self.prefix_expr(&step.rhs, &iterscope)?;
                     let (nb, _) = eval(&pe_rhs, self)?.to_bits(step.span)?;
                     let next = nb.to_i64_lossy();
@@ -729,18 +995,24 @@ impl Sim {
                 let picked = chosen.or(default.as_ref());
                 if let Some(its) = picked {
                     let n = self.next_genblk(scope);
-                    let sub = scope.push(format!("genblk{n}."));
+                    let sub = scope.push(format!("{}genblk{n}.", scope.innermost()));
                     for it2 in its {
                         self.elab_item(it2, &sub)?;
                     }
                 }
             }
             ast::ModuleItem::GenBlock { name, items, .. } => {
-                let sub = match name {
-                    Some(n) => scope.push(format!("{n}.")),
-                    None => {
-                        let n = self.next_genblk(scope);
-                        scope.push(format!("genblk{n}."))
+                let sub = if name.is_some() && self.pending_gen_block.take() == *name {
+                    // `for ... begin : NAME`: the iteration scope already
+                    // carries `NAME[i].` — reuse it verbatim.
+                    scope.clone()
+                } else {
+                    match name {
+                        Some(n) => scope.push(format!("{}{n}.", scope.innermost())),
+                        None => {
+                            let n = self.next_genblk(scope);
+                            scope.push(format!("{}genblk{n}.", scope.innermost()))
+                        }
                     }
                 };
                 for it2 in items {
@@ -780,6 +1052,34 @@ impl Sim {
     }
 
     fn elab_instance(&mut self, inst: &ast::Instance, scope: &Scope) -> SResult<()> {
+        if let Some(k) = gate_kind(&inst.mod_name) {
+            if !inst.params.is_empty() {
+                return Err(SimError::at(
+                    "gate primitives cannot have parameter overrides",
+                    inst.span,
+                ));
+            }
+            for unit in &inst.insts {
+                if unit.array.is_some() {
+                    return Err(SimError::at("gate instance arrays land at M8", unit.span));
+                }
+                let mut conns = Vec::with_capacity(unit.conns.len());
+                for c in &unit.conns {
+                    if c.name.is_some() {
+                        return Err(SimError::at("gate connections must be positional", c.span));
+                    }
+                    match &c.expr {
+                        Some(e) => {
+                            let pe = self.prefix_expr(e, scope)?;
+                            conns.push(pe);
+                        }
+                        None => return Err(SimError::at("unconnected gate terminal", c.span)),
+                    }
+                }
+                self.gates.push(GateInst::split(k, &conns, inst.span)?);
+            }
+            return Ok(());
+        }
         let child = self
             .modules
             .get(&inst.mod_name)
@@ -812,11 +1112,10 @@ impl Sim {
                     }
                 } else {
                     for (i, p) in inst.params.iter().enumerate() {
+                        // Upstream tolerates positional overrides beyond the
+                        // formal list (and empty ones); match that leniency.
                         let Some(formal) = child.params.get(i) else {
-                            return Err(SimError::at(
-                                "positional parameter override out of range",
-                                p.span,
-                            ));
+                            continue;
                         };
                         if let Some(e) = &p.expr {
                             let pe = self.prefix_expr(e, scope)?;
@@ -914,6 +1213,62 @@ impl Sim {
 
     // ---------- naming ----------
 
+    /// `blk[I-1].z`-style hierarchical reference: flatten the base path
+    /// (indexes evaluate at elaboration), try the scope chain innermost-out,
+    /// and return the canonical cell name.
+    fn resolve_hier_dot(
+        &mut self,
+        base: &Expr,
+        name: &str,
+        scope: &Scope,
+    ) -> SResult<String> {
+        let path = self.hier_path(base, scope)?;
+        for prefix in scope.chain.iter().rev() {
+            let cand = format!("{prefix}{path}.{name}");
+            let root = self.find(&cand);
+            if self.cells.contains_key(&root) {
+                return Ok(root);
+            }
+            if self.cells.contains_key(&cand) {
+                return Ok(cand);
+            }
+        }
+        Err(SimError::at(
+            format!("undeclared hierarchical identifier `{path}.{name}`"),
+            base.span().merge(base.span()),
+        ))
+    }
+
+    /// Textual path of a hierarchical base: idents joined by `.`, indexes
+    /// evaluated and rendered as `[i]`.
+    fn hier_path(&mut self, e: &Expr, scope: &Scope) -> SResult<String> {
+        match e {
+            Expr::Ident { name, .. } => Ok(name.clone()),
+            Expr::HierIdent { parts, .. } => Ok(parts.join(".")),
+            Expr::HierDot { base, name, .. } => {
+                let b = self.hier_path(base, scope)?;
+                Ok(format!("{b}.{name}"))
+            }
+            Expr::Index { base, index, .. } => {
+                let b = self.hier_path(base, scope)?;
+                let pe = self.prefix_expr(index, scope)?;
+                let v = eval(&pe, self)?;
+                let (bits, _) = v.to_bits(index.span())?;
+                if bits.has_unknown() {
+                    return Err(SimError::at(
+                        "hierarchical reference index contains x/z",
+                        index.span(),
+                    ));
+                }
+                Ok(format!("{b}[{}]", bits.to_u64_lossy()))
+            }
+            other => Err(SimError::at(
+                "unsupported hierarchical reference base",
+                other.span(),
+            )),
+        }
+    }
+
     fn resolve_name(&self, name: &str, scope: &Scope) -> Option<String> {
         for p in scope.chain.iter().rev() {
             let cand = format!("{p}{name}");
@@ -927,7 +1282,7 @@ impl Sim {
         None
     }
 
-    fn prefix_expr(&self, e: &Expr, scope: &Scope) -> SResult<Expr> {
+    fn prefix_expr(&mut self, e: &Expr, scope: &Scope) -> SResult<Expr> {
         Ok(match e {
             Expr::Ident { span, name } => Expr::Ident {
                 span: *span,
@@ -937,9 +1292,19 @@ impl Sim {
             },
             Expr::HierIdent { span, parts } => {
                 let joined = parts.join(".");
+                let resolved = self.resolve_name(&joined, scope).or_else(|| {
+                    // `<ModuleName>.sig` self-reference (roots are addressable
+                    // by their module name): strip the module segment.
+                    if parts.len() >= 2 && self.modules.contains_key(&parts[0]) {
+                        let rest = parts[1..].join(".");
+                        self.resolve_name(&rest, scope)
+                    } else {
+                        None
+                    }
+                });
                 Expr::Ident {
                     span: *span,
-                    name: self.resolve_name(&joined, scope).ok_or_else(|| {
+                    name: resolved.ok_or_else(|| {
                         SimError::at(
                             format!("undeclared hierarchical identifier `{joined}`"),
                             *span,
@@ -987,6 +1352,13 @@ impl Sim {
                 base: Box::new(self.prefix_expr(base, scope)?),
                 index: Box::new(self.prefix_expr(index, scope)?),
             },
+            Expr::HierDot { span, base, name } => {
+                let canon = self.resolve_hier_dot(base, name, scope)?;
+                Expr::Ident {
+                    span: *span,
+                    name: canon,
+                }
+            }
             Expr::PartSelect {
                 span,
                 base,
@@ -1030,7 +1402,7 @@ impl Sim {
         })
     }
 
-    fn prefix_edges(&self, edges: &[EventEdge], scope: &Scope) -> SResult<Vec<EventEdge>> {
+    fn prefix_edges(&mut self, edges: &[EventEdge], scope: &Scope) -> SResult<Vec<EventEdge>> {
         edges
             .iter()
             .map(|ed| {
@@ -1191,9 +1563,21 @@ impl Sim {
             return Err(SimError::at("statement nesting too deep", stmt_span(s)));
         }
         match s {
-            Stmt::Block { body, .. } => {
+            Stmt::Block {
+                name,
+                decls,
+                body,
+                ..
+            } => {
+                let bscope = match name {
+                    Some(n) => scope.push(format!("{n}.")),
+                    None => scope.clone(),
+                };
+                for d in decls {
+                    self.elab_var_decl(d, &bscope)?;
+                }
                 for b in body {
-                    self.lower_stmt(out, b, scope, depth + 1)?;
+                    self.lower_stmt(out, b, &bscope, depth + 1)?;
                 }
             }
             Stmt::BAssign { lhs, rhs, .. } => {
@@ -1501,8 +1885,12 @@ impl Sim {
                 .dumpable
                 .iter()
                 .filter_map(|n| {
-                    let root = self.parent.get(n).cloned().unwrap_or_else(|| n.clone());
-                    let w = self.cells.get(&root).or_else(|| self.cells.get(n))?.bits.width;
+                    let w = if let Some((root, _)) = self.mem_elems.get(n) {
+                        self.cells.get(root)?.bits.width
+                    } else {
+                        let root = self.parent.get(n).cloned().unwrap_or_else(|| n.clone());
+                        self.cells.get(&root).or_else(|| self.cells.get(n))?.bits.width
+                    };
                     Some((n.clone(), n.split('.').map(|s| s.to_string()).collect(), w))
                 })
                 .collect();
@@ -1523,6 +1911,12 @@ impl Sim {
         let names: Vec<String> = self.dumpable.iter().cloned().collect();
         let mut m = std::collections::BTreeMap::new();
         for n in names {
+            if let Some((root, wi)) = self.mem_elems.get(&n) {
+                if let Some(mem) = self.cells.get(root).and_then(|c| c.mem.as_ref()) {
+                    m.insert(n, mem.words[*wi].clone());
+                }
+                continue;
+            }
             let root = self.find(&n);
             if let Some(c) = self.cells.get(&root) {
                 m.insert(n, c.bits);
@@ -1556,6 +1950,35 @@ impl Sim {
             Expr::Ident { name, .. } => self.set_name(name, bits, signed),
             Expr::HierIdent { parts, .. } => self.set_name(&parts.join("."), bits, signed),
             Expr::Index { base, index, .. } => {
+                // Memory word store (whole element).
+                if let Some(mn) = eval::mem_base_name(base) {
+                    if let Some((lsb, n, w, esigned)) = self.mem_info(&mn) {
+                        let root = self.find(&mn);
+                        let (i, _) = eval(index, self)?.to_bits(index.span())?;
+                        if i.has_unknown() {
+                            return Ok(()); // x-indexed write: no effect
+                        }
+                        let wi = i.to_u64_lossy() as i64 - lsb;
+                        if wi < 0 || wi as usize >= n {
+                            return Ok(()); // out-of-range word write: ignored
+                        }
+                        let word = if esigned && signed {
+                            bits.sadjust(w)?
+                        } else {
+                            bits.uadjust(w)?
+                        };
+                        {
+                            let c = self.cells.get_mut(&root).unwrap();
+                            c.mem.as_mut().unwrap().words[wi as usize] = word.clone();
+                        }
+                        if let Some(w) = self.vcd.as_mut() {
+                            if w.started() {
+                                w.record_change(&format!("{root}[{}]", lsb + wi), word);
+                            }
+                        }
+                        return Ok(());
+                    }
+                }
                 let (cur, cs) = self.read_lvalue_base(base)?;
                 let (i, _) = eval(index, self)?.to_bits(index.span())?;
                 if i.has_unknown() {
@@ -1645,7 +2068,15 @@ impl Sim {
                 let root = self.find(&key);
                 Ok(self.cells.get(&root).map(|c| c.bits.width).unwrap_or(1))
             }
-            Expr::Index { .. } => Ok(1),
+            Expr::Index { base, .. } => {
+                // Memory element lvalue: element width; plain bit-select: 1 bit.
+                if let Some(mn) = eval::mem_base_name(base) {
+                    if let Some((_, _, w, _)) = self.mem_info(&mn) {
+                        return Ok(w);
+                    }
+                }
+                Ok(1)
+            }
             Expr::PartSelect { msb, lsb, .. } => {
                 let (m, _) = eval(msb, self)?.to_bits(msb.span())?;
                 let (l, _) = eval(lsb, self)?.to_bits(lsb.span())?;
@@ -1684,6 +2115,31 @@ impl Sim {
                 if cur.0 != target {
                     self.assign_lvalue(lhs, Val::Bits { bits, signed })?;
                     changed = true;
+                }
+            }
+            let gs: Vec<(GateKind, Vec<Expr>, Vec<Expr>)> = self
+                .gates
+                .iter()
+                .map(|g| (g.kind, g.outs.clone(), g.ins.clone()))
+                .collect();
+            for (kind, outs, ins) in &gs {
+                let mut iv = Vec::with_capacity(ins.len());
+                for e in ins {
+                    let (b, _) = eval(e, self)?.to_bits(e.span())?;
+                    iv.push(b);
+                }
+                let val = gate_fold(*kind, &iv);
+                for o in outs {
+                    let cur = self.read_lvalue_base_quiet(o)?;
+                    let target = if cur.1 {
+                        val.sadjust(cur.0.width)?
+                    } else {
+                        val.uadjust(cur.0.width)?
+                    };
+                    if cur.0 != target {
+                        self.assign_lvalue(o, Val::Bits { bits: val.clone(), signed: false })?;
+                        changed = true;
+                    }
                 }
             }
             if !changed {
@@ -2026,11 +2482,148 @@ impl Sim {
                 Ok(Flow::Next)
             }
             "$dumpoff" | "$dumpon" | "$dumpall" => Ok(Flow::Next),
+            "$readmemh" | "$readmemb" => self.sys_readmem(name, args),
             _ => Err(SimError::new(
                 format!("system task `{name}` is not yet supported"),
                 None,
             )),
         }
+    }
+
+    /// `$readmemh`/`$readmemb` (§17.2.4): whitespace-separated values into
+    /// memory words; `@addr` jumps to a logical address; start/finish args
+    /// bound the fill window; values wider than a word truncate to the LSBs.
+    fn sys_readmem(&mut self, name: &str, args: &[Expr]) -> SResult<Flow> {
+        if args.len() < 2 || args.len() > 4 {
+            return Err(SimError::new(format!("{name} takes 2..4 arguments"), None));
+        }
+        let path = match eval(&args[0], self)? {
+            Val::Str(s) => s,
+            _ => {
+                return Err(SimError::new(
+                    format!("{name}: file name must be a string literal"),
+                    None,
+                ))
+            }
+        };
+        let mn = eval::mem_base_name(&args[1]).ok_or_else(|| {
+            SimError::new(format!("{name}: second argument must be a memory"), None)
+        })?;
+        if self.mem_info(&mn).is_none() {
+            return Err(SimError::new(
+                format!("{name}: `{mn}` is not a memory"),
+                None,
+            ));
+        }
+        let (lsb, n, w, _esigned) = self.mem_info(&mn).unwrap();
+        let root = self.find(&mn);
+        let mut opt_addr = |e: Option<&Expr>| -> SResult<Option<i64>> {
+            match e {
+                Some(e) => {
+                    let (b, _) = eval(e, self)?.to_bits(e.span())?;
+                    if b.has_unknown() {
+                        return Ok(None);
+                    }
+                    Ok(Some(b.to_u64_lossy() as i64))
+                }
+                None => Ok(None),
+            }
+        };
+        let start = opt_addr(args.get(2))?;
+        let finish = opt_addr(args.get(3))?;
+        let fp = if std::path::Path::new(&path).is_absolute() {
+            std::path::PathBuf::from(&path)
+        } else {
+            self.file_base.join(&path)
+        };
+        let text = std::fs::read_to_string(&fp)
+            .map_err(|e| SimError::new(format!("{name}: cannot open `{path}`: {e}"), None))?;
+        let bin = name == "$readmemb";
+        let chars: Vec<char> = text.chars().collect();
+        let mut words = {
+            let c = self.cells.get(&root).unwrap();
+            c.mem.as_ref().unwrap().words.clone()
+        };
+        let mut touched: Vec<usize> = Vec::new();
+        let mut i = 0usize;
+        let mut wi: i64 = match start {
+            Some(s) => s - lsb,
+            None => 0,
+        };
+        while i < chars.len() {
+            let c = chars[i];
+            if c.is_whitespace() {
+                i += 1;
+                continue;
+            }
+            if c == '/' && i + 1 < chars.len() && chars[i + 1] == '/' {
+                while i < chars.len() && chars[i] != '\n' {
+                    i += 1;
+                }
+                continue;
+            }
+            if c == '/' && i + 1 < chars.len() && chars[i + 1] == '*' {
+                i += 2;
+                while i + 1 < chars.len() && !(chars[i] == '*' && chars[i + 1] == '/') {
+                    i += 1;
+                }
+                i = (i + 2).min(chars.len());
+                continue;
+            }
+            if c == '@' {
+                i += 1;
+                let mut addr: u64 = 0;
+                let mut any = false;
+                while i < chars.len() && (chars[i].is_ascii_hexdigit() || chars[i] == '_') {
+                    if let Some(d) = chars[i].to_digit(16) {
+                        addr = addr * 16 + d as u64;
+                        any = true;
+                    }
+                    i += 1;
+                }
+                if !any {
+                    return Err(SimError::new(format!("{name}: bad @address"), None));
+                }
+                wi = addr as i64 - lsb;
+                continue;
+            }
+            // Value token: collect until whitespace/comment.
+            let mut tok: Vec<char> = Vec::new();
+            while i < chars.len()
+                && !chars[i].is_whitespace()
+                && !(chars[i] == '/' && i + 1 < chars.len() && (chars[i + 1] == '/' || chars[i + 1] == '*'))
+            {
+                tok.push(chars[i]);
+                i += 1;
+            }
+            if let Some(f) = finish {
+                if wi + lsb > f {
+                    break;
+                }
+            }
+            if wi >= 0 && (wi as usize) < n {
+                let val = readmem_val(&tok, bin, w, name)?;
+                words[wi as usize] = val;
+                touched.push(wi as usize);
+            }
+            wi += 1;
+        }
+        {
+            let c = self.cells.get_mut(&root).unwrap();
+            c.mem.as_mut().unwrap().words = words;
+        }
+        if let Some(w) = self.vcd.as_mut() {
+            if w.started() {
+                for wi in touched {
+                    let val = {
+                        let c = self.cells.get(&root).unwrap();
+                        c.mem.as_ref().unwrap().words[wi].clone()
+                    };
+                    w.record_change(&format!("{root}[{}]", lsb + wi as i64), val);
+                }
+            }
+        }
+        Ok(Flow::Next)
     }
 
     /// `$display` formatting per IEEE 1364-2005 §17.1.1.
@@ -2296,8 +2889,32 @@ fn it_span(it: &ast::ModuleItem) -> Span {
 
 impl Lookup for Sim {
     fn lookup(&mut self, name: &str, span: Span) -> SResult<Val> {
+        let root = self.find(name);
+        if let Some(c) = self.cells.get(&root) {
+            if c.mem.is_some() {
+                return Err(SimError::at(
+                    format!("cannot read whole memory `{name}` (must be indexed)"),
+                    span,
+                ));
+            }
+        }
         let (bits, signed) = self.read_name(name, span)?;
         Ok(Val::Bits { bits, signed })
+    }
+
+    fn mem_info(&mut self, name: &str) -> Option<(i64, usize, u32, bool)> {
+        let root = self.find(name);
+        let c = self.cells.get(&root)?;
+        let m = c.mem.as_ref()?;
+        Some((m.addr_lsb, m.words.len(), c.bits.width, c.signed))
+    }
+
+    fn read_mem_word(&mut self, name: &str, word: usize) -> SResult<Bits> {
+        let root = self.find(name);
+        match self.cells.get(&root).and_then(|c| c.mem.as_ref()) {
+            Some(m) if word < m.words.len() => Ok(m.words[word].clone()),
+            _ => Err(SimError::new(format!("bad memory word read `{name}`"), None)),
+        }
     }
 
     fn decl_range(&mut self, name: &str) -> Option<(i64, i64)> {

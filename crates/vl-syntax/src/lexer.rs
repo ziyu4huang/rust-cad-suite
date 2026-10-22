@@ -425,6 +425,13 @@ impl<'a, 'd> Lexer<'a, 'd> {
                 return Token::new(Tok::BasedLit, self.span_from(start), text);
             }
         };
+        // White space is allowed between the base and the value (§3.5).
+        while matches!(
+            self.peek(0),
+            Some(b' ') | Some(b'\t') | Some(b'\n') | Some(b'\r') | Some(b'\x0c')
+        ) {
+            self.pos += 1;
+        }
         let dstart = self.pos;
         while !self.eof() && class.contains(&self.cur()) {
             self.pos += 1;

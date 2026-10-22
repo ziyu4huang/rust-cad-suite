@@ -138,6 +138,7 @@ impl<'d> Parser<'d> {
         } else {
             None
         };
+        let mut decls = Vec::new();
         let mut body = Vec::new();
         loop {
             self.skip_attrs();
@@ -147,15 +148,21 @@ impl<'d> Parser<'d> {
             if self.at_eof() {
                 return self.err(start, "VL-E020", "unterminated `begin` block (missing `end`)");
             }
-            // Block-local declarations (reg/integer/...) are legal in named
-            // blocks; v0 parses and discards them with a not-yet error.
+            // Block-local declarations (reg/integer/...) — legal in named
+            // blocks (§9.8); scoped to the block for name resolution.
             if self.peek_is_var_decl_kw() {
                 let t = self.peek().clone();
-                return self.err(
-                    t.span,
-                    "VL-E900",
-                    "block-local declarations are not yet supported (milestone M7)",
-                );
+                let (kind, ty) = match t.kind {
+                    Tok::Keyword(Kw::Integer) => (ast::DeclKind::Integer, Some(ast::ParamType::Integer)),
+                    Tok::Keyword(Kw::Real) => (ast::DeclKind::Real, Some(ast::ParamType::Real)),
+                    Tok::Keyword(Kw::Realtime) => (ast::DeclKind::Realtime, Some(ast::ParamType::Realtime)),
+                    Tok::Keyword(Kw::Time) => (ast::DeclKind::Time, Some(ast::ParamType::Time)),
+                    _ => (ast::DeclKind::Reg, None),
+                };
+                self.pos += 1;
+                let decl = self.decl_tail(t.span, kind, ty, None)?;
+                decls.push(decl);
+                continue;
             }
             let before = self.pos;
             match self.stmt() {
@@ -175,6 +182,7 @@ impl<'d> Parser<'d> {
         Ok(Stmt::Block {
             span: start.merge(end),
             name,
+            decls,
             body,
         })
     }
@@ -328,6 +336,16 @@ impl<'d> Parser<'d> {
                 edges: Vec::new(),
             });
         }
+        if self.at_punct(Punct::AttrOpen) {
+            // `@(*)` lexes `(*` as an attribute-open token; at statement
+            // level the star event control is the only reading.
+            self.pos += 1;
+            let end = self.expect_punct(Punct::RParen, "after `@(*`")?;
+            return Ok(EventCtrl {
+                span: at_span.merge(end),
+                edges: Vec::new(),
+            });
+        }
         if self.peek().kind == Tok::Ident {
             // `@ident` (event variable or signal) without parentheses.
             let e = self.primary_ident_only()?;
@@ -380,7 +398,42 @@ impl<'d> Parser<'d> {
     }
 
     /// Expression-led statements: blocking/nonblocking assignment or task call.
+    ///
+    /// Assignments are lvalue-led (V2005 §9.2), so parse a unary (primary +
+    /// postfix) first and dispatch on the `=` / `<=` that follows; a
+    /// binary-leading form can never be an assignment (`a <= b ? c : d` and
+    /// `mem[i] <= i == 0 ? x : y` both hide the `<=` under operators with
+    /// lower precedence). Anything else rewinds to the full-expression paths
+    /// (task calls, bare identifiers).
     fn expr_stmt(&mut self) -> PResult<Stmt> {
+        let save = self.pos;
+        let is_nb = if let Ok(lhs) = self.unary() {
+            if self.at_punct(Punct::Eq) || self.at_punct(Punct::Le) {
+                let nb = self.at_punct(Punct::Le);
+                if !lhs.is_lvalue() {
+                    return self.err(
+                        lhs.span(),
+                        "VL-E021",
+                        "left side of assignment is not an lvalue",
+                    );
+                }
+                self.pos += 1;
+                self.reject_intra_assign()?;
+                let rhs = self.expr()?;
+                let end = self.expect_punct(Punct::Semi, "after assignment")?;
+                let span = lhs.span().merge(end);
+                return Ok(if nb {
+                    Stmt::NbAssign { span, lhs, rhs }
+                } else {
+                    Stmt::BAssign { span, lhs, rhs }
+                });
+            }
+            false
+        } else {
+            false
+        };
+        let _ = is_nb;
+        self.pos = save;
         let lhs = self.expr()?;
         let span = lhs.span();
         if self.eat_punct(Punct::Eq) {
@@ -414,6 +467,55 @@ impl<'d> Parser<'d> {
                     lhs: *l,
                     rhs: *r,
                 })
+            }
+            Expr::Ternary {
+                span,
+                cond,
+                then,
+                els,
+            } => {
+                // `a <= b ? c : d` parses as a comparison-led ternary; at
+                // statement level the `<=` is the nonblocking assignment and
+                // the whole ternary is its rhs (V2005 has no expression
+                // statements, so the reading is unambiguous).
+                let nb = match &*cond {
+                    Expr::Binary {
+                        op: ast::BinOp::Le,
+                        lhs: l,
+                        rhs: r,
+                        span: ls,
+                    } => {
+                        if !l.is_lvalue() {
+                            return self.err(*ls, "VL-E021", "left side of `<=` is not an lvalue");
+                        }
+                        Some((
+                            (**l).clone(),
+                            Expr::Ternary {
+                                span,
+                                cond: r.clone(),
+                                then,
+                                els,
+                            },
+                            *ls,
+                        ))
+                    }
+                    _ => None,
+                };
+                match nb {
+                    Some((l, rhs, ls)) => {
+                        let end = self.expect_punct(Punct::Semi, "after nonblocking assignment")?;
+                        Ok(Stmt::NbAssign {
+                            span: ls.merge(end),
+                            lhs: l,
+                            rhs,
+                        })
+                    }
+                    None => self.err(
+                        span,
+                        "VL-E020",
+                        "expected a statement (assignment or task call)",
+                    ),
+                }
             }
             Expr::Call { span, func, args } => {
                 let end = self.expect_punct(Punct::Semi, "after task call")?;

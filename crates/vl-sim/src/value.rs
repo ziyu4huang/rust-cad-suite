@@ -597,16 +597,6 @@ pub fn from_numlit(n: &vl_syntax::ast::NumLit) -> VResult<Bits> {
         }
         return Ok(b);
     }
-    // Upstream (Verilator) errors on more digit-bits than the declared size
-    // rather than truncating — match it (found by the E2E differential run).
-    if let Some(declared) = n.width {
-        if nat_width > declared {
-            return Err(ValueError(format!(
-                "too many digits for {declared}-bit number: `{}`",
-                n.digits
-            )));
-        }
-    }
     let mut data = 0u64;
     let mut mask = 0u64;
     for c in digits.chars() {
@@ -626,11 +616,20 @@ pub fn from_numlit(n: &vl_syntax::ast::NumLit) -> VResult<Bits> {
         mask = (mask << per) | nib.1;
     }
     let w = full.min(MAX_WIDTH);
-    Ok(Bits {
+    let bits = Bits {
         width: w,
         data: data & low_bits(w),
         mask: mask & low_bits(w),
-    })
+    };
+    if let Some(declared) = n.width {
+        if data & !low_bits(declared.min(64)) & !mask != 0 {
+            return Err(ValueError(format!(
+                "too many digits for {declared}-bit number: `{}`",
+                n.digits
+            )));
+        }
+    }
+    Ok(bits)
 }
 
 #[cfg(test)]

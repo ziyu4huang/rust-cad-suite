@@ -358,18 +358,58 @@ impl<'d> Parser<'d> {
                         self.pos += 1;
                         self.generate_region(t.span)
                     }
-                    Kw::If | Kw::For | Kw::Case | Kw::Casex | Kw::Casez => self.err(
-                        t.span,
-                        "VL-E900",
-                        "generate constructs must appear inside `generate ... endgenerate` (IEEE 1364-2005 §12.3)",
-                    ),
+                    // V2005 allows if/for/case generate constructs directly
+                    // as module items (module_or_generate_item, §12.3).
+                    Kw::If | Kw::For | Kw::Case | Kw::Casex | Kw::Casez => {
+                        self.generate_body_item()
+                    }
+                    Kw::Begin => {
+                        // A (named) begin block at module level is a
+                        // module_or_generate_item — gen_items parses
+                        // begin..end and constructs the GenBlock itself.
+                        let mut its = self.gen_items()?;
+                        match its.len() {
+                            0 => Ok(Some(ast::ModuleItem::Empty)),
+                            1 => Ok(Some(its.remove(0))),
+                            _ => self.err(
+                                t.span,
+                                "VL-E020",
+                                "multiple items in module-level begin block",
+                            ),
+                        }
+                    }
                     Kw::Function => Ok(Some(ModuleItem::Function(Box::new(
                         self.function_or_task(false)?,
                     )))),
                     Kw::Task => Ok(Some(ModuleItem::Task(Box::new(
                         self.function_or_task(true)?,
                     )))),
-                    Kw::Specify | Kw::Specparam | Kw::Primitive | Kw::Table | Kw::Config
+                    Kw::Specify => {
+                        // Specify blocks are ignored for simulation purposes
+                        // (upstream lint tolerates them; contents dropped).
+                        self.pos += 1;
+                        let mut depth = 1usize;
+                        while depth > 0 && !self.at_eof() {
+                            if self.at_kw(Kw::Specify) {
+                                depth += 1;
+                            }
+                            if self.eat_kw(Kw::Endspecify) {
+                                depth -= 1;
+                            } else {
+                                self.pos += 1;
+                            }
+                        }
+                        Ok(Some(ast::ModuleItem::Empty))
+                    }
+                    Kw::Specparam => {
+                        // SDF timing params are simulation-inert here: skip
+                        // the declaration up to and including the `;`.
+                        while !self.at_eof() && !self.eat_punct(Punct::Semi) {
+                            self.pos += 1;
+                        }
+                        Ok(Some(ast::ModuleItem::Empty))
+                    }
+                    Kw::Primitive | Kw::Table | Kw::Config
                     | Kw::Library => self.err(
                         t.span,
                         "VL-E900",
@@ -861,7 +901,7 @@ impl<'d> Parser<'d> {
                         kind: ast::DeclKind::Reg,
                         ty,
                         signed,
-                        range,
+                        range: range.clone(),
                         dir: Some(dir),
                         entries: vec![ast::DeclEntry {
                             span: dspan,
@@ -871,6 +911,36 @@ impl<'d> Parser<'d> {
                         }],
                     });
                     if !self.eat_punct(Punct::Comma) {
+                        break;
+                    }
+                    // Bare names after a group (`input [3:0] s1, s2, s3`)
+                    // share the group's direction/range.
+                    let mut list_done = false;
+                    loop {
+                        if self.peek().kind != Tok::Ident {
+                            break;
+                        }
+                        let (nm, nspan) = self.expect_ident("port name")?;
+                        ports.push(ast::Decl {
+                            span: nspan,
+                            kind: ast::DeclKind::Reg,
+                            ty,
+                            signed,
+                            range: range.clone(),
+                            dir: Some(dir),
+                            entries: vec![ast::DeclEntry {
+                                span: nspan,
+                                name: nm,
+                                unpacked: Vec::new(),
+                                init: None,
+                            }],
+                        });
+                        if !self.eat_punct(Punct::Comma) {
+                            list_done = true;
+                            break;
+                        }
+                    }
+                    if list_done {
                         break;
                     }
                 }

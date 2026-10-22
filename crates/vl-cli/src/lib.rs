@@ -183,7 +183,7 @@ fn preprocess_and_parse(
 }
 
 fn compile(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
-    let _ = preprocess_and_parse(o, sm, diags);
+    let (modules, timescale) = preprocess_and_parse(o, sm, diags);
     if o.preprocess_only {
         return if diags.has_errors() { 1 } else { 0 };
     }
@@ -194,10 +194,60 @@ fn compile(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
     let n_err = diags.error_count();
     if n_err > 0 {
         println!("%Error: {n_err} error(s) during parsing");
-        1
-    } else {
-        println!("%Info: parse ok (lint gate; elaboration lands at M3)");
-        0
+        return 1;
+    }
+    // Lint = parse + elaborate (upstream `--lint-only` elaborates too);
+    // simulation only runs for --binary.
+    if let Some(explicit) = &o.top_module {
+        return match vl_sim::Sim::build(&modules, explicit, timescale.as_deref()) {
+            Ok(_) => {
+                println!("%Info: lint ok ({explicit})");
+                0
+            }
+            Err(e) => {
+                println!("%Error: {}", e.message);
+                1
+            }
+        };
+    }
+    // Multi-top files lint like upstream: every un-instantiated module is a
+    // root and all of them must elaborate (simulation still demands --top-module).
+    match detect_top(&modules) {
+        Ok(top) => match vl_sim::Sim::build(&modules, &top, timescale.as_deref()) {
+            Ok(_) => {
+                println!("%Info: lint ok ({top})");
+                0
+            }
+            Err(e) => {
+                println!("%Error: {}", e.message);
+                1
+            }
+        },
+        Err(cands) if cands.len() > 1 => {
+            let mut first_err = None;
+            for c in &cands {
+                if let Err(e) = vl_sim::Sim::build(&modules, c, timescale.as_deref()) {
+                    first_err.get_or_insert((c.clone(), e.message.clone()));
+                }
+            }
+            match first_err {
+                None => {
+                    println!("%Info: lint ok (multi-top: {})", cands.join(", "));
+                    0
+                }
+                Some((c, m)) => {
+                    println!("%Error: top `{c}`: {m}");
+                    1
+                }
+            }
+        }
+        Err(cands) => {
+            println!(
+                "%Error: cannot auto-detect top module (candidates: {}); pass --top-module",
+                if cands.is_empty() { "none".to_string() } else { cands.join(", ") }
+            );
+            1
+        }
     }
 }
 
