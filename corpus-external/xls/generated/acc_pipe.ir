@@ -1,0 +1,11 @@
+package acc_pipe
+
+file_number 0 "corpus-external/xls/dslx/acc_pipe.x"
+
+top fn __acc_pipe__acc_pipe(x: bits[8] id=1, y: bits[8] id=2) -> bits[16] {
+  zero_ext.3: bits[16] = zero_ext(x, new_bit_count=16, id=3)
+  zero_ext.4: bits[16] = zero_ext(y, new_bit_count=16, id=4)
+  sum_xy: bits[16] = add(zero_ext.3, zero_ext.4, id=5, pos=[(0,6,18)])
+  literal.6: bits[16] = literal(value=3, id=6, pos=[(0,7,27)])
+  ret scaled: bits[16] = umul(sum_xy, literal.6, id=7, pos=[(0,7,17)])
+}

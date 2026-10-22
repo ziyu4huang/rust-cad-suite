@@ -38,10 +38,14 @@ jobs:
           fi
           # rverilator targets Verilog-2005: always_ff -> always (semantics
           # identical for these single-clock flop blocks; raw copy kept).
+          # XLS has no timescale concept; inject the harness convention or
+          # TIMESCALEMOD warnings fire when the file precedes the TB
+          # (verilator default-fatal; see REGISTRY D16).
           for v in out/*.v; do
             [ -s "$v" ] || continue
             cp "$v" "$v.raw"
             sed -i 's/always_ff @/always @/g' "$v"
+            printf '`timescale 1ns/1ps\n' | cat - "$v" > "$v.tmp" && mv "$v.tmp" "$v"
           done
           ls -la out/ || true
       - name: License

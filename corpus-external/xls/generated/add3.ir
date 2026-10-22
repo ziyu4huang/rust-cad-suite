@@ -1,0 +1,11 @@
+package add3
+
+file_number 0 "corpus-external/xls/dslx/add3.x"
+
+top fn __add3__add3(x: bits[8] id=1, y: bits[8] id=2, z: bits[8] id=3) -> bits[9] {
+  zero_ext.4: bits[9] = zero_ext(x, new_bit_count=9, id=4)
+  zero_ext.5: bits[9] = zero_ext(y, new_bit_count=9, id=5)
+  add.6: bits[9] = add(zero_ext.4, zero_ext.5, id=6, pos=[(0,2,5)])
+  zero_ext.7: bits[9] = zero_ext(z, new_bit_count=9, id=7)
+  ret add.8: bits[9] = add(add.6, zero_ext.7, id=8, pos=[(0,2,5)])
+}
