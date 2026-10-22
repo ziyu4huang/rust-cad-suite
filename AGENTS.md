@@ -117,3 +117,13 @@
   组件×能力×閘×證據的關係表=`docs/REGISTRY.md`(改組件職責同輪更新)。
 - 提交前必跑 `bash scripts/regress.sh`;`--with-record` 轮之后必须人工读
   `git diff corpus/e2e`(期望变更=语义变更的收据,不许盲提交)。
+
+## 10.6 探針插拔手術紀律(2026-10-23 立法;點星 regex 吃掉 GenBlock+三臂實錄)
+
+- 調試探針(eprintln/debug print)的**插入與移除都是文字手術**:錨點必須含
+  探針完整獨有內容(含其閉括號行),移除後必 `cargo build` 斷言零錯才續行。
+- **禁 `[\s\S]*?`/`.*` 點星 regex 跨行刪除**——點星會跨過探針自身的閉括號
+  吃到下一個同縮排 `}`, collateral 是整段函數臂。刪除錨=「探針首行…探針尾行」
+  精確字面量;探針寫成單行或用唯一標記註解(`// probe-xyz`)包裹,刪除按標記配對。
+- 外部語料收編(lint-diff)已入策略:每里程碑收編一批外部測試檔,
+  accept/reject 差分=結構性 bug 最快探針(REFLECTION §14.1)。

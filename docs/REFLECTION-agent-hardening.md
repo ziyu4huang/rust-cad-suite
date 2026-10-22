@@ -184,3 +184,40 @@ race on its first run over the corpus.
   and the chain ends with `git status --short` empty (AGENTS §8b).
 - `/tmp` is cleaned externally twice-daily on this machine: evidence artifacts
   (oracle-ref.vcd, fuzz repro) live in the repo or do not exist (AGENTS §9).
+
+## 14. 第三輪實錄(2026-10-23,M7+yosys 收編弧)
+
+### 14.1 外部語料差分是結構性 bug 的最快探針(Strategy)
+
+自建 55 例 E2E 全綠,收編 yosys tests/simple 87 檔當輪即抓 14 個前端缺陷,
+其中 Scope.push 巢狀丟前綴(`genblk1.foo.x`→`foo.x`)是**結構性 bug**——
+自建語料全部單層 generate,永遠踩不到。教訓升格:內建語料=作者想像力的鏡像,
+外部語料=他人想像力的採樣;**每個里程碑都應收編一批外部語料當差分面**,
+lint-only 差分(accept/reject 判決)是成本最低的形態(無需 testbench)。
+
+### 14.2 手術斷言律對「探針插拔」同樣適用(Incident)
+
+調試插的 eprintln 探針,移除時用 `re.sub(r"if std::env::var_os\(...\)[\s\S]*?\n        \}\n", ...)`
+——點星懶匹配跨過探針自己的 16 空格閉括號、一路吃到 8 空格 `}`,吞掉
+GenBlock 臂+三個後續 match 臂(cargo `unclosed delimiter` 才暴露)。
+規則入 AGENTS §10.6:**探針插拔=文字手術,錨點必須含探針獨有完整內容+精確行界,
+禁 `[\s\S]*?` 點星跨行**;插探針時就寫成「刪除安全」形狀(單行/完整塊)。
+
+### 14.3 oracle 行為差異先分「語義 vs 嚴格度」再對齊(Verdict discipline)
+
+lint 差分第一輪 8 個 ORACLE-ONLY-REJECT 全是 `%Warning`(verilator 預設 fatal)
+——換 `-Wno-fatal` 後反轉成 43 個 OURS-ONLY-REJECT,才是真差距清單。
+同理 `3'h0`:位數檢查→值域檢查的差異、位置參數超界寬容——先判定
+「這是 LRM 語義差還是工具嚴格度差」,嚴格度差一律跟 oracle,語義差才走 4-state/單測軌。
+
+### 14.4 語料自審條款:X-clean 紀律會被新功能破壞(Process)
+
+M7 寫 readmem 新例時放了 `x2` 十六進位數字——錄製後 expected 帶 2-state 投影(02),
+我方 4-state 跑出 x2 = 假 FAIL。X-clean 紀律(D1)在**新增每個語料例**時都要
+重新過一遍,不是入庫一次就永久成立;corpus_lint 可考慮未來加 x-數字掃描(R4 候補)。
+
+### 14.5 錄製成本結構(Tooling)
+
+oracle 錄製 ≈3.5 分/例(每例全量 C++ 構建)。全庫重錄 55 例 ≈3 小時——
+**只錄新增/變更例**(symlink 臨時 corpus+`--corpus` 旗標)是必要工具,
+本次為此加了 `--corpus`;未來可再省:verilated.cpp 公共物件共享預構建。

@@ -2,4 +2,5 @@
 vendor-reference/
 corpus-external/*
 !corpus-external/yosys-simple
+!corpus-external/sv-tests
 *.vcd

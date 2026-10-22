@@ -32,7 +32,12 @@ crates/
 ├── vl-cli/       bin `rverilator`                            (現用,0 外部依賴)
 └── vl-difftest/  dev-only oracle 差分 harness               (M4)
 corpus/           自寫樣例 + oracle 期望輸出(入 git)
-corpus-external/  picorv32/serv/sv-tests 快照(ISC,入 git,帶 LICENSE 聲明;gitignored 直到首次收編)
+corpus-external/  外部語料快照(入 git,帶 LICENSE;收編即解除 ignore):
+                  yosys-simple/ =YosysHQ/yosys tests/simple 87 檔(ISC)+LINT-DIFF.tsv;
+                  sv-tests/     =chipsalliance/sv-tests chapter-5/6/8/9/12 260 檔(ISC)+TSV
+                                 (SV 語法多數在 V2005 範圍外,31% 為資訊值非缺陷值);
+                  lint 差分協議=EXT=v|sv bash scripts/lint_diff.sh <dir> <tsv>(oracle=-Wno-fatal,
+                  判決只看 error 級;warning 類 WIDTH/LATCH 是未來 lint 產品軌)
 fuzz/             cargo-fuzz(M2 起)
 ```
 依賴政策:核心 crates 零外部依賴;vl-cli 未來可 clap(現手寫 flags)。
@@ -56,7 +61,9 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 | M4 | 解釋器核(無時序) | 4-state 值(IEEE §5 表格單測為準,對抗審 #2);tb_race 確定序;加法器 TB 與 oracle stdout byte-diff | ✅ 2026-10-21:上下文位寬/符號(§5.4)、函式(靜態)/任務(內聯)、process 序=宣告序(32_proc_order 對拍);算術 X=**LRM 精確**(§5.1.4:任一運算元含 x/z → 整個結果 x——原「保守」措辭是誤標,IEEE 原文如此;值單測軌持續) |
 | M5 | timing+調度 | **counter8 fixture `PASS` byte-exact**(corpus/counter8/,oracle 已錄;含 NBA 區讀值細節);UNOPTFLAT;TIMESCALEMOD 對等硬錯 | ✅ 2026-10-21:進程 VM+時間輪+NBA 區+邊沿喚醒;counter8 與 fulladd byte-diff 綠(sim_gate);UNOPTFLAT=組合 100 輪上限;TIMESCALEMOD 對等待 |
 | M6 | VCD | 規則=逐時間戳 (canonical name→value) 集合比對+**alias 組折疊**(oracle 實證多網同碼),禁裸字節 diff(對抗審 #4) | ✅ 2026-10-21:vl-sim/vcd.rs 寫出器(作用域樹/有序 id/時間槽 flush)+\$dumpfile/\$dumpvars 接線;閘=vcd_gate(4 例 oracle-ref.vcd 交叉對拍 16/16 訊號 90 采樣點零失配,入 cargo test);oracle 參考=`scripts/oracle_vcd.sh`(--binary --trace 原生支援 \$dumpvars,自寫 main 不需要) |
-| M7-M9 | 語言廣度/SV 階梯/perf gate + tier-B ADR | 見 PLAN-DRAFT §5 | |
+| M7 | 記憶體陣列+\$readmem+閘原始件 | 30_gen_mux 轉綠+新例 oracle 錄製 | ✅ 2026-10-23:unpack 陣列(單 range)/逐字 VCD(mem[i] 元件變數=oracle 實證)/\$readmemh/\$readmemb(@addr 跳址+start/finish+註解;x-index 寫忽略/OOB 讀 x)/12 種閘原始件(§7 4-state 表,bufif/notif 停動驅 z);**E2E 55/55=100%**(52_mem_basic/53_readmem/54_gates/55_mem_nba oracle 錄製) |
+| M7b | lint-only 差分軌(yosys tests/simple 收編) | lint parity 對 verilator --lint-only -Wno-fatal | ✅ 2026-10-23 首輪:**44→66/87 (75.9%)**;harness=scripts/lint_diff.sh;TSV=corpus-external/yosys-simple/LINT-DIFF.tsv;餘 20 差異=M8 路線圖(見下) |
+| M8-M9 | 語言廣度/SV 階梯/perf gate + tier-B ADR | 見 PLAN-DRAFT §5;M8 首批候補=層級引用深化(unnamed genblk 鏈×5 檔)、SV fill literals '0/'1(≈11 檔)、>64-bit 多 limb(×6)、intra-assign delay、reals、>8 字元字串、宏貼字面量(`SIZE'ha) | |
 
 ## 6. CLI 契約(對抗審 #7/#8 修訂)
 - 二進制名 `rverilator`;`verilator` 別名等 ≥M9 flag 相容可信後再議(open question)。

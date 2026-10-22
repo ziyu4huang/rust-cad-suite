@@ -10,7 +10,7 @@ ORACLE="${VERILATOR:-/opt/homebrew/bin/verilator}"
 [ -x "$OURS" ] || { echo "ours binary missing: $OURS" >&2; exit 2; }
 echo -e "file\tours_rc\toracle_rc\tclass" > "$OUT"
 ma=0; mr=0; uor=0; oor=0
-for f in "$DIR"/*.v; do
+for f in "$DIR"/*."${EXT:-v}"; do
   n=$(basename "$f")
   "$OURS" --lint-only "$f" >/dev/null 2>&1; orc=$?
   # -Wno-fatal: verdict parity is on ERRORS; verilator warning classes

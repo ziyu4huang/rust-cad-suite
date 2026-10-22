@@ -57,6 +57,9 @@
 | D6 | 二元 `~&`/`~|` | 拒收(Annex A 無) | 拒收 | 同上 | parser/expr.rs |
 | D7 | 電平敏感 always t0 | t0 先執行一次 | 同 oracle | 同上 | 21 號 |
 | D8 | `$display` 診斷前綴 | `%Error:` 等 | 相同前綴;lint 文案不逐字對齊 | exit code+類別對齊,文案自由 | PLAN §6 |
+| D9 | 讀入 x 值(2-state) | x→0(`readmem x2`→02) | 4-state 保留 x | 差分語料 X-clean;4-state 單測軌 | 53_readmem 實錄(1023) |
+| D10 | 值域字面量檢查位置 | 靜態全函數體 lint | 惰性求值(函數體調用才檢) | 未調用函數的字面量錯誤不攔(values.v) | LINT-DIFF.tsv |
+| D11 | 位置參數覆蓋超界 | 寬容(忽略) | 同(對齊 oracle,比 LRM 松) | oracle 即 spec | interp elab_instance |
 
 ## Incident register(工具鏈開發事故;五欄制)
 
@@ -72,5 +75,8 @@
 | 10-22 | fuzz:lexer 三處 UTF-8 panic | 單字節步進/續字節當空白/盲 bump | 按字符處理 | fuzz_smoke 常駐 |
 | 10-22 | oracle VCD 只有 2 標記 | 自寫 main 多此一舉 | `--binary --trace` 原生 \$dumpvars | scripts/oracle_vcd.sh |
 | 10-22 | PLAN.md 漏提交 | `grep -c` 零匹配斷 && 鏈 | `|| true`+終檢 git status | AGENTS §10.5 |
+| 10-23 | probe 移除 regex `[\s\S]*?` 吃掉 GenBlock 臂+三個後續臂 | 點星 regex 錨錨到 8 空格 `}` 跨臂貪吃 | 手術還原+鐵則:探針插拔也走錨點斷言手術,禁 regex 點星跨區 | AGENTS §10.6 |
+| 10-23 | Scope.push 巢狀丟前綴(genblk1.foo.x→foo.x) | chain 段=完整路徑前綴,巢狀 generate push 未串接;單層語料掩蓋結構 bug | 三臂串接 innermost();外部語料(yosys)3 分鐘抓出 | 外部語料收編策略=PLAN §7.5 |
+| 10-23 | `3'h0` 被拒(位數檢查) | 檢查「數字位寬」而非「值域顯著位」 | 值域檢查(3'h0 合法,3'h9 拒) | value.rs |
 | `vl-difftest --html` | 報告需求 | 生成 docs/e2e-report/index.html |
 | `vl-difftest --record` | 語義變更後 | 重錄 oracle 期望(人工讀 diff) |

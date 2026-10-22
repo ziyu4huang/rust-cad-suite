@@ -5,11 +5,17 @@
 
 ## O1: Verilator 等价模拟器(Phase 1)达到可用的兼容性
 
-- **KR1.1 E2E 差分通过率 ≥95%(对 Verilator 5.050,byte-level)**
-  当前:50/51 = **98.0%**(2026-10-21,51 例含 VCD case)。
-  证据:`cargo run -p vl-difftest`(exit 0);报告 [docs/e2e-report/index.html](e2e-report/index.html)
-  (由 `--html` 机械生成);期望文件 `corpus/e2e/*/expected.stdout` 已入 git(7e68cdd 之后的 commit)。
-  唯一 FAIL=30_gen_mux 存储器数组,声明的 M7 硬错(非缺陷)。
+- **KR1.1 E2E 差分通过率 ≥95%(对 Verilator 5.050,byte-level)** ✅ 2026-10-23
+  当前:**55/55 = 100%**(2026-10-23,M7 落地:30_gen_mux 轉綠+新增 52-55 四例
+  mem/readmem/gates/mem_nba 全部 oracle 錄製)。
+  证据:`cargo run -p vl-difftest`(exit 0,== 55/55 ==);报告 [docs/e2e-report/index.html](e2e-report/index.html);
+  期望文件 `corpus/e2e/*/expected.stdout` 已入 git。
+- **KR1.7 lint-only 差分軌(yosys tests/simple 收編,2026-10-23 立)**
+  當前:**66/87 = 75.9%**(收編首輪 44/87;同輪修 14 個前端/少量語義缺陷,清單=commit 9534603)。
+  證據:`bash scripts/lint_diff.sh corpus-external/yosys-simple corpus-external/yosys-simple/LINT-DIFF.tsv`
+  (oracle=verilator --lint-only -Wno-fatal,判決只看 error 級);TSV 已入 git;
+  餘 20 差異=M8 路線圖(層級引用深化 ×5/>64-bit ×6/fill literals/intra-assign/reals/字串/宏貼字面量)。
+  sv-tests 第三批 260 檔(ISC)=資訊值:81/260,多數為 SV-only 語法(logic/typedef/fill),非 V2005 範圍。
 - **KR1.2 回归闸机械化(≥80% 断言入 cargo test)**
   证据:`crates/vl-difftest/tests/regression_gate.rs`;`bash scripts/regress.sh` 全绿。
   期望文件常驻 → 无本机 oracle 也能跑闸。
@@ -17,7 +23,7 @@
   当前:8 值语义测试 + 12 词法 + 17 前端 + 2 sim_gate + 1 诊断 = 41 tests 全绿。
   证据:`cargo test`(全绿);`crates/vl-sim/src/value.rs#tests`。
 - **KR1.4 里程碑指針契约:未支持構造 100% 硬錯(exit≠0)且帶 `milestone Mx`**
-  证据:corpus/e2e/30(M7 指針);`counter8` 早期指針實錄;AGENTS §3。
+  证据:`counter8` 早期指針實錄;AGENTS §3;M7 後指針餘=real/宽>64/多維 unpack(M8)。
 - **KR1.5 M6 VCD 對拍(alias 折疊規則化比對)** ✅ 2026-10-21。
   證據:`cargo test -p vl-difftest --test vcd_gate`(4 例 oracle-ref.vcd,16/16 訊號、90 采樣點零失配);`vl-difftest --vcd-xcheck ours oracle`;參考錄製=scripts/oracle_vcd.sh。
 - **KR1.6 前端 fuzz 閘(語料變異+隨機字節,無 panic/無掛死)** ✅ 2026-10-21。
