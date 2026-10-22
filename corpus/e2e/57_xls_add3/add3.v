@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module __add3__add3(
   input wire clk,
   input wire [7:0] x,

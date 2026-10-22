@@ -17,6 +17,7 @@ const cases = [
   { dir: "corpus/e2e/52_mem_basic", top: "tb", files: ["tb.v"] },
   { dir: "corpus/e2e/54_gates", top: "tb", files: ["tb.v"] },
   { dir: "corpus/e2e/55_mem_nba", top: "tb", files: ["tb.v"] },
+  { dir: "corpus/e2e/57_xls_add3", top: "tb", files: ["add3.v", "tb.v"] },
 ];
 
 let pass = 0;

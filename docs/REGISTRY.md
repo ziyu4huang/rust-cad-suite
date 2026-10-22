@@ -66,6 +66,7 @@
 | D13 | rVPI EndOfSimulation | C 於 $finish 後回調 | 兩個 Ok 出口觸發,SimError 路徑不觸發 | 註冊分歧 | vpi_gate |
 | D14 | rVPI finish/stop | vpiFinish/vpiStop 有別 | 合流(同 $stop 既有行為) | 與 TB 系統任務行為一致 | interp syscall |
 | D15 | rVPI Transport/Inertial put | 脈衝消除有別 | 切片 2:兩模式同義(事件模型無脈衝消除) | 註冊分歧,切片 2 落地 | ADR-0003 D4 |
+| D16 | 混合 timescale 檔序 | TIMESCALEMOD 警告預設致命(檔序相關) | 不報(通過) | 語料面已修(XLS 生成檔注入 timescale);引擎面對齊候補 | corpus-external/xls;REGISTRY 1023 |
 
 ## Incident register(工具鏈開發事故;五欄制)
 

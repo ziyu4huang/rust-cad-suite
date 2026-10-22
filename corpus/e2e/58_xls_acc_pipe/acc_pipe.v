@@ -1,3 +1,4 @@
+`timescale 1ns/1ps
 module __acc_pipe__acc_pipe(
   input wire clk,
   input wire [7:0] x,
