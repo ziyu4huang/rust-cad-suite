@@ -69,6 +69,21 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 
 **E2E 回歸閘(2026-10-21 上線)**:`corpus/e2e/` 32 例×oracle 錄製期望已入 git;`cargo test` 內建 ≥80% 閘(`vl-difftest` crate;期望常駐,無需本機 oracle)。當前基線 **31/32=96.9%**(唯一 FAIL=30_gen_mux 存儲器陣列 M7 硬錯,屬聲明範圍)。錄製=`cargo run -p vl-difftest -- --record`。
 
+### 7.5 外部語料普查(2026-10-22,gh api 實搜;回應「官方回歸跑了嗎+找更多回歸語料」)
+
+**官方 verilator test_regress 未跑、也無法全跑**:實測其 repo 有 **3,616 個 .v**,每例由 Perl/C++ harness 驅動、附各自 golden;大量案例測的是 C++ runtime/VPI/編譯器旗標,對獨立模擬器 CLI 不可遷移。本專案的「回歸」= 自建 51 例錄製期望差分套件(oracle=本機 5.050)。test_regress 與 ivtest 同列**唯讀挖掘源,永不入 git**。
+
+| 來源 | 規模(實測) | License(查 LICENSE 檔) | 可入 git? | 用途 |
+|---|---|---|---|---|
+| chipsalliance/sv-tests | 402⭐;tests/chapter-5..26 按章+generic 主題 | ISC | ✅ | 第三批:chapter-5..9/12 行為子集過濾 |
+| YosysHQ/yosys tests/simple | 87 .v(always/case/attribute/const-fold 小例) | ISC | ✅ | **第二批首選**——純 Verilog 小例,正中現有能力 |
+| YosysHQ/picorv32 | 全核 RISC-V | ISC | ✅ | M7 後:整合驗證標的 |
+| olofk/serv | 1.9k⭐ 位串列 RISC-V | ISC | ✅ | M7 後:整合驗證標的 |
+| steveicarus/ivtest | **2,607 個 .v**(ivltests/) | GPL-2.0 | ⚠️ 唯讀挖掘 | 最大 V2005 相容性語料;按主題抽角案例 |
+| verilator/verilator test_regress | 3,616 個 .v | LGPL/Artistic(NOASSERTION) | ❌ 唯讀挖掘 | 既有政策不變 |
+
+收編流程=既有 `record_with_oracle`(期望一律 oracle 錄製)+ corpus_lint R1-R3 三閘,零手寫期望。
+
 ## 8. Open questions — 裁決建議已「暫定採納」(2026-10-21;使用者隨時可翻案,翻案=改本表+對應 ADR)
 | # | 問題 | 暫定裁決 | 理由 |
 |---|---|---|---|
