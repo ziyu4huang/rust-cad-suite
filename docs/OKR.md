@@ -16,6 +16,12 @@
   (oracle=verilator --lint-only -Wno-fatal,判決只看 error 級);TSV 已入 git;
   餘 20 差異=M8 路線圖(層級引用深化 ×5/>64-bit ×6/fill literals/intra-assign/reals/字串/宏貼字面量)。
   sv-tests 第三批 260 檔(ISC)=資訊值:81/260,多數為 SV-only 語法(logic/typedef/fill),非 V2005 範圍。
+- **KR1.8 VCD 單一核心三面共用(agentic web 整合軌,2026-10-23 立)**
+  當前:✅ vl-vcd(writer+reader)為 CLI/wasm/FFI/difftest 唯一 VCD 實作;JS 手搓 parser 已退役。
+  證據:`cargo test -p vl-vcd`(10 測,fixture 含磁碟真樣本);wasm `vcd_parse` 閘
+  (BigInt 時序+錯誤路徑);ffi `vcd_read.mjs`(agent 讀波形:dump→解析→斷言);
+  e2e 57/57 零漂移;瀏覽器 XLS 獨立驗證卡 ✓ byte-exact ×3(目檢=docs/e2e-report/wasm-demo-v2-verified.png);
+  XLS 依賴結論=docs/XLS-VERILATOR-STUDY.md;GTKWave 研讀=docs/GTKWAVE-VCD-STUDY.md;ADR-0004。
 - **KR1.2 回归闸机械化(≥80% 断言入 cargo test)**
   证据:`crates/vl-difftest/tests/regression_gate.rs`;`bash scripts/regress.sh` 全绿。
   期望文件常驻 → 无本机 oracle 也能跑闸。

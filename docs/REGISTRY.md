@@ -14,6 +14,7 @@
 | `vl-difftest` | oracle 錄製/差分閘/HTML 報告(dev-only, publish=false) | vl-syntax, vl-sim, rcs-diag | —(自建) | regression_gate ≥80% 斷言 |
 | `vl-wasm` | WASM facade(cdylib):`run_verilog(_stdout)`/`WasmSim`,復用 CLI 頂層偵測;wasm-pack --target web,~500KB | `wasm-test/run.mjs` 差分閘(同 oracle goldens,6 例)入 regress.sh(pkg 過期自動重建) | ADR-0003 facade 慣例 |
 | `vl-ffi` | C-ABI host facade(cdylib):`rcs_run(manifest)/rcs_version/rcs_free`,行式 manifest(file/inject);Bun bun:ffi 兩式(FFI 進程內/spawn subprocess) | bun-example 差分閘同 goldens 入 regress(dylib 缺=略過提示) | ADR-0003 facade 慣例 |
+| `vl-vcd` | VCD 單一核心:writer(IEEE §18 正典,4 慢字串介面)+容忍式 reader(E1xx/W1xx,GTKWave 啟發子集) | 0 | —(自建;GTKWave gw-vcd-loader 為研究參照) | reader_fixtures 10 測(含磁碟真樣本);零漂移=e2e expect.vcd byte-diff |
 
 ## 語言能力 ↔ 里程碑 ↔ 證據 case
 
@@ -46,6 +47,9 @@
 | `cargo test --test fuzz_smoke` | 每次提交 | 語料變異+隨機字節無 panic/無掛死 |
 | `cargo test --test corpus_lint` | 每次提交 | R1 同邊沿競爭模式 / R2 期望在場 / R3 dump↔oracle-ref 一致 / 歸一化契約 |
 | `cargo test --test vcd_gate` | 每次提交 | 有 oracle-ref.vcd 的 case 與 oracle 逐訊號零失配 |
+| `bun crates/vl-wasm/wasm-test/vcd_parse.mjs` | regress.sh | 三面共用 reader:wasm 版 BigInt 時序/單調/終值/VL-E101 錯誤路徑 |
+| `bun crates/vl-ffi/bun-example/vcd_read.mjs` | regress.sh | agent 讀波形:FFI run→`vcd <path>` 強制 dump→rcs_vcd_parse→q 終值斷言 |
+| difftest `--min-pass 100`(regress.sh) | 每次交付 | e2e 精確數閘(80% 門檻曾讓 55/57 藏身綠燈,1023 教訓) |
 
 ## Divergence register(我方 vs oracle 已知且接受的差異 — 新分歧先登記再動工)
 

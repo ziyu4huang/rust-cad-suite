@@ -277,102 +277,18 @@ pub fn record_with_oracle(corpus: &Path, verilator: &Path) -> anyhow_none::Resul
 }
 
 // ---------- M6: VCD parsing + oracle crosscheck ----------
+// Parsing lives in the shared vl-vcd crate (same reader behind the CLI,
+// wasm and FFI facades); this module keeps only the oracle comparison.
 
-/// Parsed VCD: var id → full dotted path(s) + width, and the change timeline.
-pub struct VcdData {
-    /// id → list of full paths (aliases share an id).
-    pub id_paths: std::collections::BTreeMap<String, Vec<String>>,
-    pub id_width: std::collections::BTreeMap<String, u32>,
-    /// (time, id, normalized value)
-    pub changes: Vec<(u64, String, String)>,
-}
-
-pub fn parse_vcd(text: &str) -> VcdData {
-    let mut scope: Vec<String> = Vec::new();
-    let mut id_paths: std::collections::BTreeMap<String, Vec<String>> = Default::default();
-    let mut id_width: std::collections::BTreeMap<String, u32> = Default::default();
-    let mut changes = Vec::new();
-    let mut now: u64 = 0;
-    let mut in_defs = true;
-    for raw in text.lines() {
-        let line = raw.trim();
-        if line.is_empty() {
-            continue;
-        }
-        if in_defs {
-            if line.starts_with("$scope") {
-                let parts: Vec<&str> = line.split_whitespace().collect();
-                if parts.len() >= 3 {
-                    scope.push(parts[2].to_string());
-                }
-            } else if line.starts_with("$upscope") {
-                scope.pop();
-            } else if line.starts_with("$var") {
-                // $var wire 8 $ q [7:0] $end
-                let parts: Vec<&str> = line.split_whitespace().collect();
-                if parts.len() >= 5 {
-                    let w: u32 = parts[2].parse().unwrap_or(1);
-                    let id = parts[3].to_string();
-                    let name = parts[4].to_string();
-                    let mut path = scope.clone();
-                    path.push(name);
-                    id_paths.entry(id.clone()).or_default().push(path.join("."));
-                    id_width.insert(id, w);
-                }
-            } else if line.starts_with("$enddefinitions") {
-                in_defs = false;
-            }
-            continue;
-        }
-        if let Some(t) = line.strip_prefix('#') {
-            now = t.trim().parse().unwrap_or(now);
-        } else if line.starts_with('$') {
-            // $dumpvars / $end — values inside the block are plain lines.
-            continue;
-        } else if let Some(rest) = line.strip_prefix('b') {
-            let mut it = rest.split_whitespace();
-            let v = it.next().unwrap_or("").to_string();
-            let id = it.next().unwrap_or("").to_string();
-            changes.push((now, id, v));
-        } else {
-            let (v, id) = line.split_at(1);
-            changes.push((now, id.to_string(), v.to_string()));
-        }
-    }
-    VcdData {
-        id_paths,
-        id_width,
-        changes,
-    }
-}
-
-/// Left-extend a VCD vector value to `w` bits (x/z extend with themselves).
-fn norm_val(v: &str, w: u32) -> String {
-    let w = w as usize;
-    if v.len() >= w {
-        return v[v.len() - w..].to_string();
-    }
-    let fill = match v.chars().next() {
-        Some('x') => 'x',
-        Some('z') => 'z',
-        _ => '0',
-    };
-    let mut s: String = std::iter::repeat(fill).take(w - v.len()).collect();
-    s.push_str(v);
-    s
-}
-
-/// Per-path step function: path → [(t, value)].
-fn step_functions(d: &VcdData) -> std::collections::BTreeMap<String, Vec<(u64, String)>> {
+/// Per-path step function: path -> [(t, value)] — values normalized to the
+/// declared width (vl_vcd::normalize_width, contract identical to the old
+/// local norm_val).
+fn step_functions(d: &vl_vcd::VcdFile) -> std::collections::BTreeMap<String, Vec<(u64, String)>> {
     let mut m: std::collections::BTreeMap<String, Vec<(u64, String)>> = Default::default();
-    for (t, id, v) in &d.changes {
-        let w = *d.id_width.get(id).unwrap_or(&1);
-        let nv = norm_val(v, w);
-        if let Some(paths) = d.id_paths.get(id) {
-            for p in paths {
-                m.entry(p.clone()).or_default().push((*t, nv.clone()));
-            }
-        }
+    for c in &d.changes {
+        let var = &d.vars[c.var];
+        let nv = vl_vcd::normalize_width(&c.value.to_raw(), var.width);
+        m.entry(var.name.clone()).or_default().push((c.time, nv));
     }
     m
 }
@@ -395,8 +311,8 @@ fn value_at(f: &[(u64, String)], t: u64) -> Option<&str> {
 /// path receives the shared id's values. Values are compared as step
 /// functions on the union of change times (dump-frequency independent).
 pub fn vcd_crosscheck(ours: &str, oracle: &str) -> (String, bool) {
-    let a = parse_vcd(ours);
-    let b = parse_vcd(oracle);
+    let a = vl_vcd::parse(ours).expect("ours: valid VCD");
+    let b = vl_vcd::parse(oracle).expect("oracle: valid VCD");
     let fa = step_functions(&a);
     let fb = step_functions(&b);
     let mut prefixes: std::collections::BTreeSet<String> = Default::default();

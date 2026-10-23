@@ -18,3 +18,4 @@ path = "src/main.rs"
 vl-syntax = { workspace = true }
 vl-sim = { workspace = true }
 rcs-diag = { workspace = true }
+vl-vcd = { workspace = true }

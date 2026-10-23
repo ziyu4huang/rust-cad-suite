@@ -195,6 +195,11 @@ impl WasmSim {
         self.inner.inject_file(name, contents);
     }
 
+    /// Force the VCD dump without a TB `$dumpvars` (call before `run`).
+    pub fn force_dump(&mut self) {
+        self.inner.force_dump();
+    }
+
     pub fn run(&mut self) -> Result<(), JsValue> {
         self.inner
             .run()
@@ -299,6 +304,86 @@ impl WasmSim {
     pub fn on_start_of_simulation(&mut self, _f: js_sys::Function) {}
     #[cfg(not(target_arch = "wasm32"))]
     pub fn on_end_of_simulation(&mut self, _f: js_sys::Function) {}
+}
+
+/// Parse a VCD with the SAME reader the CLI and Bun-FFI facades use (the
+/// shared `vl-vcd` core) — the browser demo renders from this, so all three
+/// tiers share one waveform parser. Errors surface as
+/// `VL-E1xx: message @ byte N`; tolerated conditions are counted in
+/// `warning_count` (details are not yet exposed across the boundary).
+#[wasm_bindgen]
+pub fn vcd_parse(text: &str) -> Result<VcdJs, JsValue> {
+    let f = vl_vcd::parse(text).map_err(|d| {
+        JsValue::from_str(&format!("{}: {} @ byte {}", d.code, d.message, d.offset))
+    })?;
+    Ok(VcdJs { inner: f })
+}
+
+/// JS view of a parsed VCD. Times are precision ticks (`times()` returns a
+/// BigInt64Array); values are raw 4-state/real/string text.
+#[wasm_bindgen]
+pub struct VcdJs {
+    inner: vl_vcd::VcdFile,
+}
+
+#[wasm_bindgen]
+impl VcdJs {
+    #[wasm_bindgen(getter)]
+    pub fn timescale(&self) -> Option<String> {
+        self.inner.timescale.clone()
+    }
+
+    #[wasm_bindgen(getter, js_name = varCount)]
+    pub fn var_count(&self) -> usize {
+        self.inner.vars.len()
+    }
+
+    #[wasm_bindgen(getter, js_name = tMax)]
+    pub fn t_max(&self) -> u64 {
+        self.inner.t_max()
+    }
+
+    #[wasm_bindgen(getter, js_name = warningCount)]
+    pub fn warning_count(&self) -> usize {
+        self.inner.warnings.len()
+    }
+
+    pub fn var_id(&self, i: usize) -> String {
+        self.inner.vars[i].id.clone()
+    }
+
+    pub fn var_name(&self, i: usize) -> String {
+        self.inner.vars[i].name.clone()
+    }
+
+    pub fn var_width(&self, i: usize) -> u32 {
+        self.inner.vars[i].width
+    }
+
+    pub fn var_type(&self, i: usize) -> String {
+        self.inner.vars[i].var_type.clone()
+    }
+
+    /// Change times for var `i`, ascending (BigInt64Array across the
+    /// boundary).
+    pub fn times(&self, i: usize) -> Vec<u64> {
+        self.inner
+            .changes
+            .iter()
+            .filter(|c| c.var == i)
+            .map(|c| c.time)
+            .collect()
+    }
+
+    /// Raw value texts for var `i`, index-aligned with `times(i)`.
+    pub fn values(&self, i: usize) -> Vec<String> {
+        self.inner
+            .changes
+            .iter()
+            .filter(|c| c.var == i)
+            .map(|c| c.value.to_raw())
+            .collect()
+    }
 }
 
 fn js_err(e: vl_sim::SimError) -> JsValue {

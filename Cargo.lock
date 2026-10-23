@@ -128,6 +128,7 @@ dependencies = [
  "rcs-diag",
  "vl-sim",
  "vl-syntax",
+ "vl-vcd",
 ]
 
 [[package]]
@@ -137,6 +138,7 @@ dependencies = [
  "rcs-diag",
  "vl-sim",
  "vl-syntax",
+ "vl-vcd",
 ]
 
 [[package]]
@@ -168,6 +170,7 @@ dependencies = [
  "vl-cli",
  "vl-sim",
  "vl-syntax",
+ "vl-vcd",
  "wasm-bindgen",
 ]
 

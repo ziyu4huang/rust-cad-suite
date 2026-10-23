@@ -1979,6 +1979,13 @@ impl Sim {
         Ok(())
     }
 
+    /// Force the VCD dump on without a TB `$dumpvars` (call before `run()`;
+    /// the equivalent of injecting `$dumpvars` at t0). Used by facades that
+    /// always want waveforms (wasm demo, FFI `vcd` manifest keyword).
+    pub fn force_dump(&mut self) {
+        self.vcd_begin();
+    }
+
     /// Build the VCD writer from every dumpable declared variable.
     fn vcd_begin(&mut self) {
         if self.vcd.is_none() {

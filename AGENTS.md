@@ -146,5 +146,10 @@
   `--helpfull`/stderr 為準,禁盲猜(REFLECTION §15.3)。
 - 互動頁交付:serve smoke(資產 200+no-store)與真瀏覽器目檢
   (點 Run→stdout→canvas)兩者不可互替;截圖入 docs/e2e-report/。
-- 三面能力變更的機械閘=regress.sh 內五閘(E2E/lint/wasm 差分+功能+VCD
-  解析器/demo serve smoke/ffi 兩式)必綠;條文正典=SKILL「wasm 增補」節。
+- VCD 讀寫一律走 `vl-vcd` 單一核心(ADR-0004):CLI/wasm/FFI/difftest 共用
+  同一 reader;**新 tier 手搓 VCD parser=違例**,JS 手搓版已退役;
+  新容忍度先入 GTKWAVE-VCD-STUDY 採用/拒收表+ADR-0004 修訂,禁 quiet tweak;
+  writer 零漂移錨=e2e expect.vcd byte-diff,值介面=4 慢字串(勿改回 Bits)。
+- 三面能力變更的機械閘=regress.sh 內(E2E 精確數 100%/lint parity 基線/
+  wasm 差分+功能+vcd_parse/demo serve smoke+corpus 白名單/ffi 三閘含
+  vcd_read)必綠;條文正典=SKILL「wasm 增補」節。

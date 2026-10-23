@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>rverilator.wasm — in-browser Verilog simulation</title>
+<title>rverilator.wasm — in-browser Verilog simulation + XLS verification</title>
 <style>
   :root { color-scheme: dark; }
   body { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin: 1rem auto; max-width: 1200px; color: #ddd; background: #101418; }
   h1 { font-size: 1.1rem; color: #7fd; }
+  h2 { font-size: .95rem; color: #9ce; margin-top: 2rem; }
   .cols { display: flex; gap: 1rem; align-items: flex-start; }
   .col { flex: 1; min-width: 0; }
   textarea { width: 100%; box-sizing: border-box; background: #0a0e12; color: #cde; border: 1px solid #345; min-height: 300px; font: inherit; font-size: .8rem; }
@@ -16,15 +17,20 @@
   pre { background: #0a0e12; border: 1px solid #345; padding: .5rem; min-height: 3rem; white-space: pre-wrap; font-size: .78rem; }
   canvas { background: #0a0e12; border: 1px solid #345; width: 100%; }
   .err { color: #f88; }
+  .ok-badge { color: #6d6; }
+  .bad-badge { color: #f88; }
   .small { font-size: .72rem; color: #889; }
   label { display: block; margin: .4rem 0 .1rem; font-size: .78rem; color: #9ab; }
+  .case { border: 1px solid #345; padding: .6rem .8rem; margin: .8rem 0; }
+  .case h3 { font-size: .85rem; color: #cde; margin: .1rem 0 .3rem; }
 </style>
 </head>
 <body>
 <h1>rverilator.wasm — Verilog-2005 simulation in your browser</h1>
 <p class="small">Same core as the native CLI (vl-sim compiled to WebAssembly, ~500KB).
 Expectations in <code>corpus/</code> were recorded from real Verilator 5.050 — the engine
-running here reproduces them byte-exactly.</p>
+running here reproduces them byte-exactly. Waveforms are parsed by the same shared
+<code>vl-vcd</code> reader the CLI and Bun use — one parser behind every tier.</p>
 <div class="cols">
   <div class="col">
     <label>Verilog source (top auto-detected if empty)</label>
@@ -42,8 +48,18 @@ running here reproduces them byte-exactly.</p>
     <canvas id="wave" width="900" height="360"></canvas>
   </div>
 </div>
+
+<h2>XLS-generated Verilog, verified independently — in this browser</h2>
+<p class="small">Google <a href="https://github.com/google/xls" style="color:#7cd">XLS</a> (DSLX → IR → Verilog HLS)
+ships a pluggable <code>VerilogSimulator</code> interface whose only built-in implementation is Icarus Verilog;
+Verilator appears upstream only as a doc example. The cards below take XLS-generated Verilog from this repo's
+oracle-recorded corpus and simulate it with rverilator-wasm — an independent, clean-room check that does not
+trust XLS's own high-level (DSLX/JIT) evaluation. stdout is compared byte-for-byte against the
+Verilator-recorded expectation. (XLS-generated code, Apache-2.0 — see corpus-external/xls/NOTICE.)</p>
+<div id="cases"></div>
+
 <script type="module">
-import init, { WasmSim } from "./pkg/vl_wasm.js";
+import init, { WasmSim, vcd_parse } from "./pkg/vl_wasm.js";
 
 const DEFAULT_SRC = `\`timescale 1ns/1ps
 module tb;
@@ -64,7 +80,6 @@ document.getElementById("src").value = DEFAULT_SRC;
 
 const $ = (id) => document.getElementById(id);
 let shown = new Set();
-let parsed = null;
 
 $("run").onclick = async () => {
   $("run").disabled = true;
@@ -80,9 +95,10 @@ $("run").onclick = async () => {
     const sim = new WasmSim($("top").value.trim(), [$("src").value], files[0] ?? [], files[1] ?? []);
     sim.run();
     $("out").textContent = sim.take_output() || "(no output)";
+    $("out").className = "";
     const vcd = sim.take_vcd();
-    parsed = vcd ? render(vcd) : null;
-    $("status").textContent = `done · ${parsed ? parsed.signals.length + " signals" : "no dump"}`;
+    const n = vcd ? drawFrom(vcd, $("siglist"), $("wave")) : 0;
+    $("status").textContent = `done · ${n ? n + " signals" : "no dump"}`;
   } catch (e) {
     $("out").textContent = String(e);
     $("out").className = "err";
@@ -91,46 +107,60 @@ $("run").onclick = async () => {
   $("run").disabled = false;
 };
 
-function render(vcdText) {
-  const { signals, tMax } = window.__parseVcd(vcdText);
-  shown = new Set(signals.slice(0, 8).map((s) => s.name));
-  const list = $("siglist");
-  list.innerHTML = "";
-  for (const s of signals) {
+// ---------- shared waveform rendering (one tier-agnostic path) ----------
+
+// Parse with the shared Rust reader (wasm facade over vl-vcd) and render.
+// Returns the signal count.
+function drawFrom(vcdText, siglist, canvas) {
+  const vcd = vcd_parse(vcdText);
+  const sigs = [];
+  for (let i = 0; i < vcd.varCount; i++) {
+    sigs.push({
+      name: vcd.var_name(i),
+      width: vcd.var_width(i),
+      times: vcd.times(i),
+      values: vcd.values(i),
+    });
+  }
+  sigs.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
+  const tMax = Number(vcd.tMax);
+  shown = new Set(sigs.slice(0, 8).map((s) => s.name));
+  siglist.innerHTML = "";
+  for (const s of sigs) {
     const el = document.createElement("span");
     el.textContent = (shown.has(s.name) ? "■ " : "□ ") + s.name + "  ";
     el.style.cursor = "pointer";
     el.onclick = () => {
       shown.has(s.name) ? shown.delete(s.name) : shown.add(s.name);
-      draw(signals, tMax);
+      draw(sigs, tMax, siglist, canvas);
     };
-    list.appendChild(el);
+    siglist.appendChild(el);
   }
-  draw(signals, tMax);
-  return { signals, tMax };
+  draw(sigs, tMax, siglist, canvas);
+  return sigs.length;
 }
 
-function draw(signals, tMax) {
-  const cv = $("wave"), ctx = cv.getContext("2d");
-  const W = cv.width, rowH = 34, top = 10;
-  ctx.clearRect(0, 0, W, cv.height);
-  const shownSigs = signals.filter((s) => shown.has(s.name));
+function draw(sigs, tMax, siglist, canvas) {
+  const ctx = canvas.getContext("2d");
+  const W = canvas.width, rowH = 34, top = 10;
+  const shownSigs = sigs.filter((s) => shown.has(s.name));
   const H = top + Math.max(1, shownSigs.length) * rowH;
-  cv.height = Math.max(120, H);
-  ctx.fillStyle = "#101418"; ctx.fillRect(0, 0, W, cv.height);
+  canvas.height = Math.max(120, H);
+  ctx.fillStyle = "#101418"; ctx.fillRect(0, 0, W, canvas.height);
   const x = (t) => 90 + (t / Math.max(1, tMax)) * (W - 110);
   ctx.strokeStyle = "#234"; ctx.beginPath();
-  for (let g = 0; g <= 8; g++) { const gx = 90 + g * (W - 110) / 8; ctx.moveTo(gx, 4); ctx.lineTo(gx, cv.height - 4); }
+  for (let g = 0; g <= 8; g++) { const gx = 90 + g * (W - 110) / 8; ctx.moveTo(gx, 4); ctx.lineTo(gx, canvas.height - 4); }
   ctx.stroke();
   shownSigs.forEach((s, r) => {
     const y0 = top + r * rowH + 8;
     ctx.fillStyle = "#9cf"; ctx.font = "11px monospace";
     ctx.fillText(s.name, 4, y0 + 8);
-    let prev = s.changes.length ? null : "x";
+    let prev = s.times.length ? null : "x";
     ctx.strokeStyle = "#4ec9b0"; ctx.fillStyle = "#b58"; ctx.beginPath();
-    s.changes.forEach(([t, v], i) => {
-      const nextT = i + 1 < s.changes.length ? s.changes[i + 1][0] : tMax;
-      const x0 = x(t), x1 = x(nextT);
+    s.times.forEach((t, i) => {
+      const v = s.values[i];
+      const nextT = i + 1 < s.times.length ? s.times[i + 1] : tMax;
+      const x0 = x(Number(t)), x1 = x(Number(nextT));
       if (v === "x" || v === "z") {
         ctx.moveTo(x0, y0); ctx.lineTo(x1, y0); ctx.moveTo(x0, y0 + 16); ctx.lineTo(x1, y0 + 16);
         ctx.fillStyle = v === "x" ? "#b55" : "#666"; ctx.fillRect(x0, y0, x1 - x0, 16);
@@ -151,9 +181,80 @@ function draw(signals, tMax) {
     ctx.stroke();
   });
 }
+
+// ---------- XLS independent-verification cards ----------
+
+const CASES = [
+  {
+    dir: "51_vcd_counter",
+    title: "counter (reference — not XLS-generated)",
+    desc: "Repo corpus reference case with a $dumpvars TB; the shared-reader gate parses this exact VCD.",
+    files: ["tb.v"],
+    top: "tb",
+  },
+  {
+    dir: "57_xls_add3",
+    title: "XLS add3 (DSLX → IR → pipeline → Verilog)",
+    desc: "3-stage pipelined adder emitted by xlscc/DSLX toolchain, harvested via the xls-harvest pipeline.",
+    files: ["add3.v", "tb.v"],
+    top: "tb",
+  },
+  {
+    dir: "58_xls_acc_pipe",
+    title: "XLS acc_pipe (stateful pipeline)",
+    desc: "Accumulator pipeline generated by XLS codegen — race-safe TB, no $dumpvars: the page forces the dump (force_dump), which is the facade capability, not a TB edit.",
+    files: ["acc_pipe.v", "tb.v"],
+    top: "tb",
+  },
+];
+
+async function mountCases() {
+  await init();
+  const host = $("cases");
+  for (const c of CASES) {
+    const div = document.createElement("div");
+    div.className = "case";
+    div.innerHTML = `<h3>${c.title}</h3><div class="small">${c.desc}</div>
+      <p><button>▶ Run + verify</button> <span class="badge small"></span></p>
+      <pre class="out small">(not run)</pre>
+      <div class="siglist small"></div>
+      <canvas width="900" height="220"></canvas>`;
+    host.appendChild(div);
+    const btn = div.querySelector("button");
+    const badge = div.querySelector(".badge");
+    const out = div.querySelector(".out");
+    btn.onclick = async () => {
+      btn.disabled = true;
+      badge.textContent = "running…";
+      badge.className = "badge small";
+      try {
+        const sources = [];
+        for (const f of c.files) {
+          sources.push(await (await fetch(`/corpus/e2e/${c.dir}/${f}`)).text());
+        }
+        const expected = await (await fetch(`/corpus/e2e/${c.dir}/expected.stdout`)).text();
+        const sim = new WasmSim(c.top, sources, [], []);
+        sim.force_dump();          // TBs of XLS cases carry no $dumpvars
+        sim.run();
+        const got = sim.take_output();
+        const match = got === expected;
+        out.textContent = got || "(no output)";
+        badge.textContent = match
+          ? "✓ matches Verilator-recorded expectation (byte-exact)"
+          : "✗ differs from recorded expectation";
+        badge.className = `badge small ${match ? "ok-badge" : "bad-badge"}`;
+        const vcd = sim.take_vcd();
+        if (vcd) drawFrom(vcd, div.querySelector(".siglist"), div.querySelector("canvas"));
+      } catch (e) {
+        out.textContent = String(e);
+        out.className = "out small err";
+        badge.textContent = "error";
+      }
+      btn.disabled = false;
+    };
+  }
+}
+mountCases();
 </script>
-<script type="module">
-  // expose the parser to the app module (single-file demo, no bundler)
-  import { parseVcd } from "./vcd.mjs";
-  window.__parseVcd = parseVcd;
-</script>
+</body>
+</html>

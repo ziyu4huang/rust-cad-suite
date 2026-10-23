@@ -6,10 +6,23 @@
 //! top <name>|auto
 //! file <path>          # source file, relative to the manifest's dir
 //! inject <name> <path> # virtual $readmem* file
+//! vcd <path>           # force the dump (no TB $dumpvars needed) and
+//!                      # write the VCD text to <path> after the run
 //! ```
-//! `rcs_run` returns the design stdout, or a string starting with
-//! `ERROR: ` — callers branch on the prefix. Free returned strings with
-//! [`rcs_free`].
+//! `rcs_run` returns the design stdout ONLY (adding the VCD here would
+//! break embedders that compare stdout byte-exactly — write it to a file
+//! with `vcd <path>` instead), or a string starting with `ERROR: ` —
+//! callers branch on the prefix. Free returned strings with [`rcs_free`].
+//!
+//! [`rcs_vcd_parse`] feeds VCD text to the SAME shared reader the CLI and
+//! wasm facades use (vl-vcd) and returns a line protocol:
+//! ```text
+//! ok timescale=<ts|-> vars=<n> tmax=<t> warns=<k>
+//! var <idx> <width> <type> <id> <hier-name>
+//! c <idx> <time> <value>
+//! warn <code> <offset> <message>
+//! ```
+//! or `ERROR: VL-E1xx ... @ byte N`.
 
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
@@ -39,6 +52,7 @@ fn run(manifest_path: &str) -> Result<String, String> {
     let mut top: Option<String> = None;
     let mut files: Vec<String> = Vec::new();
     let mut inject: Vec<(String, String)> = Vec::new();
+    let mut vcd_out: Option<PathBuf> = None;
     for (i, raw) in manifest.lines().enumerate() {
         let line = raw.trim();
         if line.is_empty() || line.starts_with('#') {
@@ -50,6 +64,7 @@ fn run(manifest_path: &str) -> Result<String, String> {
         match kw {
             "top" => top = Some(rest.trim().to_string()),
             "file" => files.push(base.join(rest.trim()).to_string_lossy().into()),
+            "vcd" => vcd_out = Some(base.join(rest.trim())),
             "inject" => {
                 let (name, path) = rest.trim().split_once(' ').ok_or_else(|| {
                     format!("manifest line {}: `inject <name> <path>`", i + 1)
@@ -89,7 +104,17 @@ fn run(manifest_path: &str) -> Result<String, String> {
     for (n, c) in inject {
         sim.inject_file(&n, &c);
     }
+    if vcd_out.is_some() {
+        sim.force_dump();
+    }
     sim.run().map_err(|e| format!("run: {}", e.message))?;
+    if let Some(path) = vcd_out {
+        let (_, text) = sim
+            .take_vcd()
+            .ok_or_else(|| "internal: force_dump produced no VCD".to_string())?;
+        std::fs::write(&path, text)
+            .map_err(|e| format!("cannot write vcd `{}`: {e}", path.display()))?;
+    }
     Ok(sim.take_output())
 }
 
@@ -129,4 +154,44 @@ pub extern "C" fn rcs_run(manifest: *const c_char) -> *mut c_char {
         Err(_) => "ERROR: internal panic".to_string(),
     };
     CString::new(out).unwrap_or_else(|_| CString::new("ERROR: invalid utf-8").unwrap()).into_raw()
+}
+
+/// Parse VCD text with the shared vl-vcd reader. Returns the line protocol
+/// (see the module docs) or `ERROR: ...`; free with [`rcs_free`].
+#[no_mangle]
+pub extern "C" fn rcs_vcd_parse(text: *const c_char) -> *mut c_char {
+    let text = unsafe { CStr::from_ptr(text) }.to_string_lossy().into_owned();
+    let out = match std::panic::catch_unwind(|| vcd_line_protocol(&text)) {
+        Ok(Ok(lines)) => lines,
+        Ok(Err(e)) => format!("ERROR: {e}"),
+        Err(_) => "ERROR: internal panic".to_string(),
+    };
+    CString::new(out)
+        .unwrap_or_else(|_| CString::new("ERROR: invalid utf-8").unwrap())
+        .into_raw()
+}
+
+fn vcd_line_protocol(text: &str) -> Result<String, String> {
+    let f = vl_vcd::parse(text).map_err(|d| format!("{}: {} @ byte {}", d.code, d.message, d.offset))?;
+    let mut out = String::new();
+    out.push_str(&format!(
+        "ok timescale={} vars={} tmax={} warns={}\n",
+        f.timescale.as_deref().unwrap_or("-"),
+        f.vars.len(),
+        f.t_max(),
+        f.warnings.len()
+    ));
+    for (i, v) in f.vars.iter().enumerate() {
+        out.push_str(&format!(
+            "var {i} {} {} {} {}\n",
+            v.width, v.var_type, v.id, v.name
+        ));
+    }
+    for c in &f.changes {
+        out.push_str(&format!("c {} {} {}\n", c.var, c.time, c.value.to_raw()));
+    }
+    for w in &f.warnings {
+        out.push_str(&format!("warn {} {} {}\n", w.code, w.offset, w.message));
+    }
+    Ok(out)
 }

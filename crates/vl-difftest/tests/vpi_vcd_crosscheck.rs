@@ -7,7 +7,7 @@
 use std::cell::RefCell;
 use std::path::Path;
 use std::rc::Rc;
-use vl_difftest::parse_vcd;
+use vl_vcd::{parse as parse_vcd, VcdValue};
 use vl_syntax::parser;
 use vl_syntax::pp::{self, PpOptions};
 use vl_sim::interp::Sim;
@@ -48,24 +48,25 @@ fn vc_trace_matches_vcd_dump() {
 
     // (b) VCD observation path: the in-sim dump via $dumpfile/$dumpvars.
     let (_, vcd_text) = sim.take_vcd().expect("TB carries a dump");
-    let vcd = parse_vcd(&vcd_text);
-    let qid = vcd
-        .id_paths
+    let vcd = parse_vcd(&vcd_text).expect("our own VCD parses");
+    let qvar = vcd
+        .vars
         .iter()
-        .find(|(_, p)| p.last().map(|s| s.as_str()) == Some("q"))
-        .map(|(id, _)| id.clone())
+        .position(|v| v.leaf == "q")
         .expect("q in vcd");
     let vcd_changes: Vec<(u64, String)> = vcd
         .changes
         .iter()
-        .filter(|(_, id, _)| *id == qid)
-        .map(|(t, _, v)| {
-            let dec = if v.chars().all(|c| c == '0' || c == '1') {
-                u64::from_str_radix(v, 2).unwrap_or(0).to_string()
-            } else {
-                v.clone()
+        .filter(|c| c.var == qvar)
+        .map(|c| {
+            let raw = c.value.to_raw();
+            let dec = match &c.value {
+                VcdValue::Vector(v) if v.chars().all(|ch| ch == '0' || ch == '1') => {
+                    u64::from_str_radix(v, 2).unwrap_or(0).to_string()
+                }
+                _ => raw,
             };
-            (*t, dec)
+            (c.time, dec)
         })
         .collect();
 
