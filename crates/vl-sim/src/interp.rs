@@ -2457,6 +2457,11 @@ impl Sim {
         Ok(())
     }
 
+    /// Current simulation time (precision ticks).
+    pub fn now_ticks(&self) -> u64 {
+        self.now
+    }
+
     /// EndOfSimulation must fire at most once per Sim (both `run()` exits
     /// and stepwise completion route through here).
     fn fire_eos_once(&mut self) -> SResult<()> {

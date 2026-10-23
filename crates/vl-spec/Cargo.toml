@@ -1,0 +1,11 @@
+[package]
+name = "vl-spec"
+description = "Spec-verification core: per-cycle invariants + lockstep RTL-vs-golden-model harness (ADR-0007)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+vl-syntax = { workspace = true }
+vl-sim = { workspace = true }
+rcs-diag = { workspace = true }

@@ -151,6 +151,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "vl-spec"
+version = "0.1.0"
+dependencies = [
+ "rcs-diag",
+ "vl-sim",
+ "vl-syntax",
+]
+
+[[package]]
 name = "vl-syntax"
 version = "0.1.0"
 dependencies = [
