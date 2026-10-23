@@ -45,6 +45,10 @@
   (首跑抓 43 號殘留競爭)。✅
 - **KR2.5 分歧登記簿與事故登記簿常態化**:docs/REGISTRY.md D1-D8 / 10 起事故
   五欄入帳;新分歧「先登記再動工」。✅(2026-10-22 建簿)
+- **KR2.7 第四輪反思落四層**(2026-10-23,rVPI+wasm/FFI+XLS 弧):REFLECTION
+  §15 六條(facade 三面同落/對抗審抓架構斷言錯/工具自證迭代/ABI 邊界契約
+  測試釘死/外部產物正規化隨快照/curl≠目檢)各有實錄證據;AGENTS §10.7
+  三面 facade 紀律;SKILL wasm 增補;證據=wasm-demo-verified.png+四閘入 regress。
 - **KR2.6 robustness 軌與 pass-rate 軌分立**:fuzz 600 迭代入 cargo test,
   失敗自動落盤復現;首輪三 bug 在事故簿。✅
 

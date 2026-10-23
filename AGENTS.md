@@ -127,10 +127,24 @@
   精確字面量;探針寫成單行或用唯一標記註解(`// probe-xyz`)包裹,刪除按標記配對。
 - 外部語料收編(lint-diff)已入策略:每里程碑收編一批外部測試檔,
   accept/reject 差分=結構性 bug 最快探針(REFLECTION §14.1)。
+
+## 10.7 三面 facade 紀律(2026-10-23 立法;rVPI+wasm/FFI+XLS 弧實錄)
+
+- 模擬器三個對外面(native CLI / vl-wasm 瀏覽器 / vl-ffi host FFI):
+  **新能力先落核心(vl-sim)再露面**,禁只在單一面實現($readmem 注入
+  落 Sim 一處三面同受益=正面先例;REFLECTION §15.1)。
 - rVPI(`crates/vl-sim/src/vpi.rs`)能力變更:回調觸發點/投递語義的改動
   必同輪更新 ADR-0003 觸發點表+vpi_gate 斷言+REGISTRY 分歧行;
   禁向 C ABI 兼容方向漂移(非目標圍欄在 ADR-0003)。
-- 模擬器三面(native CLI/vl-wasm/vl-ffi)能力變更:regress.sh 的 wasm+ffi
-  差分閘與 demo serve smoke 必綠;互動頁交付必附真瀏覽器目檢截圖於
-  docs/e2e-report/;wasm-only 表面必 cfg 閘(u64 跨界=BigInt;
-  $readmem 瀏覽器走注入;回調契約見 SKILL wasm 增補)。
+- wasm 面:js_sys 表面必 `#[cfg(target_arch="wasm32")]`(host stub);
+  u64 跨界=BigInt;回調只收 `{time,value,valueHex}`、JS→sim 中途重入禁;
+  `$readmem` 瀏覽器一律虛擬注入(`inject_file`/`run_verilog_with_files`)。
+- host FFI 面:ABI 用行式 manifest(零 serde);返回串以 `ERROR: ` 前綴
+  分支;`rcs_free` 配對釋放。
+- 外部工具產物收編(XLS 類):正規化(always_ff→always/timescale 注入)
+  在收割管線內做+raw 保留+記在快照 README;上游工具介面衝突以
+  `--helpfull`/stderr 為準,禁盲猜(REFLECTION §15.3)。
+- 互動頁交付:serve smoke(資產 200+no-store)與真瀏覽器目檢
+  (點 Run→stdout→canvas)兩者不可互替;截圖入 docs/e2e-report/。
+- 三面能力變更的機械閘=regress.sh 內五閘(E2E/lint/wasm 差分+功能+VCD
+  解析器/demo serve smoke/ffi 兩式)必綠;條文正典=SKILL「wasm 增補」節。

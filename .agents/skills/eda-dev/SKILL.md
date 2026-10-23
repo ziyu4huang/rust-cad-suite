@@ -53,7 +53,8 @@ description: rust-cad-suite 开发正典——AI agent 做 EDA/IC 工具(模拟�
 ## 3-tiers+1(改规则时执行)
 
 任何新铁则必须同轮落四层,缺一不算数:
-①机械闸(scripts/regress.sh 或 vl-difftest 内断言)
+①机械闸(scripts/regress.sh 五閘:E2E 差分/lint parity/wasm 差分+功能+VCD
+  解析器/demo serve smoke/ffi 兩式——或 vl-difftest 内断言)
 ②本 skill 的正典条文
 ③AGENTS.md 对应节
 ④证据页/报告(docs/e2e-report/)可核。

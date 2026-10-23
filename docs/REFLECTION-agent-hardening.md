@@ -221,3 +221,51 @@ M7 寫 readmem 新例時放了 `x2` 十六進位數字——錄製後 expected �
 oracle 錄製 ≈3.5 分/例(每例全量 C++ 構建)。全庫重錄 55 例 ≈3 小時——
 **只錄新增/變更例**(symlink 臨時 corpus+`--corpus` 旗標)是必要工具,
 本次為此加了 `--corpus`;未來可再省:verilated.cpp 公共物件共享預構建。
+
+## 15. 第四輪實錄(2026-10-23,rVPI+wasm/FFI 三面+XLS 收編弧)
+
+### 15.1 Facade 三面同落:能力落核心,不是落表面(Strategy)
+
+rverilator 現有三個對外面(native CLI / vl-wasm 瀏覽器 / vl-ffi host FFI)。
+`$readmem` 虛擬注入落 `Sim.inject_file` **一處**,三面當輪同時受益;反例
+教訓是「能力只在 wasm 面實現」——那會讓 CLI 與 FFI 靜默落後。規則:
+新能力先問「落核心還是落某一面」;核心純(零外部依賴)是三面都能便宜
+移植的前提(500KB wasm、FFI golden PASS、進程內 0.106ms/run 全來自同一個零改動核心)。
+
+### 15.2 planner→adversarial 抓的是「對現有代碼的斷言錯」(Process)
+
+rVPI 設計的 4×P1 全是計畫對代碼的**斷言錯**:`find()` 會路徑壓縮需 `&mut`
+(計畫稱 &self 即可)、ValueChange 排水點放在 exec_one 內(過度急切)、
+top 模組名未存(cell 鍵是 `q` 非 `tb.q`)、CellKind 需逐站核實——
+沒有一個是「實作時才會發現的 bug」,全部是**設計文件對代碼的錯誤宣稱**,
+對抗審逐一 file:line 取證後在動工前消滅。附:subagent 額度中斷時,
+對抗審可內聯執行——紀律的核心是「每個攻擊點必須代碼取證」,不是 agent 數量。
+
+### 15.3 工具介面衝突以工具自身證據收斂(Tooling)
+
+XLS 收編四輪 CI 迭代:`--ir_path`/`--output_type` 已廢、`--delay_model`
+必須顯式、`--pipeline_stages` 必給、`#[pipeline]` 屬性已移除、`s1` 成保留字
+——每一項都由工具自己的 `--helpfull`/parse error 定案,零盲猜。
+= oracle-first 在「工具介面」域的同族律:上游工具的現行介面,以它的
+輸出為 spec,不以記憶/舊文檔為 spec。
+
+### 15.4 跨語言邊界契約由測試釘死(Contract)
+
+wasm 面三條邊界契約各由一個 gate 釘死:①u64 跨界=BigInt(features.mjs
+字面量首犯實錄)②回調只收 `{time,value,valueHex}`、JS→sim 中途重入禁
+(註冊契約,測試對齊)③js_sys 表面 `#[cfg(target_arch="wasm32")]` 閘
+(host 構建 stub)。ABI 邊界的型別投射不是文檔問題,是測試問題。
+
+### 15.5 外部工具產物的正規化是收編協議的一部分(Harvest)
+
+XLS codegen 輸出 `always_ff`(SV 關鍵字)且無 timescale——收割管線內
+正規化(always_ff→always、注入 `` `timescale ``、raw 副本保留),並把
+正規化記在快照所在處(corpus-external/xls/README.md)。語料的正規化
+契約不在語料旁邊=下一個收編者必然重踩(TIMESCALEMOD 致命警告實錄)。
+
+### 15.6 互動頁交付:curl 200 ≠ 目檢(Verification)
+
+瀏覽器 demo 的 serve smoke(四資產 200+no-store)全綠仍不夠——真瀏覽器
+點 Run 後才發現該驗的是 stdout 內容與 canvas 波形渲染;截圖入
+docs/e2e-report/ 為證。機械閘驗「資產在場」,目檢驗「畫得對」;
+兩者不可互替(SKILL wasm 增補已立法)。
