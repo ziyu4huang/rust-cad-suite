@@ -1,0 +1,9 @@
+start tip=1 busy=1
+phantom ack=0
+addr ack=0
+data ack=0
+idle1 scl=1 sda=1
+addr2 ack=1
+rd dout=96 ack=1
+idle2 scl=1 sda=1 tip=0
+slave saw 20 3c

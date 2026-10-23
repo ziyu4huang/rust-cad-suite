@@ -510,6 +510,14 @@ impl Sim {
     }
 
     pub(crate) fn vpi_write_bits(&mut self, h: VpiHandle, bits: &Bits) -> SResult<()> {
+        // A put before the first run_until still wakes edge-waiters — but
+        // without init_once the always-block prologues have never run, so
+        // no process is registered on its sensitivity list yet and the
+        // edge is silently lost (caught by the spec-i2c read-transaction
+        // lockstep: the DUT's serial shift dropped every bit but the
+        // last). Seed the scheduler BEFORE the write so the edge is seen
+        // against a fully registered sensitivity state.
+        self.init_once()?;
         let name = self.vpi.table[h.0 as usize].name.clone();
         if let Some((root, wi)) = self.mem_elems.get(&name).cloned() {
             let canon = self.find_follow(&root);

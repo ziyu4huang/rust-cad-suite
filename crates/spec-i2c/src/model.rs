@@ -41,10 +41,20 @@ pub struct Slave {
     prev_sda: u8,
     started: bool,
     bits: Vec<u8>,
-    acking: bool,
     read_mode: bool,
     pub drives_sda_low: bool,
-    pub prev_ack_done: bool,
+    /// Ack-slot bookkeeping: `in_ack` = the 8 data bits are decoded and the
+    /// 9th (ack) clock is in flight; `ack_pull` = this byte's ack pulls low
+    /// (write bytes; read payloads stay released for the master's ack);
+    /// `ack_hi` = the ack slot's high half is in flight (the pull window —
+    /// gating on it keeps the pull off the bit-7 data level).
+    in_ack: bool,
+    ack_pull: bool,
+    ack_hi: bool,
+    /// The drive level applied on the previous call: lets the STOP detector
+    /// tell "the slave released its pull" from "the master released the bus"
+    /// (a real STOP).
+    prev_pull: bool,
 }
 
 impl Slave {
@@ -57,10 +67,12 @@ impl Slave {
             prev_sda: 1,
             started: false,
             bits: Vec::new(),
-            acking: false,
             read_mode: false,
             drives_sda_low: false,
-            prev_ack_done: false,
+            in_ack: false,
+            ack_pull: false,
+            ack_hi: false,
+            prev_pull: false,
         }
     }
 }
@@ -73,63 +85,100 @@ pub fn bus_levels(m: &MasterView, slave: &mut Slave) -> (u8, u8) {
     // Slave reacts to SDA/SCL on the falling edge of SCL (change) and the
     // rising edge (sample); START/STOP detected on SDA falls/rises while
     // SCL is high.
-    if slave.prev_scl == 1 && scl_i == 1 && slave.prev_sda == 1 && sda_i == 0 {
+    if slave.prev_scl == 1 && scl_i == 1 && slave.prev_sda == 1 && sda_i == 0 && !slave.drives_sda_low {
         slave.started = true;
         slave.bits.clear();
+        slave.drives_sda_low = false;
+        slave.in_ack = false;
+        slave.ack_pull = false;
+        slave.ack_hi = false;
+        slave.read_mode = false;
     }
-    if slave.prev_scl == 1 && scl_i == 1 && slave.prev_sda == 0 && sda_i == 1 {
+    if slave.prev_scl == 1 && scl_i == 1 && slave.prev_sda == 0 && sda_i == 1 && !slave.prev_pull {
         slave.started = false;
-        slave.acking = false;
         slave.read_mode = false;
         slave.drives_sda_low = false;
+        slave.in_ack = false;
+        slave.ack_pull = false;
+        slave.ack_hi = false;
         slave.bits.clear();
     }
     // Rising edge: a slave holding ACK keeps it through the whole 9th
     // clock (the master samples at the end of the high half) and releases
     // at the falling edge instead.
-    if slave.started && slave.prev_scl == 1 && scl_i == 0 {
-        // Falling edge: the ACK slot (if any) ends here — release the drive
-        // while SCL is low so the next phase starts clean.
-        if slave.acking {
-            slave.drives_sda_low = false;
-            slave.acking = false;
-            slave.bits.clear();
-        }
-        // Data-bit falling edge: capture; the ack level is NOT data and
-        // would misalign the next byte's bit counting.
-        if !slave.acking {
-            slave.bits.push(sda_i);
-        }
-        if slave.acking {
-            // ack released this fall; nothing else to do this edge
-        } else if slave.bits.len() == 8 {
-            let byte = slave
-                .bits
-                .iter()
-                .fold(0u8, |a, &b| (a << 1) | b);
-            slave.read_mode = byte & 1 == 1;
-            let matched = (byte >> 1) == slave.addr;
-            slave.acking = matched || !slave.read_mode;
-            slave.drives_sda_low = slave.acking && !slave.read_mode;
-            if slave.read_mode {
-                slave.drives_sda_low = false;
-            }
-            slave.bits.clear();
-        } else if slave.read_mode && slave.bits.len() < 8 {
-            // drive the next read-data bit during this low half
-            let bitpos = 7 - slave.bits.len();
-            let word = slave.read_data[slave.read_idx % slave.read_data.len()];
-            slave.drives_sda_low = (word >> bitpos) & 1 == 0;
-        }
-        if slave.read_mode && slave.bits.is_empty() && slave.prev_ack_done {
-            // read byte + ack finished: advance to the next word
-            slave.read_idx += 1;
-            slave.prev_ack_done = false;
-        }
-    }
+    // Level-derived drive FIRST, from the state as of the previous edge,
+    // and applied BEFORE the boundary detectors run: the slave's own ack
+    // pull must be visible in the SDA level the START/STOP detectors
+    // examine, or the pull's own release (prev_sda=0 pulled, fresh wire-AND
+    // =1) reads as a false STOP while SCL is high and kills `started`.
+    // Level-derived drive, recomputed every call: idempotent, and immune
+    // to missed edges where SCL parks low through HOLD straight into the
+    // next byte's first low half (an edge-scheduled drive missed that
+    // first bit entirely). Ack high: pull for write / release for read.
+    // Read payload: drive the current word's bit for the byte position.
+    slave.drives_sda_low = if slave.ack_hi && slave.ack_pull {
+        true
+    } else if !slave.in_ack
+        && !slave.ack_hi
+        && slave.started
+        && slave.read_mode
+        && slave.bits.len() <= 8
+        && (scl_i == 0 && slave.bits.len() < 8
+            || (scl_i == 1 && slave.bits.len() >= 1))
+    {
+        // Bit k's window (low half + high half) must carry word bit 7-k.
+        // The buffer is pushed at each SCL rise, so len is k in the low
+        // half and k+1 in the high half — the phase-based bitpos keeps the
+        // level continuous across the SCL edge the master samples at.
+        let len = slave.bits.len();
+        let bitpos = if scl_i == 1 { 8 - len } else { 7 - len };
+        let word = slave.read_data[slave.read_idx % slave.read_data.len()];
+        (word >> bitpos) & 1 == 0
+    } else {
+        false
+    };
     if slave.drives_sda_low {
         sda_i = 0;
     }
+    // Rising edge: sample the data bit. Levels are stable through the whole
+    // high half, so the one-clk-stale driver view still reads the right bit.
+    // The ack-slot level is never data: while `in_ack` the rise SWALLOWS it.
+    if slave.started && slave.prev_scl == 0 && scl_i == 1 {
+        if slave.in_ack {
+            slave.in_ack = false;
+            slave.ack_hi = true;
+        } else {
+            slave.bits.push(sda_i);
+            if slave.bits.len() == 8 {
+                let byte = slave
+                    .bits
+                    .iter()
+                    .fold(0u8, |a, &b| (a << 1) | b);
+                let completed_payload = slave.read_mode; // mode this byte ran in
+                slave.read_mode = byte & 1 == 1;
+                let matched = (byte >> 1) == slave.addr;
+                // Matched write bytes: the slave pulls the ack low. Read
+                // payloads: the master acks; the slave stays released.
+                slave.in_ack = true;
+                slave.ack_pull = matched || !slave.read_mode;
+                slave.ack_hi = false;
+                if slave.read_mode && completed_payload {
+                    // Payload read byte serviced: the next payload serves
+                    // the next word. The address byte advances nothing.
+                    slave.read_idx =
+                        (slave.read_idx + 1) % slave.read_data.len();
+                }
+                slave.bits.clear();
+            }
+        }
+    }
+    // Ack-slot end: the fall after the ack slot's high half closes the
+    // pull window. A +-1 clk skew on this edge touches no sample point.
+    if slave.started && slave.prev_scl == 1 && scl_i == 0 && slave.ack_hi {
+        slave.ack_hi = false;
+        slave.ack_pull = false;
+    }
+    slave.prev_pull = slave.drives_sda_low;
     slave.prev_scl = scl_i;
     slave.prev_sda = sda_i;
     (scl_i, sda_i)
@@ -169,14 +218,15 @@ pub struct I2cGolden {
     pub ack_rx: u8,
     pub dout: u8,
     pub prescale: u16,
-    // own bus view
-    pub slave: Slave,
+    // Bus view: adopted from the cycle's CmdInput (the ONE testbench bus —
+    // see the CmdInput docs; an own-slave view diverges from the RTL's bus
+    // on 1-clk edge races).
     pub scl_i: u8,
     pub sda_i: u8,
 }
 
 impl I2cGolden {
-    pub fn new(prescale: u16, slave_addr: u8) -> I2cGolden {
+    pub fn new(prescale: u16, _slave_addr: u8) -> I2cGolden {
         I2cGolden {
             state: ST_IDLE,
             cnt: 0,
@@ -199,7 +249,6 @@ impl I2cGolden {
             ack_rx: 1,
             dout: 0,
             prescale,
-            slave: Slave::new(slave_addr),
             scl_i: 1,
             sda_i: 1,
         }
@@ -444,14 +493,9 @@ impl GoldenModel for I2cGolden {
             }
         }
 
-        // Own bus view (same wire-AND + slave).
-        let view = MasterView {
-            scl_o: self.scl_o,
-            sda_o: self.sda_o,
-            scl_oe: self.scl_oe,
-            sda_oe: self.sda_oe,
-        };
-        let (scl_i, sda_i) = bus_levels(&view, &mut self.slave);
+        // Adopt the cycle's bus (computed by the ONE testbench slave from
+        // the RTL's outputs — exactly what the DUT samples this cycle).
+        let (scl_i, sda_i) = input.bus.get();
         self.scl_i = scl_i;
         self.sda_i = sda_i;
     }

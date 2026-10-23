@@ -11,7 +11,7 @@ use spec_i2c::invariants::{
     AckRelease, BusyTipCoherence, MsbFirst, SdaStableWhileSclHigh,
 };
 use spec_i2c::model::{I2cGolden, ST_ACK, ST_IDLE};
-use spec_i2c::{CmdInput, RTL, CMD_START, CMD_STOP, CMD_WR};
+use spec_i2c::{CmdInput, RTL, CMD_RD, CMD_START, CMD_STOP, CMD_WR};
 use vl_spec::{build_sim, GoldenModel, LockstepSpec, SignalId, SpecReport};
 
 const PRESCALE: u64 = 4;
@@ -37,6 +37,8 @@ struct IDs {
     ack_rx: SignalId,
     dout: SignalId,
     half: SignalId,
+    tx: SignalId,
+    bitcnt: SignalId,
 }
 
 fn build_harness(
@@ -77,6 +79,8 @@ fn build_harness(
         ack_rx: spec.bind_signal("ack_rx").unwrap(),
         dout: spec.bind_signal("dout").unwrap(),
         half: spec.bind_signal("half").unwrap(),
+        tx: spec.bind_signal("tx").unwrap(),
+        bitcnt: spec.bind_signal("bitcnt").unwrap(),
     };
     spec.write_int(ids.scl_i, 1);
     spec.write_int(ids.sda_i, 1);
@@ -121,12 +125,14 @@ fn build_harness(
             bus3.borrow_mut().refresh(sim, sigs);
             let g = |id: SignalId| -> u8 { sigs.u64(sim, id).unwrap_or(0) as u8 };
             println!(
-                "BUS t={} state={} scl={} sda={} oe={}",
+                "BUS t={} state={} scl={} sda={} oe={} tx={:02x} bc={}",
                 sim.now_ticks(),
                 g(ids.state),
                 g(ids.scl_i),
                 g(ids.sda_i),
-                g(ids.sda_oe)
+                g(ids.sda_oe),
+                g(ids.tx),
+                g(ids.bitcnt)
             );
         })
         .probe(move |sigs, sim| {
@@ -218,6 +224,64 @@ fn scripted_write_transaction_clean() {
     for _ in 0..32 {
         spec.cycle(&CmdInput::idle()).unwrap();
     }
+
+    let report: SpecReport = spec.finish();
+    assert_eq!(report.violations.len(), 0, "{}", report.render_text());
+    assert!(report.cycles_run > 100);
+}
+
+/// Read transaction: address-with-read (0xA1 = 0x50<<1 | 1), then one RD
+/// byte. The bus slave drives its first read word (0xA5) MSB-first on SDA;
+/// the DUT must clock it in and expose it on `dout`. This is the absolute
+/// payload check the lockstep projection alone cannot give: both slave
+/// instances (bus driver + golden view) must agree AND the received byte
+/// must equal the word the spec says the slave holds.
+#[test]
+fn scripted_read_transaction_clean() {
+    let (mut spec, ids, _bus, _expected) = build_harness(RTL);
+
+    let mut cmd = |spec: &mut LockstepSpec<I2cGolden>, ids: &IDs, c: (u8, u8)| {
+        let (c8, d8) = c;
+        assert_eq!(spec.read_u64(ids.tip), 0, "issue we only while parked");
+        spec.cycle(&CmdInput::strobe(c8, d8)).unwrap();
+        spec.cycle(&CmdInput::idle()).unwrap(); // latch cycle
+        if c8 == CMD_STOP {
+            for _ in 0..300 {
+                if spec.read_u64(ids.busy) == 0 {
+                    return;
+                }
+                spec.cycle(&CmdInput::idle()).unwrap();
+            }
+            panic!("STOP never completed");
+        }
+        let mut saw_tip = false;
+        for _ in 0..300 {
+            if spec.read_u64(ids.tip) == 1 {
+                saw_tip = true;
+                break;
+            }
+            spec.cycle(&CmdInput::idle()).unwrap();
+        }
+        assert!(saw_tip, "transfer never started");
+        for _ in 0..300 {
+            if spec.read_u64(ids.tip) == 0 {
+                return;
+            }
+            spec.cycle(&CmdInput::idle()).unwrap();
+        }
+        panic!("transfer never finished");
+    };
+
+    cmd(&mut spec, &ids, (CMD_START, 0));
+    cmd(&mut spec, &ids, (CMD_WR, 0xA1));
+    cmd(&mut spec, &ids, (CMD_RD, 0));
+    // The read byte completed: dout must hold the slave's first word.
+    assert_eq!(
+        spec.read_u64(ids.dout),
+        0xA5,
+        "DUT must clock in the slave's read word"
+    );
+    cmd(&mut spec, &ids, (CMD_STOP, 0));
 
     let report: SpecReport = spec.finish();
     assert_eq!(report.violations.len(), 0, "{}", report.render_text());

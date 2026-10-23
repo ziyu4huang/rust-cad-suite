@@ -2444,7 +2444,7 @@ impl Sim {
         self.sched_loop(Some(t))
     }
 
-    fn init_once(&mut self) -> SResult<()> {
+    pub(crate) fn init_once(&mut self) -> SResult<()> {
         if self.sched_started {
             return Ok(());
         }
@@ -2454,6 +2454,21 @@ impl Sim {
         self.fire_start_of_simulation()?;
         self.drain_vc_callbacks()?;
         self.runnable = (0..self.procs.len()).collect();
+        // Run the prologues: every process advances to its first wait so
+        // that a put-driven edge BEFORE the first run()/run_until() finds
+        // registered waiters. A bare seeding left the queue unexecuted and
+        // the first edge was silently lost (caught by the spec-i2c
+        // serial-shift repro: every shift but the last evaluated against
+        // an unregistered sensitivity state).
+        while let Some(pid) = self.runnable.pop_front() {
+            if self.finished {
+                break;
+            }
+            self.step_process(pid)?;
+        }
+        if !self.inactive.is_empty() {
+            self.runnable.extend(self.inactive.drain(..));
+        }
         Ok(())
     }
 

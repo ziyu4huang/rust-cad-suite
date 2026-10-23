@@ -18,24 +18,28 @@
 // Language subset: posedge/negedge async reset, NBA, case, params — the
 // constructs the rverilator differential corpus pins as verified (M5-M7).
 
+// Port-order note (ANSI range inheritance, IEEE 1364-2005 12.3.2): a
+// range-less port in an ANSI list INHERITS the previous port's range. All
+// single-bit ports therefore come FIRST (no ranged port precedes them);
+// every ranged port carries its own explicit range.
 module i2c_master (
     input  wire        clk,
     input  wire        rst_n,
-    input  wire [15:0] prescale,
     input  wire        we,
-    input  wire [3:0]  cmd,     // {STOP, START, RD, WR} = bit[3..0]
-    input  wire [7:0]  din,
-    output reg  [7:0]  dout,
+    input  wire        scl_i,   // bus sense (unused v1: no stretching)
+    input  wire        sda_i,
     output reg         ack_rx,  // ack bit sampled for the last TX byte (0 = ACK)
     output reg         done,    // 1-clk strobe: a byte completed
     output reg         busy,    // a command sequence is in progress
     output reg         tip,     // a byte transfer is in progress
-    input  wire        scl_i,   // bus sense (unused v1: no stretching)
-    input  wire        sda_i,
     output reg         scl_o,
     output reg         sda_o,
     output reg         scl_oe,
-    output reg         sda_oe
+    output reg         sda_oe,
+    input  wire [15:0] prescale,
+    input  wire [3:0]  cmd,     // {STOP, START, RD, WR} = bit[3..0]
+    input  wire [7:0]  din,
+    output reg  [7:0]  dout
 );
 
   localparam [3:0] ST_IDLE = 4'd0;

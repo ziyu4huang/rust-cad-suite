@@ -34,6 +34,9 @@ impl BusDriver {
             sda_oe: g(self.sda_oe),
         };
         let (scl_i, sda_i) = bus_levels(&view, &mut self.slave);
+        // The ONE bus: publish the levels for the golden master's view too
+        // (it adopts exactly what the DUT samples this cycle).
+        input.bus.set((scl_i, sda_i));
         sigs.put_int(sim, self.scl_i, scl_i as i64).ok();
         sigs.put_int(sim, self.sda_i, sda_i as i64).ok();
         sigs.put_int(sim, self.we, input.we as i64).ok();
