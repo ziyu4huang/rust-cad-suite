@@ -254,7 +254,7 @@ impl GateInst {
 const GATE_X: Bits = Bits { width: 1, data: 0, mask: 1 };
 const GATE_Z: Bits = Bits { width: 1, data: 1, mask: 1 };
 const fn gate_b(t: bool) -> Bits {
-    Bits { width: 1, data: t as u64, mask: 0 }
+    Bits { width: 1, data: t as u128, mask: 0 }
 }
 
 /// IEEE 1364-2005 §7 primitive tables (4-state; no strengths — a disabled
@@ -320,8 +320,8 @@ fn gate_fold(kind: GateKind, ins: &[Bits]) -> Bits {
 /// Parse one `$readmem*` value token: LSB-aligned into `w` bits, truncating
 /// extra high bits; `x/z/?` carry into the unknown mask (x → x, z → z).
 fn readmem_val(tok: &[char], bin: bool, w: u32, task: &str) -> SResult<Bits> {
-    let mut data: u64 = 0;
-    let mut mask: u64 = 0;
+    let mut data: u128 = 0;
+    let mut mask: u128 = 0;
     let mut nbits = 0usize;
     for &c in tok {
         if c == '_' {
@@ -329,7 +329,7 @@ fn readmem_val(tok: &[char], bin: bool, w: u32, task: &str) -> SResult<Bits> {
         }
         let (d, m) = if bin {
             match c {
-                '0' => (0u64, 0u64),
+                '0' => (0u128, 0u128),
                 '1' => (1, 0),
                 'x' | 'X' => (0, 1),
                 'z' | 'Z' | '?' => (1, 1),
@@ -342,7 +342,7 @@ fn readmem_val(tok: &[char], bin: bool, w: u32, task: &str) -> SResult<Bits> {
             }
         } else {
             match c {
-                '0'..='9' | 'a'..='f' | 'A'..='F' => (c.to_digit(16).unwrap() as u64, 0),
+                '0'..='9' | 'a'..='f' | 'A'..='F' => (c.to_digit(16).unwrap() as u128, 0),
                 'x' | 'X' => (0, 1),
                 'z' | 'Z' | '?' => (1, 1),
                 _ => {
@@ -2831,18 +2831,23 @@ impl Sim {
                     .to_string(),
                 ('d' | 'D', Val::Bits { bits, signed }) => {
                     let natural = if *signed {
-                        bits.to_i64_lossy().abs().to_string().len()
-                            + (bits.to_i64_lossy() < 0) as usize
+                        bits
+                            .to_i128_lossy()
+                            .checked_abs()
+                            .unwrap_or(i128::MAX)
+                            .to_string()
+                            .len()
+                            + (bits.to_i128_lossy() < 0) as usize
                     } else {
-                        let maxv = if bits.width >= 64 {
-                            u64::MAX
+                        let maxv: u128 = if bits.width >= 128 {
+                            u128::MAX
                         } else {
                             low_bits(bits.width)
                         };
                         maxv.to_string().len()
                     };
                     let mut s = if *signed {
-                        if bits.has_unknown() { "x".to_string() } else { bits.to_i64_lossy().to_string() }
+                        if bits.has_unknown() { "x".to_string() } else { bits.to_i128_lossy().to_string() }
                     } else {
                         bits.fmt_dec()
                     };

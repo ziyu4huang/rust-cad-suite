@@ -337,17 +337,17 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                     BinOp::Sub => a.sub(&b)?,
                     BinOp::Mul => a.mul(&b)?,
                     BinOp::Div => {
-                        if signed && a.is_known() && b.is_known() && b.to_u64_lossy() != 0 {
-                            let q = a.to_i64_lossy().wrapping_div(b.to_i64_lossy());
-                            Bits::from_u64(w, (q as u64) & value::low_bits(w))?
+                        if signed && a.is_known() && b.is_known() && b.to_u128_lossy() != 0 {
+                            let q = a.to_i128_lossy().wrapping_div(b.to_i128_lossy());
+                            Bits::from_u128(w, (q as u128) & value::low_bits(w))?
                         } else {
                             a.div(&b)?
                         }
                     }
                     BinOp::Mod => {
-                        if signed && a.is_known() && b.is_known() && b.to_u64_lossy() != 0 {
-                            let q = a.to_i64_lossy().wrapping_rem(b.to_i64_lossy());
-                            Bits::from_u64(w, (q as u64) & value::low_bits(w))?
+                        if signed && a.is_known() && b.is_known() && b.to_u128_lossy() != 0 {
+                            let q = a.to_i128_lossy().wrapping_rem(b.to_i128_lossy());
+                            Bits::from_u128(w, (q as u128) & value::low_bits(w))?
                         } else {
                             a.rem(&b)?
                         }
@@ -355,9 +355,9 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                     _ => {
                         if signed && a.is_known() && b.is_known() {
                             // Signed power per §5.1.5 table (base/exponent sign cases).
-                            let base = a.to_i64_lossy();
-                            let exp = b.to_i64_lossy();
-                            let r: i64 = if exp < 0 {
+                            let base = a.to_i128_lossy();
+                            let exp = b.to_i128_lossy();
+                            let r: i128 = if exp < 0 {
                                 match base {
                                     1 => 1,
                                     -1 => if exp % 2 == 0 { 1 } else { -1 },
@@ -365,9 +365,9 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                                     _ => 0,
                                 }
                             } else {
-                                (base as i128).checked_pow(exp.min(63) as u32).unwrap_or(0) as i64
+                                base.checked_pow(exp.min(126) as u32).unwrap_or(0)
                             };
-                            Bits::from_u64(w, (r as u64) & value::low_bits(w))?
+                            Bits::from_u128(w, (r as u128) & value::low_bits(w))?
                         } else {
                             a.pow(&b)?
                         }

@@ -487,8 +487,8 @@ impl Sim {
                 let _ = width;
                 Bits {
                     width: 64,
-                    data,
-                    mask,
+                    data: data as u128,
+                    mask: mask as u128,
                 }
             }
             VpiValue::Scalar(sc) => Bits {
