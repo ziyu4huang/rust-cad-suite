@@ -13,7 +13,9 @@
 //! vl-wasm (both, via wasm-bindgen facade), vl-ffi (both, via C ABI).
 
 pub mod reader;
+pub mod render;
 pub mod writer;
 
 pub use reader::{parse, normalize_width, VcdChange, VcdDiag, VcdFile, VcdValue, VcdVar};
+pub use render::{render, RenderOptions};
 pub use writer::VcdWriter;

@@ -9,3 +9,7 @@ license = "MIT"
 # vl-difftest) consumes this crate, so nothing here may pull the tree in
 # the other direction (ADR-0004).
 [dependencies]
+
+[[bin]]
+name = "vcd2svg"
+path = "src/bin/vcd2svg.rs"

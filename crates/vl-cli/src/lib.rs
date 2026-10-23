@@ -35,6 +35,7 @@ Options:
                        Accepted for compatibility; no-op in v0
   -h, --help           This help
 
+Companion: `vcd2svg <file.vcd>` renders a dump to SVG (crates/vl-vcd).
 Exit codes: 0 = no errors, 1 = diagnostics or usage error.
 ";
 

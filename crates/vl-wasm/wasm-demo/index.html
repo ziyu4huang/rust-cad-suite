@@ -15,7 +15,7 @@
   button { background: #1d4436; color: #cfe; border: 1px solid #3a7; padding: .4rem 1.2rem; cursor: pointer; font: inherit; }
   button:disabled { opacity: .5; }
   pre { background: #0a0e12; border: 1px solid #345; padding: .5rem; min-height: 3rem; white-space: pre-wrap; font-size: .78rem; }
-  canvas { background: #0a0e12; border: 1px solid #345; width: 100%; }
+  .wavehost svg { background: #0a0e12; border: 1px solid #345; width: 100%; height: auto; display: block; }
   .err { color: #f88; }
   .ok-badge { color: #6d6; }
   .bad-badge { color: #f88; }
@@ -45,7 +45,7 @@ running here reproduces them byte-exactly. Waveforms are parsed by the same shar
   <div class="col">
     <label>waveform (from the design's $dumpvars VCD; click names to toggle)</label>
     <div id="siglist" class="small"></div>
-    <canvas id="wave" width="900" height="360"></canvas>
+    <div id="wave" class="wavehost"></div>
   </div>
 </div>
 
@@ -60,6 +60,7 @@ Verilator-recorded expectation. (XLS-generated code, Apache-2.0 — see corpus-e
 
 <script type="module">
 import init, { WasmSim, vcd_parse } from "./pkg/vl_wasm.js";
+const SVG_FLAGS = { t0: 1, t1: 2, height: 4 };
 
 const DEFAULT_SRC = `\`timescale 1ns/1ps
 module tb;
@@ -79,7 +80,6 @@ endmodule
 document.getElementById("src").value = DEFAULT_SRC;
 
 const $ = (id) => document.getElementById(id);
-let shown = new Set();
 
 $("run").onclick = async () => {
   $("run").disabled = true;
@@ -108,78 +108,45 @@ $("run").onclick = async () => {
 };
 
 // ---------- shared waveform rendering (one tier-agnostic path) ----------
-
-// Parse with the shared Rust reader (wasm facade over vl-vcd) and render.
+// The waveform is a deterministic SVG emitted by the SAME Rust renderer the
+// vcd2svg CLI and the Bun FFI use (ADR-0005) — the browser only injects it.
 // Returns the signal count.
-function drawFrom(vcdText, siglist, canvas) {
+
+function drawFrom(vcdText, siglist, host) {
   const vcd = vcd_parse(vcdText);
   const sigs = [];
   for (let i = 0; i < vcd.varCount; i++) {
-    sigs.push({
-      name: vcd.var_name(i),
-      width: vcd.var_width(i),
-      times: vcd.times(i),
-      values: vcd.values(i),
-    });
+    sigs.push({ name: vcd.var_name(i) });
   }
   sigs.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0));
-  const tMax = Number(vcd.tMax);
-  shown = new Set(sigs.slice(0, 8).map((s) => s.name));
+  // Per-view state in closure scope — the playground and each XLS card own
+  // their own order/shown sets (module-level sharing caused an E105 mix).
+  const order = sigs.map((s) => s.name);
+  const shown = new Set(sigs.slice(0, 8).map((s) => s.name));
   siglist.innerHTML = "";
   for (const s of sigs) {
     const el = document.createElement("span");
-    el.textContent = (shown.has(s.name) ? "■ " : "□ ") + s.name + "  ";
+    const paint = () => {
+      el.textContent = (shown.has(s.name) ? "■ " : "□ ") + s.name + "  ";
+    };
+    paint();
     el.style.cursor = "pointer";
     el.onclick = () => {
       shown.has(s.name) ? shown.delete(s.name) : shown.add(s.name);
-      draw(sigs, tMax, siglist, canvas);
+      paint();
+      renderSvg(vcd, order, shown, host);
     };
     siglist.appendChild(el);
   }
-  draw(sigs, tMax, siglist, canvas);
+  renderSvg(vcd, order, shown, host);
   return sigs.length;
 }
 
-function draw(sigs, tMax, siglist, canvas) {
-  const ctx = canvas.getContext("2d");
-  const W = canvas.width, rowH = 34, top = 10;
-  const shownSigs = sigs.filter((s) => shown.has(s.name));
-  const H = top + Math.max(1, shownSigs.length) * rowH;
-  canvas.height = Math.max(120, H);
-  ctx.fillStyle = "#101418"; ctx.fillRect(0, 0, W, canvas.height);
-  const x = (t) => 90 + (t / Math.max(1, tMax)) * (W - 110);
-  ctx.strokeStyle = "#234"; ctx.beginPath();
-  for (let g = 0; g <= 8; g++) { const gx = 90 + g * (W - 110) / 8; ctx.moveTo(gx, 4); ctx.lineTo(gx, canvas.height - 4); }
-  ctx.stroke();
-  shownSigs.forEach((s, r) => {
-    const y0 = top + r * rowH + 8;
-    ctx.fillStyle = "#9cf"; ctx.font = "11px monospace";
-    ctx.fillText(s.name, 4, y0 + 8);
-    let prev = s.times.length ? null : "x";
-    ctx.strokeStyle = "#4ec9b0"; ctx.fillStyle = "#b58"; ctx.beginPath();
-    s.times.forEach((t, i) => {
-      const v = s.values[i];
-      const nextT = i + 1 < s.times.length ? s.times[i + 1] : tMax;
-      const x0 = x(Number(t)), x1 = x(Number(nextT));
-      if (v === "x" || v === "z") {
-        ctx.moveTo(x0, y0); ctx.lineTo(x1, y0); ctx.moveTo(x0, y0 + 16); ctx.lineTo(x1, y0 + 16);
-        ctx.fillStyle = v === "x" ? "#b55" : "#666"; ctx.fillRect(x0, y0, x1 - x0, 16);
-        ctx.fillStyle = "#b58";
-      } else {
-        const hi = v === "1" || (!isNaN(Number(v)) && Number(v) !== 0);
-        const yv = y0 + (hi ? 0 : 16);
-        if (prev !== null && prev !== v) {
-          const pv = prev === "1" || (!isNaN(Number(prev)) && Number(prev) !== 0);
-          ctx.moveTo(x0, y0 + (pv ? 0 : 16)); ctx.lineTo(x0, yv);
-        } else if (prev === null) {
-          ctx.moveTo(x0, yv);
-        }
-        ctx.lineTo(x1, yv);
-      }
-      prev = v;
-    });
-    ctx.stroke();
-  });
+// Re-render from the held parse (no re-parse on toggle). Row order = name
+// order (the demo's choice; the renderer takes order as given).
+function renderSvg(vcd, order, shown, host) {
+  const signals = order.filter((n) => shown.has(n));
+  host.innerHTML = vcd.to_svg(signals, 0, 0, 0n, 0n, 0);
 }
 
 // ---------- XLS independent-verification cards ----------
@@ -218,7 +185,7 @@ async function mountCases() {
       <p><button>▶ Run + verify</button> <span class="badge small"></span></p>
       <pre class="out small">(not run)</pre>
       <div class="siglist small"></div>
-      <canvas width="900" height="220"></canvas>`;
+      <div class="wavehost"></div>`;
     host.appendChild(div);
     const btn = div.querySelector("button");
     const badge = div.querySelector(".badge");
@@ -244,7 +211,7 @@ async function mountCases() {
           : "✗ differs from recorded expectation";
         badge.className = `badge small ${match ? "ok-badge" : "bad-badge"}`;
         const vcd = sim.take_vcd();
-        if (vcd) drawFrom(vcd, div.querySelector(".siglist"), div.querySelector("canvas"));
+        if (vcd) drawFrom(vcd, div.querySelector(".siglist"), div.querySelector(".wavehost"));
       } catch (e) {
         out.textContent = String(e);
         out.className = "out small err";

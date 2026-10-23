@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 186" width="960" height="186" font-family="ui-monospace,SFMono-Regular,Menlo,monospace">
+<rect width="960" height="186" fill="#101418"/>
+<line x1="120" y1="2" x2="120" y2="168" stroke="#233442" stroke-width="1"/>
+<text x="120" y="186" font-size="9" fill="#8899aa" text-anchor="middle">0</text>
+<line x1="225" y1="2" x2="225" y2="168" stroke="#233442" stroke-width="1"/>
+<line x1="330" y1="2" x2="330" y2="168" stroke="#233442" stroke-width="1"/>
+<text x="330" y="186" font-size="9" fill="#8899aa" text-anchor="middle">18750</text>
+<line x1="435" y1="2" x2="435" y2="168" stroke="#233442" stroke-width="1"/>
+<line x1="540" y1="2" x2="540" y2="168" stroke="#233442" stroke-width="1"/>
+<text x="540" y="186" font-size="9" fill="#8899aa" text-anchor="middle">37500</text>
+<line x1="645" y1="2" x2="645" y2="168" stroke="#233442" stroke-width="1"/>
+<line x1="750" y1="2" x2="750" y2="168" stroke="#233442" stroke-width="1"/>
+<text x="750" y="186" font-size="9" fill="#8899aa" text-anchor="middle">56250</text>
+<line x1="855" y1="2" x2="855" y2="168" stroke="#233442" stroke-width="1"/>
+<line x1="960" y1="2" x2="960" y2="168" stroke="#233442" stroke-width="1"/>
+<text x="960" y="186" font-size="9" fill="#8899aa" text-anchor="middle">75000</text>
+<text x="960" y="10" font-size="9" fill="#8899aa" text-anchor="end">timescale 1ps</text>
+<g><title>clk w=1 type=wire</title><text x="4" y="34" font-size="11" fill="#9cf3ff">clk</text>
+<title>t=0..5000: 0</title><title>t=5000..10000: 1</title><title>t=10000..15000: 0</title><title>t=15000..20000: 1</title><title>t=20000..25000: 0</title><title>t=25000..30000: 1</title><title>t=30000..35000: 0</title><title>t=35000..40000: 1</title><title>t=40000..45000: 0</title><title>t=45000..50000: 1</title><title>t=50000..55000: 0</title><title>t=55000..60000: 1</title><title>t=60000..65000: 0</title><title>t=65000..70000: 1</title><title>t=70000..75000: 0</title><title>t=75000..75000: 1</title><polyline points="120 42 176 42 176 26 232 26 232 42 288 42 288 26 344 26 344 42 400 42 400 26 456 26 456 42 512 42 512 26 568 26 568 42 624 42 624 26 680 26 680 42 736 42 736 26 792 26 792 42 848 42 848 26 904 26 904 42 960 42 960 26 960 26" fill="none" stroke="#4ec9b0" stroke-width="2"/></g>
+<g><title>q w=8 type=wire</title><text x="4" y="62" font-size="11" fill="#9cf3ff">q</text>
+<title>t=0..35000: 00000000</title><rect x="120" y="58" width="392" height="8" fill="#16303c"/><title>t=35000..45000: 00000001</title><rect x="512" y="58" width="112" height="8" fill="#16303c"/><line x1="512" y1="56" x2="512" y2="68" stroke="#4ec9b0"/><title>t=45000..55000: 00000010</title><rect x="624" y="58" width="112" height="8" fill="#16303c"/><line x1="624" y1="56" x2="624" y2="68" stroke="#4ec9b0"/><title>t=55000..65000: 00000011</title><rect x="736" y="58" width="112" height="8" fill="#16303c"/><line x1="736" y1="56" x2="736" y2="68" stroke="#4ec9b0"/><title>t=65000..75000: 00000100</title><rect x="848" y="58" width="112" height="8" fill="#16303c"/><line x1="848" y1="56" x2="848" y2="68" stroke="#4ec9b0"/><title>t=75000..75000: 00000101</title><rect x="960" y="58" width="1" height="8" fill="#16303c"/><line x1="960" y1="56" x2="960" y2="68" stroke="#4ec9b0"/></g>
+<g><title>rst w=1 type=wire</title><text x="4" y="90" font-size="11" fill="#9cf3ff">rst</text>
+<title>t=0..25000: 1</title><title>t=25000..75000: 0</title><polyline points="120 82 400 82 400 98 960 98" fill="none" stroke="#4ec9b0" stroke-width="2"/></g>
+<g><title>dut.clk w=1 type=wire</title><text x="4" y="118" font-size="11" fill="#9cf3ff">dut.clk</text>
+<title>t=0..5000: 0</title><title>t=5000..10000: 1</title><title>t=10000..15000: 0</title><title>t=15000..20000: 1</title><title>t=20000..25000: 0</title><title>t=25000..30000: 1</title><title>t=30000..35000: 0</title><title>t=35000..40000: 1</title><title>t=40000..45000: 0</title><title>t=45000..50000: 1</title><title>t=50000..55000: 0</title><title>t=55000..60000: 1</title><title>t=60000..65000: 0</title><title>t=65000..70000: 1</title><title>t=70000..75000: 0</title><title>t=75000..75000: 1</title><polyline points="120 126 176 126 176 110 232 110 232 126 288 126 288 110 344 110 344 126 400 126 400 110 456 110 456 126 512 126 512 110 568 110 568 126 624 126 624 110 680 110 680 126 736 126 736 110 792 110 792 126 848 126 848 110 904 110 904 126 960 126 960 110 960 110" fill="none" stroke="#4ec9b0" stroke-width="2"/></g>
+<g><title>dut.q w=8 type=wire</title><text x="4" y="146" font-size="11" fill="#9cf3ff">dut.q</text>
+<title>t=0..35000: 00000000</title><rect x="120" y="142" width="392" height="8" fill="#16303c"/><title>t=35000..45000: 00000001</title><rect x="512" y="142" width="112" height="8" fill="#16303c"/><line x1="512" y1="140" x2="512" y2="152" stroke="#4ec9b0"/><title>t=45000..55000: 00000010</title><rect x="624" y="142" width="112" height="8" fill="#16303c"/><line x1="624" y1="140" x2="624" y2="152" stroke="#4ec9b0"/><title>t=55000..65000: 00000011</title><rect x="736" y="142" width="112" height="8" fill="#16303c"/><line x1="736" y1="140" x2="736" y2="152" stroke="#4ec9b0"/><title>t=65000..75000: 00000100</title><rect x="848" y="142" width="112" height="8" fill="#16303c"/><line x1="848" y1="140" x2="848" y2="152" stroke="#4ec9b0"/><title>t=75000..75000: 00000101</title><rect x="960" y="142" width="1" height="8" fill="#16303c"/><line x1="960" y1="140" x2="960" y2="152" stroke="#4ec9b0"/></g>
+<g><title>dut.rst w=1 type=wire</title><text x="4" y="174" font-size="11" fill="#9cf3ff">dut.rst</text>
+<title>t=0..25000: 1</title><title>t=25000..75000: 0</title><polyline points="120 166 400 166 400 182 960 182" fill="none" stroke="#4ec9b0" stroke-width="2"/></g>
+</svg>

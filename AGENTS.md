@@ -150,6 +150,12 @@
   同一 reader;**新 tier 手搓 VCD parser=違例**,JS 手搓版已退役;
   新容忍度先入 GTKWAVE-VCD-STUDY 採用/拒收表+ADR-0004 修訂,禁 quiet tweak;
   writer 零漂移錨=e2e expect.vcd byte-diff,值介面=4 慢字串(勿改回 Bits)。
+- **GUI 憲法(ADR-0005,2026-10-23 使用者定調「GUI 我們都用web做,需要的底層都用
+  rust寫,然後cli 與web都共用 web透過wasm 共用,波型生成要用SVG」)**:GUI 一律 web;
+  GUI 所需底層一律 Rust 核心先落;CLI 與 web 共用核心,web 經 wasm;波形渲染=
+  vl-vcd render 出 SVG(確定性+XML 轉義鐵律,golden byte-diff 釘死),
+  **點陣 canvas 波形=違例**;時間參數跨層=u64(BigInt)+flags,禁 f64 哨兵;
+  機械閘=regress 的 wasm vcd_svg+ffi vcd_svg+cargo render golden。
 - 三面能力變更的機械閘=regress.sh 內(E2E 精確數 100%/lint parity 基線/
   wasm 差分+功能+vcd_parse/demo serve smoke+corpus 白名單/ffi 三閘含
   vcd_read)必綠;條文正典=SKILL「wasm 增補」節。

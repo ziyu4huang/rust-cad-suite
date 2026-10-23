@@ -1,0 +1,29 @@
+$date
+  (recorded)
+$end
+$version
+  rverilator (rust-cad-suite)
+$end
+$timescale 1ps $end
+$var wire 1 ! clk $end
+$var wire 8 " sr $end
+$enddefinitions $end
+#0
+$dumpvars
+0!
+b00000000 "
+$end
+b10000001 "
+#5000
+1!
+b00000010 "
+#10000
+0!
+#15000
+1!
+b00000101 "
+#20000
+0!
+#25000
+1!
+b00001011 "

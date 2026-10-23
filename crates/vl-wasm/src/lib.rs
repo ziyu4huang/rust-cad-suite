@@ -311,6 +311,13 @@ impl WasmSim {
 /// tiers share one waveform parser. Errors surface as
 /// `VL-E1xx: message @ byte N`; tolerated conditions are counted in
 /// `warning_count` (details are not yet exposed across the boundary).
+/// One-shot convenience: parse + render with default options (toggle-heavy
+/// hosts should hold a `VcdJs` and call its `to_svg` instead).
+#[wasm_bindgen]
+pub fn vcd_to_svg(text: &str) -> Result<String, JsValue> {
+    vcd_parse(text)?.to_svg(Vec::new(), 0, 0, 0, 0, 0)
+}
+
 #[wasm_bindgen]
 pub fn vcd_parse(text: &str) -> Result<VcdJs, JsValue> {
     let f = vl_vcd::parse(text).map_err(|d| {
@@ -325,6 +332,11 @@ pub fn vcd_parse(text: &str) -> Result<VcdJs, JsValue> {
 pub struct VcdJs {
     inner: vl_vcd::VcdFile,
 }
+
+/// `to_svg` flags: bit0 = t0 set, bit1 = t1 set, bit2 = height set.
+pub const SVG_F_T0: u32 = 1;
+pub const SVG_F_T1: u32 = 2;
+pub const SVG_F_HEIGHT: u32 = 4;
 
 #[wasm_bindgen]
 impl VcdJs {
@@ -383,6 +395,36 @@ impl VcdJs {
             .filter(|c| c.var == i)
             .map(|c| c.value.to_raw())
             .collect()
+    }
+
+    /// Render the ALREADY-PARSED dump to a deterministic SVG (no re-parse on
+    /// toggle). `signals` = row subset in render order (empty = all, file
+    /// order); `t0`/`t1` are u64 (BigInt at the boundary — ADR-0005) and only
+    /// read when the matching flag bit is set; `height` likewise with
+    /// SVG_F_HEIGHT.
+    pub fn to_svg(
+        &self,
+        signals: Vec<String>,
+        width: u32,
+        height: u32,
+        t0: u64,
+        t1: u64,
+        flags: u32,
+    ) -> Result<String, JsValue> {
+        let opts = vl_vcd::RenderOptions {
+            width: if width == 0 { 960 } else { width },
+            height: if flags & SVG_F_HEIGHT != 0 && height > 0 {
+                Some(height)
+            } else {
+                None
+            },
+            t0: if flags & SVG_F_T0 != 0 { Some(t0) } else { None },
+            t1: if flags & SVG_F_T1 != 0 { Some(t1) } else { None },
+            signals: if signals.is_empty() { None } else { Some(signals) },
+            ..Default::default()
+        };
+        vl_vcd::render(&self.inner, &opts)
+            .map_err(|d| JsValue::from_str(&format!("{}: {} @ byte {}", d.code, d.message, d.offset)))
     }
 }
 

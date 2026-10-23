@@ -81,6 +81,10 @@ docs/e2e-report/,curl 不算目檢)。
 共用同一 reader;新 tier 手搓 VCD parser=違例(JS 手搓版已退役);
 新容忍度先入 docs/GTKWAVE-VCD-STUDY.md 採用/拒收表+ADR-0004 修訂;
 writer 值介面=4 慢字串,零漂移錨=e2e expect.vcd byte-diff。
+**SVG 波形正典(ADR-0005)**:波形渲染一律走 vl-vcd render(確定性 SVG、
+值進 title、XML 轉義),vcd2svg CLI/vcd_to_svg wasm/rcs_vcd_svg FFI 三面同源;
+GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
+時間參數跨層=u64(BigInt)+flags,禁 f64 哨兵。
 
 契約備忘:wasm 回調只收 `{time,value,valueHex}`(JS→sim 中途重入=禁,
 讀值在 run 前後);u64 跨界=BigInt;`$readmem` 在瀏覽器一律走虛擬注入

@@ -5,4 +5,5 @@ corpus-external/*
 !corpus-external/sv-tests
 !corpus-external/xls
 *.vcd
+!corpus/**/*.vcd
 crates/vl-wasm/pkg/

@@ -1,0 +1,26 @@
+$date
+  (recorded)
+$end
+$version
+  rverilator (rust-cad-suite)
+$end
+$timescale 1ps $end
+$var wire 4 ! a $end
+$var wire 4 " b $end
+$var wire 4 # p $end
+$var wire 4 $ s $end
+$var wire 4 % w $end
+$enddefinitions $end
+#0
+$dumpvars
+b0011 !
+b0101 "
+b1111 #
+b1000 $
+b1000 %
+$end
+#1000
+b0110 !
+b1110 #
+b1011 $
+b1011 %

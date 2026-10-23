@@ -14,6 +14,9 @@
 //! with `vcd <path>` instead), or a string starting with `ERROR: ` —
 //! callers branch on the prefix. Free returned strings with [`rcs_free`].
 //!
+//! [`rcs_vcd_svg`] renders VCD text to a deterministic SVG with the SAME
+//! renderer behind the `vcd2svg` CLI and the wasm facade (default options;
+//! knobs = new entry points later — ABI v1 freeze note, ADR-0005).
 //! [`rcs_vcd_parse`] feeds VCD text to the SAME shared reader the CLI and
 //! wasm facades use (vl-vcd) and returns a line protocol:
 //! ```text
@@ -164,6 +167,24 @@ pub extern "C" fn rcs_vcd_parse(text: *const c_char) -> *mut c_char {
     let out = match std::panic::catch_unwind(|| vcd_line_protocol(&text)) {
         Ok(Ok(lines)) => lines,
         Ok(Err(e)) => format!("ERROR: {e}"),
+        Err(_) => "ERROR: internal panic".to_string(),
+    };
+    CString::new(out)
+        .unwrap_or_else(|_| CString::new("ERROR: invalid utf-8").unwrap())
+        .into_raw()
+}
+
+/// Render VCD text to SVG (default options). Returns the SVG document or
+/// `ERROR: ...`; free with [`rcs_free`].
+#[no_mangle]
+pub extern "C" fn rcs_vcd_svg(text: *const c_char) -> *mut c_char {
+    let text = unsafe { CStr::from_ptr(text) }.to_string_lossy().into_owned();
+    let out = match std::panic::catch_unwind(|| {
+        vl_vcd::parse(&text)
+            .and_then(|f| vl_vcd::render(&f, &vl_vcd::RenderOptions::default()))
+    }) {
+        Ok(Ok(svg)) => svg,
+        Ok(Err(d)) => format!("ERROR: {}: {} @ byte {}", d.code, d.message, d.offset),
         Err(_) => "ERROR: internal panic".to_string(),
     };
     CString::new(out)

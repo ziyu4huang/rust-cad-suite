@@ -22,6 +22,12 @@
   (BigInt 時序+錯誤路徑);ffi `vcd_read.mjs`(agent 讀波形:dump→解析→斷言);
   e2e 57/57 零漂移;瀏覽器 XLS 獨立驗證卡 ✓ byte-exact ×3(目檢=docs/e2e-report/wasm-demo-v2-verified.png);
   XLS 依賴結論=docs/XLS-VERILATOR-STUDY.md;GTKWave 研讀=docs/GTKWAVE-VCD-STUDY.md;ADR-0004。
+- **KR1.9 SVG 波形渲染層+GUI 憲法(ADR-0005,2026-10-23 立)**
+  當前:✅ vl-vcd render 為 CLI/wasm/FFI 唯一波形渲染器;demo canvas 全退役;
+  GUI=web/底層=Rust/CLI-web 同源 憲法入 AGENTS §10.8。
+  證據:`cargo test -p vl-vcd`(render 7+golden 4,goldens/counter.svg byte-diff,
+  CLI stdout=wasm one-shot 同字節);regress wasm vcd_svg+ffi vcd_svg 閘;
+  目檢=docs/e2e-report/wasm-demo-v3-svg-verified.png;vcd2svg --help。
 - **KR1.2 回归闸机械化(≥80% 断言入 cargo test)**
   证据:`crates/vl-difftest/tests/regression_gate.rs`;`bash scripts/regress.sh` 全绿。
   期望文件常驻 → 无本机 oracle 也能跑闸。
