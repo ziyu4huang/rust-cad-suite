@@ -46,13 +46,13 @@ fi
 # goldens the native gate checks. Rebuilds pkg when core sources are newer.
 if command -v wasm-pack >/dev/null && command -v bun >/dev/null; then
     if [ ! -f crates/vl-wasm/pkg/vl_wasm_bg.wasm ] \
-       || [ -n "$(find crates/vl-sim/src crates/vl-syntax/src crates/rcs-diag/src crates/vl-wasm/src -name '*.rs' -newer crates/vl-wasm/pkg/vl_wasm_bg.wasm 2>/dev/null | head -1)" ]; then
+       || [ -n "$(find crates/vl-sim/src crates/vl-syntax/src crates/rcs-diag/src crates/vl-wasm/src crates/vl-vcd/src crates/vl-cli/src -name '*.rs' -newer crates/vl-wasm/pkg/vl_wasm_bg.wasm 2>/dev/null | head -1)" ]; then
         echo "== [extra] rebuilding wasm pkg (sources newer than pkg) =="
         wasm-pack build crates/vl-wasm --target web --out-dir pkg >/dev/null 2>&1 \
             || { echo "GATE FAIL: wasm-pack build"; fail=1; }
     fi
     if [ -f crates/vl-wasm/pkg/vl_wasm_bg.wasm ]; then
-        for t in run features vcd_parse; do
+        for t in run features vcd_parse vcd_svg; do
             bun crates/vl-wasm/wasm-test/$t.mjs >/tmp/wasm-gate-$t.out 2>&1 \
                 || { echo "GATE FAIL: wasm $t"; cat /tmp/wasm-gate-$t.out; fail=1; }
             tail -1 /tmp/wasm-gate-$t.out
@@ -88,6 +88,9 @@ if command -v bun >/dev/null && [ -f target/release/libvl_ffi.dylib ]; then
     bun crates/vl-ffi/bun-example/vcd_read.mjs >/tmp/ffi-vcd.out 2>&1 \
         || { echo "GATE FAIL: ffi vcd-read"; cat /tmp/ffi-vcd.out; fail=1; }
     echo "ffi vcd-read gate: $(grep -m1 PASS /tmp/ffi-vcd.out || echo MISSING)"
+    bun crates/vl-ffi/bun-example/vcd_svg.mjs >/tmp/ffi-svg.out 2>&1 \
+        || { echo "GATE FAIL: ffi vcd-svg"; cat /tmp/ffi-svg.out; fail=1; }
+    echo "ffi vcd-svg gate: $(grep -m1 PASS /tmp/ffi-svg.out || echo MISSING)"
 fi
 
 if [ "${1:-}" = "--with-record" ]; then
