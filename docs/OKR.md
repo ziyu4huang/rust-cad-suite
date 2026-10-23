@@ -11,10 +11,10 @@
   证据:`cargo run -p vl-difftest`(exit 0,== 55/55 ==);报告 [docs/e2e-report/index.html](e2e-report/index.html);
   期望文件 `corpus/e2e/*/expected.stdout` 已入 git。
 - **KR1.7 lint-only 差分軌(yosys tests/simple 收編,2026-10-23 立)**
-  當前:**77/87 = 88.5%**(首輪 44→二輪 73→三輪 77=u128 單 limb 擴寬 ADR-0006;case_large/dynslice/partsel 翻綠)。
+  當前:**80/87 = 92.0%**(首輪 44→二輪 73→三輪 77=u128 ADR-0006→四輪 80=IndexedPart lvalue+埠屬性+defparam 三修)。
   證據:`bash scripts/lint_diff.sh corpus-external/yosys-simple corpus-external/yosys-simple/LINT-DIFF.tsv`
   (oracle=verilator --lint-only -Wno-fatal,判決只看 error 級);TSV 已入 git;
-  餘 9 差異=>128 位三檔(多 limb 未來 ADR)/multiplier lvalue/mem_arst/paramods/intra-assign/reals/字串。
+  餘 6 差異=>128 位三檔(多 limb 未來 ADR)/intra-assign/reals/字串(全 M8)。
   sv-tests 第三批 260 檔(ISC)=資訊值:81/260,多數為 SV-only 語法(logic/typedef/fill),非 V2005 範圍。
 - **KR1.8 VCD 單一核心三面共用(agentic web 整合軌,2026-10-23 立)**
   當前:✅ vl-vcd(writer+reader)為 CLI/wasm/FFI/difftest 唯一 VCD 實作;JS 手搓 parser 已退役。

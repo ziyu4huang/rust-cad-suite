@@ -125,6 +125,7 @@ impl<'d> Parser<'d> {
         if self.eat_punct(Punct::RParen) {
             return Ok((Vec::new(), true));
         }
+        self.skip_attrs(); // a leading attribute does not make the list non-ANSI
         let ansi = self.peek_starts_port_spec();
         let mut ports = Vec::new();
         if ansi {
@@ -134,6 +135,7 @@ impl<'d> Parser<'d> {
             let mut cur_signed = false;
             let mut cur_range: Option<ast::Range> = None;
             'groups: loop {
+                self.skip_attrs(); // attributes may precede each port group
                 // Group specifiers; omitted ones inherit the previous group
                 // (LRM §12.3.3).
                 loop {

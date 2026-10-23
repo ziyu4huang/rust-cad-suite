@@ -34,11 +34,11 @@ if [ -x /opt/homebrew/bin/verilator ]; then
     lout=$(bash scripts/lint_diff.sh corpus-external/yosys-simple corpus-external/yosys-simple/LINT-DIFF.tsv 2>/dev/null | head -1)
     ln=$(printf '%s' "$lout" | sed -n 's/.*: \([0-9]*\)\/[0-9]* match.*/\1/p')
     [ -z "$ln" ] && ln=0
-    if [ "$ln" -lt 77 ]; then
-        echo "GATE FAIL: lint parity $ln/87 < committed baseline 77"
+    if [ "$ln" -lt 80 ]; then
+        echo "GATE FAIL: lint parity $ln/87 < committed baseline 80"
         fail=1
     else
-        echo "lint parity: $ln/87 (baseline 77)"
+        echo "lint parity: $ln/87 (baseline 80)"
     fi
 fi
 

@@ -154,6 +154,12 @@ pub struct Sim {
     /// union-find alias groups: root → all member names (VCD records each).
     pub(crate) alias_groups: HashMap<String, Vec<String>>,
     pub(crate) vcd: Option<vl_vcd::VcdWriter>,
+    /// Collected defparam overrides, keyed by `scope.innermost() + instance
+    /// name` (same string elab_instance derives as child_prefix minus the
+    /// trailing dot — both sides use innermost()+name). Collected before any
+    /// instance elaborates because defparams may follow their target in
+    /// source order (IEEE 1364-2005 §12.2.1; yosys paramods.v relies on it).
+    defparams: std::collections::HashMap<String, std::collections::HashMap<String, (Bits, bool)>>,
     dump_path: Option<String>,
     /// Simulation precision, for the VCD `$timescale` header.
     prec_name: &'static str,
@@ -248,6 +254,18 @@ impl GateInst {
             }
         };
         Ok(GateInst { kind, outs, ins })
+    }
+}
+
+/// Dotted path of a defparam target (`inc_a.step` → ["inc_a", "step"]).
+fn defparam_path(e: &ast::Expr) -> SResult<Vec<String>> {
+    match e {
+        ast::Expr::Ident { name, .. } => Ok(vec![name.clone()]),
+        ast::Expr::HierIdent { parts, .. } => Ok(parts.clone()),
+        _ => Err(SimError::at(
+            "defparam target must be a dotted name",
+            e.span(),
+        )),
     }
 }
 
@@ -400,6 +418,7 @@ impl Sim {
             dumpable: std::collections::BTreeSet::new(),
             alias_groups: HashMap::new(),
             vcd: None,
+            defparams: Default::default(),
             dump_path: None,
             prec_name,
             gates: Vec::new(),
@@ -575,6 +594,30 @@ impl Sim {
                     | ast::ModuleItem::GenCase { .. }
             ) {
                 self.elab_item(it, scope)?;
+            }
+        }
+        // Defparams first: they may appear after their target instance in
+        // source order, and the override must be visible when the instance
+        // elaborates. Keyed by scope so nested elaborations cannot see a
+        // parent module's defparams.
+        for it in &m.items {
+            if let ast::ModuleItem::Defparam(pairs) = it {
+                for pair in pairs {
+                    let parts = defparam_path(&pair.lhs)?;
+                    let [inst, param] = parts.as_slice() else {
+                        return Err(SimError::at(
+                            "defparam beyond `instance.param` is not yet supported",
+                            pair.span,
+                        ));
+                    };
+                    let pe = self.prefix_expr(&pair.rhs, scope)?;
+                    let (bits, signed) = eval(&pe, self)?.to_bits(pair.rhs.span())?;
+                    let key = format!("{}{inst}", scope.innermost());
+                    self.defparams
+                        .entry(key)
+                        .or_default()
+                        .insert(param.clone(), (bits, signed));
+                }
             }
         }
         for it in &m.items {
@@ -1120,12 +1163,9 @@ impl Sim {
                 _ => self.elab_var_decl(d, scope)?,
             },
             ast::ModuleItem::Function(_) | ast::ModuleItem::Task(_) => {}
-            ast::ModuleItem::Defparam(_) => {
-                return Err(SimError::at(
-                    "defparam is not yet supported (use #(.PARAM()) instance overrides)",
-                    it_span(it),
-                ))
-            }
+            // Defparams are collected (and applied) in the module-level
+            // pre-pass before instances elaborate; nothing per-item here.
+            ast::ModuleItem::Defparam(_) => {}
             ast::ModuleItem::Empty => {}
         }
         Ok(())
@@ -1194,6 +1234,18 @@ impl Sim {
             let child_scope = Scope::new(child_prefix.clone());
             let mut overrides: HashMap<String, Bits> = HashMap::new();
             let mut ovs_signed: HashMap<String, bool> = HashMap::new();
+            // defparam wins over #(...) when both target the same parameter
+            // (the defparam pre-pass collected this map before elaboration).
+            if let Some(dp) = self.defparams.get(&format!(
+                "{}{}",
+                scope.innermost(),
+                unit.name
+            )) {
+                for (k, (bits, signed)) in dp {
+                    overrides.insert(k.clone(), *bits);
+                    ovs_signed.insert(k.clone(), *signed);
+                }
+            }
             if !inst.params.is_empty() {
                 let named: Vec<&ast::ParamConn> =
                     inst.params.iter().filter(|p| p.name.is_some()).collect();
@@ -2107,6 +2159,41 @@ impl Sim {
                 };
                 self.write_base(base, cur2, cs)
             }
+            Expr::IndexedPart {
+                base,
+                offset,
+                width,
+                plus,
+                ..
+            } => {
+                // IEEE 1364-2005 §4.2.1: b[off +: W] = [off+W-1 : off];
+                // b[off -: W] = [off : off-W+1].
+                let (cur, cs) = self.read_lvalue_base(base)?;
+                let (o, _) = eval(offset, self)?.to_bits(offset.span())?;
+                let (wd, _) = eval(width, self)?.to_bits(width.span())?;
+                if o.has_unknown() || wd.has_unknown() {
+                    return Ok(());
+                }
+                let base_pos = eval::bit_position(base, o.to_i64_lossy(), self);
+                let w = wd.to_i64_lossy();
+                let (hi, lo) = match (base_pos, *plus) {
+                    (Some(b), true) => (b + w - 1, b),
+                    (Some(b), false) => (b, b - w + 1),
+                    (None, _) => (i64::MIN, i64::MIN),
+                };
+                let cur2 = match (hi, lo) {
+                    (h, l)
+                        if h >= 0
+                            && l >= 0
+                            && h >= l
+                            && (h as u32) < cur.width =>
+                    {
+                        cur.set_part(h as u32, l as u32, &bits)?
+                    }
+                    _ => cur,
+                };
+                self.write_base(base, cur2, cs)
+            }
             Expr::PartSelect {
                 base,
                 msb,
@@ -2195,6 +2282,11 @@ impl Sim {
                 let (m, _) = eval(msb, self)?.to_bits(msb.span())?;
                 let (l, _) = eval(lsb, self)?.to_bits(lsb.span())?;
                 Ok((m.to_i64_lossy() - l.to_i64_lossy()).unsigned_abs() as u32 + 1)
+            }
+            Expr::IndexedPart { offset, width, .. } => {
+                let (wb, _) = eval(width, self)?.to_bits(width.span())?;
+                let _ = eval(offset, self)?.to_bits(offset.span())?;
+                Ok(wb.to_u64_lossy() as u32)
             }
             Expr::Concat { parts, .. } => {
                 let mut w = 0;
@@ -3009,24 +3101,6 @@ fn stmt_span(s: &Stmt) -> Span {
         | Stmt::SubCall { span, .. }
         | Stmt::Disable { span, .. }
         | Stmt::Null { span } => *span,
-    }
-}
-
-fn it_span(it: &ast::ModuleItem) -> Span {
-    match it {
-        ast::ModuleItem::Decl(d) => d.span,
-        ast::ModuleItem::ContAssign(p) | ast::ModuleItem::Defparam(p) => {
-            p.first().map(|x| x.span).unwrap_or_default()
-        }
-        ast::ModuleItem::Always { span, .. } | ast::ModuleItem::Initial { span, .. } => *span,
-        ast::ModuleItem::Instance(i) => i.span,
-        ast::ModuleItem::GenerateRegion(items) => items.first().map(it_span).unwrap_or_default(),
-        ast::ModuleItem::GenIf { span, .. }
-        | ast::ModuleItem::GenFor { span, .. }
-        | ast::ModuleItem::GenCase { span, .. }
-        | ast::ModuleItem::GenBlock { span, .. } => *span,
-        ast::ModuleItem::Function(f) | ast::ModuleItem::Task(f) => f.span,
-        ast::ModuleItem::Empty => Span::default(),
     }
 }
 
