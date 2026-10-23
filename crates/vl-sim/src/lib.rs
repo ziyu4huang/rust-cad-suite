@@ -6,7 +6,6 @@
 pub mod eval;
 pub mod interp;
 pub mod value;
-pub mod vcd;
 pub mod vpi;
 
 pub use eval::{Val, SimError};

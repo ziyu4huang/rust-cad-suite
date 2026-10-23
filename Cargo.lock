@@ -145,6 +145,7 @@ version = "0.1.0"
 dependencies = [
  "rcs-diag",
  "vl-syntax",
+ "vl-vcd",
 ]
 
 [[package]]
@@ -153,6 +154,10 @@ version = "0.1.0"
 dependencies = [
  "rcs-diag",
 ]
+
+[[package]]
+name = "vl-vcd"
+version = "0.1.0"
 
 [[package]]
 name = "vl-wasm"

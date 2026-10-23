@@ -153,7 +153,7 @@ pub struct Sim {
     dumpable: std::collections::BTreeSet<String>,
     /// union-find alias groups: root → all member names (VCD records each).
     pub(crate) alias_groups: HashMap<String, Vec<String>>,
-    pub(crate) vcd: Option<crate::vcd::VcdWriter>,
+    pub(crate) vcd: Option<vl_vcd::VcdWriter>,
     dump_path: Option<String>,
     /// Simulation precision, for the VCD `$timescale` header.
     prec_name: &'static str,
@@ -499,12 +499,19 @@ impl Sim {
                 }
             }
         }
+        // Functions/tasks register eagerly (constant functions are legal in
+        // port ranges and decl inits, so they must be callable before the
+        // decl pass lowers those). A body may reference module-level
+        // variables declared later, so an eager registration failure is NOT
+        // fatal: the late loop below re-registers everything after the decl
+        // pass, and only failures there are real errors.
         for it in &m.items {
-            if let ast::ModuleItem::Function(f) = it {
-                self.register_func(f, scope)?;
-            } else if let ast::ModuleItem::Task(t) = it {
-                self.register_task(t, scope)?;
-            }
+            let r = match it {
+                ast::ModuleItem::Function(f) => self.register_func(f, scope),
+                ast::ModuleItem::Task(t) => self.register_task(t, scope),
+                _ => Ok(()),
+            };
+            let _ = r;
         }
         // ANSI header ports are declarations too — register any that no item
         // declared (non-ANSI ports get their cells from dir-decl items).
@@ -547,6 +554,9 @@ impl Sim {
                 }
             }
         }
+        // Authoritative function/task registration: module-level variables
+        // all exist by now, so body lowering here sees the full name space
+        // (the eager pass above may have failed and is overwritten).
         for it in &m.items {
             match it {
                 ast::ModuleItem::Function(f) => self.register_func(f, scope)?,
@@ -1356,10 +1366,6 @@ impl Sim {
     }
 
     fn resolve_name(&self, name: &str, scope: &Scope) -> Option<String> {
-        if std::env::var_os("RCS_DEBUG_RESOLVE").is_some() && name.contains(".") {
-            let keys: Vec<&String> = self.cells.keys().take(30).collect();
-            eprintln!("DBG resolve {name} chain={:?} keys={keys:?}", scope.chain);
-        }
         for p in scope.chain.iter().rev() {
             let cand = format!("{p}{name}");
             if self.cells.contains_key(&cand)
@@ -1958,10 +1964,10 @@ impl Sim {
                 match self.alias_groups.get(&root) {
                     Some(members) => {
                         for m in members {
-                            w.record_change(m, stored);
+                            w.record_change(m, &stored.fmt_bin());
                         }
                     }
-                    None => w.record_change(&root, stored),
+                    None => w.record_change(&root, &stored.fmt_bin()),
                 }
             }
         }
@@ -1989,7 +1995,7 @@ impl Sim {
                     Some((n.clone(), n.split('.').map(|s| s.to_string()).collect(), w))
                 })
                 .collect();
-            let mut w = crate::vcd::VcdWriter::new(vars, self.prec_name);
+            let mut w = vl_vcd::VcdWriter::new(vars, self.prec_name);
             w.start();
             self.vcd = Some(w);
         }
@@ -2002,19 +2008,19 @@ impl Sim {
         }
     }
 
-    fn vcd_snapshot(&mut self) -> std::collections::BTreeMap<String, Bits> {
+    fn vcd_snapshot(&mut self) -> std::collections::BTreeMap<String, String> {
         let names: Vec<String> = self.dumpable.iter().cloned().collect();
         let mut m = std::collections::BTreeMap::new();
         for n in names {
             if let Some((root, wi)) = self.mem_elems.get(&n) {
                 if let Some(mem) = self.cells.get(root).and_then(|c| c.mem.as_ref()) {
-                    m.insert(n, mem.words[*wi].clone());
+                    m.insert(n, mem.words[*wi].fmt_bin());
                 }
                 continue;
             }
             let root = self.find(&n);
             if let Some(c) = self.cells.get(&root) {
-                m.insert(n, c.bits);
+                m.insert(n, c.bits.fmt_bin());
             }
         }
         m
@@ -2074,7 +2080,7 @@ impl Sim {
                         }
                         if let Some(w) = self.vcd.as_mut() {
                             if w.started() {
-                                w.record_change(&format!("{root}[{}]", lsb + wi), word);
+                                w.record_change(&format!("{root}[{}]", lsb + wi), &word.fmt_bin());
                             }
                         }
                         return Ok(());
@@ -2733,7 +2739,7 @@ impl Sim {
                         let c = self.cells.get(&root).unwrap();
                         c.mem.as_ref().unwrap().words[wi].clone()
                     };
-                    w.record_change(&format!("{root}[{}]", lsb + wi as i64), val);
+                    w.record_change(&format!("{root}[{}]", lsb + wi as i64), &val.fmt_bin());
                 }
             }
         }

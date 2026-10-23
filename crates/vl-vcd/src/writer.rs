@@ -1,14 +1,18 @@
-//! VCD value-change dump writer (IEEE 1364-2005 §18) — M6.
+//! VCD value-change dump writer (IEEE 1364-2005 §18).
 //!
 //! Dump policy: variables are all elaborated net/reg/integer cells (params,
-//! genvars and function/task statics are excluded at registration time);
-//! ids are assigned in sorted-path order so output is deterministic. Change
-//! emission is per-time-slot: the scheduler flushes everything that changed
-//! while processing time T under a single `#T` header (combinational settling
-//! inside a slot collapses to the final value — that is also what the oracle's
-//! dump does, and what the alias-folding crosscheck compares).
+//! genvars and function/task statics are excluded at registration time by the
+//! simulator); ids are assigned in sorted-path order so output is
+//! deterministic. Change emission is per-time-slot: the scheduler flushes
+//! everything that changed while processing time T under a single `#T` header
+//! (combinational settling inside a slot collapses to the final value — that
+//! is also what the oracle's dump does, and what the alias-folding crosscheck
+//! compares).
+//!
+//! Values are 4-state bit strings MSB-first (`"0101xz"`; scalars are one
+//! char). The simulator's `Bits` maps 1:1 onto these strings per width, so
+//! byte output is unchanged from when this module lived inside vl-sim.
 
-use crate::value::Bits;
 use std::collections::BTreeMap;
 
 pub struct VcdWriter {
@@ -16,8 +20,8 @@ pub struct VcdWriter {
     vars: Vec<(String, Vec<String>, u32)>,
     ids: BTreeMap<String, String>,
     body: String,
-    last: BTreeMap<String, Bits>,
-    pending: BTreeMap<String, Bits>,
+    last: BTreeMap<String, String>,
+    pending: BTreeMap<String, String>,
     now_emitted: Option<u64>,
     started: bool,
     header_done: bool,
@@ -70,9 +74,9 @@ impl VcdWriter {
         self.started
     }
 
-    pub fn record_change(&mut self, name: &str, bits: Bits) {
+    pub fn record_change(&mut self, name: &str, value: &str) {
         if self.started {
-            self.pending.insert(name.to_string(), bits);
+            self.pending.insert(name.to_string(), value.to_string());
         }
     }
 
@@ -113,28 +117,19 @@ impl VcdWriter {
         h
     }
 
-    fn value_line(&self, name: &str, bits: &Bits) -> Option<String> {
+    fn value_line(&self, name: &str, value: &str) -> Option<String> {
         let id = self.ids.get(name)?;
-        if bits.width == 1 {
-            let c = if bits.mask & 1 != 0 {
-                if bits.data & 1 != 0 {
-                    'z'
-                } else {
-                    'x'
-                }
-            } else if bits.data & 1 != 0 {
-                '1'
-            } else {
-                '0'
-            };
+        let w = self.vars.iter().find(|(n, _, _)| n == name)?.2;
+        if w == 1 {
+            let c = value.chars().next()?;
             Some(format!("{c}{id}\n"))
         } else {
-            Some(format!("b{} {id}\n", bits.fmt_bin()))
+            Some(format!("b{value} {id}\n"))
         }
     }
 
     /// `#0` initialization dump (`$dumpvars` block).
-    pub fn dump_t0(&mut self, values: &BTreeMap<String, Bits>) {
+    pub fn dump_t0(&mut self, values: &BTreeMap<String, String>) {
         if !self.started || self.header_done {
             return;
         }
@@ -144,11 +139,11 @@ impl VcdWriter {
         self.body.push_str("#0\n$dumpvars\n");
         let names: Vec<String> = self.vars.iter().map(|v| v.0.clone()).collect();
         for name in names {
-            if let Some(bits) = values.get(&name) {
-                if let Some(line) = self.value_line(&name, bits) {
+            if let Some(value) = values.get(&name) {
+                if let Some(line) = self.value_line(&name, value) {
                     self.body.push_str(&line);
                 }
-                self.last.insert(name, *bits);
+                self.last.insert(name, value.clone());
             }
         }
         self.body.push_str("$end\n");
@@ -164,14 +159,14 @@ impl VcdWriter {
         }
         let pending = std::mem::take(&mut self.pending);
         let mut lines = String::new();
-        for (name, bits) in &pending {
-            if self.last.get(name) == Some(bits) {
+        for (name, value) in &pending {
+            if self.last.get(name) == Some(value) {
                 continue;
             }
-            if let Some(line) = self.value_line(name, bits) {
+            if let Some(line) = self.value_line(name, value) {
                 lines.push_str(&line);
             }
-            self.last.insert(name.clone(), *bits);
+            self.last.insert(name.clone(), value.clone());
         }
         if lines.is_empty() {
             return;
@@ -217,12 +212,12 @@ mod tests {
         let mut w = VcdWriter::new(vars, "1ps");
         w.start();
         let mut vals = BTreeMap::new();
-        vals.insert("clk".to_string(), Bits::from_u64(1, 0).unwrap());
-        vals.insert("dut.q".to_string(), Bits::from_u64(8, 3).unwrap());
+        vals.insert("clk".to_string(), "0".to_string());
+        vals.insert("dut.q".to_string(), "00000011".to_string());
         w.dump_t0(&vals);
-        w.record_change("clk", Bits::from_u64(1, 1).unwrap());
+        w.record_change("clk", "1");
         w.flush_at(5000);
-        w.record_change("clk", Bits::from_u64(1, 1).unwrap()); // no change
+        w.record_change("clk", "1"); // no change
         w.flush_at(6000);
         let out = w.finish();
         assert!(out.contains("$scope module dut $end\n$var wire 8 \" q $end\n$upscope $end"));
@@ -230,5 +225,17 @@ mod tests {
         assert!(out.contains("#0\n$dumpvars\n0!\nb00000011 \"\n$end\n"));
         assert!(out.contains("#5000\n1!\n"));
         assert!(!out.contains("#6000"), "unchanged values emit nothing");
+    }
+
+    #[test]
+    fn four_state_values_round_trip() {
+        let vars = vec![("dut.z".to_string(), vec!["dut".into(), "z".into()], 4u32)];
+        let mut w = VcdWriter::new(vars, "1ps");
+        w.start();
+        let mut vals = BTreeMap::new();
+        vals.insert("dut.z".to_string(), "xz01".to_string());
+        w.dump_t0(&vals);
+        let out = w.finish();
+        assert!(out.contains("bxz01 !"));
     }
 }

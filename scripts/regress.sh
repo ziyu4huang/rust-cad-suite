@@ -14,7 +14,8 @@ cargo test 2>&1 | grep -qE "FAILED" && { echo "GATE FAIL: cargo test FAILED"; fa
 cargo test 2>&1 | grep -cE "test result: ok" >/dev/null || { echo "GATE FAIL: no green suites"; fail=1; }
 
 echo "== [3/4] E2E differential suite (vs committed oracle expectations) =="
-if ! out=$(./target/debug/vl-difftest 2>&1); then
+# Exact-count gate: 2/57 slips silently under a 80% threshold (1023 func-regression lesson).
+if ! out=$(./target/debug/vl-difftest --min-pass 100 2>&1); then
     echo "$out" | grep -E "^FAIL|^=="
     echo "GATE FAIL: e2e below min-pass"
     fail=1
@@ -33,11 +34,11 @@ if [ -x /opt/homebrew/bin/verilator ]; then
     lout=$(bash scripts/lint_diff.sh corpus-external/yosys-simple corpus-external/yosys-simple/LINT-DIFF.tsv 2>/dev/null | head -1)
     ln=$(printf '%s' "$lout" | sed -n 's/.*: \([0-9]*\)\/[0-9]* match.*/\1/p')
     [ -z "$ln" ] && ln=0
-    if [ "$ln" -lt 73 ]; then
-        echo "GATE FAIL: lint parity $ln/87 < committed baseline 73"
+    if [ "$ln" -lt 74 ]; then
+        echo "GATE FAIL: lint parity $ln/87 < committed baseline 74"
         fail=1
     else
-        echo "lint parity: $ln/87 (baseline 73)"
+        echo "lint parity: $ln/87 (baseline 74)"
     fi
 fi
 

@@ -4,6 +4,7 @@ members = [
     "crates/rcs-diag",
     "crates/vl-syntax",
     "crates/vl-sim",
+    "crates/vl-vcd",
     "crates/vl-cli",
     "crates/vl-difftest",
     "crates/vl-wasm",
@@ -20,6 +21,7 @@ authors = ["rust-cad-suite contributors"]
 rcs-diag = { path = "crates/rcs-diag" }
 vl-syntax = { path = "crates/vl-syntax" }
 vl-sim = { path = "crates/vl-sim" }
+vl-vcd = { path = "crates/vl-vcd" }
 vl-cli = { path = "crates/vl-cli" }
 wasm-bindgen = "0.2"
 js-sys = "0.3"

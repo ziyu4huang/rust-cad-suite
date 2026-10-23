@@ -8,3 +8,4 @@ license.workspace = true
 [dependencies]
 vl-syntax = { workspace = true }
 rcs-diag = { workspace = true }
+vl-vcd = { workspace = true }

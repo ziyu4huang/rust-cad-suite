@@ -528,7 +528,7 @@ impl Sim {
             }
             if let Some(w) = self.vcd.as_mut() {
                 if w.started() {
-                    w.record_change(&format!("{canon}[{}]", wi), word.clone());
+                    w.record_change(&format!("{canon}[{}]", wi), &word.fmt_bin());
                 }
             }
             let idx = self.vpi.index.get(&name).copied();

@@ -1,0 +1,11 @@
+[package]
+name = "vl-vcd"
+version = "0.1.0"
+edition = "2021"
+description = "Shared VCD core (writer + reader) for rverilator — one implementation behind the native CLI, Bun FFI and wasm facades"
+license = "MIT"
+
+# Deliberately dependency-free: every facade (vl-sim, vl-wasm, vl-ffi,
+# vl-difftest) consumes this crate, so nothing here may pull the tree in
+# the other direction (ADR-0004).
+[dependencies]
