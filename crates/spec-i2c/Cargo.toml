@@ -1,0 +1,12 @@
+[package]
+name = "spec-i2c"
+description = "Spec-verification demonstration: clean-room I2C master, golden model, protocol invariants (ADR-0007)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+vl-spec = { workspace = true }
+vl-sim = { workspace = true }
+rcs-diag = { workspace = true }

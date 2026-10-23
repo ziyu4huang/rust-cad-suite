@@ -302,7 +302,15 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                 };
                 ext(r, false, w)
             }
-            UnOp::BitNot => Ok(eval_w(expr, ctx, w, signed)?.bit_not()),
+            UnOp::BitNot => {
+                // IEEE 1364-2005 Table 5-22: the ~ operand is
+                // self-determined — it is evaluated at its own width and the
+                // RESULT (operand width) is what the context extends.
+                // Context-widening the operand first inverts zero-padding
+                // (e.g. ~a[7] in an 8-bit context turned 1 into 8'hfe).
+                let (b, _) = eval(expr, ctx)?.to_bits(*span)?;
+                ext(b.bit_not(), false, w)
+            }
             UnOp::Plus => eval_w(expr, ctx, w, signed),
             UnOp::Minus => {
                 let b = eval_w(expr, ctx, w, signed)?;

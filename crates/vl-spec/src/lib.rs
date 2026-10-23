@@ -163,6 +163,10 @@ pub struct LockstepSpec<M: GoldenModel> {
     invariants: Vec<Box<dyn Invariant>>,
     violations: Vec<SpecViolation>,
     cycle: u64,
+    /// Optional post-half hook: runs after both clock halves have drained,
+    /// before invariants — bus models refresh levels here so invariants see
+    /// the bus as of the real edges.
+    post: Option<Box<dyn Fn(&mut Sim, &Signals)>>,
 }
 
 impl<M: GoldenModel> LockstepSpec<M> {
@@ -185,7 +189,14 @@ impl<M: GoldenModel> LockstepSpec<M> {
             invariants: Vec::new(),
             violations: Vec::new(),
             cycle: 0,
+            post: None,
         })
+    }
+
+    /// Register the post-half refresh hook (see the field doc).
+    pub fn post(mut self, f: impl Fn(&mut Sim, &Signals) + 'static) -> Self {
+        self.post = Some(Box::new(f));
+        self
     }
 
     pub fn signals(&mut self) -> &mut Signals {
@@ -205,6 +216,17 @@ impl<M: GoldenModel> LockstepSpec<M> {
     /// errors).
     pub fn put_int(&mut self, id: SignalId, v: i64) -> Result<(), SpecError> {
         self.sigs.put_int(&mut self.sim, id, v)
+    }
+
+    /// Read an integral signal (field-disjoint accessor: no borrow split
+    /// between signals/sim at call sites).
+    pub fn read_u64(&self, id: SignalId) -> u64 {
+        self.sigs.u64(&self.sim, id).unwrap_or(u64::MAX)
+    }
+
+    /// Write an integral signal.
+    pub fn write_int(&mut self, id: SignalId, v: i64) {
+        let _ = self.sigs.put_int(&mut self.sim, id, v);
     }
 
     /// Advance to an absolute time (init sequences between reset and the
@@ -274,6 +296,12 @@ impl<M: GoldenModel> LockstepSpec<M> {
                 .map_err(|e| SpecError(format!("negedge half: {}", e.message)))?,
         };
         self.model.step(input);
+
+        if let Some(post) = &self.post {
+            let sim = &mut self.sim;
+            let sigs = &self.sigs;
+            post(sim, sigs);
+        }
 
         // Projection comparison (the lockstep leg).
         let expected = self.model.observe();
