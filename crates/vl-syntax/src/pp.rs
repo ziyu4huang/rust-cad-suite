@@ -675,6 +675,26 @@ impl<'a> Pp<'a> {
     }
 
     fn finish(mut self) -> PpOutput {
+        // Macro expansion immediately followed by `'base...` forms a sized
+        // based literal (`` `SIZE'ha `` -> `8'ha`): merge the IntLit the
+        // macro produced with the width-less BasedLit token.
+        let mut out: Vec<Token> = Vec::with_capacity(self.out.len());
+        for t in std::mem::take(&mut self.out) {
+            let merge = match (out.last().map(|p| &p.kind), &t.kind) {
+                (Some(Tok::IntLit), Tok::BasedLit) => {
+                    t.text.starts_with("\'")
+                }
+                _ => false,
+            };
+            if merge {
+                let prev = out.pop().unwrap();
+                let joined = format!("{}{}", prev.text, t.text);
+                out.push(Token::new(Tok::BasedLit, prev.span.merge(t.span), joined));
+            } else {
+                out.push(t);
+            }
+        }
+        self.out = out;
         // All per-file Eofs were dropped in run(); append exactly one.
         let eof_span = self
             .out

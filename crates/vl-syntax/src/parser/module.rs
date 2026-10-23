@@ -179,6 +179,7 @@ impl<'d> Parser<'d> {
                 };
                 // One or more names in this group.
                 loop {
+                    self.skip_attrs();
                     let (name, nspan) = self.expect_ident("port name")?;
                     ports.push(ast::Port {
                         span: nspan,
@@ -660,17 +661,30 @@ impl<'d> Parser<'d> {
         }
     }
 
+    /// `if (c) begin ... end` / `for (..) begin ... end`: gen_items wraps
+    /// the begin-block as a GenBlock, but the construct's implicit genblk
+    /// already names that scope — splice a single unnamed block's items
+    /// through so only one level exists.
+    fn splice_unnamed_block(items: Vec<ModuleItem>) -> Vec<ModuleItem> {
+        if items.len() == 1 {
+            if let ModuleItem::GenBlock { name: None, items: inner, .. } = &items[0] {
+                return inner.clone();
+            }
+        }
+        items
+    }
+
     fn gen_if(&mut self) -> PResult<ModuleItem> {
         let start = self.expect_kw(Kw::If, "for generate-if")?;
         self.expect_punct(Punct::LParen, "after `if`")?;
         let cond = self.expr()?;
         self.expect_punct(Punct::RParen, "after generate-if condition")?;
-        let then = self.gen_items()?;
+        let then = Self::splice_unnamed_block(self.gen_items()?);
         let els = if self.eat_kw(Kw::Else) {
             if self.at_kw(Kw::If) {
                 Some(vec![self.gen_if()?])
             } else {
-                Some(self.gen_items()?)
+                Some(Self::splice_unnamed_block(self.gen_items()?))
             }
         } else {
             None
@@ -714,6 +728,7 @@ impl<'d> Parser<'d> {
             Some(ModuleItem::GenBlock { name, .. }) => name.clone(),
             _ => None,
         };
+        let items = Self::splice_unnamed_block(items);
         let end = items.last().map(item_span).unwrap_or(init.span());
         Ok(ModuleItem::GenFor {
             span: start.merge(end),
@@ -743,7 +758,7 @@ impl<'d> Parser<'d> {
             }
             if self.eat_kw(Kw::Default) {
                 self.eat_punct(Punct::Colon);
-                default = Some(self.gen_items()?);
+                default = Some(Self::splice_unnamed_block(self.gen_items()?));
                 continue;
             }
             let mut labels = vec![self.expr()?];
@@ -751,7 +766,7 @@ impl<'d> Parser<'d> {
                 labels.push(self.expr()?);
             }
             self.expect_punct(Punct::Colon, "after generate case labels")?;
-            let its = self.gen_items()?;
+            let its = Self::splice_unnamed_block(self.gen_items()?);
             items.push((labels, its));
         }
         let end = self.expect_kw(Kw::Endcase, "to close generate case")?;

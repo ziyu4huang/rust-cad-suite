@@ -97,6 +97,7 @@ impl<'d> Parser<'d> {
     }
 
     fn primary(&mut self) -> PResult<Expr> {
+        self.skip_attrs();
         let t = self.peek().clone();
         match t.kind {
             Tok::IntLit => {
@@ -372,6 +373,20 @@ pub fn parse_based(text: &str, span: rcs_diag::Span) -> NumLit {
         Some(b's') | Some(b'S') => (true, &rest[1..]),
         _ => (false, rest),
     };
+    // Fill literal `'0 `'1 `'x `'z`: 1-bit signed — sign extension fills
+    // the context width (zeros/all-ones/all-x/all-z respectively).
+    if width.is_none()
+        && rest.len() == 1
+        && matches!(rest, "0" | "1" | "x" | "X" | "z" | "Z")
+    {
+        return NumLit {
+            span,
+            width: None,
+            signed: true,
+            base: Base::Bin,
+            digits: rest.to_ascii_lowercase(),
+        };
+    }
     let (base, digits) = match rest.chars().next() {
         Some(c) if c.to_ascii_lowercase() == 'd' => (Base::Dec, &rest[1..]),
         Some(c) if c.to_ascii_lowercase() == 'b' => (Base::Bin, &rest[1..]),

@@ -9,7 +9,7 @@ attrib01_module.v	0	0	match-accept
 attrib02_port_decl.v	0	0	match-accept
 attrib03_parameter.v	0	0	match-accept
 attrib04_net_var.v	0	0	match-accept
-attrib06_operator_suffix.v	1	0	OURS-ONLY-REJECT
+attrib06_operator_suffix.v	0	0	match-accept
 attrib08_mod_inst.v	0	0	match-accept
 attrib09_case.v	0	0	match-accept
 carryadd.v	0	0	match-accept
@@ -17,7 +17,7 @@ case_expr_const.v	0	0	match-accept
 case_expr_non_const.v	0	0	match-accept
 case_large.v	1	0	OURS-ONLY-REJECT
 const_branch_finish.v	0	0	match-accept
-const_fold_func.v	0	0	match-accept
+const_fold_func.v	1	0	OURS-ONLY-REJECT
 const_func_shadow.v	1	0	OURS-ONLY-REJECT
 constmuldivmod.v	0	0	match-accept
 constpower.v	1	0	OURS-ONLY-REJECT
@@ -32,10 +32,10 @@ fsm.v	0	0	match-accept
 func_block.v	0	0	match-accept
 func_recurse.v	0	0	match-accept
 func_width_scope.v	1	1	match-reject
-genblk_collide.v	1	0	OURS-ONLY-REJECT
-genblk_dive.v	1	0	OURS-ONLY-REJECT
+genblk_collide.v	0	0	match-accept
+genblk_dive.v	0	0	match-accept
 genblk_order.v	0	0	match-accept
-genblk_port_shadow.v	1	0	OURS-ONLY-REJECT
+genblk_port_shadow.v	0	0	match-accept
 generate.v	1	0	OURS-ONLY-REJECT
 graphtest.v	0	0	match-accept
 hierarchy.v	0	0	match-accept
@@ -45,10 +45,10 @@ ifdef_1.v	0	0	match-accept
 ifdef_2.v	0	0	match-accept
 localparam_attr.v	0	0	match-accept
 loop_prefix_case.v	0	0	match-accept
-loop_var_shadow.v	1	0	OURS-ONLY-REJECT
+loop_var_shadow.v	0	0	match-accept
 loops.v	0	0	match-accept
 macro_arg_surrounding_spaces.v	0	0	match-accept
-macros.v	1	0	OURS-ONLY-REJECT
+macros.v	0	0	match-accept
 mem2reg.v	0	0	match-accept
 mem2reg_bounds_tern.v	0	0	match-accept
 mem_arst.v	1	0	OURS-ONLY-REJECT
@@ -58,7 +58,7 @@ module_scope_case.v	0	0	match-accept
 module_scope_func.v	1	1	match-reject
 multiplier.v	1	0	OURS-ONLY-REJECT
 muxtree.v	0	0	match-accept
-named_genblk.v	1	0	OURS-ONLY-REJECT
+named_genblk.v	0	0	match-accept
 nested_genblk_resolve.v	0	0	match-accept
 omsp_dbg_uart.v	0	0	match-accept
 operators.v	0	0	match-accept
@@ -71,7 +71,7 @@ repwhile.v	0	0	match-accept
 retime.v	0	0	match-accept
 rotate.v	0	0	match-accept
 scopes.v	0	0	match-accept
-sign_part_assign.v	1	0	OURS-ONLY-REJECT
+sign_part_assign.v	0	0	match-accept
 signed_full_slice.v	0	0	match-accept
 signedexpr.v	0	0	match-accept
 sincos.v	0	0	match-accept

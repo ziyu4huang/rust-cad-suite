@@ -394,6 +394,19 @@ impl<'a, 'd> Lexer<'a, 'd> {
             self.bump();
             text.push('s');
         }
+        // Fill literals `'0 `'1 `'x `'z` (upstream tolerates them in .v
+        // sources): encoded as a 1-bit SIGNED value — sign extension is
+        // exactly fill-to-context.
+        if width.is_none()
+            && matches!(
+                self.peek(0),
+                Some(b'0') | Some(b'1') | Some(b'x') | Some(b'X') | Some(b'z') | Some(b'Z')
+            )
+        {
+            let c = self.bump();
+            text.push(c as char);
+            return Token::new(Tok::BasedLit, self.span_from(start), text);
+        }
         // Only consume an ASCII base letter; a non-ASCII byte must not be
         // bumped (it would strand `pos` inside a UTF-8 sequence — fuzz find).
         let base_ch = match self.peek(0) {

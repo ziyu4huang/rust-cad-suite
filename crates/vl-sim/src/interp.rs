@@ -489,12 +489,21 @@ impl Sim {
                 },
             );
         }
-        // Pass 1b: item parameters, then nets/regs, then functions/tasks.
+        // Pass 1b: item parameters, then functions/tasks (constant
+        // functions are legal in port ranges and decl inits), then
+        // nets/regs.
         for it in &m.items {
             if let ast::ModuleItem::Decl(d) = it {
                 if matches!(d.kind, DeclKind::Parameter | DeclKind::Localparam) {
                     self.elab_param_decl(d, scope)?;
                 }
+            }
+        }
+        for it in &m.items {
+            if let ast::ModuleItem::Function(f) = it {
+                self.register_func(f, scope)?;
+            } else if let ast::ModuleItem::Task(t) = it {
+                self.register_task(t, scope)?;
             }
         }
         // ANSI header ports are declarations too — register any that no item
@@ -954,17 +963,37 @@ impl Sim {
             } => {
                 let pe = self.prefix_expr(cond, scope)?;
                 let (b, _) = eval(&pe, self)?.to_bits(cond.span())?;
-                let n = self.next_genblk(scope);
-                let sub = scope.push(format!("{}genblk{n}.", scope.innermost()));
-                if b.truthy()? == Some(true) {
-                    for it2 in then {
-                        self.elab_item(it2, &sub)?;
+                // IEEE 1364-2005 §12.4.3: a single NAMED begin-block as the
+                // whole branch is the scope itself — no implicit genblk.
+
+                let take_else = b.truthy()? != Some(true);
+                let raw: &[ast::ModuleItem] = if !take_else {
+                    then
+                } else {
+                    els.as_deref().unwrap_or(&[])
+                };
+                // A single named block contributes its INNER items under the
+                // block's own scope; anything else runs under an implicit
+                // genblk scope.
+                let (items, named): (Vec<ast::ModuleItem>, Option<String>) = match raw {
+                    [ast::ModuleItem::GenBlock { name: Some(n), items: inner, .. }] => {
+                        (inner.clone(), Some(n.clone()))
                     }
-                } else if let Some(els) = els {
-                    for it2 in els {
+                    other => (other.to_vec(), None),
+                };
+                if !items.is_empty() || !raw.is_empty() {
+                    let sub = match named {
+                        Some(n) => scope.push(format!("{}{n}.", scope.innermost())),
+                        None => {
+                            let n = self.next_genblk(scope);
+                            scope.push(format!("{}genblk{n}.", scope.innermost()))
+                        }
+                    };
+                    for it2 in &items {
                         self.elab_item(it2, &sub)?;
                     }
                 }
+
             }
             ast::ModuleItem::GenFor {
                 var,
@@ -1037,10 +1066,24 @@ impl Sim {
                 }
                 let picked = chosen.or(default.as_ref());
                 if let Some(its) = picked {
-                    let n = self.next_genblk(scope);
-                    let sub = scope.push(format!("{}genblk{n}.", scope.innermost()));
-                    for it2 in its {
-                        self.elab_item(it2, &sub)?;
+                    // IEEE 1364-2005 §12.4.3: when the branch is exactly one
+                    // NAMED begin-block, that block IS the scope — no
+                    // implicit genblk (references say `blk.x`, not
+                    // `genblkN.blk.x`).
+                    if let [ast::ModuleItem::GenBlock {
+                        name: Some(n), items: inner, ..
+                    }] = its.as_slice()
+                    {
+                        let sub = scope.push(format!("{}{n}.", scope.innermost()));
+                        for it2 in inner {
+                            self.elab_item(it2, &sub)?;
+                        }
+                    } else {
+                        let n = self.next_genblk(scope);
+                        let sub = scope.push(format!("{}genblk{n}.", scope.innermost()));
+                        for it2 in its {
+                            self.elab_item(it2, &sub)?;
+                        }
                     }
                 }
             }
@@ -1313,6 +1356,10 @@ impl Sim {
     }
 
     fn resolve_name(&self, name: &str, scope: &Scope) -> Option<String> {
+        if std::env::var_os("RCS_DEBUG_RESOLVE").is_some() && name.contains(".") {
+            let keys: Vec<&String> = self.cells.keys().take(30).collect();
+            eprintln!("DBG resolve {name} chain={:?} keys={keys:?}", scope.chain);
+        }
         for p in scope.chain.iter().rev() {
             let cand = format!("{p}{name}");
             if self.cells.contains_key(&cand)
