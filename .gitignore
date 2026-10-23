@@ -7,3 +7,4 @@ corpus-external/*
 *.vcd
 !corpus/**/*.vcd
 crates/vl-wasm/pkg/
+obj_dir/
