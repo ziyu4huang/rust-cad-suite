@@ -130,6 +130,15 @@ enum Flow {
     End,
 }
 
+/// Result of a stepwise [`Sim::run_until`] call.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunEnd {
+    /// Advanced to the deadline; the simulation can continue.
+    Running,
+    /// The design finished (`$finish`); further stepping is a no-op.
+    Finished,
+}
+
 pub struct Sim {
     pub(crate) parent: HashMap<String, String>,
     pub(crate) cells: HashMap<String, Cell>,
@@ -148,6 +157,11 @@ pub struct Sim {
     pub(crate) prec_fs: u64,
     out: String,
     pub(crate) finished: bool,
+    /// Stepwise scheduling state (ADR-0007): `run_until` composes with
+    /// `run()`; init (incl. the runnable seed) happens exactly once, and
+    /// EndOfSimulation fires exactly once per Sim.
+    sched_started: bool,
+    eos_fired: bool,
     genblk_counter: HashMap<String, u32>,
     /// Declared net/reg vars eligible for VCD dump (params/genvars/statics excluded).
     dumpable: std::collections::BTreeSet<String>,
@@ -414,6 +428,8 @@ impl Sim {
             prec_fs,
             out: String::new(),
             finished: false,
+            sched_started: false,
+            eos_fired: false,
             genblk_counter: HashMap::new(),
             dumpable: std::collections::BTreeSet::new(),
             alias_groups: HashMap::new(),
@@ -2401,11 +2417,57 @@ impl Sim {
     // ---------- the scheduler ----------
 
     pub fn run(&mut self) -> SResult<()> {
+        self.init_once()?;
+        match self.sched_loop(None)? {
+            RunEnd::Finished => Ok(()),
+            // Unreachable for a None deadline (a quiescent sim ends the run),
+            // but well-defined: a second run() on a started sim is an
+            // idempotent no-op rather than resuming processes past their
+            // waits (the pre-run_until behavior was undefined; REGISTRY D13).
+            RunEnd::Running => Ok(()),
+        }
+    }
+
+    /// Advance the simulation to `t` (absolute, precision ticks) and return.
+    /// Timers registered via rVPI AfterDelay pace time even when the design
+    /// has no `#`-delay events — that is what makes host-driven, testbench-
+    /// free verification possible (ADR-0007). Composes: `run()` after
+    /// `run_until` continues to completion without re-initializing.
+    pub fn run_until(&mut self, t: u64) -> SResult<RunEnd> {
+        if t <= self.now {
+            return Err(SimError::new(
+                format!("run_until deadline {t} <= current time {}", self.now),
+                None,
+            ));
+        }
+        self.init_once()?;
+        self.sched_loop(Some(t))
+    }
+
+    fn init_once(&mut self) -> SResult<()> {
+        if self.sched_started {
+            return Ok(());
+        }
+        self.sched_started = true;
         self.settle()?;
         self.wake_check()?;
         self.fire_start_of_simulation()?;
         self.drain_vc_callbacks()?;
         self.runnable = (0..self.procs.len()).collect();
+        Ok(())
+    }
+
+    /// EndOfSimulation must fire at most once per Sim (both `run()` exits
+    /// and stepwise completion route through here).
+    fn fire_eos_once(&mut self) -> SResult<()> {
+        if self.eos_fired {
+            return Ok(());
+        }
+        self.eos_fired = true;
+        self.fire_end_of_simulation()
+    }
+
+    fn sched_loop(&mut self, deadline: Option<u64>) -> SResult<RunEnd> {
         let mut budget: u64 = 0;
         loop {
             while let Some(pid) = self.runnable.pop_front() {
@@ -2423,8 +2485,8 @@ impl Sim {
             }
             if self.finished {
                 self.vcd_flush();
-                self.fire_end_of_simulation()?;
-                return Ok(());
+                self.fire_eos_once()?;
+                return Ok(RunEnd::Finished);
             }
             if !self.inactive.is_empty() {
                 self.runnable.extend(self.inactive.drain(..));
@@ -2440,23 +2502,53 @@ impl Sim {
                 self.drain_vc_callbacks()?;
                 continue;
             }
-            // End of this time slot: dump what changed, then advance.
+            // End of this time slot: dump what changed, then advance. The
+            // flush/drain always happen at the CURRENT now — changes made in
+            // this slot must be stamped with this slot's time, never with a
+            // deadline we are about to jump to.
             self.vcd_flush();
             self.drain_vc_callbacks()?;
             match self.delayed.keys().next().copied() {
-                Some(t) => {
-                    self.now = t;
+                Some(nt) => {
+                    // Timer deadlines pace time too (D17): without this, an
+                    // rVPI timer registered between two `#` events fires late
+                    // (at the event) instead of at its own time.
+                    let target = match self.vpi.timers.keys().next().copied() {
+                        Some(td) if td < nt => td,
+                        _ => nt,
+                    };
+                    if matches!(deadline, Some(t) if target > t) {
+                        self.now = deadline.unwrap();
+                        self.fire_due_timers()?;
+                        return Ok(RunEnd::Running);
+                    }
+                    self.now = target;
                     self.fire_due_timers()?;
-                    if let Some(v) = self.delayed.remove(&t) {
-                        for pid in v {
-                            self.procs[pid].state = PState::Runnable;
-                            self.runnable.push_back(pid);
+                    if target == nt {
+                        if let Some(v) = self.delayed.remove(&nt) {
+                            for pid in v {
+                                self.procs[pid].state = PState::Runnable;
+                                self.runnable.push_back(pid);
+                            }
                         }
                     }
                 }
                 None => {
-                    self.fire_end_of_simulation()?;
-                    return Ok(());
+                    match deadline {
+                        // Quiescent + deadline: time flows to the deadline
+                        // (a synchronous DUT legitimately has no `#` events
+                        // between host-driven edges — that must not end the
+                        // run).
+                        Some(t) => {
+                            self.now = t;
+                            self.fire_due_timers()?;
+                            return Ok(RunEnd::Running);
+                        }
+                        None => {
+                            self.fire_eos_once()?;
+                            return Ok(RunEnd::Finished);
+                        }
+                    }
                 }
             }
         }

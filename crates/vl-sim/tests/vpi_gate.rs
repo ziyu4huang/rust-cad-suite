@@ -135,9 +135,11 @@ endmodule
     );
     // Timer at 16k fired; finish() from inside a callback ended the run and
     // EndOfSimulation still delivered (third posedge never ran).
-    // Timers fire at the start of the next slot (next delayed key >= t).
-    assert_eq!(*log3.borrow(), vec!["timer@20000"]);
-    assert_eq!(*log4.borrow(), vec!["end@20000"]);
+    // D17: timer deadlines pace time — the timer fires at its OWN deadline
+    // (16k, between the q=2 posedge at 15k and the 3rd at 25k), not at the
+    // next `#`-delayed slot as the pre-ADR-0007 scheduler did (20k).
+    assert_eq!(*log3.borrow(), vec!["timer@16000"]);
+    assert_eq!(*log4.borrow(), vec!["end@16000"]);
 }
 
 #[test]

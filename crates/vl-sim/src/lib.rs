@@ -9,4 +9,4 @@ pub mod value;
 pub mod vpi;
 
 pub use eval::{Val, SimError};
-pub use interp::Sim;
+pub use interp::{RunEnd, Sim};
