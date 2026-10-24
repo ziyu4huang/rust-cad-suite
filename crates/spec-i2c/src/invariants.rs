@@ -167,41 +167,46 @@ impl Invariant for BusyTipCoherence {
 
 /// MSB-first bit order for write bytes: capture the SDA level at each SCL
 /// falling edge during SHIFT and compare the assembled byte against the
-/// byte the driver issued. The expected byte is shared via an
-/// `Rc<RefCell>` slot the test updates when it issues a command.
-/// OPEN ITEM (1023): the bit sampler collects 0x92 instead of 0x96 for a
-/// 0x96 write byte — one position reads the next-bit level. Sampling-phase
-/// question under investigation; see the #[ignore] reproduction test.
-#[allow(dead_code)]
+/// byte the driver issued. The expected byte is shared via an `Rc<RefCell>`
+/// slot the test updates when it issues a command.
+///
+/// Sampling phase: the level is read at the second cycle of each SCL HIGH
+/// half. The whole high half carries bit k's level, so this single phase is
+/// immune to the harness's 1-clk-stale register view — a low-half sample
+/// straddles the bit boundary (the drive changes at the low half's entry
+/// posedge, the stale register still shows the previous bit) and collected
+/// 0x92 for a 0x96 byte at exactly one position.
 pub struct MsbFirst {
-    pub sda_i: SignalId,
+    /// The master's own drive outputs (not the bus level): the invariant
+    /// asserts a MASTER-side property, and the bus is wire-ANDed with the
+    /// slave — an odd address byte flips the slave into read mode and its
+    /// payload drive would pollute bus-level samples.
+    pub sda_oe: SignalId,
+    pub sda_o: SignalId,
     pub state: SignalId,
     pub rd_mode: SignalId,
     pub cnt: SignalId,
     pub half: SignalId,
-    pub prescale: SignalId,
     pub expected: Rc<RefCell<Option<u8>>>,
     bits: Vec<u8>,
 }
-#[allow(dead_code)]
 impl MsbFirst {
-    #[allow(clippy::too_many_arguments)]
     pub fn new(
-        sda_i: SignalId,
+        sda_oe: SignalId,
+        sda_o: SignalId,
         state: SignalId,
         rd_mode: SignalId,
         cnt: SignalId,
         half: SignalId,
-        prescale: SignalId,
         expected: Rc<RefCell<Option<u8>>>,
     ) -> Self {
         MsbFirst {
-            sda_i,
+            sda_oe,
+            sda_o,
             state,
             rd_mode,
             cnt,
             half,
-            prescale,
             expected,
             bits: Vec::new(),
         }
@@ -213,17 +218,31 @@ impl Invariant for MsbFirst {
         "msb_first_bit_order"
     }
     fn check(&mut self, ctx: &vl_spec::CycleCtx, out: &mut Vec<SpecViolation>) {
-        let sda = ctx.sigs.u64(ctx.sim, self.sda_i).unwrap_or(1) as u8;
+        let sda_oe = ctx.sigs.u64(ctx.sim, self.sda_oe).unwrap_or(0) as u8;
+        let sda_o = ctx.sigs.u64(ctx.sim, self.sda_o).unwrap_or(1) as u8;
+        // The level the MASTER is driving this instant (released = 1).
+        let sda = if sda_oe != 0 && sda_o == 0 { 0 } else { 1 };
         let state = ctx.sigs.u64(ctx.sim, self.state).unwrap_or(ST_IDLE as u64) as u8;
         let rd_mode = ctx.sigs.u64(ctx.sim, self.rd_mode).unwrap_or(0) as u8;
         let cnt = ctx.sigs.u64(ctx.sim, self.cnt).unwrap_or(0);
         let half = ctx.sigs.u64(ctx.sim, self.half).unwrap_or(0) as u8;
-        // Sampling phase has one known-wrong position — open item, see the
-        // #[ignore] test in spec-i2c.
-        if state == ST_SHIFT && rd_mode == 0 && half == 0 && cnt == 1 {
-            // First clk after the low-half entry edge: the new bit has just
-            // been driven (post-edge view) and is stable for the half.
+        // One sample per bit, taken in the SCL high half (see the struct
+        // doc): bit k's level holds for its entire high half regardless of
+        // the 1-clk-stale register view.
+        if state == ST_SHIFT && rd_mode == 0 && half == 1 && cnt == 1 {
+            if std::env::var("MSB_DEBUG").is_ok() {
+                eprintln!(
+                    "MSB sample cyc={} bit={} sda={}",
+                    ctx.cycle,
+                    self.bits.len(),
+                    sda
+                );
+            }
             self.bits.push(sda);
+        }
+        if state == ST_ACK && self.bits.len() == 8 && std::env::var("MSB_DEBUG").is_ok() {
+            let byte = self.bits.iter().fold(0u8, |a, &b| (a << 1) | b);
+            eprintln!("MSB decode cyc={} byte={:02x} exp={:?}", ctx.cycle, byte, *self.expected.borrow());
         }
         if state == ST_ACK && self.bits.len() == 8 {
             let byte = self.bits.iter().fold(0u8, |a, &b| (a << 1) | b);
@@ -239,6 +258,10 @@ impl Invariant for MsbFirst {
                         message: "write bytes must go out MSB-first".into(),
                     });
                 }
+                // Consume: the START phantom re-shifts whatever tx still
+                // holds (only pend_rd clears it), so exactly ONE decode per
+                // expectation — the phantom's must not compare.
+                *self.expected.borrow_mut() = None;
             }
             self.bits.clear();
         }

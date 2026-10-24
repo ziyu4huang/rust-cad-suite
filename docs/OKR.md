@@ -28,10 +28,13 @@
   證據:`cargo test -p vl-vcd`(render 7+golden 4,goldens/counter.svg byte-diff,
   CLI stdout=wasm one-shot 同字節);regress wasm vcd_svg+ffi vcd_svg 閘;
   目檢=docs/e2e-report/wasm-demo-v3-svg-verified.png;vcd2svg --help。
-- **KR1.10 Spec 驗證層(ADR-0007,2026-10-23 立)**
-  當前:✅ vl-spec(lockstep+不變量)+spec-i2c 乾淨室 I2C(偵測力:負向變種全被抓);
-  open=corpus 59 oracle 腿+MsbFirst 取樣相位(#[ignore] 追蹤)。
-  證據:`cargo test -p vl-spec -p spec-i2c`;step_gate 6 測;docs/adr/0007。
+- **KR1.10 Spec 驗證層(ADR-0007,2026-10-23 立;2026-10-24 收割輪 12083a8)**
+  當前:✅ 全收=vl-spec(lockstep+不變量)+spec-i2c 乾淨室 I2C+corpus 59 oracle 腿
+  (e2e 58/58@100%)+RD 讀事務鎖步(dout 絕對承載)+MsbFirst 取樣器收口
+  (master 驅動輸出取樣+高半相位;LSB-first 負向=lockstep+msb_first_bit_order
+  雙腿明確);**RD 鎖步首跑連抓兩真 bug**(vl-sim 首沿丟失+I2C RTL ANSI 埠範圍
+  繼承)=spec 層偵測力的最高實證。open=時鐘伸展負向/wasm demo 整合/多位址。
+  證據:`cargo test -p vl-spec -p spec-i2c`;shift_repro 三層;docs/adr/0007。
 - **KR1.2 回归闸机械化(≥80% 断言入 cargo test)**
   证据:`crates/vl-difftest/tests/regression_gate.rs`;`bash scripts/regress.sh` 全绿。
   期望文件常驻 → 无本机 oracle 也能跑闸。

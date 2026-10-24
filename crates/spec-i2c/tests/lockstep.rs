@@ -7,12 +7,10 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use spec_i2c::bus::BusDriver;
-use spec_i2c::invariants::{
-    AckRelease, BusyTipCoherence, MsbFirst, SdaStableWhileSclHigh,
-};
-use spec_i2c::model::{I2cGolden, ST_ACK, ST_IDLE};
+use spec_i2c::invariants::{AckRelease, BusyTipCoherence, SdaStableWhileSclHigh};
+use spec_i2c::model::I2cGolden;
 use spec_i2c::{CmdInput, RTL, CMD_RD, CMD_START, CMD_STOP, CMD_WR};
-use vl_spec::{build_sim, GoldenModel, LockstepSpec, SignalId, SpecReport};
+use vl_spec::{build_sim, LockstepSpec, SignalId, SpecReport};
 
 const PRESCALE: u64 = 4;
 const ADDR: u8 = 0x50;
@@ -32,8 +30,6 @@ struct IDs {
     done: SignalId,
     state: SignalId,
     rd_mode: SignalId,
-    cnt: SignalId,
-    prescale: SignalId,
     ack_rx: SignalId,
     dout: SignalId,
     half: SignalId,
@@ -74,8 +70,6 @@ fn build_harness(
         done: spec.bind_signal("done").unwrap(),
         state: spec.bind_signal("state").unwrap(),
         rd_mode: spec.bind_signal("rd_mode").unwrap(),
-        cnt: spec.bind_signal("cnt").unwrap(),
-        prescale: spec.bind_signal("prescale").unwrap(),
         ack_rx: spec.bind_signal("ack_rx").unwrap(),
         dout: spec.bind_signal("dout").unwrap(),
         half: spec.bind_signal("half").unwrap(),
@@ -114,7 +108,6 @@ fn build_harness(
     let expected: Rc<RefCell<Option<u8>>> = Rc::new(RefCell::new(None));
 
     let bus2 = bus.clone();
-    let expected2 = expected.clone();
     let bus3 = bus.clone();
     let spec = spec
         .driver(move |sim, sigs, input: &CmdInput| {
@@ -174,10 +167,10 @@ fn scripted_write_transaction_clean() {
     // waits for the handshake — tip rises then falls (START/WR/RD), or busy
     // falls (STOP). Strobing on the consume edge has undefined latch/FSM
     // arbitration in ANY RTL — never do it.
-    let mut cmd = |spec: &mut LockstepSpec<I2cGolden>,
-                   ids: &IDs,
-                   expected: &Rc<RefCell<Option<u8>>>,
-                   c: Option<(u8, u8)>| {
+    let cmd = |spec: &mut LockstepSpec<I2cGolden>,
+               ids: &IDs,
+               expected: &Rc<RefCell<Option<u8>>>,
+               c: Option<(u8, u8)>| {
         let Some((c8, d8)) = c else {
             return;
         };
@@ -240,7 +233,7 @@ fn scripted_write_transaction_clean() {
 fn scripted_read_transaction_clean() {
     let (mut spec, ids, _bus, _expected) = build_harness(RTL);
 
-    let mut cmd = |spec: &mut LockstepSpec<I2cGolden>, ids: &IDs, c: (u8, u8)| {
+    let cmd = |spec: &mut LockstepSpec<I2cGolden>, ids: &IDs, c: (u8, u8)| {
         let (c8, d8) = c;
         assert_eq!(spec.read_u64(ids.tip), 0, "issue we only while parked");
         spec.cycle(&CmdInput::strobe(c8, d8)).unwrap();

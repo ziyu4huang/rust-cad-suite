@@ -44,11 +44,19 @@
 
 ## 非目標/待辦
 
-- corpus 59 oracle 腿(verilator 錄製的 I2C 案例=完整破解同作者迴圈的第三腳)
-  **未落地,下一輪補**。
-- MsbFirst 位元取樣器:一樣本/SCL 週期視野下收集 0x92(應 0x96)——取樣相位
-  問題 open(`#[ignore]` 複現測試追蹤);lockstep/負向偵測已覆蓋其職能。
-- 讀事務(RD)鎖步測試、時鐘伸展負向測試、wasm/demo 整合、多位址/多從機。
+- ✅ corpus 59 oracle 腿(12083a8):行為級開漏 slave TB(獨立第三作者)+
+  verilator 錄製;e2e 58/58@100%。
+- ✅ RD 讀事務鎖步測試(12083a8):dout 絕對承載檢查(0xA5);**首跑連抓兩真
+  bug**=①vl-sim 首沿丟失(init_once 只播種不執行 prologue;修=排空+寫入前
+  播種,shift_repro 三層釘死)②I2C RTL 的 ANSI 埠範圍繼承(1-bit 埠繼承前埠
+  寬度,verilator 同解=oracle 一致≠符合自身 spec;修=1-bit 埠全前置)。
+- ✅ MsbFirst 取樣器(1024 收口):取樣點移到 SCL 高半第二循環(整個高半準位
+  恆定,免疫 harness 的 1-clk-stale 暫存視野;低半取樣曾在位元邊界讀到前一位
+  元=0x92);**取樣 master 驅動輸出而非匯流排準位**(slave 對 LSB=1 位元組進
+  入讀模式會驅動匯流排,bus-level 採樣被污染)+expected 解碼即消費(START
+  phantom 重移位暫存器殘值,恰好一次解碼/期望);LSB-first 負向斷言升級=明確
+  要求 msb_first_bit_order。
+- 時鐘伸展負向測試、wasm/demo 整合、多位址/多從機。
 - 效能:每週期 ~30 次 vpi 讀——demo 尺度可忽略;perf gate=M9。
 
 ## 證據

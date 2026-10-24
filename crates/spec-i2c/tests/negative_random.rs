@@ -12,7 +12,7 @@ use spec_i2c::bus::BusDriver;
 use spec_i2c::invariants::{AckRelease, MsbFirst, SdaStableWhileSclHigh};
 use spec_i2c::model::{I2cGolden, Slave};
 use spec_i2c::{CmdInput, RTL, CMD_START, CMD_STOP, CMD_WR};
-use vl_spec::{build_sim, GoldenModel, LockstepSpec, SignalId, SpecReport, ViolationKind};
+use vl_spec::{build_sim, LockstepSpec, SignalId, SpecReport, ViolationKind};
 
 const PRESCALE: u64 = 4;
 const ADDR: u8 = 0x50;
@@ -32,7 +32,6 @@ struct IDs {
     state: SignalId,
     rd_mode: SignalId,
     cnt: SignalId,
-    prescale: SignalId,
     done: SignalId,
     ack_rx: SignalId,
     dout: SignalId,
@@ -58,7 +57,6 @@ fn build_harness(rtl: &str) -> (LockstepSpec<I2cGolden>, IDs, Rc<RefCell<Option<
         state: spec.bind_signal("state").unwrap(),
         rd_mode: spec.bind_signal("rd_mode").unwrap(),
         cnt: spec.bind_signal("cnt").unwrap(),
-        prescale: spec.bind_signal("prescale").unwrap(),
         done: spec.bind_signal("done").unwrap(),
         ack_rx: spec.bind_signal("ack_rx").unwrap(),
         dout: spec.bind_signal("dout").unwrap(),
@@ -127,6 +125,15 @@ fn build_harness(rtl: &str) -> (LockstepSpec<I2cGolden>, IDs, Rc<RefCell<Option<
             ids.rd_mode,
             ids.sda_oe,
             ids.half,
+        ))
+        .invariant(MsbFirst::new(
+            ids.sda_oe,
+            ids.sda_o,
+            ids.state,
+            ids.rd_mode,
+            ids.cnt,
+            ids.half,
+            expected_inv,
         ));
     (spec, ids, expected)
 }
@@ -193,14 +200,18 @@ fn lsb_first_variant_is_caught() {
             ViolationKind::Lockstep(n) => format!("lockstep[{n}]"),
         })
         .collect();
-    // Detection power: the lockstep leg catches the broken bit order
-    // wholesale (the golden diverges every shifted cycle). The dedicated
-    // msb_first invariant is an OPEN ITEM (see msb_sampler_phase_open_item)
-    // — once its sampler phase is fixed, tighten this assertion to require
-    // `msb_first_bit_order` explicitly.
+    // Detection power (two independent legs): the lockstep catches the
+    // broken bit order wholesale (the golden diverges every shifted
+    // cycle), and the dedicated msb_first_bit_order invariant names the
+    // protocol violation explicitly.
     assert!(
         names.iter().any(|n| n.starts_with("lockstep")),
         "LSB-first RTL must trip the lockstep leg; got {names:?}\n{}",
+        report.render_text()
+    );
+    assert!(
+        names.iter().any(|n| n == "msb_first_bit_order"),
+        "LSB-first RTL must trip msb_first_bit_order; got {names:?}\n{}",
         report.render_text()
     );
     assert!(report.violations.len() >= 40, "wholesale divergence expected");
@@ -246,18 +257,3 @@ fn randomized_write_transactions_clean() {
     report.assert_empty();
 }
 
-/// OPEN ITEM (1023): the MsbFirst bit sampler collects 0x92 instead of 0x96
-/// for a 0x96 write byte — one bit position reads the next-bit level under
-/// the one-sample-per-SCL-period view. Every other layer (lockstep,
-/// ack/busy invariants, negative detection) is proven; this sampler's
-/// phase question is the open piece. Un-ignore when picked up.
-#[test]
-#[ignore]
-fn msb_sampler_phase_open_item() {
-    let (mut spec, ids, expected) = build_harness(RTL);
-    issue(&mut spec, &ids, (CMD_START, 0));
-    // MsbFirst is not registered in build_harness while the sampler phase
-    // is open; the reproduction needs it — rebuild with a local invariant.
-    drop(spec);
-    let _ = expected;
-}
