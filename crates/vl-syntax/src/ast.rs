@@ -286,6 +286,15 @@ pub enum Stmt {
         lhs: Expr,
         rhs: Expr,
     },
+    /// Intra-assignment delay (`a = #5 v;` / `q <= #10 d;`) — the RHS is
+    /// sampled at scheduling, the commit lands after the delay.
+    IntraAssign {
+        span: Span,
+        lhs: Expr,
+        rhs: Expr,
+        delay: DelayVal,
+        nba: bool,
+    },
     If {
         span: Span,
         cond: Expr,

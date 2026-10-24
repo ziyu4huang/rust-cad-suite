@@ -516,7 +516,21 @@ impl<'d> Parser<'d> {
                     );
                 }
                 self.pos += 1;
-                self.reject_intra_assign()?;
+                if self.at_punct(Punct::Hash) {
+                    // `a = #5 v;` — intra-assignment delay (R4-e).
+                    self.pos += 1;
+                    let delay = self.delay_val()?;
+                    let rhs = self.expr()?;
+                    let end = self.expect_punct(Punct::Semi, "after assignment")?;
+                    return Ok(Stmt::IntraAssign {
+                        span: lhs.span().merge(end),
+                        lhs,
+                        rhs,
+                        delay,
+                        nba: nb,
+                    });
+                }
+                self.reject_intra_assign()?; // `= @(...) v` stays rejected
                 let rhs = self.expr()?;
                 let end = self.expect_punct(Punct::Semi, "after assignment")?;
                 let span = lhs.span().merge(end);
@@ -537,6 +551,19 @@ impl<'d> Parser<'d> {
         if self.eat_punct(Punct::Eq) {
             if !lhs.is_lvalue() {
                 return self.err(span, "VL-E021", "left side of `=` is not an lvalue");
+            }
+            if self.at_punct(Punct::Hash) {
+                self.pos += 1;
+                let delay = self.delay_val()?;
+                let rhs = self.expr()?;
+                let end = self.expect_punct(Punct::Semi, "after assignment")?;
+                return Ok(Stmt::IntraAssign {
+                    span: span.merge(end),
+                    lhs,
+                    rhs,
+                    delay,
+                    nba: false,
+                });
             }
             self.reject_intra_assign()?;
             let rhs = self.expr()?;
@@ -664,6 +691,7 @@ pub(crate) fn stmt_span(s: &Stmt) -> rcs_diag::Span {
         | Stmt::SysCall { span, .. }
         | Stmt::SubCall { span, .. }
         | Stmt::Trigger { span, .. }
+        | Stmt::IntraAssign { span, .. }
         | Stmt::Disable { span, .. }
         | Stmt::Wait { span, .. }
         | Stmt::Fork { span, .. }

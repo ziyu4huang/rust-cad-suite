@@ -59,7 +59,7 @@ if [ -f crates/riv-cli/Cargo.toml ]; then
     [ -n "$e2e_sum" ] || { echo "GATE FAIL: riv e2e SUMMARY missing"; fail=1; }
     [ -n "$iv_sum" ] || { echo "GATE FAIL: riv iv SUMMARY missing"; fail=1; }
     echo "$e2e_sum" | grep -q "SUMMARY e2e=58/59 iv=0/0" || { echo "GATE FAIL: riv e2e baseline (want exact 58/59): $e2e_sum"; fail=1; }
-    echo "$iv_sum" | grep -q "SUMMARY e2e=0/0 iv=8/10" || { echo "GATE FAIL: riv iv baseline (want exact 8/10): $iv_sum"; fail=1; }
+    echo "$iv_sum" | grep -q "SUMMARY e2e=0/0 iv=19/20" || { echo "GATE FAIL: riv iv baseline (want exact 19/20): $iv_sum"; fail=1; }
     riv_all="$e2e_out
 $iv_out"
     riv_unledgered=$(echo "$riv_all" | grep -c "UNLEDGERED" || true)

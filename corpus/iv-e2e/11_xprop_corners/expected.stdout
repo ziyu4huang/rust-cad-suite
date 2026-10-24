@@ -1,0 +1,4 @@
+sum=xxxx bw=00xx or=11x1
+else-taken
+eq=x eqcase=1
+tb.v:16: $finish called at 1000 (1ps)

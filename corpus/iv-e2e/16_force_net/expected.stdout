@@ -1,0 +1,5 @@
+y=1
+forced y=0
+a=1 forced y=0
+released y=0
+tb.v:15: $finish called at 4000 (1ps)

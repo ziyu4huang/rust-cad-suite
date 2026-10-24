@@ -302,7 +302,8 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
   | rivD6 | `:ivl_delay_selection`/目標插件機制 | dlopen .tgt/.conf | 單體 Rust;`-t` 名義面相容 |
   | rivD7 | 48_frac_delay 延遲捨入——**預登記後撤回**(2026-10-25 live probe) | 設計期預測「iverilog 按 precision 捨入會印 1500/1750」;iverilog 13.0 復位後實測數據行=`t=2000`/`t=2000`,與 verilator 金樣逐字一致,僅 finish 橫幅時刻(1750)剩差——且該行 e2e 正規化本就丟棄(rivD8) | 無需 ledger,48 現狀 pass(riv e2e 臂實測);rivD7 編號留墓碑不復用;設計 §7「32_proc_order 若分歧=rivD8」順延為 rivD9 |
   | rivD8 | e2e 臂 stdout 正規化:丟 riv 自家工具行(2026-10-25 落地) | e2e 金樣=verilator 錄製,錄製期已被 vl-difftest 丟掉 `- ` 工具行,金樣無 iverilog 形 finish/VCD info 行(riv-r2-design §10 調和注 1:字面「whitelist prefixes only」不可實現) | 丟行白名單=vl-difftest 四前綴 ∪ `^[^: ]+:[0-9]+: $finish called at `/`^VCD info: ` 兩行形,禁內容改寫;敵意 fixture(`-7div2=-3`、`tb.v:6: ` 開頭設計行)由 riv-difftest 單測釘死;**iv-e2e 臂不丟**(iverilog 工具行=金樣本體,01_hello 逐字在案) |
-  | rivD9 | **預登記**(R4 弧接 riv_vcd 閘前,登記先行):e2e 既有 oracle-ref.vcd=verilator 錄製 2-state——t0 值域(q=0)與參數傾印(D3 家族)皆與 iverilog 形(q=t0 x、`$comment Show the parameter values`)不同側 | verilator 錄製 refs(51_vcd_counter oracle-ref.vcd 實證) | riv VCD 交叉閘**以 iverilog 腿另錄金樣**(iverilog 13.0 已復位),禁用 2-state refs 直接對拍 4-state 引擎;樣本點交叉=vcd_gate 形,rivD1 header 正規化之上再收斂值域差異 |
+  | rivD9 | **預登記**(R4 弧接 riv_vcd 閘前,登記先行):e2e 既有 oracle-ref.vcd=verilator 錄製 2-state——t0 值域(q=0)與參數傾印(D3 家族)皆與 iverilog 形(q=t0 x、`$comment Show the parameter values`)不同側 | verilator 錄製 refs(51_vcd_counter oracle-ref.vcd 實證) | riv VCD 交叉閘**以 iverilog 腿另錄金樣**(iverilog 13.0 已復位),禁用 2-state refs 直接對拍 4-state 引擎;樣本點交叉=vcd_gate 形,rivD1 header 正規化之上再收斂值域差異 |✅ 2026-10-25 兌現:oracle-ref.iv.vcd 入庫+vcd-xcheck 閘入 regress,6/6 var 50 樣本點 0 失配 |
+  | rivD10 | **已登記分歧**(2026-10-25 R4 弧):未寫入記憶體元素——iverilog 13.0 讀 x(4-state),verilator 錄製金樣 2-state 讀 0 | 53_readmem 兩 oracle 實測:bmem 未寫入元素 iv=xxxx vs vl=0000,riv 逐字匹配 iverilog(tri-div-iv) | riv=match iverilog 不追 2-state 金樣;53_readmem ledger 化(riv-pending.txt)不入紅燈;後續記憶體案例必須全初始化或預期此分歧 | 53_readmem/expected.iv.stdout L2 實證;riv-pending.txt 在庫 |
 
 ## 7. VPI 子集=一等公民(R7;上游差異化核心)
 
@@ -380,6 +381,14 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
 | 採礦 10 例 | — | enforced pass |
 
 → 目標基線:**e2e 59/59、iv 9/10(採礦後 19/20)**;UDP 為唯一具名殘項。
+
+**進度註(2026-10-25 R4 弧收網;全部數字=本輪實跑)**:
+- **步驟 0 ✅**:iv 錄製腿(57/59 例錄成,40/59 iverilog 自身拒編)+tri_gate 機械三分入 regress(bug>0 斷鏈);基線 TRI agree=41 bug=0 div=0 → 收網時 agree=56 bug=0 div=1 skip=2。
+- **R4-a/b/c/d/e ✅ 一弧收網**:riv-ir v4(Elem/gates 段/Event/$stop/readmem/Trigger/AssignNbaDelay)+riv-elab Scope 堆疊(例化三型埠綁定=塌縮/驅動/追隨者;generate 透明作用域;前置宣告 pre-pass=Verilog 模組項次序無關)+riv-kernel(陣列/閘惰性排程/事件/延遲 NBA/事件序=同時戳更新先於程序喚醒)。
+- **逐例終態表修訂**:53_readmem=**rivD10 ledgered**(兩 oracle 實測分歧,riv 匹配 iverilog;原表 pass 假設被 rivD10 取代)——其餘全數 pass。**最終基線:e2e 58/59、iv 19/20(09_udp=R9 pending;10_gates 翻轉 enforced;採礦 11-20 十例全 enforced pass)**。
+- **採礦 ✅**:10 例乾淨室(X 傳播/casez-x/域內延遲(阻塞+NBA)/#0 區/force 網與位選/named events/閘 x 表/閘延遲序)全 enforced;**首輪即抓三真缺口**=共享 parser 缺 intra-assign 延遲(M8 指錯→本弧實作:阻塞=取樣後掛起、NBA=AssignNbaDelay 排程不阻塞)、閘延遲解析缺口(R4 指錯→實作)、force 位選語義(part-force 只鎖選中位,其餘位可寫——17_force_bits iverilog 實證 f2)。
+- **效能探針(release)**:1M 週期計數器 3.25s=**~308k cycles/s**;vvp=1.43M(1/4.6)。**RK5 停線條款(200k)不觸發**;R10 門檻(1M)留優化輪(熱點=body_op 逐 op clone)。
+- rivD9 ✅ 兌現(oracle-ref.iv.vcd+vcd-xcheck 閘)。
 
 **偏差帳(本弧明示重塑 §8 R4 範圍,對抗審 #10)**:強度四級+多驅動仲裁順延 R9(零語料需求);picorv32 行為 TB 點火順延下弧(R4-c 落地後可行,本弧保界);yosys-simple 全量 e2e 腿順延下弧;generate/unpacked array 正式收編 R4(收割弧指針已實測命中);`$readmemh/b` R5→R4 前拉。
 

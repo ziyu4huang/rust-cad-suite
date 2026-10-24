@@ -552,8 +552,6 @@ fn print_report(label: &str, lines: &[CaseLine], e2e_pass: usize, e2e_n: usize, 
 }
 
 fn record(corpus: &Path) {
-    let riverilog = locate_bin("iverilog");
-    let _ = &riverilog;
     for c in load_cases(corpus) {
         let work = std::env::temp_dir().join(format!("riv-record-{}", c.name));
         let _ = std::fs::remove_dir_all(&work);

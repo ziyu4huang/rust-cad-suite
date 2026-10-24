@@ -1610,6 +1610,10 @@ impl Sim {
                 self.collect_expr_reads(rhs, out);
                 self.collect_expr_reads(lhs, out);
             }
+            Stmt::IntraAssign { lhs, rhs, .. } => {
+                self.collect_expr_reads(rhs, out);
+                self.collect_expr_reads(lhs, out);
+            }
             Stmt::If {
                 cond,
                 then,
@@ -1762,6 +1766,12 @@ impl Sim {
         // has no force/fork constructs); vl-difftest 59/59 re-proves zero
         // drift after the move.
         match s {
+            Stmt::IntraAssign { .. } => {
+                return Err(SimError::at(
+                    "intra-assignment delay/event control is not yet supported (milestone M8)".to_string(),
+                    stmt_span(s),
+                ))
+            }
             Stmt::Wait { .. } => {
                 return Err(SimError::at(
                     "`wait` is not yet supported (milestone M8)",
@@ -3250,6 +3260,7 @@ fn stmt_span(s: &Stmt) -> Span {
         | Stmt::SysCall { span, .. }
         | Stmt::SubCall { span, .. }
         | Stmt::Trigger { span, .. }
+        | Stmt::IntraAssign { span, .. }
         | Stmt::Disable { span, .. }
         | Stmt::Wait { span, .. }
         | Stmt::Fork { span, .. }

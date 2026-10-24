@@ -1,0 +1,4 @@
+r=f0
+after write r=f2
+released r=f2
+tb.v:11: $finish called at 3000 (1ps)

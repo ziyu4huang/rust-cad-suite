@@ -681,6 +681,10 @@ pub enum Op {
     /// Nonblocking assignment — value sampled now, committed in the NBA
     /// region of the same slot.
     AssignNba { lv: Lval, src: Slot },
+    /// NBA with intra-assignment delay (`q <= #10 d`): value sampled now,
+    /// committed in the NBA region of the slot `now + amount` — the
+    /// process does NOT suspend.
+    AssignNbaDelay { lv: Lval, src: Slot, amount: Slot },
     Branch { cond: Slot, then: u32, els: u32 },
     Jump { to: u32 },
     /// Suspend until `now + value` (value in precision units); 0 → the
@@ -931,6 +935,7 @@ fn op_encode(op: &Op) -> String {
         Op::LoadElem { dst, var, idx } => format!("loadelem {dst} {var} {idx}"),
         Op::AssignBlk { lv, src } => format!("assignblk {} {src}", lval_encode(lv)),
         Op::AssignNba { lv, src } => format!("assignnba {} {src}", lval_encode(lv)),
+        Op::AssignNbaDelay { lv, src, amount } => format!("assignnbadelay {} {src} {amount}", lval_encode(lv)),
         Op::Branch { cond, then, els } => format!("branch {cond} {then} {els}"),
         Op::Jump { to } => format!("jump {to}"),
         Op::Delay { amount } => format!("delay {amount}"),
@@ -1427,6 +1432,11 @@ fn op_decode(t: &[&str], n: usize) -> Result<Op, ReadError> {
         "loadelem" => Ok(Op::LoadElem { dst: pu(t, 1, n)?, var: pu(t, 2, n)?, idx: pu(t, 3, n)? }),
         "assignblk" => Ok(Op::AssignBlk { lv: lval_decode(&t[1..t.len() - 1], n)?, src: pu(t, t.len() - 1, n)? }),
         "assignnba" => Ok(Op::AssignNba { lv: lval_decode(&t[1..t.len() - 1], n)?, src: pu(t, t.len() - 1, n)? }),
+        "assignnbadelay" => Ok(Op::AssignNbaDelay {
+            lv: lval_decode(&t[1..t.len() - 2], n)?,
+            src: pu(t, t.len() - 2, n)?,
+            amount: pu(t, t.len() - 1, n)?,
+        }),
         "branch" => Ok(Op::Branch { cond: pu(t, 1, n)?, then: pu(t, 2, n)?, els: pu(t, 3, n)? }),
         "jump" => Ok(Op::Jump { to: pu(t, 1, n)? }),
         "delay" => Ok(Op::Delay { amount: pu(t, 1, n)? }),
@@ -1638,6 +1648,7 @@ mod tests {
                         Op::LoadElem { dst: 3, var: 0, idx: 2 },
                         Op::AssignBlk { lv: Lval::Var { var: 0 }, src: 3 },
                         Op::AssignNba { lv: Lval::Bit { var: 0, idx: 1 }, src: 3 },
+                        Op::AssignNbaDelay { lv: Lval::Var { var: 0 }, src: 3, amount: 2 },
                         Op::AssignNba { lv: Lval::Elem { var: 0, idx: 2 }, src: 3 },
                         Op::SysCall { id: SysId::Trigger, fmt: None, args: vec![], dst: None, file: 0, line: 7, start: 0 },
                         Op::SysCall { id: SysId::Stop, fmt: None, args: vec![], dst: None, file: 0, line: 8, start: 0 },

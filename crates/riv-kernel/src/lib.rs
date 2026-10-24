@@ -119,7 +119,9 @@ pub struct Kernel {
     /// Static task/function shared frames (design §3: per-instance shared
     /// storage — concurrent calls share it, pinned by unit test).
     shared_frames: Vec<Vec<Bits>>,
-    /// `force` overlays per var: reads see it, writes are ignored.
+    /// `force` masks per var: 1-bits are forced. The stored value always
+    /// carries the forced bits (force commits them); writes only land on
+    /// unforced bits (17_force_bits: part-forces leave the rest writable).
     forces: Vec<Option<Bits>>,
     /// fork...join groups: (remaining branch count, waiter thread).
     join_groups: Vec<(u32, usize)>,
@@ -133,6 +135,8 @@ pub struct Kernel {
     gate_due: BTreeMap<u64, Vec<usize>>,
     /// Pending (time, value) per gate; None = nothing scheduled.
     gate_pending: Vec<Option<(u64, Bits)>>,
+    /// Delayed NBA commits (`q <= #10 d`): time → (lvalue, sampled value).
+    nba_due: BTreeMap<u64, Vec<(Lval, Bits)>>,
     /// rivvp -n: $stop behaves like $finish (rivD2).
     pub stop_as_finish: bool,
     /// -n $stop halted the run: like natural exhaustion — NO finish
@@ -254,6 +258,7 @@ impl Kernel {
             array_dims,
             gate_due: BTreeMap::new(),
             gate_pending,
+            nba_due: BTreeMap::new(),
             stop_as_finish: false,
             stopped_silently: false,
             vars,
@@ -359,16 +364,36 @@ impl Kernel {
             }
             // Slot settled: flush dump changes under this time.
             sink.flush_slot(self.now);
-            // Advance the wheel: threads and pending gate updates both.
+            // Advance the wheel: threads, gate updates and delayed NBAs
+            // all participate. Updates due AT the new time land BEFORE the
+            // processes woken there (iverilog event order: the update was
+            // scheduled earlier, so it runs first — 20_gate_delays pins
+            // a display at the exact settle time).
             let next_thread = self.wheel.keys().next().copied();
             let next_gate = self.gate_due.keys().next().copied();
-            let at = match (next_thread, next_gate) {
-                (Some(a), Some(b)) => a.min(b),
-                (Some(a), None) => a,
-                (None, Some(b)) => b,
-                (None, None) => break, // no more events: natural stop (exit 0)
+            let next_nba = self.nba_due.keys().next().copied();
+            let Some(at) = [next_thread, next_gate, next_nba]
+                .into_iter()
+                .flatten()
+                .min()
+            else {
+                break; // no more events: natural stop (exit 0)
             };
             self.now = at;
+            if let Some(mut gates) = self.gate_due.remove(&at) {
+                while let Some(gi) = gates.pop() {
+                    if let Err(e) = self.commit_gate(gi, sink) {
+                        return self.finish_out(sink, Some(e));
+                    }
+                }
+            }
+            if let Some(updates) = self.nba_due.remove(&at) {
+                for (lv, val) in updates {
+                    if let Err(e) = self.commit(&lv, val, sink) {
+                        return self.finish_out(sink, Some(e));
+                    }
+                }
+            }
             if next_thread == Some(at) {
                 let (_, wake) = self.wheel.pop_first().unwrap();
                 for ti in wake {
@@ -639,6 +664,16 @@ impl Kernel {
                     let val = self.slot(ti, src)?.clone();
                     let resolved = self.resolve_lvalue(ti, &lv)?;
                     self.nba.push((resolved, val));
+                }
+                Op::AssignNbaDelay { lv, src, amount } => {
+                    let val = self.slot(ti, src)?.clone();
+                    let resolved = self.resolve_lvalue(ti, &lv.clone())?;
+                    let av = self.slot(ti, amount)?.clone();
+                    if av.has_unknown() {
+                        return Err(RunError("delayed NBA amount is unknown (x)".into()));
+                    }
+                    let at = self.now.saturating_add(av.to_u128_lossy().min(u64::MAX as u128) as u64);
+                    self.nba_due.entry(at).or_default().push((resolved, val));
                 }
                 Op::Branch { cond, then, els } => {
                     let cv = self.slot(ti, cond)?.clone();
@@ -953,17 +988,66 @@ impl Kernel {
                         }
                     };
                     let vi = self.d.vars[var as usize].clone();
-                    let newv = if val.width == vi.width {
+                    let forced = if val.width == vi.width {
                         val
                     } else if val.width > vi.width {
                         val.trunc(vi.width).map_err(|e| RunError(e.0))?
                     } else {
                         val.uadjust(vi.width).map_err(|e| RunError(e.0))?
                     };
-                    // Store first (overlay unset → normal change propagation:
-                    // w = r cont-assign sees the forced value), then pin.
-                    self.store_var(var, newv.clone(), sink)?;
-                    self.forces[var as usize] = Some(newv);
+                    // Mask = the bits this lvalue selects (whole var, part,
+                    // or bit); storage receives the forced bits (change
+                    // events propagate to followers).
+                    let (mask, patched) = match lv {
+                        Lval::Var { .. } => {
+                            let m = all_ones(vi.width)?;
+                            (m.clone(), forced)
+                        }
+                        Lval::Part { hi, lo, .. } => {
+                            let w = hi.abs_diff(lo) + 1;
+                            let cur = self.var(var)?.clone();
+                            let m = mask_of(vi.width, hi, lo)?;
+                            let patched = Bits::set_part(&cur, hi, lo, &forced.trunc(w).map_err(|e| RunError(e.0))?)
+                                .map_err(|e| RunError(e.0))?;
+                            (m, patched)
+                        }
+                        Lval::Bit { idx, .. } => {
+                            let iv = self.slot(ti, idx)?.clone();
+                            match self.abs_index(var, &iv)? {
+                                Some(abs) => {
+                                    let cur = self.var(var)?.clone();
+                                    let m = mask_of(vi.width, abs, abs)?;
+                                    let patched = Bits::set_part(&cur, abs, abs, &forced.trunc(1).map_err(|e| RunError(e.0))?)
+                                        .map_err(|e| RunError(e.0))?;
+                                    (m, patched)
+                                }
+                                None => {
+                                    let m = Bits::zeros(vi.width).map_err(|e| RunError(e.0))?;
+                                    (m, self.var(var)?.clone())
+                                }
+                            }
+                        }
+                        Lval::PartDyn { hi, lo, .. } => {
+                            let hv = self.slot(ti, hi)?.clone();
+                            let lv2 = self.slot(ti, lo)?.clone();
+                            if hv.has_unknown() || lv2.has_unknown() {
+                                let m = Bits::zeros(vi.width).map_err(|e| RunError(e.0))?;
+                                (m, self.var(var)?.clone())
+                            } else {
+                                let (h, l) = (hv.to_u128_lossy() as u32, lv2.to_u128_lossy() as u32);
+                                let (hi2, lo2) = (h.max(l), h.min(l));
+                                let w = hi2.abs_diff(lo2) + 1;
+                                let cur = self.var(var)?.clone();
+                                let m = mask_of(vi.width, hi2, lo2)?;
+                                let patched = Bits::set_part(&cur, hi2, lo2, &forced.trunc(w).map_err(|e| RunError(e.0))?)
+                                    .map_err(|e| RunError(e.0))?;
+                                (m, patched)
+                            }
+                        }
+                        _ => unreachable!(" Elem/Concat rejected above"),
+                    };
+                    self.store_var_raw(var, patched, sink)?;
+                    self.forces[var as usize] = Some(mask);
                 }
                 Op::Release { lv } => {
                     let var = match lv {
@@ -978,9 +1062,28 @@ impl Kernel {
                             return Err(RunError("release on a concatenation is not supported".into()))
                         }
                     };
-                    // The reg keeps the forced value (04_force golden); the
-                    // overlay clears so normal writes work again.
+                    let is_net = self.d.vars[var as usize].kind == VarKind::Net;
                     self.forces[var as usize] = None;
+                    if is_net {
+                        // Release on a net: the driver re-takes the wire —
+                        // poke its cont-assign threads awake to re-evaluate
+                        // (16_force_net: released y follows ~a).
+                        let threads: Vec<usize> = self
+                            .d
+                            .assigns
+                            .iter()
+                            .filter(|(_, v)| *v == var)
+                            .map(|(t, _)| *t as usize)
+                            .collect();
+                        for t in threads {
+                            if matches!(self.threads[t].status, Status::Wait(_)) {
+                                self.threads[t].status = Status::Ready;
+                                self.threads[t].pc = 0; // re-run from the top
+                                self.active.push_back(t);
+                            }
+                        }
+                    }
+                    // Regs keep the forced value (04_force golden).
                 }
                 Op::Fork { branches, join } => {
                     if branches.is_empty() {
@@ -1115,12 +1218,10 @@ impl Kernel {
             .ok_or_else(|| RunError(format!("var id {v} out of range")))
     }
 
-    /// Var read with the force overlay applied (design §4: `force` makes
-    /// reads see the forced value; `w = r` cont-assign threads follow).
+    /// Var read — the stored value already carries forced bits (the force
+    /// commits them into storage; design §4: reads and `w = r` followers
+    /// see the forced value).
     fn read_var(&self, v: VarId) -> Result<&Bits, RunError> {
-        if let Some(Some(f)) = self.forces.get(v as usize) {
-            return Ok(f);
-        }
         self.var(v)
     }
 
@@ -1277,11 +1378,25 @@ impl Kernel {
     }
 
     fn store_var(&mut self, var: VarId, newv: Bits, sink: &mut dyn DumpSink) -> Result<(), RunError> {
-        if self.forces.get(var as usize).map_or(false, |f| f.is_some()) {
-            // IEEE: while a reg is forced, procedural/NBA writes have no
-            // effect until `release`.
-            return Ok(());
+        // Forced bits absorb writes (IEEE: writes have no effect on a
+        // forced lvalue until release — bit-granular for part forces).
+        if let Some(Some(mask)) = self.forces.get(var as usize) {
+            let cur = self.vars[var as usize].clone();
+            let mask = mask.clone();
+            let ones = all_ones(newv.width)?;
+            let inv = ones.bit_xor(&mask).map_err(|e| RunError(e.0))?;
+            let effective = newv
+                .bit_and(&inv)
+                .map_err(|e| RunError(e.0))?
+                .bit_or(&cur.bit_and(&mask).map_err(|e| RunError(e.0))?)
+                .map_err(|e| RunError(e.0))?;
+            return self.store_var_raw(var, effective, sink);
         }
+        self.store_var_raw(var, newv, sink)
+    }
+
+    /// Unconditional storage write + change propagation.
+    fn store_var_raw(&mut self, var: VarId, newv: Bits, sink: &mut dyn DumpSink) -> Result<(), RunError> {
         let old = self.vars[var as usize].clone();
         if old == newv {
             return Ok(());
@@ -1897,6 +2012,7 @@ fn op_tag(op: &Op) -> &'static str {
         Op::LoadElem { .. } => "loadelem",
         Op::AssignBlk { .. } => "assignblk",
         Op::AssignNba { .. } => "assignnba",
+        Op::AssignNbaDelay { .. } => "assignnbadelay",
         Op::Branch { .. } => "branch",
         Op::Jump { .. } => "jump",
         Op::Delay { .. } => "delay",
@@ -2080,6 +2196,20 @@ fn gate_table(kind: GateKind, inputs: &[Bits]) -> Bits {
         }
     };
     b4_bits(out)
+}
+
+/// All-ones of width `w` (u64::MAX only fits w <= 64).
+fn all_ones(w: u32) -> Result<Bits, RunError> {
+    vl_values::from_numlit_parts(Some(w), false, VB::Bin, &"1".repeat(w as usize))
+        .map_err(|e| RunError(e.0))
+}
+
+/// Width-`w` value with ones ONLY in [hi:lo] (the force mask for a
+/// selection — zeros elsewhere, so unforced bits stay writable).
+fn mask_of(w: u32, hi: u32, lo: u32) -> Result<Bits, RunError> {
+    let n = hi.abs_diff(lo) + 1;
+    let zeros = Bits::zeros(w).map_err(|e| RunError(e.0))?;
+    Bits::set_part(&zeros, hi, lo, &all_ones(n)?).map_err(|e| RunError(e.0))
 }
 
 fn not4(v: B4) -> B4 {

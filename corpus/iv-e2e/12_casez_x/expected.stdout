@@ -1,0 +1,3 @@
+casez r=1
+casex r=3
+tb.v:17: $finish called at 0 (1ps)

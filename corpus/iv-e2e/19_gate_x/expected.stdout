@@ -1,0 +1,3 @@
+and=0 or=x nand=1 buf=0
+and=x or=1 nand=x
+tb.v:14: $finish called at 2000 (1ps)

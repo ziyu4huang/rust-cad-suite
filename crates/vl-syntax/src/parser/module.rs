@@ -527,25 +527,39 @@ impl<'d> Parser<'d> {
 
     fn gate_instance(&mut self, k: Kw) -> PResult<Option<ModuleItem>> {
         let start = self.bump().span;
+        // `buf #2 b1(out, in)` / `nand #(6, 7) g(...)` — the delay rides in
+        // Instance.params (single expr, or a Concat of the 2-3 tuple
+        // elements) exactly like module `#(...)` overrides; the elaborator
+        // decodes rise/fall/turn-off from it.
+        let mut params: Vec<ast::ParamConn> = Vec::new();
         if self.at_punct(Punct::Hash) {
-            // `buf #2 b1(out, in)` — gate/net delays are the R4 structural
-            // batch (design §4); without this arm the `#` dies as a bare
-            // syntax error with no milestone pointer for the classifier.
-            return self.err(
-                self.peek().span,
-                "VL-E900",
-                format!(
-                    "gate `{}` with a delay lands at the structural batch (milestone R4)",
-                    k.as_str()
-                ),
-            );
+            self.pos += 1;
+            let expr = if self.at_punct(Punct::LParen) {
+                self.pos += 1;
+                let mut parts: Vec<Expr> = Vec::new();
+                loop {
+                    parts.push(self.expr()?);
+                    if !self.eat_punct(Punct::Comma) {
+                        break;
+                    }
+                }
+                self.expect_punct(Punct::RParen, "to close the gate delay list")?;
+                if parts.len() == 1 {
+                    parts.pop().unwrap()
+                } else {
+                    Expr::Concat { span: start, parts }
+                }
+            } else {
+                self.expr()?
+            };
+            params.push(ast::ParamConn { span: start, name: None, expr: Some(expr) });
         }
         let insts = self.instance_units()?;
         let end = self.expect_punct(Punct::Semi, "after gate instance")?;
         Ok(Some(ModuleItem::Instance(ast::Instance {
             span: start.merge(end),
             mod_name: k.as_str().to_string(),
-            params: Vec::new(),
+            params,
             insts,
         })))
     }

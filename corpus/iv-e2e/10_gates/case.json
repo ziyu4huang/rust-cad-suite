@@ -1,6 +1,8 @@
 {
- "files": ["tb.v"],
+ "files": [
+  "tb.v"
+ ],
  "g": "2005",
  "plusargs": [],
- "enforced": false
+ "enforced": true
 }

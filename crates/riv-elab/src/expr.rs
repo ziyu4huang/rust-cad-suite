@@ -1146,6 +1146,39 @@ impl<'e, 'f> Lower<'e, 'f> {
             }
             Stmt::BAssign { lhs, rhs, .. } => self.lower_assign(lhs, rhs, false),
             Stmt::NbAssign { lhs, rhs, .. } => self.lower_assign(lhs, rhs, true),
+            Stmt::IntraAssign { span, lhs, rhs, delay, nba } => {
+                // `a = #5 v` / `q <= #10 d` (R4-e): the RHS (and any dynamic
+                // index) is sampled NOW; the commit lands after the delay —
+                // blocking commits in the active region of the target slot,
+                // NBA pushes into that slot's NBA region.
+                if let Expr::Ident { name, .. } = lhs {
+                    if let Some(NameKind::Local { .. }) = self.lookup(name) {
+                        return Err(self.err(*span, "intra-assignment delay on a block-local variable is not supported"));
+                    }
+                }
+                let lv = self.lower_lvalue(lhs)?;
+                let lw = match &lv {
+                    Lval::Var { var } => self.e.vars[*var as usize].width,
+                    Lval::Bit { .. } => 1,
+                    Lval::Part { hi, lo, .. } => hi.abs_diff(*lo) + 1,
+                    Lval::PartDyn { .. } => 1,
+                    Lval::Elem { var, .. } => self.e.vars[*var as usize].width,
+                    Lval::Concat { parts } => parts.iter().map(|(_, w)| *w).sum(),
+                };
+                let v = self.lower(rhs, lw)?;
+                let amt = self.delay_units(delay, *span)?;
+                if *nba {
+                    // NBA intra-delay schedules WITHOUT blocking the
+                    // process (14_nba_delay: finish at #11, not #21).
+                    self.emit(Op::AssignNbaDelay { lv, src: v.slot, amount: amt });
+                } else {
+                    // Blocking intra-delay samples and SUSPENDS; the
+                    // commit lands after the delay.
+                    self.emit(Op::Delay { amount: amt });
+                    self.emit(Op::AssignBlk { lv, src: v.slot });
+                }
+                Ok(())
+            }
             Stmt::If { cond, then, els, .. } => {
                 let c = self.lower(cond, 0)?;
                 let br = self.emit(Op::Branch { cond: c.slot, then: u32::MAX, els: u32::MAX });
