@@ -86,10 +86,40 @@ version = "0.1.0"
 [[package]]
 name = "riv-cli"
 version = "0.1.0"
+dependencies = [
+ "rcs-diag",
+ "riv-elab",
+ "riv-ir",
+ "riv-kernel",
+ "vl-syntax",
+ "vl-vcd",
+]
 
 [[package]]
 name = "riv-difftest"
 version = "0.1.0"
+
+[[package]]
+name = "riv-elab"
+version = "0.1.0"
+dependencies = [
+ "rcs-diag",
+ "riv-ir",
+ "vl-syntax",
+ "vl-values",
+]
+
+[[package]]
+name = "riv-ir"
+version = "0.1.0"
+
+[[package]]
+name = "riv-kernel"
+version = "0.1.0"
+dependencies = [
+ "riv-ir",
+ "vl-values",
+]
 
 [[package]]
 name = "rustversion"
@@ -164,6 +194,7 @@ version = "0.1.0"
 dependencies = [
  "rcs-diag",
  "vl-syntax",
+ "vl-values",
  "vl-vcd",
 ]
 
@@ -182,6 +213,10 @@ version = "0.1.0"
 dependencies = [
  "rcs-diag",
 ]
+
+[[package]]
+name = "vl-values"
+version = "0.1.0"
 
 [[package]]
 name = "vl-vcd"

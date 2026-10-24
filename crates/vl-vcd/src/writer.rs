@@ -26,6 +26,9 @@ pub struct VcdWriter {
     started: bool,
     header_done: bool,
     timescale: String,
+    /// `$version` identity (rverilator by default; riverilog passes its
+    /// own name via `new_named` — ivD1 self-identification).
+    program_name: String,
 }
 
 /// Printable ASCII 33..=126 (94 codes); multi-char beyond that.
@@ -46,7 +49,18 @@ fn id_code(n: usize) -> String {
 }
 
 impl VcdWriter {
-    pub fn new(mut vars: Vec<(String, Vec<String>, u32)>, timescale: &str) -> VcdWriter {
+    pub fn new(vars: Vec<(String, Vec<String>, u32)>, timescale: &str) -> VcdWriter {
+        Self::new_named(vars, "rverilator (rust-cad-suite)", timescale)
+    }
+
+    /// `program_name` lands in the `$version` header; the default keeps
+    /// the historical `rverilator` string so e2e expect.vcd goldens stay
+    /// byte-identical (ADR-0004 zero-drift anchor).
+    pub fn new_named(
+        mut vars: Vec<(String, Vec<String>, u32)>,
+        program_name: &str,
+        timescale: &str,
+    ) -> VcdWriter {
         vars.sort_by(|a, b| a.0.cmp(&b.0));
         let ids = vars
             .iter()
@@ -63,6 +77,7 @@ impl VcdWriter {
             started: false,
             header_done: false,
             timescale: timescale.to_string(),
+            program_name: program_name.to_string(),
         }
     }
 
@@ -82,7 +97,7 @@ impl VcdWriter {
 
     fn header(&self) -> String {
         let mut h = String::from("$date\n  (recorded)\n$end\n");
-        h.push_str("$version\n  rverilator (rust-cad-suite)\n$end\n");
+        h.push_str(&format!("$version\n  {}\n$end\n", self.program_name));
         h.push_str(&format!("$timescale {} $end\n", self.timescale));
         let mut tree: BTreeMap<Vec<String>, Vec<(String, u32, String)>> = BTreeMap::new();
         for (name, path, w) in &self.vars {
@@ -225,6 +240,24 @@ mod tests {
         assert!(out.contains("#0\n$dumpvars\n0!\nb00000011 \"\n$end\n"));
         assert!(out.contains("#5000\n1!\n"));
         assert!(!out.contains("#6000"), "unchanged values emit nothing");
+    }
+
+    #[test]
+    fn program_name_is_parametric_with_rverilator_default() {
+        let vars = vec![("x".to_string(), vec!["x".into()], 1u32)];
+        let mut w = VcdWriter::new(vars.clone(), "1ps");
+        w.start();
+        let mut vals = BTreeMap::new();
+        vals.insert("x".to_string(), "0".to_string());
+        w.dump_t0(&vals);
+        assert!(w.finish().contains("$version\n  rverilator (rust-cad-suite)\n$end"));
+
+        let mut w = VcdWriter::new_named(vars, "riverilog 0.1.0 (oss-cad-suite Rust rewrite)", "1ps");
+        w.start();
+        let mut vals = BTreeMap::new();
+        vals.insert("x".to_string(), "0".to_string());
+        w.dump_t0(&vals);
+        assert!(w.finish().contains("$version\n  riverilog 0.1.0 (oss-cad-suite Rust rewrite)\n$end"));
     }
 
     #[test]

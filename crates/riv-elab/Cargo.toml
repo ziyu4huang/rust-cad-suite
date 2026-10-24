@@ -1,0 +1,12 @@
+[package]
+name = "riv-elab"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+vl-syntax.workspace = true
+rcs-diag.workspace = true
+riv-ir.workspace = true
+vl-values.workspace = true

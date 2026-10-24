@@ -88,14 +88,66 @@ fn unplanned_targets_name_the_line() {
 }
 
 #[test]
-fn compile_pipeline_is_a_milestone_hard_error_exit_2() {
+fn compile_class_errors_are_exit_2() {
+    // Missing source file: a compile-class error, exit 2 (the R0 pipeline
+    // milestone stub retired at C2 — the pipeline now compiles flat
+    // designs; only the error CLASS is pinned here, the diag text is
+    // vl-syntax's).
     let (_, se, rc) = run("riverilog", &["-g2005", "tb.v"]);
     assert_eq!(rc, 2, "compile-class error");
-    assert!(se.contains("milestone R1"), "{se}");
-    // null target defers to R1 — same error today, different pointer.
+    assert!(se.contains("cannot open input file"), "{se}");
+    // null target still defers to R1 (preprocess+parse only).
     let (_, se, rc) = run("riverilog", &["-t", "null", "tb.v"]);
     assert_eq!(rc, 2);
     assert!(se.contains("milestone R1"), "{se}");
+}
+
+/// C2/C3 acceptance as a mechanical gate: riverilog compiles the iv-e2e
+/// flat cases to RIV-1 and rivvp runs them byte-identical to the recorded
+/// iverilog goldens (run in a temp dir, cwd = case dir per the recording
+/// contract).
+fn run_iv_case(case: &str) {
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let case_dir = root.join("corpus/iv-e2e").join(case);
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{case}"));
+    let _ = std::fs::remove_dir_all(&work);
+    std::fs::create_dir_all(&work).unwrap();
+    std::fs::copy(case_dir.join("tb.v"), work.join("tb.v")).unwrap();
+    let compile = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-g2005", "-o", "out.riv", "tb.v"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert!(
+        compile.status.success(),
+        "{case}: riverilog failed: {}",
+        String::from_utf8_lossy(&compile.stderr)
+    );
+    let run = Command::new(env!("CARGO_BIN_EXE_rivvp"))
+        .arg("out.riv")
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    let want = std::fs::read_to_string(case_dir.join("expected.stdout")).unwrap();
+    assert_eq!(
+        String::from_utf8_lossy(&run.stdout),
+        want,
+        "{case}: stdout byte-diff"
+    );
+    let want_exit: i32 = std::fs::read_to_string(case_dir.join("expected.exit"))
+        .unwrap()
+        .trim()
+        .parse()
+        .unwrap();
+    assert_eq!(run.status.code(), Some(want_exit), "{case}: exit code");
+}
+
+#[test]
+fn iv_e2e_hello_and_nba_are_byte_exact() {
+    run_iv_case("01_hello");
+    // 03_nba pins the stratified slot: active reads the old value, #0
+    // (inactive) still the old one, NBA commits after, settled at #1.
+    run_iv_case("03_nba");
 }
 
 #[test]
@@ -116,8 +168,10 @@ fn vvp_contracts() {
     let (_, se, rc) = run_vp(&[]);
     assert_eq!(rc, 255);
     assert_eq!(se, "rivvp: no input file.\n");
-    // Existing file, nothing loadable yet: milestone hard-error.
+    // Existing file that is not a riv design: load refusal, exit 1 (the
+    // R0 "nothing loadable" milestone stub retired at C3 — rivvp loads
+    // RIV-1 now).
     let (_, se, rc) = run_vp(&["Cargo.toml"]);
     assert_eq!(rc, 1);
-    assert!(se.contains("milestone R2"), "{se}");
+    assert!(se.contains("not a riv design"), "{se}");
 }

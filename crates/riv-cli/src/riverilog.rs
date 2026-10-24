@@ -1,12 +1,12 @@
 //! `riverilog` — the riverilog compiler entrypoint (iverilog-shaped CLI).
 //!
-//! R0 contract (docs/RIVERILOG-PLAN.md §5, all behavioral claims measured on
-//! Icarus Verilog 13.0 and pinned by crates/riv-cli/goldens):
-//! exit 0 = `-V`; exit 1 = `-h`/usage/illegal option (stderr); exit 2 =
-//! compile/elaboration class errors. The compile pipeline itself lands at
-//! R1 (preprocess+parse over the shared vl-syntax) and R2 (event kernel) —
-//! reaching it today is a milestone hard-error, never a silent no-op.
+//! Contract (iverilog-measured, pinned by crates/riv-cli/goldens): exit 0
+//! = `-V`; exit 1 = `-h`/usage/illegal option (stderr); exit 2 =
+//! compile/elaboration class errors. Since C2 the pipeline compiles flat
+//! designs to RIV-1 (`out.riv` / `-o`): preprocess+parse (shared
+//! vl-syntax) → flat elaboration (riv-elab) → RIV-1 write (riv-ir).
 
+use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -35,13 +35,14 @@ fn banner() -> String {
     )
 }
 
-/// Target registry: accepted (deferred), R-milestone-deferred, and the
-/// explicit no-plan list (PLAN §5: synthesis-netlist targets belong to the
+/// Target registry: accepted, R-milestone-deferred, and the explicit
+/// no-plan list (PLAN §5: synthesis-netlist targets belong to the
 /// yosys-equivalent line, not this tool).
-fn target_policy(t: &str) -> Result<&'static str, String> {
+fn target_policy(t: &str) -> Result<Option<&'static str>, String> {
     match t {
-        "vvp" => Ok("deferred to R2 (event kernel) + R6 (riv format)"),
-        "null" => Ok("deferred to R1 (preprocess + parse)"),
+        // The RIV-1 writer IS the vvp target since C2.
+        "vvp" => Ok(None),
+        "null" => Ok(Some("the null target (preprocess + parse only) lands at milestone R1 (docs/RIVERILOG-PLAN.md §8)")),
         "blif" | "fpga" | "vhdl" | "vlog95" => Err(format!(
             "riverilog: target `{t}` is not planned (synthesis-netlist output belongs to the yosys-equivalent line; see docs/RIVERILOG-PLAN.md §5)"
         )),
@@ -65,6 +66,8 @@ fn main() -> ExitCode {
     let mut sources: Vec<String> = Vec::new();
     let mut out: Option<String> = None;
     let mut target: Option<String> = None;
+    let mut top: Option<String> = None;
+    let mut include_dirs: Vec<PathBuf> = Vec::new();
     let mut i = 0usize;
     while i < argv.len() {
         let a = argv[i].clone();
@@ -79,6 +82,16 @@ fn main() -> ExitCode {
             }
             "-o" => {
                 out = argv.get(i + 1).cloned();
+                i += 1;
+            }
+            "-s" => {
+                top = argv.get(i + 1).cloned();
+                i += 1;
+            }
+            "-I" | "-y" => {
+                if let Some(d) = argv.get(i + 1) {
+                    include_dirs.push(PathBuf::from(d));
+                }
                 i += 1;
             }
             "-t" => match argv.get(i + 1) {
@@ -141,12 +154,19 @@ fn main() -> ExitCode {
     }
 
     if let Some(t) = &target {
-        if let Err(e) = target_policy(t) {
-            eprintln!("{e}");
-            return ExitCode::from(1);
+        match target_policy(t) {
+            Ok(None) => {}
+            Ok(Some(defer)) => {
+                eprintln!("riverilog: {defer}");
+                return ExitCode::from(2);
+            }
+            Err(e) => {
+                eprintln!("{e}");
+                return ExitCode::from(1);
+            }
         }
     }
-    let _ = out; // stored for R2 (default a.out per the oracle contract)
+    let out_path = out.unwrap_or_else(|| "a.out".to_string());
 
     if sources.is_empty() {
         eprintln!("riverilog: no source files.");
@@ -155,10 +175,67 @@ fn main() -> ExitCode {
         return ExitCode::from(1);
     }
 
-    // The compile pipeline itself: milestone hard-error (AGENTS §3 —
-    // unsupported never silently no-ops). Error class = compile (2).
-    eprintln!(
-        "riverilog: the compile pipeline lands at milestone R1 (preprocess+parse) and R2 (event kernel); nothing is compiled yet (docs/RIVERILOG-PLAN.md §8)"
-    );
-    ExitCode::from(2)
+    match compile(
+        &sources,
+        top.as_deref(),
+        &include_dirs,
+        Path::new(&out_path),
+    ) {
+        Ok(()) => ExitCode::from(0),
+        Err(e) => {
+            eprintln!("{e}");
+            ExitCode::from(u32::try_from(e.exit).unwrap_or(2) as u8)
+        }
+    }
+}
+
+/// Compile pipeline: preprocess + parse (shared vl-syntax) → flat
+/// elaboration (riv-elab) → RIV-1 text write.
+fn compile(
+    sources: &[String],
+    top: Option<&str>,
+    include_dirs: &[PathBuf],
+    out_path: &Path,
+) -> Result<(), riv_elab::ElabError> {
+    use rcs_diag::{DiagSink, SourceMap};
+    let mut sm = SourceMap::new();
+    let mut diags = DiagSink::new();
+    let opts = vl_syntax::pp::PpOptions {
+        include_dirs: include_dirs.to_vec(),
+        predefines: Vec::new(),
+    };
+    let mut modules = Vec::new();
+    let mut files: Vec<riv_elab::FileTs> = Vec::new();
+    for f in sources {
+        let path = PathBuf::from(f);
+        let Some(pp_out) = vl_syntax::pp::preprocess_file(&path, &mut sm, &mut diags, &opts) else {
+            continue;
+        };
+        files.push(riv_elab::FileTs {
+            path: f.clone(),
+            timescale: pp_out.timescale,
+        });
+        let parsed = vl_syntax::parser::parse_source_file(pp_out.tokens, &mut diags);
+        modules.extend(parsed.modules);
+    }
+    if diags.has_errors() {
+        let mut text = String::new();
+        rcs_diag::render_diags(&mut text, &sm, &diags.diags);
+        eprint!("{text}");
+        return Err(riv_elab::ElabError {
+            message: format!("riverilog: {} error(s) during parsing", diags.error_count()),
+            exit: 2,
+        });
+    }
+    let design = riv_elab::elaborate(riv_elab::ElabInput {
+        modules: &modules,
+        sm: &sm,
+        top,
+        files: &files,
+    })?;
+    std::fs::write(out_path, design.write()).map_err(|e| riv_elab::ElabError {
+        message: format!("riverilog: cannot write {}: {e}", out_path.display()),
+        exit: 2,
+    })?;
+    Ok(())
 }

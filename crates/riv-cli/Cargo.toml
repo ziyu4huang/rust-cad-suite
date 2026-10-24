@@ -5,6 +5,14 @@ edition.workspace = true
 license.workspace = true
 authors.workspace = true
 
+[dependencies]
+vl-syntax.workspace = true
+rcs-diag.workspace = true
+riv-elab.workspace = true
+riv-ir.workspace = true
+riv-kernel.workspace = true
+vl-vcd.workspace = true
+
 [[bin]]
 name = "riverilog"
 path = "src/riverilog.rs"

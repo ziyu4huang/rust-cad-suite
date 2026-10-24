@@ -3,8 +3,12 @@ resolver = "2"
 members = [
     "crates/riv-cli",
     "crates/riv-difftest",
+    "crates/riv-ir",
+    "crates/riv-elab",
+    "crates/riv-kernel",
     "crates/rcs-diag",
     "crates/vl-syntax",
+    "crates/vl-values",
     "crates/vl-sim",
     "crates/vl-vcd",
     "crates/vl-spec",
@@ -24,6 +28,10 @@ authors = ["rust-cad-suite contributors"]
 [workspace.dependencies]
 rcs-diag = { path = "crates/rcs-diag" }
 vl-syntax = { path = "crates/vl-syntax" }
+vl-values = { path = "crates/vl-values" }
+riv-ir = { path = "crates/riv-ir" }
+riv-elab = { path = "crates/riv-elab" }
+riv-kernel = { path = "crates/riv-kernel" }
 vl-sim = { path = "crates/vl-sim" }
 vl-vcd = { path = "crates/vl-vcd" }
 vl-spec = { path = "crates/vl-spec" }
