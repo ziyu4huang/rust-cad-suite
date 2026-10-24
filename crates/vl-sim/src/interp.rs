@@ -1678,6 +1678,14 @@ impl Sim {
                 }
             }
             Stmt::Disable { .. } | Stmt::Null { .. } => {}
+            // C6-relocated constructs never reach lowering (build errors at
+            // lower_stmt), so their read sets are irrelevant here.
+            Stmt::Wait { .. }
+            | Stmt::Fork { .. }
+            | Stmt::Force { .. }
+            | Stmt::Release { .. }
+            | Stmt::Deassign { .. }
+            | Stmt::ProcContAssign { .. } => {}
         }
     }
 
@@ -1747,7 +1755,37 @@ impl Sim {
         if depth > 64 {
             return Err(SimError::at("statement nesting too deep", stmt_span(s)));
         }
+        // C6 relocation (design §5 方言注): these parse-level milestone
+        // errors moved here from vl-syntax/parser/stmt.rs — message text
+        // preserved VERBATIM per family (M8: wait/fork; M7: force family +
+        // procedural assign). No e2e corpus case pins them (triage table
+        // has no force/fork constructs); vl-difftest 59/59 re-proves zero
+        // drift after the move.
         match s {
+            Stmt::Wait { .. } => {
+                return Err(SimError::at(
+                    "`wait` is not yet supported (milestone M8)",
+                    stmt_span(s),
+                ))
+            }
+            Stmt::Fork { .. } => {
+                return Err(SimError::at(
+                    "`fork/join` is not yet supported (milestone M8)",
+                    stmt_span(s),
+                ))
+            }
+            Stmt::Force { .. } | Stmt::Release { .. } | Stmt::Deassign { .. } => {
+                return Err(SimError::at(
+                    "force/release/deassign are not yet supported (milestone M7)",
+                    stmt_span(s),
+                ))
+            }
+            Stmt::ProcContAssign { .. } => {
+                return Err(SimError::at(
+                    "procedural continuous assignment is not yet supported (milestone M7)",
+                    stmt_span(s),
+                ))
+            }
             Stmt::Block {
                 name,
                 decls,
@@ -3206,6 +3244,12 @@ fn stmt_span(s: &Stmt) -> Span {
         | Stmt::SysCall { span, .. }
         | Stmt::SubCall { span, .. }
         | Stmt::Disable { span, .. }
+        | Stmt::Wait { span, .. }
+        | Stmt::Fork { span, .. }
+        | Stmt::Force { span, .. }
+        | Stmt::Release { span, .. }
+        | Stmt::Deassign { span, .. }
+        | Stmt::ProcContAssign { span, .. }
         | Stmt::Null { span } => *span,
     }
 }

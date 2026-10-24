@@ -245,6 +245,17 @@ impl<'d> Parser<'d> {
                         self.sync_top();
                     }
                 }
+            } else if self.at_kw(Kw::Primitive) {
+                // UDP table primitives are the R9 deep-water item (PLAN §8);
+                // a plain syntax error here would hide the milestone
+                // pointer the chase-ledger classifier keys on.
+                let t = self.peek().clone();
+                let _ = self.err::<()>(
+                    t.span,
+                    "VL-E900",
+                    "UDP primitives (`primitive ... endprimitive`) land at milestone R9".to_string(),
+                );
+                self.sync_top();
             } else {
                 let t = self.peek().clone();
                 let _ = self.err::<()>(

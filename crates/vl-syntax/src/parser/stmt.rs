@@ -47,24 +47,113 @@ impl<'d> Parser<'d> {
                     body: Box::new(body),
                 })
             }
-            Tok::Keyword(Kw::Wait) | Tok::Keyword(Kw::Fork) => self.err(
-                t.span,
-                "VL-E900",
-                format!(
-                    "`{}` is not yet supported (milestone M8)",
-                    if t.is_kw(Kw::Wait) { "wait" } else { "fork/join" }
-                ),
-            ),
-            Tok::Keyword(Kw::Force) | Tok::Keyword(Kw::Release) | Tok::Keyword(Kw::Deassign) => self.err(
-                t.span,
-                "VL-E900",
-                "force/release/deassign are not yet supported (milestone M7)",
-            ),
-            Tok::Keyword(Kw::Assign) => self.err(
-                t.span,
-                "VL-E900",
-                "procedural continuous assignment is not yet supported (milestone M7)",
-            ),
+            Tok::Keyword(Kw::Wait) => {
+                // R3-B relocation (design §5 方言注): the parse-level M8
+                // error arms moved to Sim::build verbatim (vl-sim side);
+                // the parser now produces the AST and riverilog lowers it.
+                self.pos += 1;
+                self.expect_punct(Punct::LParen, "after `wait`")?;
+                let cond = self.expr()?;
+                self.expect_punct(Punct::RParen, "to close `wait` condition")?;
+                let body = if self.at_punct(Punct::Semi) {
+                    self.pos += 1;
+                    None
+                } else {
+                    Some(Box::new(self.stmt()?))
+                };
+                Ok(Stmt::Wait {
+                    span: t.span.merge(cond.span()),
+                    cond,
+                    body,
+                })
+            }
+            Tok::Keyword(Kw::Fork) => {
+                self.pos += 1;
+                let name = if self.eat_punct(Punct::Colon) {
+                    let (n, _) = self.expect_ident("block name after `fork :`")?;
+                    Some(n)
+                } else {
+                    None
+                };
+                let mut branches = Vec::new();
+                loop {
+                    self.skip_attrs();
+                    if self.at_kw(Kw::Join) {
+                        self.pos += 1;
+                        break;
+                    }
+                    if self.at_eof() {
+                        return self.err(
+                            t.span,
+                            "VL-E020",
+                            "unterminated `fork` (missing `join`)".to_string(),
+                        );
+                    }
+                    if let Tok::Ident = self.peek().kind {
+                        // join_any/join_none lex as identifiers (SV keywords);
+                        // reject with the R8 pointer instead of a confusing
+                        // statement error.
+                        if self.peek().text == "join_any" || self.peek().text == "join_none" {
+                            return self.err(
+                                self.peek().span,
+                                "VL-E900",
+                                format!("`{}` is SystemVerilog (milestone R8)", self.peek().text),
+                            );
+                        }
+                    }
+                    let before = self.pos;
+                    match self.stmt() {
+                        Ok(b) => branches.push(b),
+                        Err(_) => {
+                            self.sync_stmt();
+                            if self.pos == before {
+                                self.pos += 1;
+                            }
+                        }
+                    }
+                }
+                let end = self.peek().span;
+                Ok(Stmt::Fork {
+                    span: t.span.merge(end),
+                    name,
+                    branches,
+                })
+            }
+            Tok::Keyword(Kw::Force) => {
+                self.pos += 1;
+                let lhs = self.expr()?;
+                self.expect_punct(Punct::Eq, "in `force lhs = rhs`")?;
+                let rhs = self.expr()?;
+                let end = self.expect_punct(Punct::Semi, "after `force` statement")?;
+                Ok(Stmt::Force {
+                    span: t.span.merge(end),
+                    lhs,
+                    rhs,
+                })
+            }
+            Tok::Keyword(Kw::Release) | Tok::Keyword(Kw::Deassign) => {
+                self.pos += 1;
+                let lhs = self.expr()?;
+                let end = self.expect_punct(Punct::Semi, "after statement")?;
+                Ok(if t.is_kw(Kw::Release) {
+                    Stmt::Release { span: t.span.merge(end), lhs }
+                } else {
+                    Stmt::Deassign { span: t.span.merge(end), lhs }
+                })
+            }
+            Tok::Keyword(Kw::Assign) => {
+                // Procedural continuous assignment: `assign lhs = rhs;`
+                self.pos += 1;
+                let lhs = self.expr()?;
+                self.expect_punct(Punct::Eq, "in procedural `assign lhs = rhs`")?;
+                let rhs = self.expr()?;
+                let end = self.expect_punct(Punct::Semi, "after procedural `assign`")?;
+                Ok(Stmt::ProcContAssign {
+                    span: t.span.merge(end),
+                    lhs,
+                    rhs,
+                })
+            }
             Tok::Keyword(Kw::Disable) => {
                 self.pos += 1;
                 let (name, _) = self.expect_ident("block name after `disable`")?;
@@ -566,6 +655,12 @@ pub(crate) fn stmt_span(s: &Stmt) -> rcs_diag::Span {
         | Stmt::SysCall { span, .. }
         | Stmt::SubCall { span, .. }
         | Stmt::Disable { span, .. }
+        | Stmt::Wait { span, .. }
+        | Stmt::Fork { span, .. }
+        | Stmt::Force { span, .. }
+        | Stmt::Release { span, .. }
+        | Stmt::Deassign { span, .. }
+        | Stmt::ProcContAssign { span, .. }
         | Stmt::Null { span } => *span,
     }
 }

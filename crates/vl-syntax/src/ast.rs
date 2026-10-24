@@ -253,6 +253,9 @@ pub struct PortConn {
 pub struct Function {
     pub span: Span,
     pub is_task: bool,
+    /// `function automatic ...` / `task automatic ...` — reentrant
+    /// (per-activation frames); default is static (shared frame).
+    pub automatic: bool,
     pub name: String,
     pub ret_signed: bool,
     pub ret_range: Option<Range>,
@@ -337,6 +340,42 @@ pub enum Stmt {
         span: Span,
         name: String,
         args: Vec<Expr>,
+    },
+    /// `wait (cond) stmt_or_null` — level wait until cond is true.
+    Wait {
+        span: Span,
+        cond: Expr,
+        body: Option<Box<Stmt>>,
+    },
+    /// `fork ... join` — concurrent branches; the process waits at the
+    /// join for all of them. (join_any/join_none are SV, milestone R8.)
+    Fork {
+        span: Span,
+        name: Option<String>,
+        branches: Vec<Stmt>,
+    },
+    /// `force lhs = rhs;` — procedural continuous override.
+    Force {
+        span: Span,
+        lhs: Expr,
+        rhs: Expr,
+    },
+    /// `release lhs;` — the reg keeps the forced value (04_force golden).
+    Release {
+        span: Span,
+        lhs: Expr,
+    },
+    /// `deassign lhs;`
+    Deassign {
+        span: Span,
+        lhs: Expr,
+    },
+    /// `assign lhs = rhs;` inside procedural scope — procedural
+    /// continuous assignment (cancelled by `deassign`).
+    ProcContAssign {
+        span: Span,
+        lhs: Expr,
+        rhs: Expr,
     },
     Disable {
         span: Span,

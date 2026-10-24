@@ -527,6 +527,19 @@ impl<'d> Parser<'d> {
 
     fn gate_instance(&mut self, k: Kw) -> PResult<Option<ModuleItem>> {
         let start = self.bump().span;
+        if self.at_punct(Punct::Hash) {
+            // `buf #2 b1(out, in)` — gate/net delays are the R4 structural
+            // batch (design §4); without this arm the `#` dies as a bare
+            // syntax error with no milestone pointer for the classifier.
+            return self.err(
+                self.peek().span,
+                "VL-E900",
+                format!(
+                    "gate `{}` with a delay lands at the structural batch (milestone R4)",
+                    k.as_str()
+                ),
+            );
+        }
         let insts = self.instance_units()?;
         let end = self.expect_punct(Punct::Semi, "after gate instance")?;
         Ok(Some(ModuleItem::Instance(ast::Instance {
@@ -826,7 +839,7 @@ impl<'d> Parser<'d> {
         let kwname = if is_task { "task" } else { "function" };
         let start = self.bump().span; // `function` / `task`
         self.skip_attrs();
-        if self.eat_kw(Kw::Automatic) {}
+        let automatic = self.eat_kw(Kw::Automatic);
         let mut ret_signed = false;
         let mut ret_range: Option<ast::Range> = None;
         let mut ret_type: Option<ParamType> = None;
@@ -1030,6 +1043,7 @@ impl<'d> Parser<'d> {
         Ok(ast::Function {
             span: start.merge(self.toks[(self.pos - 1).min(self.toks.len() - 1)].span),
             is_task,
+            automatic,
             name,
             ret_signed,
             ret_range,
