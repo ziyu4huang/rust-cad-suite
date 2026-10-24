@@ -11,7 +11,7 @@
   证据:`cargo run -p vl-difftest`(exit 0,== 55/55 ==);报告 [docs/e2e-report/index.html](e2e-report/index.html);
   期望文件 `corpus/e2e/*/expected.stdout` 已入 git。
 - **KR1.7 lint-only 差分軌(yosys tests/simple 收編,2026-10-23 立)**
-  當前:**80/87 = 92.0%**(首輪 44→二輪 73→三輪 77=u128 ADR-0006→四輪 80=IndexedPart lvalue+埠屬性+defparam 三修)。
+  當前:**83/87 = 95.4%**(44→73→77=u128 ADR-0006→80=IndexedPart/埠屬性/defparam→83=M8 寬埠三案例 ADR-0008)。
   證據:`bash scripts/lint_diff.sh corpus-external/yosys-simple corpus-external/yosys-simple/LINT-DIFF.tsv`
   (oracle=verilator --lint-only -Wno-fatal,判決只看 error 級);TSV 已入 git;
   餘 6 差異=>128 位三檔(多 limb 未來 ADR)/intra-assign/reals/字串(全 M8)。
