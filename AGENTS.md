@@ -164,3 +164,32 @@
 - 三面能力變更的機械閘=regress.sh 內(E2E 精確數 100%/lint parity 基線/
   wasm 差分+功能+vcd_parse/demo serve smoke+corpus 白名單/ffi 三閘含
   vcd_read)必綠;條文正典=SKILL「wasm 增補」節。
+
+## 10.8 表示變更與大數契約(2026-10-24 立法;M8 多 limb+riverilog R0 弧實錄)
+
+- **公共型別表示變更,欄位存取面普查先行**:`rg -c '\.field'` 普查全部呼叫端;
+  讀取面寬=struct 殼+私有 repr enum(欄位讀取零改動),禁裸 enum(enum Bits
+  炸 30+ `.width` 讀取點+與 AST `NumLit.width` 撞名實錄)。結果一律
+  canonicalize 回快臂,熱路徑不見 heap 形(REFLECTION §17.2;SKILL 13)。
+- **Limb/大數契約四律**(每律一真 bug;REFLECTION §17.3;SKILL 14):
+  ①符號中間值按 width 遮罩——limb 級運算跑整 limb,padding 垃圾跨輪複合
+  (spow 產出垃圾 limb 實錄);②補數表達式以 care 遮罩——遮罩輸入會被
+  `!d` 展開回去(reduce_and 假 0 實錄);③同號比較不反轉——二補數
+  pattern 序=值序,帶號單測必蓋符號四象限(both-negative 翻面=e2e
+  12_signed_ops 首輪抓出,單測全綠的盲區);④大數常數 limb-wise 構造
+  (`vec![1u64; n]`=[1,1,1,1] 不是 1,pow 全 limb 垃圾實錄)。
+  **機檢**=value.rs 的 N-vs-W property 測試(上下文確定運算×寬度掃描
+  1..128,同一對值原寬 vs 符號加寬運算截回必相等;自決定運算按 IEEE §5.4
+  排除),新 limb 代碼必過——**首跑連抓兩真 bug**(sadjust >128 頂 limb
+  餘位元填充缺失+pre-M8 ashr w+s>128 填充溢位),符號運算類真 bug 本弧
+  共三個全部由機械閘抓出。
+- **CLI/語料契約實測枚舉**(riverilog R0;REFLECTION §17.4-17.6;SKILL 15):
+  行為類契約只認實跑輸出(exit codes/錯誤文案逐字),清單類只認上游文檔,
+  皆無=釘「未知=硬錯」不發明清單(-g feature 清單盲猜未遂實錄,真表 R1
+  從 man page 建);expected.* 禁機器相關字串(絕對路徑/時鐘/主機名),
+  錄製 cwd=案例目錄並寫進 harness($finish 行內嵌編譯期路徑實錄);
+  **chase-ledger**:能力未到的期望先錄,pending 錨「里程碑硬錯」契約,
+  翻 enforced=同輪 commit,無 ledger 編輯的提前成功=DRIFT 紅燈。
+- **全量 --record 只在 oracle 升級輪跑**(provenance 檔必 churn——5.050→
+  5.052 實錄 58 檔;churn=升級信號要讀;日常錄單案例=`--corpus` 指向
+  含案例子目錄的父層)。正規化期望零漂移=升級無語義變化的免費證明。

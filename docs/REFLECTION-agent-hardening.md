@@ -328,3 +328,96 @@ LSB-first 負向測試原本只斷言「lockstep 整批分歧(≥40 違例)」�
 那條 invariant」;做不到指名=invariant 層有缺口(本次缺口=取樣相位,收口
 後自然可指名)。MsbFirst 誤報的解剖同時暴露 invariant 設計三缺陷(相位/
 來源/expected 生命週期)——**負向測試綠+正向測試紅的交叉點=設計缺陷最密集處**。
+
+## 17. 第六輪實錄(2026-10-24,M8 多 limb 值 + riverilog R0 弧)
+
+### 17.1 計畫的根因診斷必附重現;對抗審的職責=把假設變量測(Strategy)
+
+planner 對三個 lint 拒收案例的診斷是「需要寬運算」(從案例名 constpower 推斷);
+對抗審實跑重現後翻案:**三案例全部死在 `Bits::zeros(w)` 的儲存上限**(512/3594/
+256 位元寬埠宣告),constpower 的 `**` 本身只有 32 位元。同一輪還翻案兩處:
+「比較 bug 是潛伏」實為活蟲(96-bit 帶號比較今天就與 oracle 分歧,重現釘在
+/tmp/widecmp3.v);「~8 個 clone 點」實為 ~16 個破壞叢。**教訓**:計畫裡的根因
+斷言若不帶「已重現的命令+輸出」,它就是假設;對抗審的第一動作=逐條跑重現,
+不是讀邏輯。這是 §15.2(對抗審抓架構斷言錯)的升格:抓的不只是設計文檔的錯
+宣稱,連同輪 planner 的診斷也照翻。
+
+### 17.2 公共型別表示變更,先普查欄位存取面(Mechanical→SKILL 13)
+
+第一版把 `Bits` 改成 enum,`cargo check` 立即炸出 30+ 處 `.width` 欄位讀取
+(還會與 AST `NumLit.width` 撞名,盲目 sed 必傷)。終版=**struct 殼保留
+`pub width` + 私有二態 repr enum**——欄位讀取面零改動,只有 6 個結構體字面值
+與 2 個欄位存取叢需手術。**教訓**:改公共型別的表示法之前,先 `rg -c '\.field'`
+普查讀取面;讀取面寬=保留 struct 殼+私有 repr,不裸 enum。附帶法則:結果寬度
+≤128 一律 canonicalize 回快臂,熱路徑永不見 heap 形。
+
+### 17.3 Limb/大數契約四律(每律一個真 bug;Mechanical→SKILL 14)
+
+1. **符號中間值必須按 width 遮罩**:limb 級運算跑整 limb(64 的倍數),
+   200 位元值佔 256 位元;neg/pow 的 padding 位元垃圾會跨輪複合(spow 產出
+   [-8,-9,-9,-9] 型態的 limb)。修=每個帶號中間值過 `mask_width`。
+2. **補數表達式必須 care 遮罩**:reduce_and 的 W 臂先遮罩輸入仍錯——
+   `!d` 又把寬度以上的 0 padding 展開成 1,掃出一個假「0 位元」。修=遮罩
+   表達式本身(`(!d & !m) & care`),不是遮罩輸入。
+3. **同號比較不需反轉**:二補數 pattern 序=值序(同號時);只有跨號才走
+   符號分支。我寫了 both-negative 反轉,單測全綠(測試只有跨號案例),
+   **e2e `12_signed_ops` 首輪抓出翻面**——差分語料抓單測盲區再次實證。
+   帶號測試必須覆蓋符號類四象限(正×正/負×負/跨號×2),不是「有一個帶號案例」。
+4. **`vec![1u64; n]` 是 [1,1,1,1] 不是 1**:大數常數必須 limb-wise 構造
+   (`vec![0; n]; acc[0]=1`)。pow 的初始 acc 用錯,全部 limb 垃圾——且因為
+   輸入輸出都在寬域,單看結果「像是個數」極難目檢,是逐步探針才定位的。
+
+機檢層=value.rs 的系統性 N-vs-W property 測試(全運算×寬度掃描:同一對值
+在原寬與符號加寬後運算截回,結果必相等;自決定運算按 IEEE §5.4 邊界排除)。
+**首跑即連抓兩個已出貨的真 bug**,都不在任何人手工測試的覆盖裡:
+①`sadjust` 到 >128 寬時,源寬非 64 對齊的情境頂 limb 的剩餘位元沒被符號填充
+ (W 臂缺了 N 臂的 `!low_bits(sw)` 那步);②**pre-M8 就繼承的 N 臂 ashr
+ 填充溢位**——`fill << w` 在 u128 只能表達 bit 127,w+s>128 的帶號右移
+ (127 位元 -1 >>2)填充位元靜默丟失。修法=超界路由 limb 路徑。加上
+ 之前 e2e 抓的 both-negative 比較反轉,這一弧的符號運算類真 bug 共三個,
+ 全部由機械閘(而非人審)抓出——3-tiers 的價值主張在本輪有了最直接的一次
+ 實證。
+
+### 17.4 CLI 契約=實測枚舉;清單類從 man page 取,行為類從實跑取(Riverilog R0)
+
+R0 幾乎發生一次「盲猜立法」:我為 `-g` 旗標拼了一份 feature 清單寫進代碼,
+隨後對照真機才發現 **oracle 對任何未知 -g 參數(連 no-bogus)都回同一條
+"Unknown/Unsupported Language generation" 訊息**——正解=照鏡這一條可觀測
+行為,真 feature 登記表 R1 才從 man page 建。其餘契約同法釘死:`iverilog -h`
+exit 1(vs `vvp -h` exit 0 的不對稱)、illegal option 打印首 dash 後一個
+字元、無源檔文案、預設輸出 a.out。**教訓**:行為類契約只認實跑輸出;清單類
+(旗標表/feature 表)只認上游文檔;兩者都沒有就釘「未知=硬錯」,不發明清單。
+
+### 17.5 期望檔禁機器相關字串;錄製 cwd=案例目錄(Riverilog R0)
+
+$finish 行內嵌編譯期路徑——從 repo 根錄製會把 `corpus/iv-e2e/01_hello/tb.v`
+或絕對路徑烤進 goldens(跨機器必漂)。修=在案例目錄內編譯,golden 穩定為
+`tb.v:6:` 相對形。**法則**:expected.* 落檔前掃一眼絕對路徑/時鐘/主機名;
+錄製協議裡 cwd 是契約的一部分,寫進 harness 而不是靠紀律。
+
+### 17.6 Chase-ledger:能力未到,期望先行(Riverilog R0,新模式)
+
+R0 引擎還不存在,但 10 例期望已錄製入庫。閘的形態:pending 案例必須回答
+「里程碑硬錯」(exit 2+R 指針)——這本身就是被釘死的契約;某案例突然能跑而
+`case.json` 沒翻 `enforced: true` = DRIFT 紅燈(防假綠的反向閘)。里程碑落地
+時翻開案例=同輪 commit,閘自動切精確數比對,harness 零改動。**這是 EDA 工具
+漸進式交付的可複用模式**:期望先行、契約先行、能力逐案例點燈,每一步都有
+機械閘看著。
+
+### 17.7 Provenance churn 與 oracle 升級(流程)
+
+全量 `--record` 在 oracle 5.050→5.052 後 churn 了 58 個 provenance 檔
+(版本橫幅+walltime);**正規化期望零漂移**=一次免費的「升級無語義變化」證明。
+處置=還原 provenance churn 保持弧手術性;churn 本身是 oracle 升級的信號,
+要讀不要瞞。錄製協議註記:全量重錄只在 oracle 升級輪做,日常用 `--corpus`
+指向父層錄單案例。
+
+### 17.8 對 3-tiers 的觀察
+
+本輪兩個弧的四層落點:機檢=N-vs-W property 測試+chase-ledger 閘+既有
+regress 全閘(首輪抓 both-negative 翻面);skill=鐵則 13-15;AGENTS=§10.8;
+證據=ADR-0008+RIVERILOG-PLAN §0/case60+cli goldens。值得記錄的後設觀察:
+**「單測全綠+e2e 紅」的案例(both-negative)在六輪裡第二次出現**(§14 的
+race-free TB 也是)——單測證明「我寫的規則對」,e2e 證明「規則覆蓋了真世界」;
+兩者不可互替,且新運算子的單測清單應該機械化(符號四象限/寬度邊界 63/64/65/
+127/128/129/x 位置),不靠作者直覺列。

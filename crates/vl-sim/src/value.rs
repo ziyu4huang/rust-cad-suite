@@ -676,12 +676,27 @@ impl Bits {
         }
         chk(width)?;
         if width > 128 {
-            // Limb path: fill the extension region with the sign kind.
+            // Limb path: sign-fill the remainder bits of the top source limb
+            // first (the limb arm of the N arm's `!low_bits(sw)` fill), then
+            // extend whole limbs with the sign kind. Skipping the remainder
+            // fill corrupts every source width that is not a multiple of 64
+            // (the N-vs-W property test caught this on its first run).
             let (sign, sign_unknown) = self.sign_bit();
             let n = limbs_for(width);
             let fill: u64 = if sign { u64::MAX } else { 0 };
             let fillm: u64 = if sign_unknown { u64::MAX } else { 0 };
             let mut l = Limbs::of(self);
+            let rem = self.width % 64;
+            if rem != 0 {
+                let li = limbs_for(self.width) - 1;
+                let hi = !((1u64 << rem) - 1);
+                if sign {
+                    l.data[li] |= hi;
+                }
+                if sign_unknown {
+                    l.mask[li] |= hi;
+                }
+            }
             l.data.resize(n, fill);
             l.mask.resize(n, fillm);
             let (d, m) = trunc_limbs(&l.data, &l.mask, width);
@@ -1359,6 +1374,14 @@ impl Bits {
         let w = self.width;
         match &self.repr {
             Repr::N { data, mask } => {
+                // The fill<<w trick below needs bits [w, w+s) representable in
+                // u128; beyond that the fill silently drops (pre-M8 inherited
+                // bug, caught by the N-vs-W property: 127-bit -1 >>2 lost the
+                // top fill bit). Route through the limb path, which has room.
+                if w + s > 128 {
+                    let ext = self.sadjust(w + s)?;
+                    return ext.ashr(amount, true)?.trunc(w);
+                }
                 let (sign, sign_unknown) = self.sign_bit();
                 let fill: u128 = if !sign_unknown && sign { !0u128 } else { 0 };
                 let fillm: u128 = if sign_unknown { !0u128 } else { 0 };
@@ -2490,6 +2513,85 @@ mod tests {
         assert!(!p.is_wide());
         let cmp = big.logic_eq(&big).unwrap();
         assert!(!cmp.is_wide());
+    }
+
+    /// Mechanical check for the AGENTS 10.8 limb laws: for every
+    /// context-determined op, computing at the value's own width (N arm) must
+    /// equal computing sign-padded at a wide width (W arm) truncated back.
+    /// Self-determined ops (reductions, concat, replicate, truthy) are
+    /// excluded by definition (IEEE 1364-2005 §5.4 — padding is not part of
+    /// their operand). This would have caught the pack two-limb bug, the
+    /// reduce care-mask bug and the cmp reversal mechanically.
+    #[test]
+    fn n_w_padding_property() {
+        let widths = [1u32, 4, 7, 63, 64, 65, 80, 100, 127, 128];
+        let tw = 192u32; // any width > 128 forces the W arm
+        let mag = |w: u32, k: usize| -> u128 {
+            match k {
+                0 => 0,
+                1 => 1,
+                2 => low_bits(w),                       // all ones
+                3 => 1u128 << (w - 1),                  // sign bit
+                _ => 0xA5A5_5A5A_0000_00FF & low_bits(w), // pattern
+            }
+        };
+        for &w in &widths {
+            for k1 in 0..5 {
+                for k2 in 0..5 {
+                    let a = Bits::from_u128(w, mag(w, k1)).unwrap();
+                    let b = Bits::from_u128(w, mag(w, k2)).unwrap();
+                    let aw = a.uadjust(tw).unwrap();
+                    let bw = b.uadjust(tw).unwrap();
+                    let asg = a.sadjust(tw).unwrap();
+                    let bsg = b.sadjust(tw).unwrap();
+                    let cmp1 = |op: &str, r: &Bits, rw: &Bits| {
+                        assert_eq!(r.fmt_bin(), rw.fmt_bin(),
+                            "op {op} mismatch at width {w} ({k1},{k2})");
+                    };
+                    let cmp1b = |op: &str, r: &Bits, rw: &Bits| {
+                        assert_eq!(r.to_u64_lossy(), rw.to_u64_lossy(),
+                            "op {op} 1-bit mismatch at width {w} ({k1},{k2})");
+                    };
+                    cmp1("add", &a.add(&b).unwrap(), &aw.add(&bw).unwrap().trunc(w).unwrap());
+                    cmp1("sub", &a.sub(&b).unwrap(), &aw.sub(&bw).unwrap().trunc(w).unwrap());
+                    cmp1("mul", &a.mul(&b).unwrap(), &aw.mul(&bw).unwrap().trunc(w).unwrap());
+                    cmp1("div", &a.div(&b).unwrap(), &aw.div(&bw).unwrap().trunc(w).unwrap());
+                    cmp1("rem", &a.rem(&b).unwrap(), &aw.rem(&bw).unwrap().trunc(w).unwrap());
+                    cmp1("and", &a.bit_and(&b).unwrap(), &aw.bit_and(&bw).unwrap().trunc(w).unwrap());
+                    cmp1("or", &a.bit_or(&b).unwrap(), &aw.bit_or(&bw).unwrap().trunc(w).unwrap());
+                    cmp1("xor", &a.bit_xor(&b).unwrap(), &aw.bit_xor(&bw).unwrap().trunc(w).unwrap());
+                    cmp1("merge", &a.merge(&b).unwrap(), &aw.merge(&bw).unwrap().trunc(w).unwrap());
+                    cmp1b("eq", &a.logic_eq(&b).unwrap(), &aw.logic_eq(&bw).unwrap());
+                    cmp1b("case_eq", &a.case_eq(&b).unwrap(), &aw.case_eq(&bw).unwrap());
+                    cmp1b("lt", &a.lt(&b).unwrap(), &aw.lt(&bw).unwrap());
+                    let sh = (k1 as u128) % (w as u128).max(1); // keep below w
+                    let amt = Bits::from_u128(w, sh).unwrap();
+                    let amtw = Bits::from_u128(tw, sh).unwrap();
+                    cmp1("shl", &a.shl(&amt).unwrap(), &aw.shl(&amtw).unwrap().trunc(w).unwrap());
+                    cmp1("shr", &a.shr(&amt).unwrap(), &aw.shr(&amtw).unwrap().trunc(w).unwrap());
+                    cmp1("ashr", &a.ashr(&amt, true).unwrap(), &asg.ashr(&amtw, true).unwrap().trunc(w).unwrap());
+                    cmp1("part", &a.part(w / 2, 0).unwrap(), &aw.part(w / 2, 0).unwrap());
+                    if a.is_known() && b.is_known() {
+                        cmp1("sdiv", &a.sdiv(&b).unwrap(), &asg.sdiv(&bsg).unwrap().trunc(w).unwrap());
+                        cmp1("srem", &a.srem(&b).unwrap(), &asg.srem(&bsg).unwrap().trunc(w).unwrap());
+                        // Same-sign and cross-sign compare order must be
+                        // padding-invariant (the both-negative reversal bug
+                        // class — AGENTS 10.8 ③).
+                        assert_eq!(a.cmp_signed(&b), asg.cmp_signed(&bsg));
+                    }
+                }
+            }
+        }
+        // Limb round-trip: of/padded preserve the value exactly.
+        for &w in &widths {
+            for k in 0..5 {
+                let a = Bits::from_u128(w, mag(w, k)).unwrap();
+                let rt = Limbs::of(&a).pack(w).unwrap();
+                assert_eq!(a, rt, "limb round-trip at width {w} ({k})");
+                let pt = Limbs::padded(&a, 200).pack(200).unwrap();
+                assert_eq!(pt.trunc(w).unwrap(), a, "padded round-trip at width {w} ({k})");
+            }
+        }
     }
 
     #[test]

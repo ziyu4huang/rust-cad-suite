@@ -41,6 +41,21 @@ description: rust-cad-suite 开发正典——AI agent 做 EDA/IC 工具(模拟�
    不取被 slave 污染的匯流排);取樣點鎖「準位整窗恆定」的相位(SCL 高半),
    低半取樣跨邊界(REFLECTION §16)。
 
+13. **公共型別表示變更,欄位存取面普查先行**:`rg -c '\\.field'` 全 workspace
+    普查;讀取面寬=struct 殼+私有 repr enum(欄位讀取零改動),禁裸 enum
+    (實錄:enum Bits 炸 30+ `.width` 讀取點並與 AST `NumLit.width` 撞名)。
+    結果一律 canonicalize 回快臂,熱路徑不見 heap 形(REFLECTION §17.2)。
+14. **Limb/大數契約四律**:①符號中間值按 width 遮罩(padding 垃圾跨輪複合)
+    ②補數表達式以 care 遮罩(遮罩輸入會被 `!d` 展開回去)③同號比較不反轉
+    (二補數 pattern 序=值序;帶號單測必蓋符號四象限)④大數常數 limb-wise
+    構造(`vec![1u64; n]`=[1,1,1,1] 不是 1)。機檢=value.rs 的 N-vs-W
+    property 測試(全運算×寬度掃描),新 limb 代碼必過(REFLECTION §17.3)。
+15. **CLI/語料契約實測枚舉**:行為類只認實跑輸出(exit codes/錯誤文案逐字),
+    清單類只認上游文檔,兩者皆無=釘「未知=硬錯」不發明清單;expected.* 禁
+    機器相關字串,錄製 cwd=案例目錄(契約寫進 harness);能力未到的期望先錄
+    =chase-ledger(pending 錨「里程碑硬錯」契約,翻 enforced=同輪 commit,
+    無 ledger 編輯的提前成功=DRIFT 紅燈)(REFLECTION §17.4-17.6)。
+
 ## 标准循环(语义开发)
 
 ```
@@ -62,8 +77,8 @@ description: rust-cad-suite 开发正典——AI agent 做 EDA/IC 工具(模拟�
 
 任何新铁则必须同轮落四层,缺一不算数:
 ①机械闸(scripts/regress.sh:E2E 差分精确数 100%/lint parity 基线/wasm 差分+
-  功能+vcd_parse/demo serve smoke+corpus 白名单/ffi 三闸含 vcd_read——
-  或 vl-difftest 内断言)
+  功能+vcd_parse/demo serve smoke+corpus 白名单/ffi 三闸含 vcd_read+
+  riv-cli goldens/riv-difftest chase-ledger——或 vl-difftest 内断言)
 ②本 skill 的正典条文
 ③AGENTS.md 对应节
 ④证据页/报告(docs/e2e-report/)可核。
