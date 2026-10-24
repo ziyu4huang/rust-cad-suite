@@ -32,6 +32,12 @@ pub enum Variant {
     Correct,
     LsbFirst,
     NoAckRelease,
+    /// Honors scl_i at the read sample (`rd_mode && scl_i`) — deviates from
+    /// the documented simplification "scl_i unused". Behaviorally EQUIVALENT
+    /// against a slave that never stretches (scl_i mirrors the master's own
+    /// schedule); only a stretching slave exposes it, which is why the
+    /// negative test pairs this variant with `Config::stretch`.
+    HonorsSclI,
 }
 
 const LSB_ANCHOR: &str = "tx[7 - bitcnt[2:0]]";
@@ -43,10 +49,13 @@ const NOACK_BROKEN: &str = "end else begin\n              sda_oe <= 1'b1;\n     
 /// panic — this crosses the wasm boundary, where a trap kills the page) if
 /// a surgery anchor misses; the native test asserts the anchors hit.
 pub fn rtl_for(v: Variant) -> Result<String, SpecError> {
+    const SCL_ANCHOR: &str = "if (rd_mode) begin\n                tx <= {tx[6:0], sda_i};\n              end";
+    const SCL_BROKEN: &str = "if (rd_mode && scl_i) begin\n                tx <= {tx[6:0], sda_i};\n              end";
     let (anchor, broken) = match v {
         Variant::Correct => return Ok(RTL.to_string()),
         Variant::LsbFirst => (LSB_ANCHOR, LSB_BROKEN),
         Variant::NoAckRelease => (NOACK_ANCHOR, NOACK_BROKEN),
+        Variant::HonorsSclI => (SCL_ANCHOR, SCL_BROKEN),
     };
     let out = RTL.replace(anchor, broken);
     if out == RTL {
@@ -57,11 +66,38 @@ pub fn rtl_for(v: Variant) -> Result<String, SpecError> {
     Ok(out)
 }
 
-/// One spec run's artifacts: the structured report and the run's VCD
-/// (rendered to SVG by the demo; the wasm gate byte-compares two runs).
+/// One spec run's artifacts: the structured report, the run's VCD
+/// (rendered to SVG by the demo; the wasm gate byte-compares two runs),
+/// and one `dout` sample per completed read byte (absolute payload checks
+/// for multi-address scenarios).
 pub struct ScenarioResult {
     pub report: SpecReport,
     pub vcd: Option<String>,
+    pub dout_samples: Vec<u8>,
+}
+
+/// Scenario configuration: the RTL variant, the slave set behind the bus
+/// (address, per-address read word pattern), and whether the slave set
+/// stretches SCL after every fall.
+pub struct Config {
+    pub variant: Variant,
+    pub slaves: Vec<(u8, [u8; 4])>,
+    pub stretch: bool,
+    /// Read-leg addresses; defaults to each configured slave's address.
+    /// Point it at an address OUTSIDE the table to exercise the
+    /// unknown-address NACK path (released bus reads 0xff).
+    pub read_addrs: Option<Vec<u8>>,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Config {
+            variant: Variant::Correct,
+            slaves: vec![(ADDR, [0xA5, 0x3C, 0x81, 0x5A])],
+            stretch: false,
+            read_addrs: None,
+        }
+    }
 }
 
 struct Ids {
@@ -131,9 +167,9 @@ fn issue(
 /// Assemble the full harness for variant `v` (force_dump included — the
 /// VCD must be capturing before the init puts).
 fn build(
-    v: Variant,
+    cfg: &Config,
 ) -> Result<(LockstepSpec<I2cGolden>, Ids, Rc<RefCell<Option<u8>>>), SpecError> {
-    let rtl = rtl_for(v)?;
+    let rtl = rtl_for(cfg.variant)?;
     let sim = build_sim(&[("i2c_master.v", rtl.as_str())], "i2c_master")?;
     let mut spec =
         LockstepSpec::new(sim, "clk", PRESCALE, I2cGolden::new(PRESCALE as u16, ADDR))?;
@@ -185,7 +221,11 @@ fn build(
         sda_o: ids.sda_o,
         scl_oe: ids.scl_oe,
         sda_oe: ids.sda_oe,
-        slave: Slave::new(ADDR),
+        slave: Slave::with_slaves(
+            &cfg.slaves,
+            if cfg.stretch { 12 } else { 0 },
+            true,
+        ),
     }));
     let expected: Rc<RefCell<Option<u8>>> = Rc::new(RefCell::new(None));
     let b2 = bus.clone();
@@ -238,10 +278,19 @@ fn build(
     Ok((spec, ids, expected))
 }
 
-/// Run the canonical write script on variant `v` end-to-end inside this
-/// process (wasm-safe: no fs/threads; error paths return Err, never panic).
+/// Run the canonical write script (START; WR 0xA0; WR 0x96; STOP; settle)
+/// end-to-end inside this process (wasm-safe: no fs/threads; error paths
+/// return Err, never panic).
 pub fn run(v: Variant) -> Result<ScenarioResult, SpecError> {
-    let (mut spec, ids, expected) = build(v)?;
+    run_cfg(&Config {
+        variant: v,
+        ..Config::default()
+    })
+}
+
+/// Run `cfg` with the canonical write script.
+pub fn run_cfg(cfg: &Config) -> Result<ScenarioResult, SpecError> {
+    let (mut spec, ids, expected) = build(cfg)?;
     issue(&mut spec, &ids, (crate::CMD_START, 0))?;
     *expected.borrow_mut() = Some(0xA0);
     issue(&mut spec, &ids, (CMD_WR, 0xA0))?;
@@ -254,5 +303,41 @@ pub fn run(v: Variant) -> Result<ScenarioResult, SpecError> {
     // VCD contract: take before finish (finish consumes the spec).
     let vcd = spec.sim().take_vcd().map(|(_, text)| text);
     let report = spec.finish();
-    Ok(ScenarioResult { report, vcd })
+    Ok(ScenarioResult {
+        report,
+        vcd,
+        dout_samples: Vec::new(),
+    })
+}
+
+/// Run one read transaction per configured slave (START; WR addr|1 — the
+/// address byte with R/W=1; RD — the slave drives its first word; STOP)
+/// and return the `dout` sample of each read byte. Addressed slaves answer
+/// with their own word; an unknown address is NACKed and the released bus
+/// reads 0xff.
+pub fn run_reads(cfg: &Config) -> Result<ScenarioResult, SpecError> {
+    let (mut spec, ids, _expected) = build(cfg)?;
+    let mut dout_samples = Vec::new();
+    let read_addrs: Vec<u8> = match &cfg.read_addrs {
+        Some(a) => a.clone(),
+        None => cfg.slaves.iter().map(|(a, _)| *a).collect(),
+    };
+    for addr in &read_addrs {
+        issue(&mut spec, &ids, (crate::CMD_START, 0))?;
+        issue(&mut spec, &ids, (CMD_WR, (addr << 1) | 1))?;
+        issue(&mut spec, &ids, (crate::CMD_RD, 0))?;
+        dout_samples.push(spec.read_u64(ids.dout) as u8);
+        issue(&mut spec, &ids, (CMD_STOP, 0))?;
+        for _ in 0..16 {
+            spec.cycle(&CmdInput::idle())?;
+        }
+    }
+    // VCD contract: take before finish (finish consumes the spec).
+    let vcd = spec.sim().take_vcd().map(|(_, text)| text);
+    let report = spec.finish();
+    Ok(ScenarioResult {
+        report,
+        vcd,
+        dout_samples,
+    })
 }

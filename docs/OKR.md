@@ -37,6 +37,9 @@
   **2026-10-24 wasm/demo 整合收口**:i2c_spec_check one-shot wasm 面
   (scenario.rs 全組合:四不變量+canonical 腳本+三變體)+demo spec 卡
   (三變體 radio/違例表/SVG 波形/RTL 變更檢視)+wasm spec 閘。
+  **2026-10-24 時鐘伸展+多位址收口**:Slave 位址表(未知位址 NACK/讀 0xff)
+  +SCL 伸展(fall 觸發釘低;spec RTL 伸展下乾淨)+HonorsSclI 變體
+  (無伸展等價不報/伸展下 lockstep 抓到)+phantom 跳過(9 沿)。
   證據:`cargo test -p vl-spec -p spec-i2c`;shift_repro 三層;
   `bun crates/vl-wasm/wasm-test/spec.mjs`;docs/e2e-report/wasm-demo-v4-spec-*.png;
   docs/adr/0007。

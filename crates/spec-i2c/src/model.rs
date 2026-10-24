@@ -31,12 +31,32 @@ pub const ST_ACK: u8 = 3;
 pub const ST_HOLD: u8 = 4;
 pub const ST_STOP: u8 = 5;
 
-/// Ideal slave: acks address 0x50 (+R bit), acks every data byte, and
-/// emits read data from a fixed pattern.
+/// Ideal slave SET behind one bus position: acks a matched address
+/// (byte[7:1] in the table), NACKs unknown addresses, and emits read data
+/// from the addressed slave's word pattern. One instance models the whole
+/// set honestly for this protocol subset (non-addressed slaves never
+/// drive, so the wire-AND of the set equals the addressed slave). Optional
+/// clock stretching: after each SCL fall the slave holds SCL low for
+/// `stretch` calls (a slow slave; the master per this spec ignores scl_i,
+/// so data levels survive the stretch and only the schedule shifts).
 pub struct Slave {
     pub addr: u8,
-    read_data: [u8; 4],
+    addrs: Vec<u8>,
+    words: Vec<[u8; 4]>,
+    active: usize,
     read_idx: usize,
+    stretch_cfg: u32,
+    scl_stretch_left: u32,
+    /// This RTL's documented START phantom: the first byte after START
+    /// shifts whatever `tx` holds. A slave modeling the documented spec
+    /// skips that byte entirely (it is neither an address nor data); the
+    /// phantom's ack slot stays released (NACK) because nothing decodes.
+    skip_phantom: bool,
+    skip_bits: u32,
+    /// The addressed slave answered the current address byte: gates the
+    /// read-payload drive (an unaddressed slave never drives — the bus
+    /// reads released).
+    addressed: bool,
     prev_scl: u8,
     prev_sda: u8,
     started: bool,
@@ -59,10 +79,30 @@ pub struct Slave {
 
 impl Slave {
     pub fn new(addr: u8) -> Slave {
+        Slave::with_slaves(&[(addr, [0xA5, 0x3C, 0x81, 0x5A])], 0, false)
+    }
+
+    /// A slave set: `(address, read word pattern)` pairs, optionally
+    /// stretching SCL after every fall (`stretch_cycles` calls per fall;
+    /// 0 = never stretches), optionally skipping the START phantom byte
+    /// (true = model the documented spec where the address byte is the
+    /// second byte after START).
+    pub fn with_slaves(
+        table: &[(u8, [u8; 4])],
+        stretch_cycles: u32,
+        skip_phantom: bool,
+    ) -> Slave {
         Slave {
-            addr,
-            read_data: [0xA5, 0x3C, 0x81, 0x5A],
+            addr: table[0].0,
+            addrs: table.iter().map(|(a, _)| *a).collect(),
+            words: table.iter().map(|(_, w)| *w).collect(),
+            active: 0,
             read_idx: 0,
+            stretch_cfg: stretch_cycles,
+            scl_stretch_left: 0,
+            skip_phantom,
+            skip_bits: 0,
+            addressed: false,
             prev_scl: 1,
             prev_sda: 1,
             started: false,
@@ -80,8 +120,17 @@ impl Slave {
 /// The open-drain wire-AND + slave, shared by the golden model's bus view.
 /// Given the master's drive outputs, returns the bus levels.
 pub fn bus_levels(m: &MasterView, slave: &mut Slave) -> (u8, u8) {
-    let scl_i = if m.scl_oe != 0 && m.scl_o == 0 { 0 } else { 1 };
+    let mut scl_i = if m.scl_oe != 0 && m.scl_o == 0 { 0 } else { 1 };
     let mut sda_i = if m.sda_oe != 0 && m.sda_o == 0 { 0 } else { 1 };
+    // Clock stretching: while the stretch counter runs, the slave holds SCL
+    // low no matter what the master does with its own scl_o. The master per
+    // this spec ignores scl_i, so its schedule is unaffected and data
+    // levels (stable through both halves) survive; only the bus schedule
+    // shifts. A variant RTL that honors scl_i diverges exactly here.
+    if slave.scl_stretch_left > 0 {
+        scl_i = 0;
+        slave.scl_stretch_left -= 1;
+    }
     // Slave reacts to SDA/SCL on the falling edge of SCL (change) and the
     // rising edge (sample); START/STOP detected on SDA falls/rises while
     // SCL is high.
@@ -93,6 +142,10 @@ pub fn bus_levels(m: &MasterView, slave: &mut Slave) -> (u8, u8) {
         slave.ack_pull = false;
         slave.ack_hi = false;
         slave.read_mode = false;
+        slave.addressed = false;
+        if slave.skip_phantom {
+            slave.skip_bits = 9; // the phantom's 8 bits + its ack level
+        }
     }
     if slave.prev_scl == 1 && scl_i == 1 && slave.prev_sda == 0 && sda_i == 1 && !slave.prev_pull {
         slave.started = false;
@@ -101,6 +154,7 @@ pub fn bus_levels(m: &MasterView, slave: &mut Slave) -> (u8, u8) {
         slave.in_ack = false;
         slave.ack_pull = false;
         slave.ack_hi = false;
+        slave.addressed = false;
         slave.bits.clear();
     }
     // Rising edge: a slave holding ACK keeps it through the whole 9th
@@ -121,6 +175,7 @@ pub fn bus_levels(m: &MasterView, slave: &mut Slave) -> (u8, u8) {
     } else if !slave.in_ack
         && !slave.ack_hi
         && slave.started
+        && slave.addressed
         && slave.read_mode
         && slave.bits.len() <= 8
         && (scl_i == 0 && slave.bits.len() < 8
@@ -132,7 +187,7 @@ pub fn bus_levels(m: &MasterView, slave: &mut Slave) -> (u8, u8) {
         // level continuous across the SCL edge the master samples at.
         let len = slave.bits.len();
         let bitpos = if scl_i == 1 { 8 - len } else { 7 - len };
-        let word = slave.read_data[slave.read_idx % slave.read_data.len()];
+        let word = slave.words[slave.active][slave.read_idx % slave.words[slave.active].len()];
         (word >> bitpos) & 1 == 0
     } else {
         false
@@ -147,6 +202,10 @@ pub fn bus_levels(m: &MasterView, slave: &mut Slave) -> (u8, u8) {
         if slave.in_ack {
             slave.in_ack = false;
             slave.ack_hi = true;
+        } else if slave.skip_bits > 0 {
+            // The START phantom's bits: not an address, not data — the
+            // slave neither decodes nor acks them (released ack slot).
+            slave.skip_bits -= 1;
         } else {
             slave.bits.push(sda_i);
             if slave.bits.len() == 8 {
@@ -156,17 +215,25 @@ pub fn bus_levels(m: &MasterView, slave: &mut Slave) -> (u8, u8) {
                     .fold(0u8, |a, &b| (a << 1) | b);
                 let completed_payload = slave.read_mode; // mode this byte ran in
                 slave.read_mode = byte & 1 == 1;
-                let matched = (byte >> 1) == slave.addr;
-                // Matched write bytes: the slave pulls the ack low. Read
-                // payloads: the master acks; the slave stays released.
+                let addr = byte >> 1;
+                let matched = slave.addrs.contains(&addr);
+                if matched {
+                    slave.addressed = true;
+                    slave.active = slave.addrs.iter().position(|a| *a == addr).unwrap();
+                    slave.read_idx = 0; // each read transaction restarts the word
+                }
+                // Addressed write bytes: the slave pulls the ack low.
+                // Unknown addresses: NACK (released — nothing at that
+                // address pulls). Read payloads: the master acks; the
+                // slave stays released.
                 slave.in_ack = true;
                 slave.ack_pull = matched || !slave.read_mode;
                 slave.ack_hi = false;
                 if slave.read_mode && completed_payload {
                     // Payload read byte serviced: the next payload serves
                     // the next word. The address byte advances nothing.
-                    slave.read_idx =
-                        (slave.read_idx + 1) % slave.read_data.len();
+                    slave.read_idx = (slave.read_idx + 1)
+                        % slave.words[slave.active].len();
                 }
                 slave.bits.clear();
             }
@@ -177,6 +244,19 @@ pub fn bus_levels(m: &MasterView, slave: &mut Slave) -> (u8, u8) {
     if slave.started && slave.prev_scl == 1 && scl_i == 0 && slave.ack_hi {
         slave.ack_hi = false;
         slave.ack_pull = false;
+    }
+    // Clock stretching: arm at every real SCL fall (bit boundary). The
+    // stretch pins scl low through the following window; data levels are
+    // identical in both halves, so the master's (schedule-bound) samples
+    // still read the right bit. The stretch-induced rise at release is the
+    // bit's rise, delayed — the slave's sample bookkeeping stays 1:1.
+    if slave.started
+        && slave.prev_scl == 1
+        && scl_i == 0
+        && slave.scl_stretch_left == 0
+        && slave.stretch_cfg > 0
+    {
+        slave.scl_stretch_left = slave.stretch_cfg;
     }
     slave.prev_pull = slave.drives_sda_low;
     slave.prev_scl = scl_i;

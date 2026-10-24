@@ -60,7 +60,13 @@
   全組合:四不變量+canonical 腳本+三變體)+demo spec 卡(三變體 radio/違例
   表/SVG 波形/RTL 變更檢視)+wasm spec 閘(spec.mjs:0 違例/負向指名/BigInt
   跨界/雙跑確定性/錯誤路徑);目檢=docs/e2e-report/wasm-demo-v4-spec-*.png。
-- 時鐘伸展負向測試、多位址/多從機。
+- ✅ 時鐘伸展負向+多位址/多從機(1024 收口):Slave 升級=位址表
+  (matched 閘 ack/read 驅動,未知位址 NACK+匯流排讀 0xff)+SCL 伸展
+  (每 fall 觸發、釘低 stretch_cycles 呼叫;資料電平跨兩半恆定故鎖步資料
+  無損)+phantom 跳過(9 個沿=8 資料+ack 準位;位址字節=文件明文的第二
+  字節);**HonorsSclI 變體**(rd_mode&&scl_i=違反「scl_i 未使用」宣稱):
+  無伸展下行為等價不報、伸展下被 lockstep 抓到=雙向偵測力。
+- 效能:每週期 ~30 次 vpi 讀——demo 尺度可忽略;perf gate=M9。
 - 效能:每週期 ~30 次 vpi 讀——demo 尺度可忽略;perf gate=M9。
 
 ## 證據
