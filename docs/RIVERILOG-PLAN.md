@@ -302,6 +302,7 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
   | rivD6 | `:ivl_delay_selection`/目標插件機制 | dlopen .tgt/.conf | 單體 Rust;`-t` 名義面相容 |
   | rivD7 | 48_frac_delay 延遲捨入——**預登記後撤回**(2026-10-25 live probe) | 設計期預測「iverilog 按 precision 捨入會印 1500/1750」;iverilog 13.0 復位後實測數據行=`t=2000`/`t=2000`,與 verilator 金樣逐字一致,僅 finish 橫幅時刻(1750)剩差——且該行 e2e 正規化本就丟棄(rivD8) | 無需 ledger,48 現狀 pass(riv e2e 臂實測);rivD7 編號留墓碑不復用;設計 §7「32_proc_order 若分歧=rivD8」順延為 rivD9 |
   | rivD8 | e2e 臂 stdout 正規化:丟 riv 自家工具行(2026-10-25 落地) | e2e 金樣=verilator 錄製,錄製期已被 vl-difftest 丟掉 `- ` 工具行,金樣無 iverilog 形 finish/VCD info 行(riv-r2-design §10 調和注 1:字面「whitelist prefixes only」不可實現) | 丟行白名單=vl-difftest 四前綴 ∪ `^[^: ]+:[0-9]+: $finish called at `/`^VCD info: ` 兩行形,禁內容改寫;敵意 fixture(`-7div2=-3`、`tb.v:6: ` 開頭設計行)由 riv-difftest 單測釘死;**iv-e2e 臂不丟**(iverilog 工具行=金樣本體,01_hello 逐字在案) |
+  | rivD9 | **預登記**(R4 弧接 riv_vcd 閘前,登記先行):e2e 既有 oracle-ref.vcd=verilator 錄製 2-state——t0 值域(q=0)與參數傾印(D3 家族)皆與 iverilog 形(q=t0 x、`$comment Show the parameter values`)不同側 | verilator 錄製 refs(51_vcd_counter oracle-ref.vcd 實證) | riv VCD 交叉閘**以 iverilog 腿另錄金樣**(iverilog 13.0 已復位),禁用 2-state refs 直接對拍 4-state 引擎;樣本點交叉=vcd_gate 形,rivD1 header 正規化之上再收斂值域差異 |
 
 ## 7. VPI 子集=一等公民(R7;上游差異化核心)
 
@@ -328,7 +329,7 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
 | **R1** ◐部分 | 共享葉整備:`vl-values` 提取(零漂移=e2e 58/58+全部套件綠證明);vl-syntax dialect profile(-g1995..2012 關鍵字表+icarus-misc);`-E` 面;**三角閘**:yosys-simple 87 檔+既有 e2e(X-clean 子集)加跑 iverilog 腿 | `riv_pp`(-E 差分)、`tri_gate`(雙 oracle 三角;預期分歧=已登記家族) | -E 輸出與 oracle 正規化比對 ≥95%;三角分歧 100% 可歸因(入分歧簿) | ~1k |
 | **R2** ✅2026-10-25 | **事件內核+平層 elaboration**(對抗審 P1:平層裝配原本無里程碑認領):分層隊列(active/inactive/NBA/monitor)、時間軸+timescale/precision(全域 precision 收斂,§0.1 "(1s)" 渲染)、#delay/#0/邊沿/電平事件、執行緒物件(PC+locals);riv-elab 的**平層部分**(net/reg/cont-assign/initial 裝配)在本里程碑認領,層次化例化在 R4 | `riv_kernel`(單測:區域序/真值表)+`riv_e2e` 首批 ≥25 例 | nba.v/mon.v byte-exact;`--min-pass 100` | ~2k |
 | **R3** ✅核心 2026-10-25 | 行為語言核心:fork/join(+SV 階梯鈎子)/wait/named event/force/release/assign-deassign/task/function/while-repeat-forever/$display 全家/$monitor/$strobe/$finish 族(含 file:line+單位字串)。**VPI-first 落法**(對抗審 P1:$display 全家在 R3、vpi 註冊面在 R7 的打結):R3 內嵌**最小 vpi 註冊 shim**($display 族經它落地),R7 只補外部模組面(-m)與客戶端語義——§7 的「VPI-first 不是口號」自證在 R3 就完成 | riv_e2e 擴至 60+;`riv_sys`(系統任務 goldens) | §0.1 全部行為 byte-exact;ivltests 行為子集首輪挖掘(10 例入庫) | ~2.5k |
-| **R4** | 結構層:模組例化/層次引用、連續賦值(+delay)、閘原語(and..xor 12 種+bufif/notif+三元延遲)、**強度=機械定義**(對抗審 P1:驅動強度四級 strong/pull/weak/highz+多驅動仲裁 0/1/x/z;電容級/供電級/強度感知 X=R9)、參數/-P/-s/-y/-Y 庫搜尋 | riv_e2e 擴至 90+;yosys-simple 全量 e2e 腿 | 閘延遲語義(gates.v 探針)x 傳播 byte-exact;picorv32 行為 TB 點火(首整合標的;其 TB 多走 $readmemh 載程式= R5 貨,點火以手寫 hex 陣列 TB 先行) | ~2k |
+| **R4** | 結構層(2026-10-25 弧計畫修訂=§8.1,對抗審吸收):模組例化(**含 `#(...)` 具名參數覆寫——15/22/29/37/38 五例的硬前置**)、層次引用、**net/連續賦值執行期語義(42 綠例零覆蓋,獨立探針先行)**、閘原語(and..xor 12 種+bufif/notif+三元延遲,**慣性取消窗口探針釘死**)、genvar/generate+unpacked array(收割弧指針實測命中,正式收編)+`$readmemh/b`(R5 前拉,§8.1 偏差帳)、`-y` 語義修正(現誤別名 `-I`,riverilog.rs:91);**強度四級+多驅動仲裁順延 R9**(零語料需求,§8.1 偏差帳) | riv_e2e 逐例翻轉同 commit 改基線;`riv_vcd`(scope 樹 dump+iverilog 側金樣交叉,rivD9);iv 錄製腿+tri_gate(步驟 0);採礦 10 例(GPL 掃描+corpus_lint 閘) | §8.1 逐例終態表(目標 e2e 59/59、iv 9/10、採礦後 19/20);picorv32 點火+yosys-simple 全量腿=**順延下一弧**(§8.1 偏差帳) | ~2k |
 | **R5** | IO/傾印系統任務:$dumpfile/$dumpvars/$dumpall/$dumpoff/$dumpon、IVERILOG_DUMPER/-vcd、$readmemh/b(@addr/OOB)、$fopen/$fwrite MCD、plusargs、$random/$time/$realtime 族 | `riv_vcd`(vl-vcd reader 交叉) | oracle VCD 交叉對拍零失配(rivD1 正規化後);dump 語料 8 例 | ~1k |
 | **R6** | 序列化+兩進制流:`out.riv`(自有格式:versioned 文字、確定性輸出、含 delay_selection/time_precision 元資料;**格式帶版本+遷移政策,R8/R9 為已知改版點**——對抗審 P1:R6 排在兩大 IR 擴張面之前,凍結必然回改);`rivvp` 完整旗標面(+plusargs/-n/-N/-q/-l/-M/-m/-i)。**R10/XLS 無 out.riv 硬依賴**(XLS 只執行不解析 .vvp,單進程 fallback 可行——out.riv 的依據是 OD2 介面凍結點,不是 R10 的功能閘) | `riv_flow` | 兩次編譯 byte-同;artifact 回放 stdout 與同進程跑 byte-同;XLS 形狀(compile→run)demo | ~1k |
 | **R7** | **VPI 一等公民**(§7) | `riv_vpi`(vpi_gate 同款+雙路徑一真相) | ivltests/vpi 挑例語料化 8-12 例;內建系統任務=vpi 註冊面實作的自證 | ~1.5k |
@@ -340,8 +341,47 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
 - **R2 ✅ / R3 ✅核心**:vl-values 提取(C1;零依賴,vl-sim/src/value.rs=shim,e2e 59/59 零漂移)+riv-ir(RIV-1 版本化文字 IR,C2)+riv-elab 平層(C2)+riv-kernel 分層排程(C3)+行為批次(C5/C6:casez/loops/$time+%t/$monitor/$strobe/plusargs/tasks+每啟用幀/fork/force/wait;vl-syntax parser 擴展+vl-sim 錯誤 parse→build 遷移,M7/M8 逐臂保文字,interp.rs:1767-1785)。
 - **量尺**:`cargo run -q -p riv-difftest -- --e2e --corpus corpus/e2e` → `SUMMARY e2e=42/59 iv=0/0`(17 個 pending **全部**帶 `milestone R4` 指針:例化 15/16/22/29/37/38/51/54/57/58/59、genvar 28/30/36、unpacked array 52/53/55);`--e2e --corpus corpus/iv-e2e` → `SUMMARY e2e=0/0 iv=8/10`(01-08 enforced 全 byte-exact;09_udp=R9、10_gates=R4 pending)。R4 指針現在**可達且被 17 例實測命中**(riv-elab err.rs 分類面)。
 - **R1 ◐**:`-g1995..2012` 全階梯**受理**(riverilog.rs:57,「dialect profiles land at R1/R8」)、`-t vvp`=RIV-1 writer;**未落**=dialect 關鍵字表本體、`-t null`/`-E`(硬錯指針 R1,riverilog.rs:45)、`tri_gate`/`--record-iv-leg`(設計期 iverilog 缺席順延;**2026-10-25 復測 iverilog 13.0 已復位**,可開工)。
-- **R3 殘項**:named events(->ev/@ev,零實作零語料)、VPI-first shim(系統任務=直譯 `Op::SysCall`,riv-ir lib.rs:595,註冊面收斂留 R7)。
+- **R3 殘項**:named events(->ev/@ev,零實作零語料;**elab 指針仍寫 R3 但 R3 已 ✅——R4 弧同輪修訂指針歸屬並實作,採礦 family 依賴它**)、`$stop`(expr.rs:1561,同為 R3 指針殘項,2026-10-25 對抗審補登)、VPI-first shim(系統任務=直譯 `Op::SysCall`,riv-ir lib.rs:595,註冊面收斂留 R7)。
 - 偏差(out.riv 前拉 R6→R2、最小 dump 前拉 R5→C3、$value$plusargs 前拉 R5→C5、runner 正規化=rivD8、e2e pending ledger 檔機制)=riv-r2-design §9 逐條在帳;48_frac_delay 的 rivD7 預登記已撤回(§6 表,live probe 反證)。
+
+### 8.1 R4 收割弧計畫(2026-10-25 立案;獨立對抗審 15 項全吸收)
+
+> 促級記錄:使用者 2026-10-25 指示收割弧落地後續定下一弧(RK2 逐弧精神:本弧=使用者明示促級第二個 riverilog 弧;M9 tier-B 續停,OD5 不預綁)。本節=下一弧 SSOT;執行序如下,每步的閘與語料同輪。
+
+**步驟 0(先於一切翻轉)=iv 錄製腿+tri_gate 落地**(R1 殘項,非「修 bug」——`--record-iv-leg` 旗標從未實作,對抗審 #7 實證;收割弧 workflow log 的「exit 2」=未知旗標):實作 `riv-difftest --record-iv-leg --corpus corpus/e2e`(iverilog 13.0 已復位)錄 `expected.iv.stdout`/`expected.iv.exit` **入 git**(無 oracle 環境可重放);`tri_gate` 機械三分:iv==vl 而我異=riv bug;iv≠vl=rivD 候選(登記後才準繼續);兩 oracle 一致=硬通貨。**為何最先**:e2e 金樣=verilator 錄製而 riv spec=match iverilog,17 例同時翻轉若無此腿,riv bug 與雙 oracle 分歧將混帳(rivD7 撤回=前車之鑑)。
+
+**R4-a 例化+參數+net 語義**(最大包,先落):模組例化(ANSI 埠全語料在用;**非 ANSI 埠=零語料,補一例探針**——對抗審 #14)、`#(...)` 具名參數覆寫+參數鏈(`$clog2` 已在)、層次名解析、**net/連續賦值執行期語義=獨立探針例先行**(reg→NBA→assign→`@(posedge net)` 序;42 綠例零 `assign` 覆蓋,核心喚醒序/NBA 提交再評價/埠驅父網全部未測——對抗審 #3,59 的最深水區)、`-y` 語義修正(現誤作 `-I` 別名=CLI 契約分歧,改真庫搜尋或帶指針硬錯)。
+**R4-b generate**:genvar for/if/case+嵌套作用域(30=**b+c 跨包**,表內標註)。
+**R4-c 記憶體+readmem 前拉**:unpacked array 全鏈(riv-ir arrays 段已在)+`$readmemh/b`(start/finish/@addr/註解)——**R5→R4 前拉,偏差入本節帳**;收割弧 commit 0df3bf1 訊息稱 kernel 已有 readmem **為過度宣稱**(elab expr.rs:1565 實為 R5 硬錯,對抗審 #1 抓正),本項補真實作。
+**R4-d 閘+延遲**:12 原語+bufif/notif+(rise,fall,turn-off)三元;**慣性取消窗口探針**(iv-10 現金樣 t3/t13 兩點在 transport/inertial 兩語義下同輸出=金樣不釘死語義,對抗審 #9:補 `#7` 窗內取樣例)+**bufif/notif z 驅動觀測例**(54 現例 en=0 後未印);三元延遲無語料錨=僅在補錄 oracle 探針後宣稱,否則順延 R9。
+**R4-e 殘面**:named events+`$stop` 實作(R3 殘項歸位,採礦 family 依賴)+`-P/-Y/-Y` 面指針審;RIV-3 版本 bump+writer→reader→writer roundtrip 測同 commit。
+
+**衛生項**:①riv_vcd 閘=scope 樹 DumpSink(現 flat 名,層次後 51 雙 `q` 撞名=退化 VCD,對抗審 #4)+**iverilog 腿錄 VCD 金樣**(rivD9:2-state refs 錯側)+樣本點交叉(vcd_gate 形);②採礦 10 例(X 傳播角落/delay 角落/force-release/named events)全 enforced 入庫,GPL 相似度掃描工件+corpus_lint R1-R3 同輪(RK3);③perf 探針在 R4-a **之後**(層次改熱路徑,先行數字無預測力——對抗審 #15):counter8 類 TB 測 cyc/s 記 REGISTRY;**<200k cycles/s=RK5 停線重評條款生效,非僅記數**。
+
+**逐例終態表(驗收=機械可推導;每翻轉同 commit 改 regress 基線,殘項必須在本表留名,禁無出處數字——對抗審 #6)**:
+
+| case | 需求 | 終態 |
+|---|---|---|
+| 15_params | 例化+參數覆寫 | pass |
+| 16_hierarchy3 | 例化+層次名 | pass |
+| 22_counter_nba | 例化+param+cont-assign | pass |
+| 28/36 | genvar(36=嵌套) | pass |
+| 29/37 | 例化+param+gen-if/case | pass |
+| 30_gen_mux | genvar+array+cont-assign 變址讀(b+c 跨包) | pass |
+| 38_param_chain | 例化+param 鏈 | pass |
+| 51_vcd_counter | 例化+scope 樹 dump+iverilog VCD 金樣 | pass(+riv_vcd 閘) |
+| 52/55 | unpacked array(55=NBA 交互) | pass |
+| 53_readmem | array+readmemh/b(R5 前拉) | pass |
+| 54_gates | 閘原語+z 驅動觀測例 | pass |
+| 57/58 | 例化+cont-assign | pass |
+| 59_i2c_master | 例化+net 語義全深度(探針先行) | pass |
+| iv-09_udp | R9 | pending(指針不變) |
+| iv-10_gates | 閘延遲+慣性窗口探針 | pass |
+| 採礦 10 例 | — | enforced pass |
+
+→ 目標基線:**e2e 59/59、iv 9/10(採礦後 19/20)**;UDP 為唯一具名殘項。
+
+**偏差帳(本弧明示重塑 §8 R4 範圍,對抗審 #10)**:強度四級+多驅動仲裁順延 R9(零語料需求);picorv32 行為 TB 點火順延下弧(R4-c 落地後可行,本弧保界);yosys-simple 全量 e2e 腿順延下弧;generate/unpacked array 正式收編 R4(收割弧指針已實測命中);`$readmemh/b` R5→R4 前拉。
 
 排序內依賴:R1→R2 硬依賴(vl-values);R6 依賴 R2-R5 的設計表示凍結度;
 R7 依賴 R2(區域拓撲);R8 依賴 R3;R9/R10 可與 rverilator M8+ 交錯。

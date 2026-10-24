@@ -19,7 +19,7 @@
 
 ## 1. Suite 路線圖(Phase 1 之後的排序)
 1. **P2 yosys-equiv 綜合核**——最高槓桿,復用 vl-syntax/vl-elab。
-2. **P3 iverilog-equiv(riverilog)**——事件驅動調度器 + VPI 子集;**正典企劃=docs/RIVERILOG-PLAN.md(2026-10-24 立項)**;R0 ✅(CLI 契約 goldens+iv-e2e 10 例 chase ledger);**R2+R3 ✅ 2026-10-25**(docs/riv-r2-design.md C1-C6 弧:vl-values 提取+riv-ir/riv-elab/riv-kernel 三 crate+兩段式 `riverilog -o out.riv`→`rivvp` 貫通;riv e2e **42/59**、iv **8/10** byte-exact,17 個 e2e pending 全帶 `milestone R4` 結構層指針;R1 ◐=-g 受理但 dialect/-E/-t null 未落+tri_gate 順延——iverilog 已復位可開工;named events/VPI shim=R3 殘項)。
+2. **P3 iverilog-equiv(riverilog)**——事件驅動調度器 + VPI 子集;**正典企劃=docs/RIVERILOG-PLAN.md(2026-10-24 立項)**;R0 ✅(CLI 契約 goldens+iv-e2e 10 例 chase ledger);**R2+R3 ✅ 2026-10-25**(docs/riv-r2-design.md C1-C6 弧:vl-values 提取+riv-ir/riv-elab/riv-kernel 三 crate+兩段式 `riverilog -o out.riv`→`rivvp` 貫通;riv e2e **42/59**、iv **8/10** byte-exact,17 個 e2e pending 全帶 `milestone R4` 結構層指針;R1 ◐=-g 受理但 dialect/-E/-t null 未落+tri_gate 順延——iverilog 已復位可開工;named events/VPI shim=R3 殘項)。**下一弧=R4 收割弧(2026-10-25 立案,獨立對抗審 15 項吸收,SSOT=RIVERILOG-PLAN §8.1:步驟 0=iv 錄製腿+tri_gate 先行;例化含參數覆寫+net/cont-assign 執行期語義獨立探針;generate/unpacked array/readmem 前拉收編;逐例終態表目標 e2e 59/59、iv 9/10+採礦 19/20;強度/picorv32/yosys 腿順延=偏差帳在案;M9 tier-B 續停)**。
 3. **P4 nextpnr-generic + FPGA 家族**——prjoxide(Rust, ISC)直接收編;其餘長尾。
 4. **P5 formal**——⚠ 風險最高:上游 SMT/SAT 全是 C++,純 Rust solver 成熟度是全 suite 最大未知;屆時再裁。
 5. **P6 波形查看器**——surfer(Rust, EUPL-1.2,僅可獨立二進制)或自寫 TUI。
