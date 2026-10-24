@@ -32,6 +32,14 @@ description: rust-cad-suite 开发正典——AI agent 做 EDA/IC 工具(模拟�
 9. **robustness 轨独立**:fuzz_smoke 常驻;pass-rate 绿≠健壮。
 10. **计划项必带 LRM 条号**:条文已说明实现精确时,工作项作废(§5.1.4 实录)。
 11. **分歧/事故先登记**:docs/REGISTRY.md 的 Divergence / Incident 两簿。
+12. **三重锚,各锚各的**:oracle 锚「行为一致」、golden model 锚「宣称意图」
+   (ADR-0007 spec 层:lockstep+invariant)、invariant 锚「协议性质」且
+   **指名道姓**(负向变种的断言必须点名对应 invariant,整批抓到≠归因)。
+   实证(2026-10-24):I2C RTL 的 ANSI 埠範圍繼承讓 we/sda_i 合法變寬——
+   oracle 錄製照樣一致,golden 按 1-bit 建模才暴露;**oracle 一致≠符合自身
+   spec**。取樣來源選「性質所屬方」的輸出(master 側性質取 master 驅動輸出,
+   不取被 slave 污染的匯流排);取樣點鎖「準位整窗恆定」的相位(SCL 高半),
+   低半取樣跨邊界(REFLECTION §16)。
 
 ## 标准循环(语义开发)
 

@@ -269,3 +269,62 @@ XLS codegen 輸出 `always_ff`(SV 關鍵字)且無 timescale——收割管線�
 點 Run 後才發現該驗的是 stdout 內容與 canvas 波形渲染;截圖入
 docs/e2e-report/ 為證。機械閘驗「資產在場」,目檢驗「畫得對」;
 兩者不可互替(SKILL wasm 增補已立法)。
+
+## 16. 第五輪實錄(2026-10-24,spec 驗證層收割弧:corpus 59+RD 鎖步+MsbFirst 收口)
+
+### 16.1 oracle 一致 ≠ 符合自身 spec——差分測試的哲學邊界有了實證(Strategy)
+
+本弧最重的一課。I2C RTL 的 1-bit 埠寫在 `prescale [15:0]` 之後,被 ANSI 埠
+範圍繼承(LRM 12.3.2)合法地放大成 16/8 位元——**verilator 同解,oracle 錄製
+照樣一致,e2e 照樣 PASS**;golden model 按「宣稱的 spec」(1-bit 腳位)建模
+才暴露。差分測試錨的是「行為與 oracle 一致」,錨不了「行為與宣稱意圖一致」;
+spec 驗證層(ADR-0007)的存在意義由這個案例自身證明:golden 是「意圖」的
+機器化身,oracle 是「事實」的機器化身,兩者分歧=意圖與事實的裂縫,這正是
+使用者問的「驗證 spec 正確性」的工具化形態。附:修完 RTL 後 corpus 重錄,
+輸出 byte-identical(1-bit 接線只動 bit0)——行為面無感,意圖面歸位。
+
+### 16.2 測試設備單實例;獨立性只給受測物(Architecture)
+
+golden master 原本內嵌自己的 slave+匯流排視圖,與驅動 DUT 的 BusDriver slave
+形成兩個實例——同一份代碼,吃 RTL 輸出與 golden 輸出兩條**不同滯後**的沿流,
+邊沿競態(ack 槽的 rise 落在 acking 清除前還是後)必然分岔。三輪競態硬化
+(ack_high_seen 閘/相位修正/偵測器守衛)都只是推遲。判準一句話:**這件東西
+是受測物還是測試設備?** slave 是測試設備→單實例共用(CmdInput 帶 Cell 匯流排,
+golden 採用 DUT 所採樣的準位);golden master 的 FSM 才是受測物→獨立重實作。
+附帶收穫:golden 從此看到的與 DUT 採樣的逐位元組相同,鎖步只剩真分歧。
+
+### 16.3 取樣來源=性質所屬方的輸出,不是共享介質(Invariant design)
+
+「寫字節 MSB-first」是 master 側性質,invariant 卻取樣匯流排準位——匯流排是
+wire-AND 共享介質,slave 對 LSB=1 的位元組(隨機位元組一半)進入讀模式驅動
+payload,採樣被污染且形態隨資料變化(數值對照完全對不上任何簡單變換)。
+修法=取 master 驅動輸出(sda_oe/sda_o)。**除錯手法入冊**:先在正確 RTL 上
+證明「這是誤報」,再 per-bit 傾印+逐 byte 分組對照(每 byte 一行 8-bit 樣本
++OK/MISMATCH 標記),污染形態自己現形——數值對照表勝過時間軸推理。
+
+### 16.4 1-clk-stale 視窗的取樣相位律(Timing)
+
+harness 的驅動器在 clk-low put、檢查讀的是本拍 posedge 前的暫存——任何
+「每 SCL 週期取樣一次」的檢查,取樣點必須選「準位整窗恆定」的相位(SCL 高半),
+低半取樣跨位元邊界(驅動在低半入口 posedge 切換,stale 暫存仍顯示前一位元;
+0xA1 曾被讀成 0xD1)。slave 側同構:rise 取樣免疫 stale,fall 取樣讀到下一
+位元。推廣:**凡「驅動在窗首切換、取樣在窗末」的協議,取樣點鎖窗中央**。
+
+### 16.5 修復放對事件生命週期的正確端;切片手術後必 diff 對帳(Incident)
+
+兩連:①首沿丟失修復——init_once 的播種放在寫入「後」執行太晚,沿的
+prev/new 資訊已丟,正確位置=寫入「前」;時序敏感修復先畫事件生命週期
+(種子→寫入→偵測)再下手術。②清儀器的 index 切片(`s[:i]+s[j:]`)把
+rise/fall 分支整段靜默刪除——**被刪代碼的職能被其他層覆蓋(slave 的 ack
+吞掉機制)所以 cargo test 全綠**,一輪後 slave 完全啞火才暴露。規則升格
+(§10.6 同族):index 切片刪除後必印出被刪文本行數/逐行 review,或刪前
+斷言區間內包含預期的錨點行;「測試綠」不是刪除安全證明。
+
+### 16.6 偵測力的最終形態=指名道姓(Detection power)
+
+LSB-first 負向測試原本只斷言「lockstep 整批分歧(≥40 違例)」——整批抓到
+≠歸因(可能是任何 bug 的連坐)。升級=雙腿:lockstep 整批 **且**
+`msb_first_bit_order` 指名。推廣:每個負向變種的斷言應指名「該變種對應的
+那條 invariant」;做不到指名=invariant 層有缺口(本次缺口=取樣相位,收口
+後自然可指名)。MsbFirst 誤報的解剖同時暴露 invariant 設計三缺陷(相位/
+來源/expected 生命週期)——**負向測試綠+正向測試紅的交叉點=設計缺陷最密集處**。
