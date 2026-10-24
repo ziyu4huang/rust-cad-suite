@@ -1,0 +1,8 @@
+[package]
+name = "vl-values"
+description = "4-state Verilog value core (Bits two-arm N/W repr, limb engine, IEEE 1364 formatting) — zero-dependency shared leaf (ADR-0008, RIVERILOG-PLAN §3.1)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]

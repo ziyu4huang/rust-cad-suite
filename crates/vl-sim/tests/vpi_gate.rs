@@ -31,7 +31,7 @@ fn build(files: &[(&str, &str)], top: &str) -> Sim {
 
 #[test]
 fn handles_and_properties() {
-    let mut sim = build(
+    let sim = build(
         &[
             ("t.v", "module tb;\n  reg [7:0] mem [0:3];\n  wire clk;\n  parameter P = 5;\nendmodule\n"),
         ],
