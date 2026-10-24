@@ -29,7 +29,7 @@
   CLI stdout=wasm one-shot 同字節);regress wasm vcd_svg+ffi vcd_svg 閘;
   目檢=docs/e2e-report/wasm-demo-v3-svg-verified.png;vcd2svg --help。
 - **KR1.10 Spec 驗證層(ADR-0007,2026-10-23 立;2026-10-24 收割輪 12083a8)**
-- **O-riv riverilog(2026-10-24 立項,R0 落地)**:R0 ✅=CLI 契約 goldens byte-exact(riv-cli 8 測)+iv-e2e 10 例 chase ledger(R0 契約=里程碑硬錯)+regress 閘;KR-riv.e2e=enforced 案例精確數(隨 R2+ 翻 enforced);SSOT=docs/RIVERILOG-PLAN.md。
+- **O-riv riverilog(2026-10-24 立項;R0 ✅→R2+R3 ✅ 2026-10-25 弧)**:R0=CLI 契約 goldens+iv-e2e 10 例 chase ledger;**R2+R3 弧**(docs/riv-r2-design.md C1-C6)=vl-values 提取(零依賴共享葉;e2e 59/59 零漂移自證)+riv-ir/riv-elab/riv-kernel 三新 crate(合計 ~7.1k loc;連同 vl-values 四 crate 共 ~9.7k,零外部依賴,riv-kernel 零 vl-sim 依賴)+兩段式 `riverilog -o out.riv`→`rivvp` 貫通+vl-syntax fork/force/wait 擴展(vl-sim 錯誤 parse→build 遷移,M7/M8 逐臂保文字)。**KR-riv.e2e 當前=e2e 42/59、iv 8/10**(iv 01-08 翻 enforced 全 byte-exact;17 個 e2e pending 全帶 `milestone R4` 結構層指針、09_udp=R9=範圍外宣告;UNLEDGERED=0、DRIFT=0)。證據(逐字可重跑):`cargo run -q -p riv-difftest -- --e2e --corpus corpus/e2e` → `SUMMARY e2e=42/59 iv=0/0`;`cargo run -q -p riv-difftest -- --e2e --corpus corpus/iv-e2e` → `SUMMARY e2e=0/0 iv=8/10`;`cargo test -q -p riv-cli`(9)/`cargo test -q -p riv-difftest`(7);`bash scripts/regress.sh`(riv 兩臂基線逐字 grep+UNLEDGERED/DRIFT==0)。R1 殘項=dialect 關鍵字表/-E/-t null(指針在案)+tri_gate/--record-iv-leg(**iverilog 13.0 於 2026-10-25 復測已復位**,設計期「缺席」順延理由消失,可開工);rivD7 預登記撤回(live probe 反證,見 REGISTRY)。SSOT=docs/RIVERILOG-PLAN.md。
   當前:✅ 全收=vl-spec(lockstep+不變量)+spec-i2c 乾淨室 I2C+corpus 59 oracle 腿
   (e2e 58/58@100%)+RD 讀事務鎖步(dout 絕對承載)+MsbFirst 取樣器收口
   (master 驅動輸出取樣+高半相位;LSB-first 負向=lockstep+msb_first_bit_order

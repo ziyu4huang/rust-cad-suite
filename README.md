@@ -9,7 +9,7 @@ a Rust binary.
 simulator toolchain. Roadmap, milestones and decisions live in [PLAN.md](PLAN.md)
 and [docs/adr/](docs/adr/).
 
-## Status (2026-10-24)
+## Status (2026-10-25)
 | Milestone | State |
 |---|---|
 | M0-M6 workspace / preprocessor / parser / elaboration / scheduler / VCD | done — see [PLAN.md](PLAN.md) |
@@ -17,7 +17,7 @@ and [docs/adr/](docs/adr/).
 | **E2E differential regression** | **59/59 = 100% vs Verilator 5.052** (`corpus/e2e`, expectations recorded from the oracle, exact-100% gate in `scripts/regress.sh`) |
 | Lint-only differential track | **83/87 (95.4%)** over the vendored yosys `tests/simple` suite (`corpus-external/`, ISC); harness = `scripts/lint_diff.sh`; remaining divergences = 3 different-root-cause feature gaps + 1 registered divergence |
 | Wide values (>128 bits) | done — two-arm value repr, full limb-aware op surface ([ADR-0008](docs/adr/0008-multi-limb-values.md)) |
-| **riverilog** (iverilog-analog, R0) | CLI contract pinned — `riverilog`/`rivvp` entrypoints with byte-exact goldens + 10 iv-e2e chase cases recorded from iverilog 13.0; plan = [docs/RIVERILOG-PLAN.md](docs/RIVERILOG-PLAN.md) |
+| **riverilog** (iverilog-analog, R2/R3) | real compile→simulate pipeline — `riverilog tb.v -o out.riv` + `rivvp out.riv` runs flat designs end-to-end: **42/59 e2e + 8/10 iv-e2e byte-exact** (iv 01-08 enforced; the 17 e2e pendings all carry `milestone R4` structural pointers, 09_udp → R9); shared value leaf extracted as zero-dep `vl-values`; design = [docs/riv-r2-design.md](docs/riv-r2-design.md), plan = [docs/RIVERILOG-PLAN.md](docs/RIVERILOG-PLAN.md) |
 | **rVPI** (Rust-native VPI analog) | slice 1 done — typed handles, value get/put, value-change/after-delay/start/end callbacks, iteration, time ([ADR-0003](docs/adr/0003-rvpi.md)); verified by `vpi_gate` + a two-paths-vs-corpus check + an internal rVPI×VCD crosscheck |
 | Frontend fuzz | done — 600-iteration deterministic mutation/random-bytes smoke in `cargo test` (caught 3 UTF-8 robustness bugs on first run) |
 
@@ -44,6 +44,7 @@ cargo test
 - `crates/vl-syntax` — preprocessor, lexer, recursive-descent parser, AST.
 - `crates/vl-sim` — 4-state values, evaluator, interpreter (event scheduler) and the rVPI interface (`src/vpi.rs`).
 - `crates/vl-cli` — the `rverilator` binary.
+- `crates/vl-values` + `crates/riv-*` (`riv-ir`, `riv-elab`, `riv-kernel`, `riv-cli`, `riv-difftest`) — the riverilog (iverilog-analog) line: `riverilog`/`rivvp` binaries over flat elaboration → RIV-1 (own versioned text IR) → event-driven kernel; see [docs/RIVERILOG-PLAN.md](docs/RIVERILOG-PLAN.md).
 - `crates/vl-wasm` — WebAssembly facade over `vl-sim` (`wasm-pack build crates/vl-wasm --target web`, ~500KB; differential-gated from Bun).
 - `corpus/` — self-written fixtures with Verilator-5.050-recorded expected outputs.
 - `vendor-reference/` (gitignored) — upstream build scripts + binary release, reference only.

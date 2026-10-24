@@ -193,3 +193,19 @@
 - **全量 --record 只在 oracle 升級輪跑**(provenance 檔必 churn——5.050→
   5.052 實錄 58 檔;churn=升級信號要讀;日常錄單案例=`--corpus` 指向
   含案例子目錄的父層)。正規化期望零漂移=升級無語義變化的免費證明。
+
+## 10.9 riv runner 紀律(2026-10-24,C4 立法)
+
+- **riv-difftest 正規化=丟行白名單**(vl-difftest 四前綴 ∪ finish 橫幅/
+  `VCD info: ` 形),禁內容改寫;敵意 fixture(`-7div2=-3`、`tb.v:6: `
+  開頭設計行)由單測釘死。
+- **riv 語料 ledger 檔=e2e 樹的 chase-ledger**:案例目錄 `riv-pending.txt`
+  (rivD7 預登記已於 2026-10-25 live probe **撤回**:iverilog 13.0 與
+  verilator 金樣數據行逐字一致,48_frac_delay 現狀 pass 無需 ledger;檔案
+  機制常駐,首個真分歧落地時啟用)。runner 輸出中 **UNLEDGERED**(diff 無
+  ledger)與 **DRIFT**(ledger stale:pending 案例跑通/ledgered 案例 byte
+  相合)為紅燈,regress.sh grep==0 執法;**翻 case.json enforced 或動
+  ledger 必與能力變更同輪**(工作樹呈現,commit 由 user 定)。DECL 分類=
+  子串 `milestone R`(R0 無括號形與 §5-5 括號形通吃),M7/M8 舊族指針=
+  error 非 pending。SUMMARY 精確數基線(C4 定盤 e2e=28/59、iv=4/10;
+  2026-10-25 R2/R3 弧末=**e2e=42/59、iv=8/10**)隨能力同輪上調。

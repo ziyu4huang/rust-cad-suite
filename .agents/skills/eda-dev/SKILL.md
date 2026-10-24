@@ -115,3 +115,9 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
 `#[cfg(target_arch = "wasm32")]`(host 構建用 stub)。
 
 - 雙 oracle 紀律(2026-10-24,riverilog R0 起):iverilog 13.0/vvp=第二 oracle;期望錄製要帶 `-n`(防互動態);iv-e2e 案例一律自寫 TB+錄製,iverilog 主樹 ivtest/=GPL-2.0 唯讀挖掘永不入 git;iverilog 特有行為(分層隊列/$stop 四行橫幅/sorry 語義)以 corpus 釘死,分歧入 rivD 簿。
+
+## riv runner 增補(2026-10-24,C4)
+
+- **正規化=丟行白名單,禁內容改寫**:riv-difftest e2e 臂丟 vl-difftest 四前綴(`- `/`-Info`/`-Warning`/`-Error`,字串前綴匹配與 vl-difftest 逐字一致)+ riv 自家工具行形(`<file>:<line>: $finish called at `/`VCD info: `);設計輸出 `-7div2=-3`、`tb.v:6: <非 finish 設計行>` 必須存活——敵意 fixture 單測釘死(riv-difftest 內 `#[cfg(test)]`)。
+- **e2e ledger 檔**:預登記分歧=案例目錄 `riv-pending.txt`(rivD7 預登記 2026-10-25 撤回:live probe 證 iverilog 13.0 與 verilator 金樣數據行逐字一致,48_frac_delay pass 無需 ledger;機制常駐,首個真分歧時啟用)。分類:diff+ledger=pending、pass+ledger=DRIFT 紅燈(ledger stale)、diff 無 ledger=UNLEDGERED 紅燈、編譯/執行帶 `milestone R` 指針=DECL pending(兩種訊息形——無括號 R0 形與 §5-5 括號形——子串 `milestone R` 通吃)。
+- **regress 執法=精確數基線**:`SUMMARY e2e=42/59 iv=0/0` 與 `SUMMARY e2e=0/0 iv=8/10` 逐字 grep(C4 定盤 28/59、4/10→2026-10-25 R2/R3 弧末 42/59、8/10;落地能力時同輪上調基線與翻 case.json/ledger),UNLEDGERED/DRIFT grep==0;runner 本身 exit 恆 0,执法力全在 regress grep。
