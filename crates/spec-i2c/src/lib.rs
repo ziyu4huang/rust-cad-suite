@@ -11,6 +11,7 @@
 //! demo; OpenCores' GPL core was read-only inspiration, zero code copied.
 
 pub mod bus;
+pub mod scenario;
 pub mod invariants;
 pub mod model;
 

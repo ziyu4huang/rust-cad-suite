@@ -56,7 +56,11 @@
   入讀模式會驅動匯流排,bus-level 採樣被污染)+expected 解碼即消費(START
   phantom 重移位暫存器殘值,恰好一次解碼/期望);LSB-first 負向斷言升級=明確
   要求 msb_first_bit_order。
-- 時鐘伸展負向測試、wasm/demo 整合、多位址/多從機。
+- ✅ wasm/demo 整合(1024):i2c_spec_check one-shot wasm 面(scenario.rs
+  全組合:四不變量+canonical 腳本+三變體)+demo spec 卡(三變體 radio/違例
+  表/SVG 波形/RTL 變更檢視)+wasm spec 閘(spec.mjs:0 違例/負向指名/BigInt
+  跨界/雙跑確定性/錯誤路徑);目檢=docs/e2e-report/wasm-demo-v4-spec-*.png。
+- 時鐘伸展負向測試、多位址/多從機。
 - 效能:每週期 ~30 次 vpi 讀——demo 尺度可忽略;perf gate=M9。
 
 ## 證據

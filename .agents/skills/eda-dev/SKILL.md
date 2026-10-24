@@ -79,7 +79,7 @@ rVPI(`crates/vl-sim/src/vpi.rs`,Rust 原生 VPI 結構等價)新能力必須四�
 
 模擬器對外三面(native CLI / vl-wasm 瀏覽器 / vl-ffi host FFI)的新能力,
 四證同落(繼承 rVPI 四證制):
-①wasm 差分+功能閘(`wasm-test/run|features|vcd_parse.mjs`,regress 自動)
+①wasm 差分+功能閘+渲染閘+spec 層閘(`wasm-test/run|features|vcd_parse|vcd_svg|spec.mjs`,regress 自動;spec=ADR-0007 閉環:correct 0 違例/負向指名/BigInt/確定性)
 ②host FFI 差分(`bun-example/run.mjs`+`spawn.mjs`+`vcd_read.mjs`,regress 自動;dylib 缺=閘略過並提示)
 ③demo serve smoke(資產 200+no-store+corpus 白名單探針,regress 自動)
 ④**互動頁交付前必真瀏覽器目檢**(點 Run→stdout→canvas 波形;截圖存

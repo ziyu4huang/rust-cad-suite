@@ -34,7 +34,12 @@
   (master 驅動輸出取樣+高半相位;LSB-first 負向=lockstep+msb_first_bit_order
   雙腿明確);**RD 鎖步首跑連抓兩真 bug**(vl-sim 首沿丟失+I2C RTL ANSI 埠範圍
   繼承)=spec 層偵測力的最高實證。open=時鐘伸展負向/wasm demo 整合/多位址。
-  證據:`cargo test -p vl-spec -p spec-i2c`;shift_repro 三層;docs/adr/0007。
+  **2026-10-24 wasm/demo 整合收口**:i2c_spec_check one-shot wasm 面
+  (scenario.rs 全組合:四不變量+canonical 腳本+三變體)+demo spec 卡
+  (三變體 radio/違例表/SVG 波形/RTL 變更檢視)+wasm spec 閘。
+  證據:`cargo test -p vl-spec -p spec-i2c`;shift_repro 三層;
+  `bun crates/vl-wasm/wasm-test/spec.mjs`;docs/e2e-report/wasm-demo-v4-spec-*.png;
+  docs/adr/0007。
 - **KR1.2 回归闸机械化(≥80% 断言入 cargo test)**
   证据:`crates/vl-difftest/tests/regression_gate.rs`;`bash scripts/regress.sh` 全绿。
   期望文件常驻 → 无本机 oracle 也能跑闸。

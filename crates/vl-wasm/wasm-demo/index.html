@@ -58,8 +58,26 @@ trust XLS's own high-level (DSLX/JIT) evaluation. stdout is compared byte-for-by
 Verilator-recorded expectation. (XLS-generated code, Apache-2.0 — see corpus-external/xls/NOTICE.)</p>
 <div id="cases"></div>
 
+<h2 style="margin-top:2rem">Spec verification: RTL ↔ golden-model lockstep, in this browser</h2>
+<p class="small">The spec-verification layer (ADR-0007) checks an RTL against a three-layer machine-checkable
+spec: an executable golden model, per-cycle protocol invariants, and a lockstep harness — the same
+composition <code>cargo test -p spec-i2c</code> gates natively, here running wholly inside wasm.
+Detection power is the product: pick a surgically broken RTL variant and watch the spec catch it,
+named. The waveform is the run's VCD rendered as SVG (ADR-0005).</p>
+<div id="speccard" class="case">
+  <div class="variants" style="margin-bottom:.5rem"></div>
+  <button class="run">▶ Run spec check</button>
+  <span class="badge small" style="margin-left:.75rem"></span>
+  <table class="violations small" style="margin:.75rem 0"></table>
+  <div class="summary out small" style="white-space:pre-wrap"></div>
+  <div class="siglist small" style="margin:.5rem 0"></div>
+  <div class="wavehost"></div>
+  <details style="margin-top:.75rem"><summary class="small">RTL source (shows the mutation on broken variants)</summary>
+    <pre class="rtl small" style="white-space:pre-wrap"></pre></details>
+</div>
+
 <script type="module">
-import init, { WasmSim, vcd_parse } from "./pkg/vl_wasm.js";
+import init, { WasmSim, vcd_parse, i2c_spec_check, i2c_rtl } from "./pkg/vl_wasm.js";
 const SVG_FLAGS = { t0: 1, t1: 2, height: 4 };
 
 const DEFAULT_SRC = `\`timescale 1ns/1ps
@@ -222,6 +240,100 @@ async function mountCases() {
   }
 }
 mountCases();
+
+// ---------- spec verification card (ADR-0007 closed loop) ----------
+// The scripted I2C spec check runs wholly inside wasm: clean-room RTL +
+// golden model + four protocol invariants (the same composition
+// `cargo test -p spec-i2c` gates natively). Broken variants are real
+// surgical mutations of the baked-in RTL — the violations the table shows
+// are the spec layer catching them, named.
+const VARIANTS = [
+  { id: 0, label: "correct RTL" },
+  { id: 1, label: "broken: LSB-first bit order" },
+  { id: 2, label: "broken: no ack release" },
+];
+
+(async () => {
+  // The spec surface touches wasm at setup (i2c_rtl preview), so the card
+  // must wait for init — mountCases() is async and NOT awaited, and this
+  // block runs synchronously before its internal `await init()` completes.
+  await init();
+  const host = document.getElementById("speccard");
+  const radios = host.querySelector(".variants");
+  const runBtn = host.querySelector(".run");
+  const badge = host.querySelector(".badge");
+  const table = host.querySelector(".violations");
+  const rtlPre = host.querySelector(".rtl");
+  const summary = host.querySelector(".summary");
+  let variant = 0;
+  for (const v of VARIANTS) {
+    const el = document.createElement("label");
+    el.style.cursor = "pointer";
+    const r = document.createElement("input");
+    r.type = "radio";
+    r.name = "spec-variant";
+    r.checked = v.id === 0;
+    r.onchange = () => {
+      if (r.checked) {
+        variant = v.id;
+        rtlPre.textContent = i2c_rtl(variant);
+      }
+    };
+    el.appendChild(r);
+    el.appendChild(document.createTextNode(" " + v.label + "  "));
+    radios.appendChild(el);
+  }
+  rtlPre.textContent = i2c_rtl(0);
+
+  runBtn.onclick = () => {
+    runBtn.disabled = true;
+    badge.textContent = "running…";
+    badge.className = "badge small";
+    table.textContent = "";
+    summary.textContent = "";
+    try {
+      const r = i2c_spec_check(variant);
+      const n = r.violationCount;
+      badge.textContent = n === 0
+        ? `✓ spec holds: ${r.cyclesRun} cycles, 0 violations`
+        : `✗ spec violated: ${r.cyclesRun} cycles, ${n} violations`;
+      badge.className = `badge small ${n === 0 ? "ok-badge" : "bad-badge"}`;
+      summary.textContent = r.render_text();
+      const rows = Math.min(n, 20);
+      for (let i = 0; i < rows; i++) {
+        const tr = document.createElement("tr");
+        for (const cell of [
+          String(r.violation_cycle(i)),
+          String(r.violation_time(i)),
+          r.violation_kind(i),
+          r.violation_expected(i),
+          r.violation_actual(i),
+        ]) {
+          const td = document.createElement("td");
+          td.textContent = cell;
+          td.style.padding = "0 12px 0 0";
+          td.style.verticalAlign = "top";
+          tr.appendChild(td);
+        }
+        table.appendChild(tr);
+      }
+      if (n > rows) {
+        const more = document.createElement("div");
+        more.className = "small";
+        more.textContent = `…and ${n - rows} more (see the full report below)`;
+        table.appendChild(more);
+      }
+      if (r.vcd) {
+        drawFrom(r.vcd, host.querySelector(".siglist"), host.querySelector(".wavehost"));
+      }
+    } catch (e) {
+      badge.textContent = "error";
+      badge.className = "badge small bad-badge";
+      summary.textContent = String(e);
+    }
+    runBtn.disabled = false;
+  };
+})();
 </script>
 </body>
 </html>

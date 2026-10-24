@@ -431,3 +431,131 @@ impl VcdJs {
 fn js_err(e: vl_sim::SimError) -> JsValue {
     JsValue::from_str(&e.message)
 }
+
+// ---------- spec-verification layer (ADR-0007 browser closed loop) ----------
+//
+// One-shot: the scripted I2C spec check (clean-room master + golden model +
+// four protocol invariants, canonical write script) runs wholly inside wasm;
+// JS receives the structured report plus the run's VCD for SVG rendering.
+// The scenario composition lives in spec-i2c (core-first, AGENTS 10.7);
+// this surface only translates types. u64 times cross as BigInt.
+
+/// Variant selector for [`i2c_spec_check`]: 0 = correct RTL, 1 = LSB-first
+/// (bit order surgically broken), 2 = no-ack-release (the slave-side ack
+/// release surgically removed). Unknown values are a hard error.
+#[wasm_bindgen]
+pub fn i2c_spec_check(variant: u32) -> Result<SpecCheckJs, JsValue> {
+    let v = match variant {
+        0 => spec_i2c::scenario::Variant::Correct,
+        1 => spec_i2c::scenario::Variant::LsbFirst,
+        2 => spec_i2c::scenario::Variant::NoAckRelease,
+        other => return Err(JsValue::from_str(&format!("unknown i2c spec variant {other} (0=correct, 1=lsb-first, 2=no-ack-release)"))),
+    };
+    let inner = spec_i2c::scenario::run(v).map_err(|e| JsValue::from_str(&e.to_string()))?;
+    Ok(SpecCheckJs { inner })
+}
+
+/// The (possibly surgically broken) RTL source the check runs, for
+/// display via textContent — broken variants show the flipped lines.
+#[wasm_bindgen]
+pub fn i2c_rtl(variant: u32) -> Result<String, JsValue> {
+    let v = match variant {
+        0 => spec_i2c::scenario::Variant::Correct,
+        1 => spec_i2c::scenario::Variant::LsbFirst,
+        2 => spec_i2c::scenario::Variant::NoAckRelease,
+        other => return Err(JsValue::from_str(&format!("unknown i2c spec variant {other}"))),
+    };
+    spec_i2c::scenario::rtl_for(v).map_err(|e| JsValue::from_str(&e.to_string()))
+}
+
+/// Structured result of one [`i2c_spec_check`] run.
+#[wasm_bindgen]
+pub struct SpecCheckJs {
+    inner: spec_i2c::scenario::ScenarioResult,
+}
+
+#[wasm_bindgen]
+impl SpecCheckJs {
+    /// Lockstep cycles the script ran (BigInt across the boundary).
+    #[wasm_bindgen(getter, js_name = cyclesRun)]
+    pub fn cycles_run(&self) -> u64 {
+        self.inner.report.cycles_run
+    }
+
+    #[wasm_bindgen(getter, js_name = violationCount)]
+    pub fn violation_count(&self) -> usize {
+        self.inner.report.violations.len()
+    }
+
+    /// Precision-tick time of violation `i` (BigInt).
+    pub fn violation_time(&self, i: usize) -> Result<u64, JsValue> {
+        self.inner
+            .report
+            .violations
+            .get(i)
+            .map(|v| v.time)
+            .ok_or_else(|| JsValue::from_str("violation index out of range"))
+    }
+
+    /// Lockstep cycle index of violation `i` (BigInt).
+    pub fn violation_cycle(&self, i: usize) -> Result<u64, JsValue> {
+        self.inner
+            .report
+            .violations
+            .get(i)
+            .map(|v| v.cycle)
+            .ok_or_else(|| JsValue::from_str("violation index out of range"))
+    }
+
+    /// Kind of violation `i`: "invariant `<name>`" or "lockstep[<name>]".
+    pub fn violation_kind(&self, i: usize) -> Result<String, JsValue> {
+        self.inner
+            .report
+            .violations
+            .get(i)
+            .map(|v| match &v.kind {
+                vl_spec::ViolationKind::Invariant(n) => format!("invariant `{n}`"),
+                vl_spec::ViolationKind::Lockstep(n) => format!("lockstep[{n}]"),
+            })
+            .ok_or_else(|| JsValue::from_str("violation index out of range"))
+    }
+
+    pub fn violation_expected(&self, i: usize) -> Result<String, JsValue> {
+        self.inner
+            .report
+            .violations
+            .get(i)
+            .map(|v| v.expected.clone())
+            .ok_or_else(|| JsValue::from_str("violation index out of range"))
+    }
+
+    pub fn violation_actual(&self, i: usize) -> Result<String, JsValue> {
+        self.inner
+            .report
+            .violations
+            .get(i)
+            .map(|v| v.actual.clone())
+            .ok_or_else(|| JsValue::from_str("violation index out of range"))
+    }
+
+    pub fn violation_message(&self, i: usize) -> Result<String, JsValue> {
+        self.inner
+            .report
+            .violations
+            .get(i)
+            .map(|v| v.message.clone())
+            .ok_or_else(|| JsValue::from_str("violation index out of range"))
+    }
+
+    /// Canonical multi-line text form (cargo-test facing).
+    pub fn render_text(&self) -> String {
+        self.inner.report.render_text()
+    }
+
+    /// The run's VCD text (force_dump at assembly; taken before finish) —
+    /// feed to `vcd_parse` + the SVG renderer, never canvas.
+    #[wasm_bindgen(getter)]
+    pub fn vcd(&self) -> Option<String> {
+        self.inner.vcd.clone()
+    }
+}
