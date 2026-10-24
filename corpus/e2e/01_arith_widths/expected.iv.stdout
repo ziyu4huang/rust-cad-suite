@@ -1,0 +1,3 @@
+sum9=300 sum8=44 prod=20000
+diff=100
+tb.v:11: $finish called at 1000 (1ps)

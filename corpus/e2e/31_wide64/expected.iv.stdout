@@ -1,0 +1,5 @@
+and=0000000000000001 or=deadbeefcafeffff xor=deadbeefcafefffe
+shl=beefcafe00010000 shr=0000deadbeefcafe
+add=deadbeefcaff0000
+hi=deadbeef lo=cafe0001
+tb.v:10: $finish called at 0 (1ps)

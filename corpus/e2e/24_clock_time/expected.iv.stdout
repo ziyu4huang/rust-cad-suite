@@ -1,0 +1,3 @@
+t=23000 ns=23
+t=30000 ns=30
+tb.v:8: $finish called at 30000 (1ps)

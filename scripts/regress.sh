@@ -66,6 +66,16 @@ $iv_out"
     [ "$riv_unledgered" -eq 0 ] || { echo "GATE FAIL: riv UNLEDGERED x$riv_unledgered (byte-diff without a riv-pending.txt ledger)"; echo "$riv_all" | grep "UNLEDGERED"; fail=1; }
     riv_drift=$(echo "$riv_all" | grep -c "DRIFT" || true)
     [ "$riv_drift" -eq 0 ] || { echo "GATE FAIL: riv DRIFT x$riv_drift (ledger stale — flip case.json/ledger in the same commit)"; echo "$riv_all" | grep "DRIFT"; fail=1; }
+    # Three-way triage (R4 arc step 0, RIVERILOG-PLAN §8.1): the iv leg is
+    # committed (expected.iv.*), so this needs no local oracle. bug>0 = riv
+    # disagrees with BOTH agreeing oracles — blocks any baseline flip.
+    # tri-div-* lines feed the rivD register (they do not fail the gate).
+    tri_out=$(cargo run -q -p riv-difftest -- --tri --corpus corpus/e2e 2>&1)
+    tri_sum=$(echo "$tri_out" | grep -E "^TRI " || true)
+    [ -n "$tri_sum" ] || { echo "GATE FAIL: riv tri TRI summary missing"; fail=1; }
+    tri_bug=$(echo "$tri_sum" | sed -E 's/.*bug=([0-9]+).*/\1/')
+    [ "$tri_bug" = "0" ] || { echo "GATE FAIL: riv tri bug=x$tri_bug (riv differs from both agreeing oracles)"; echo "$tri_out" | grep "tri-bug"; fail=1; }
+    echo "$tri_sum"
     echo "$e2e_sum"
     echo "$iv_sum"
 fi

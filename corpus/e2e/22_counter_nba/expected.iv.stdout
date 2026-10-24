@@ -1,0 +1,2 @@
+PASS
+tb.v:21: $finish called at 76000 (1ps)

@@ -1,0 +1,4 @@
+lt=1 le=1 gt=0 ge=0
+eq=0 ne=1
+land=1 lor=1 lnot=0
+tb.v:8: $finish called at 0 (1ps)

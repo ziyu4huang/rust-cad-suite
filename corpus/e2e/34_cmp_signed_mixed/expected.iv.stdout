@@ -1,0 +1,5 @@
+s=-1 u=15
+s_lt0=1
+mixed=0
+slit=1
+tb.v:10: $finish called at 0 (1ps)

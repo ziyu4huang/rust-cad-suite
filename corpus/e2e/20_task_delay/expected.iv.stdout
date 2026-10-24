@@ -1,0 +1,2 @@
+cnt=3 done=1
+tb.v:20: $finish called at 26000 (1ps)

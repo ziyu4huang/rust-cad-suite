@@ -1,0 +1,4 @@
+for acc=6
+while j=10
+repeat acc=6
+tb.v:18: $finish called at 0 (1ps)

@@ -1,0 +1,4 @@
+xy=01 w=ba
+cat=00010010
+repl=101010
+tb.v:13: $finish called at 1000 (1ps)

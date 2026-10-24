@@ -1,0 +1,3 @@
+VCD info: dumpfile dump.vcd opened for output.
+PASS
+tb.v:23: $finish called at 76000 (1ps)

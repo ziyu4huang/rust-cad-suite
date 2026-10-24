@@ -1,0 +1,4 @@
+-7div2=-3 -7mod2=-1
+7div-2=3 7mod-2=1
+neg-div-zero-is-x=1
+tb.v:9: $finish called at 0 (1ps)

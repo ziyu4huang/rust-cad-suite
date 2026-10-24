@@ -1,0 +1,2 @@
+lfsr=b0
+tb.v:10: $finish called at 76000 (1ps)

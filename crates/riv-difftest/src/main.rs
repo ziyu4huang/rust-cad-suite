@@ -591,28 +591,267 @@ fn record(corpus: &Path) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// Step 0 of the R4 arc (RIVERILOG-PLAN §8.1): the iverilog leg over the e2e
+// corpus + the mechanical three-way triage. The e2e goldens are
+// verilator-recorded while riverilog's spec is "match iverilog" — without
+// this leg, case flips cannot distinguish riv bugs from two-oracle
+// disagreements (rivD7 withdrawal precedent).
+// ---------------------------------------------------------------------------
+
+/// `--record-iv-leg --corpus corpus/e2e`: per e2e-style case dir (tb.v +
+/// expected.stdout, data files staged), record the iverilog/vvp answer as
+/// `expected.iv.stdout` + `expected.iv.exit` (raw; committed so the triage
+/// replays without a local oracle). A case iverilog cannot compile gets
+/// exit 2 + empty stdout — tri skips those legs.
+fn record_iv_leg(corpus: &Path) {
+    let timeout = watchdog_timeout();
+    let mut dirs: Vec<PathBuf> = std::fs::read_dir(corpus)
+        .expect("corpus dir")
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.is_dir())
+        .collect();
+    dirs.sort();
+    let mut n_ok = 0usize;
+    let mut n_fail = 0usize;
+    for case_dir in dirs {
+        let name = case_dir.file_name().unwrap().to_string_lossy().into_owned();
+        let work = stage_work_dir(&case_dir, "riv-iv-leg", &name);
+        let sources = source_files(&work);
+        if sources.is_empty() {
+            eprintln!("iv-leg {name}: no source files, skipped");
+            continue;
+        }
+        let comp = run_with_watchdog(
+            {
+                let mut c = Command::new("iverilog");
+                c.arg("-o").arg("c.vvp").args(&sources).current_dir(&work);
+                c
+            },
+            timeout,
+        );
+        if comp.watchdog || comp.code != Some(0) {
+            n_fail += 1;
+            eprintln!(
+                "iv-leg {name}: iverilog compile failed ({}), leg recorded as exit 2",
+                comp.stderr.lines().last().unwrap_or("")
+            );
+            std::fs::write(case_dir.join("expected.iv.exit"), "2\n").unwrap();
+            std::fs::write(case_dir.join("expected.iv.stdout"), "").unwrap();
+            continue;
+        }
+        let run = run_with_watchdog(
+            {
+                let mut c = Command::new("vvp");
+                c.arg("-n").arg("c.vvp").current_dir(&work);
+                c
+            },
+            timeout,
+        );
+        if run.watchdog {
+            eprintln!("iv-leg {name}: vvp watchdog, leg recorded as exit 2");
+            std::fs::write(case_dir.join("expected.iv.exit"), "2\n").unwrap();
+            std::fs::write(case_dir.join("expected.iv.stdout"), "").unwrap();
+            n_fail += 1;
+            continue;
+        }
+        let code = run.code.unwrap_or(-1);
+        std::fs::write(case_dir.join("expected.iv.stdout"), &run.stdout).unwrap();
+        std::fs::write(case_dir.join("expected.iv.exit"), format!("{code}\n")).unwrap();
+        n_ok += 1;
+        println!("iv-leg {name}: recorded (rc {code}, {} bytes)", run.stdout.len());
+    }
+    println!("iv-leg done: {n_ok} recorded, {n_fail} compile/run failures");
+}
+
+/// One e2e-arm riv run reused by the triage (compile+run+normalize).
+struct RivRun {
+    /// Normalized stdout; None when compile/run failed (pending counts as a
+    /// distinct status, not a diff).
+    got: Option<String>,
+    status: String,
+    detail: String,
+}
+
+fn run_riv_e2e_case(
+    case_dir: &Path,
+    name: &str,
+    riverilog: &Path,
+    rivvp: &Path,
+    timeout: Duration,
+) -> RivRun {
+    let work = stage_work_dir(case_dir, "riv-tri", name);
+    let sources = source_files(&work);
+    if sources.is_empty() {
+        return RivRun { got: None, status: "error".into(), detail: "no source files".into() };
+    }
+    let compile = run_with_watchdog(
+        {
+            let mut c = Command::new(riverilog);
+            c.arg("-o").arg("out.riv").args(&sources).current_dir(&work);
+            c
+        },
+        timeout,
+    );
+    if compile.watchdog {
+        return RivRun { got: None, status: "error".into(), detail: "watchdog: compile".into() };
+    }
+    if compile.code != Some(0) {
+        let d = one_line(&compile.stderr);
+        return RivRun {
+            got: None,
+            status: if is_decl(compile.code, &compile.stderr) { "pending".into() } else { "error".into() },
+            detail: d,
+        };
+    }
+    let run = run_with_watchdog(
+        {
+            let mut c = Command::new(rivvp);
+            c.arg("out.riv").current_dir(&work);
+            c
+        },
+        timeout,
+    );
+    if run.watchdog {
+        return RivRun { got: None, status: "error".into(), detail: "watchdog: run".into() };
+    }
+    if run.code != Some(0) {
+        return RivRun {
+            got: None,
+            status: "error".into(),
+            detail: format!("run exit {:?}: {}", run.code, one_line(&run.stderr)),
+        };
+    }
+    RivRun {
+        got: Some(normalize_e2e_stdout(&run.stdout)),
+        status: "pass".into(),
+        detail: String::new(),
+    }
+}
+
+fn first_diff(a: &str, b: &str) -> String {
+    let la: Vec<&str> = a.lines().collect();
+    let lb: Vec<&str> = b.lines().collect();
+    for i in 0..la.len().max(lb.len()) {
+        let (x, y) = (la.get(i).copied().unwrap_or("<eof>"), lb.get(i).copied().unwrap_or("<eof>"));
+        if x != y {
+            return format!("line {}: iv `{}` vs vl `{}`", i + 1, x, y);
+        }
+    }
+    "identical".into()
+}
+
+/// `--tri --corpus corpus/e2e`: mechanical three-way triage per case
+/// (iv leg = expected.iv.stdout normalized like the e2e arm; vl =
+/// expected.stdout; riv = live run). Classification per plan §8.1:
+///   iv==vl && riv==both   → tri-pass   (both oracles agree; hard currency)
+///   iv==vl && riv differs → tri-bug    (riv bug — block the flip)
+///   iv!=vl && riv==iv     → tri-div-iv (rivD candidate vs the verilator golden)
+///   iv!=vl && riv==vl     → tri-div-vl (rivD candidate vs iverilog)
+///   otherwise             → tri-own   (riv differs from both — likely bug)
+/// Legs with expected.iv.exit != 0 (iverilog could not build the case) are
+/// skipped: no second oracle, the e2e arm alone governs.
+fn tri_gate(corpus: &Path, riverilog: &Path, rivvp: &Path) {
+    let timeout = watchdog_timeout();
+    let mut dirs: Vec<PathBuf> = std::fs::read_dir(corpus)
+        .expect("corpus dir")
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.is_dir())
+        .collect();
+    dirs.sort();
+    let (mut n_pass, mut n_bug, mut n_div, mut n_skip) = (0usize, 0usize, 0usize, 0usize);
+    for case_dir in dirs {
+        let name = case_dir.file_name().unwrap().to_string_lossy().into_owned();
+        let Some(vl) = std::fs::read_to_string(case_dir.join("expected.stdout")).ok() else {
+            println!("tri\t{name}\ttri-skip\tno expected.stdout");
+            n_skip += 1;
+            continue;
+        };
+        let iv_exit: i32 = std::fs::read_to_string(case_dir.join("expected.iv.exit"))
+            .ok()
+            .and_then(|t| t.trim().parse().ok())
+            .unwrap_or(-1);
+        if iv_exit != 0 {
+            println!(
+                "tri\t{name}\ttri-skip\tno iverilog leg (exit {iv_exit}; record with --record-iv-leg)"
+            );
+            n_skip += 1;
+            continue;
+        }
+        let iv_raw = std::fs::read_to_string(case_dir.join("expected.iv.stdout")).unwrap_or_default();
+        let iv = normalize_e2e_stdout(&iv_raw);
+        let riv = run_riv_e2e_case(&case_dir, &name, riverilog, rivvp, timeout);
+        let Some(got) = riv.got else {
+            println!("tri\t{name}\ttri-{}\t{}", riv.status, riv.detail);
+            if riv.status == "pass" {
+                unreachable!()
+            }
+            // pending/error cases: not a three-way question yet.
+            n_skip += 1;
+            continue;
+        };
+        if iv == vl {
+            if got == vl {
+                println!("tri\t{name}\ttri-pass\toracles agree, riv matches");
+                n_pass += 1;
+            } else {
+                println!("tri\t{name}\ttri-bug\toracles agree, riv differs: {}", first_diff(&iv, &got));
+                n_bug += 1;
+            }
+        } else if got == iv {
+            println!("tri\t{name}\ttri-div-iv\toracles differ ({}), riv matches iverilog — rivD candidate", first_diff(&iv, &vl));
+            n_div += 1;
+        } else if got == vl {
+            println!("tri\t{name}\ttri-div-vl\toracles differ ({}), riv matches verilator — rivD candidate", first_diff(&iv, &vl));
+            n_div += 1;
+        } else {
+            println!("tri\t{name}\ttri-own\toracles differ ({}), riv matches neither: {}", first_diff(&iv, &vl), first_diff(&iv, &got));
+            n_div += 1;
+        }
+    }
+    println!("TRI agree={n_pass} bug={n_bug} div={n_div} skip={n_skip}");
+}
+
 fn main() -> std::process::ExitCode {
     let argv: Vec<String> = std::env::args().skip(1).collect();
     let mut do_record = false;
     let mut do_e2e = false;
+    let mut do_iv_leg = false;
+    let mut do_tri = false;
     let mut corpus: Option<PathBuf> = None;
     let mut i = 0usize;
     while i < argv.len() {
         match argv[i].as_str() {
             "--record" => do_record = true,
             "--e2e" => do_e2e = true,
+            "--record-iv-leg" => do_iv_leg = true,
+            "--tri" => do_tri = true,
             "--corpus" => {
                 corpus = Some(PathBuf::from(&argv[i + 1]));
                 i += 1;
             }
             other => {
                 eprintln!(
-                    "unknown arg `{other}` (usage: riv-difftest [--record] [--e2e] [--corpus DIR])"
+                    "unknown arg `{other}` (usage: riv-difftest [--record] [--record-iv-leg] [--tri] [--e2e] [--corpus DIR])"
                 );
                 return std::process::ExitCode::from(2);
             }
         }
         i += 1;
+    }
+    if do_iv_leg {
+        let corpus = corpus.unwrap_or_else(default_e2e_corpus);
+        record_iv_leg(&corpus);
+        return std::process::ExitCode::from(0);
+    }
+    if do_tri {
+        let corpus = corpus.unwrap_or_else(default_e2e_corpus);
+        let riverilog = locate_bin("riverilog");
+        let rivvp = locate_bin("rivvp");
+        tri_gate(&corpus, &riverilog, &rivvp);
+        return std::process::ExitCode::from(0);
     }
     if do_record {
         let corpus = corpus.unwrap_or_else(default_iv_corpus);

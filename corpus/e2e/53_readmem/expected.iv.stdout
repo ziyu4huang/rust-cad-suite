@@ -1,0 +1,4 @@
+h=00 00 33 11 22 55 a2 00
+b=1010 0101 1111 xxxx 0011 xxxx
+h2=aa bb
+tb.v:16: $finish called at 1000 (1ps)
