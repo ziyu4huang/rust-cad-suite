@@ -1,0 +1,4 @@
+m: t=0 c=0
+m: t=5000 c=10
+m: t=10000 c=20
+tb.v:9: $finish called at 15000 (1ps)

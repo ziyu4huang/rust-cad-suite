@@ -1,0 +1,2 @@
+VCD info: dumpfile dump.vcd opened for output.
+tb.v:10: $finish called at 10000 (1ps)

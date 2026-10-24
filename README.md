@@ -9,13 +9,15 @@ a Rust binary.
 simulator toolchain. Roadmap, milestones and decisions live in [PLAN.md](PLAN.md)
 and [docs/adr/](docs/adr/).
 
-## Status (2026-10-23)
+## Status (2026-10-24)
 | Milestone | State |
 |---|---|
 | M0-M6 workspace / preprocessor / parser / elaboration / scheduler / VCD | done — see [PLAN.md](PLAN.md) |
 | M7 memory arrays + `$readmemh`/`$readmemb` + 12 gate primitives | done — `mem[i]` VCD element vars, x-index writes ignored, out-of-range reads x |
-| **E2E differential regression** | **55/55 = 100% vs Verilator 5.050** (`corpus/e2e`, expectations recorded from the oracle, ≥80% gate in `cargo test`) |
-| Lint-only differential track | **66/87 (75.9%)** over the vendored yosys `tests/simple` suite (`corpus-external/`, ISC); harness = `scripts/lint_diff.sh`; remaining 20 divergences are the M8 roadmap |
+| **E2E differential regression** | **59/59 = 100% vs Verilator 5.052** (`corpus/e2e`, expectations recorded from the oracle, exact-100% gate in `scripts/regress.sh`) |
+| Lint-only differential track | **83/87 (95.4%)** over the vendored yosys `tests/simple` suite (`corpus-external/`, ISC); harness = `scripts/lint_diff.sh`; remaining divergences = 3 different-root-cause feature gaps + 1 registered divergence |
+| Wide values (>128 bits) | done — two-arm value repr, full limb-aware op surface ([ADR-0008](docs/adr/0008-multi-limb-values.md)) |
+| **riverilog** (iverilog-analog, R0) | CLI contract pinned — `riverilog`/`rivvp` entrypoints with byte-exact goldens + 10 iv-e2e chase cases recorded from iverilog 13.0; plan = [docs/RIVERILOG-PLAN.md](docs/RIVERILOG-PLAN.md) |
 | **rVPI** (Rust-native VPI analog) | slice 1 done — typed handles, value get/put, value-change/after-delay/start/end callbacks, iteration, time ([ADR-0003](docs/adr/0003-rvpi.md)); verified by `vpi_gate` + a two-paths-vs-corpus check + an internal rVPI×VCD crosscheck |
 | Frontend fuzz | done — 600-iteration deterministic mutation/random-bytes smoke in `cargo test` (caught 3 UTF-8 robustness bugs on first run) |
 

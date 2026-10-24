@@ -1,6 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
+    "crates/riv-cli",
+    "crates/riv-difftest",
     "crates/rcs-diag",
     "crates/vl-syntax",
     "crates/vl-sim",

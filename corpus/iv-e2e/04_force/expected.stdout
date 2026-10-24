@@ -1,0 +1,3 @@
+forced r=1 w=1
+released r=1 w=1
+tb.v:12: $finish called at 4000 (1ps)

@@ -1,0 +1,6 @@
+riverilog version {VERSION} (oss-cad-suite Rust rewrite)
+
+riverilog Preprocessor version {VERSION}
+riverilog Parser/Elaborator version {VERSION}
+  FLAG vvp.rtg
+vvp.rtg: riverilog riv design writer {VERSION}

@@ -1,0 +1,4 @@
+t0 active sees a=0
+post-#0 sees a=0
+t1 sees a=1
+tb.v:11: $finish called at 1000 (1ps)

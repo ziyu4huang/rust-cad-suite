@@ -1,0 +1,5 @@
+add=xxxx
+and=00xx
+or=1011
+else
+tb.v:12: $finish called at 0 (1ps)

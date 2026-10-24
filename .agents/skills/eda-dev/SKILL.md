@@ -98,3 +98,5 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
 讀值在 run 前後);u64 跨界=BigInt;`$readmem` 在瀏覽器一律走虛擬注入
 (`inject_file`/`run_verilog_with_files`),不碰真 FS;js_sys 表面一律
 `#[cfg(target_arch = "wasm32")]`(host 構建用 stub)。
+
+- 雙 oracle 紀律(2026-10-24,riverilog R0 起):iverilog 13.0/vvp=第二 oracle;期望錄製要帶 `-n`(防互動態);iv-e2e 案例一律自寫 TB+錄製,iverilog 主樹 ivtest/=GPL-2.0 唯讀挖掘永不入 git;iverilog 特有行為(分層隊列/$stop 四行橫幅/sorry 語義)以 corpus 釘死,分歧入 rivD 簿。

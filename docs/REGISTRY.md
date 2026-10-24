@@ -53,6 +53,7 @@
 | `bun crates/vl-ffi/bun-example/vcd_read.mjs` | regress.sh | agent 讀波形:FFI run→`vcd <path>` 強制 dump→rcs_vcd_parse→q 終值斷言 |
 | difftest `--min-pass 100`(regress.sh) | 每次交付 | e2e 精確數閘(80% 門檻曾讓 55/57 藏身綠燈,1023 教訓) |
 | lint parity 基線 83(regress.sh) | 每次交付 | M8 五輪基線(ADR-0008);閘曾攔下 78 誤算(ADR-0006 備忘) |
+| riv-cli/riv-difftest(riverilog R0) | riverilog/rivvp 契約面 goldens byte-exact + iv-e2e 10 例 chase ledger(pending=里程碑硬錯契約) | RIVERILOG-PLAN.md §5/§8;分歧簿前綴 rivD(rivD1-rivD6 預載於 §6) |
 | `cargo test -q -p vl-spec -p spec-i2c` | regress.sh | spec 驗證層:lockstep/不變量/負向偵測/隨機 |
 | D17 timer 期限推進 | — | rVPI AfterDelay 於自身期限準點觸發(舊=拖到下一 # 事件);vpi_gate 20000→16000 |
 | `bun crates/vl-wasm/wasm-test/vcd_svg.mjs` | regress.sh | 三面同源渲染器:wasm one-shot==golden byte-diff+句柄重渲+u64 窗口+hostile 轉義+錯誤路徑 |

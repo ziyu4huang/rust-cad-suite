@@ -1,0 +1,14 @@
+[package]
+name = "riv-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "riverilog"
+path = "src/riverilog.rs"
+
+[[bin]]
+name = "rivvp"
+path = "src/rivvp.rs"

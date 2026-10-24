@@ -29,6 +29,7 @@
   CLI stdout=wasm one-shot 同字節);regress wasm vcd_svg+ffi vcd_svg 閘;
   目檢=docs/e2e-report/wasm-demo-v3-svg-verified.png;vcd2svg --help。
 - **KR1.10 Spec 驗證層(ADR-0007,2026-10-23 立;2026-10-24 收割輪 12083a8)**
+- **O-riv riverilog(2026-10-24 立項,R0 落地)**:R0 ✅=CLI 契約 goldens byte-exact(riv-cli 8 測)+iv-e2e 10 例 chase ledger(R0 契約=里程碑硬錯)+regress 閘;KR-riv.e2e=enforced 案例精確數(隨 R2+ 翻 enforced);SSOT=docs/RIVERILOG-PLAN.md。
   當前:✅ 全收=vl-spec(lockstep+不變量)+spec-i2c 乾淨室 I2C+corpus 59 oracle 腿
   (e2e 58/58@100%)+RD 讀事務鎖步(dout 絕對承載)+MsbFirst 取樣器收口
   (master 驅動輸出取樣+高半相位;LSB-first 負向=lockstep+msb_first_bit_order

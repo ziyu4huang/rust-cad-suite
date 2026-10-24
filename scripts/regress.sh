@@ -42,6 +42,17 @@ if [ -x /opt/homebrew/bin/verilator ]; then
     fi
 fi
 
+# riverilog R0: CLI contract goldens (byte-exact, zero oracle dependency)
+# + iv-e2e chase ledger (pending cases must answer the milestone hard-error;
+# flipping a case to enforced requires a committed case.json edit).
+if [ -f crates/riv-cli/Cargo.toml ]; then
+    ct=$(cargo test -p riv-cli 2>&1 | grep -E "^test result" | tail -1)
+    echo "$ct" | grep -q "test result: ok" || { echo "GATE FAIL: riv-cli goldens: $ct"; fail=1; }
+    riv=$(cargo run -q -p riv-difftest 2>&1 | tail -1)
+    echo "$riv" | grep -q "== riverilog e2e:" || { echo "GATE FAIL: riv-difftest: $riv"; fail=1; }
+    echo "$riv"
+fi
+
 # WASM differential gate: the wasm engine must reproduce the same oracle
 # goldens the native gate checks. Rebuilds pkg when core sources are newer.
 if command -v wasm-pack >/dev/null && command -v bun >/dev/null; then

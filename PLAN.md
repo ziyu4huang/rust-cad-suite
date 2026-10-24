@@ -7,15 +7,16 @@
 
 ## 0. 已驗證事實(2026-10-21 本機)
 - rustc/cargo 1.95.0;macOS arm64。
-- 真 Verilator 5.050 在 `/opt/homebrew/bin/verilator` = dev-time 差分 oracle(永不 ship);
-  iverilog 未裝(difftest 自動跳過)。
+- 真 Verilator 5.052(/opt/homebrew/bin,2026-10-24 由 5.050 升;正規化期望零漂移
+  實證)= dev-time 差分 oracle(永不 ship);iverilog 13.0(/opt/homebrew/bin,
+  2026-10-24 裝)= 第二 oracle(riverilog 線用,docs/RIVERILOG-PLAN.md)。
 - oss-cad-suite 二進制包 darwin-arm64-20261020(526MB)已下載至
   `vendor-reference/suite-dl/`(gitignored),Phase 2+ 各工具的 oracle 候選。
 - upstream 63 個工具腳本清單見 `vendor-reference/oss-cad-suite-build/default/scripts/`。
 
 ## 1. Suite 路線圖(Phase 1 之後的排序)
 1. **P2 yosys-equiv 綜合核**——最高槓桿,復用 vl-syntax/vl-elab。
-2. **P3 iverilog-equiv**——事件驅動調度器 + VPI 子集,~80% 復用 Phase 1 crates。
+2. **P3 iverilog-equiv(riverilog)**——事件驅動調度器 + VPI 子集;**正典企劃=docs/RIVERILOG-PLAN.md(2026-10-24 立項)**;R0 ✅(CLI 契約 goldens+iv-e2e 10 例 chase ledger)。
 3. **P4 nextpnr-generic + FPGA 家族**——prjoxide(Rust, ISC)直接收編;其餘長尾。
 4. **P5 formal**——⚠ 風險最高:上游 SMT/SAT 全是 C++,純 Rust solver 成熟度是全 suite 最大未知;屆時再裁。
 5. **P6 波形查看器**——surfer(Rust, EUPL-1.2,僅可獨立二進制)或自寫 TUI。
