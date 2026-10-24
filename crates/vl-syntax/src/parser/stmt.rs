@@ -163,6 +163,15 @@ impl<'d> Parser<'d> {
                     name,
                 })
             }
+            Tok::Punct(Punct::Arrow) => {
+                self.pos += 1;
+                let (name, _) = self.expect_ident("event name after `->`")?;
+                let end = self.expect_punct(Punct::Semi, "after `-> event`")?;
+                Ok(Stmt::Trigger {
+                    span: t.span.merge(end),
+                    name,
+                })
+            }
             Tok::Punct(Punct::Semi) => {
                 self.pos += 1;
                 Ok(Stmt::Null { span: t.span })
@@ -654,6 +663,7 @@ pub(crate) fn stmt_span(s: &Stmt) -> rcs_diag::Span {
         | Stmt::EventCtrl { span, .. }
         | Stmt::SysCall { span, .. }
         | Stmt::SubCall { span, .. }
+        | Stmt::Trigger { span, .. }
         | Stmt::Disable { span, .. }
         | Stmt::Wait { span, .. }
         | Stmt::Fork { span, .. }

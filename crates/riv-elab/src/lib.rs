@@ -1308,11 +1308,14 @@ impl<'a> Walker<'a> {
             )),
             DeclKind::Event => {
                 // Named events (R4-e): 1-bit event vars, no value storage.
+                // The pre-pass already registered the names.
                 for entry in &d.entries {
                     if !entry.unpacked.is_empty() {
                         return Err(err_at(file, line, "event arrays are not supported"));
                     }
-                    self.declare_var(&entry.name, 1, false, VarKind::Event, file, entry.span, 0, 0, Vec::new())?;
+                    if !self.e.cur().names.contains_key(&entry.name) {
+                        self.declare_var(&entry.name, 1, false, VarKind::Event, file, entry.span, 0, 0, Vec::new())?;
+                    }
                 }
                 Ok(())
             }

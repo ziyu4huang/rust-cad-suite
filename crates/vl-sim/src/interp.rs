@@ -1677,7 +1677,7 @@ impl Sim {
                     self.collect_expr_reads(a, out);
                 }
             }
-            Stmt::Disable { .. } | Stmt::Null { .. } => {}
+            Stmt::Disable { .. } | Stmt::Trigger { .. } | Stmt::Null { .. } => {}
             // C6-relocated constructs never reach lowering (build errors at
             // lower_stmt), so their read sets are irrelevant here.
             Stmt::Wait { .. }
@@ -2013,6 +2013,12 @@ impl Sim {
                         }
                     }
                 }
+            }
+            Stmt::Trigger { span, name } => {
+                return Err(SimError::at(
+                    format!("`-> {name}` named event triggers are not yet supported (milestone M8)"),
+                    *span,
+                ))
             }
             Stmt::Disable { span, name } => {
                 return Err(SimError::at(
@@ -3243,6 +3249,7 @@ fn stmt_span(s: &Stmt) -> Span {
         | Stmt::EventCtrl { span, .. }
         | Stmt::SysCall { span, .. }
         | Stmt::SubCall { span, .. }
+        | Stmt::Trigger { span, .. }
         | Stmt::Disable { span, .. }
         | Stmt::Wait { span, .. }
         | Stmt::Fork { span, .. }

@@ -22,6 +22,9 @@ fn main() -> ExitCode {
     let argv: Vec<String> = std::env::args().skip(1).collect();
     let mut design: Option<String> = None;
     let mut plusargs: Vec<String> = Vec::new();
+    // -n: $stop ≡ $finish (rivD2; measured: the stop line prints, then
+    // the run ends). Default = banner + continue (EOF semantics).
+    let mut stop_as_finish = false;
     let mut i = 0usize;
     while i < argv.len() {
         let a = argv[i].clone();
@@ -34,7 +37,8 @@ fn main() -> ExitCode {
                 println!("{USAGE}");
                 return ExitCode::from(0);
             }
-            "-n" | "-N" | "-i" | "-q" => {}
+            "-n" => stop_as_finish = true,
+            "-N" | "-i" | "-q" => {}
             "-l" | "-M" | "-m" => i += 1,
             _ if a.starts_with('+') => plusargs.push(a),
             _ if a.starts_with('-') => {
@@ -81,8 +85,10 @@ fn main() -> ExitCode {
             return ExitCode::from(1);
         }
     };
-    // Plusargs feed $test$plusargs/$value$plusargs (C5/R3-A).
+    // Plusargs feed $test$plusargs/$value$plusargs (C5/R3-A); -n feeds
+    // the rivD2 $stop semantics.
     kernel.set_plusargs(plusargs);
+    kernel.stop_as_finish = stop_as_finish;
     let mut sink = VcdSink::new(&d);
     let outcome = kernel.run(&mut sink);
     print!("{}", outcome.output);
@@ -104,13 +110,23 @@ impl VcdSink {
         // Var registry: flat name `top.var`, scope path [top, var],
         // declared width — deterministic order comes from the writer's
         // sort.
+        // Scope tree (RIVERILOG-PLAN §8.1 hygiene ①): dotted var paths
+        // split into real VCD scopes (tb.dut.q → $scope tb $scope dut $var
+        // q). Event vars carry no value and arrays dump per-element at R5 —
+        // both stay out of the registry. Collapsed-port dead vars keep
+        // their row (constant x); the cross-compare gate intersects.
         let var_list: Vec<(String, Vec<String>, u32)> = d
             .vars
             .iter()
+            .filter(|v| {
+                v.kind != riv_ir::VarKind::Event && v.kind != riv_ir::VarKind::Array
+            })
             .map(|v| {
+                let mut scopes = vec![d.meta.top.clone()];
+                scopes.extend(v.name.split('.').map(|c| c.to_string()));
                 (
                     format!("{}.{}", d.meta.top, v.name),
-                    vec![d.meta.top.clone(), v.name.clone()],
+                    scopes,
                     v.width,
                 )
             })

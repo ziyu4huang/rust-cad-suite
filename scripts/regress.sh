@@ -78,6 +78,29 @@ $iv_out"
     echo "$tri_sum"
     echo "$e2e_sum"
     echo "$iv_sum"
+    # riverilog VCD cross-compare (RIVERILOG-PLAN §8.1 hygiene ①/rivD9):
+    # 51's dump vs the iverilog-recorded reference through the single VCD
+    # core (ADR-0004) — sample-point compare, name intersection, header
+    # families normalized away by the reader.
+    vcd_tmp=$(mktemp -d)
+    repo_root=$(pwd)
+    cp corpus/e2e/51_vcd_counter/tb.v "$vcd_tmp/"
+    (cd "$vcd_tmp" && "$repo_root/target/debug/riverilog" -o out.riv tb.v >/dev/null 2>&1 && "$repo_root/target/debug/rivvp" out.riv >/dev/null 2>&1)
+    if [ -f "$vcd_tmp/dump.vcd" ]; then
+        vcd_rep=$(cargo run -q -p vl-difftest -- --vcd-xcheck "$vcd_tmp/dump.vcd" corpus/e2e/51_vcd_counter/oracle-ref.iv.vcd 2>&1)
+        vcd_rc=$?
+        if [ "$vcd_rc" -ne 0 ]; then
+            echo "GATE FAIL: riv VCD crosscheck (51 vs iverilog ref)"
+            echo "$vcd_rep"
+            fail=1
+        else
+            echo "$vcd_rep" | tail -1
+        fi
+    else
+        echo "GATE FAIL: riv VCD crosscheck — 51 produced no dump.vcd"
+        fail=1
+    fi
+    rm -rf "$vcd_tmp"
 fi
 
 # WASM differential gate: the wasm engine must reproduce the same oracle

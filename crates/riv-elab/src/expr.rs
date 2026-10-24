@@ -1402,6 +1402,27 @@ impl<'e, 'f> Lower<'e, 'f> {
                 self.lower_call_site(*span, func, name, formals, args, None)?;
                 Ok(())
             }
+            Stmt::Trigger { span, name } => {
+                // `-> ev` (R4-e): the event var id rides in args[0].slot
+                // (static at lowering; the kernel wakes Any-waiters).
+                let Some(NameKind::Var(v)) = self.lookup(name) else {
+                    return Err(self.err(*span, format!("identifier `{name}` is not declared")));
+                };
+                if self.e.vars[v as usize].kind != riv_ir::VarKind::Event {
+                    return Err(self.err(*span, format!("`{name}` is not an event")));
+                }
+                let file_idx = self.pool_file_idx();
+                self.emit(Op::SysCall {
+                    id: SysId::Trigger,
+                    fmt: None,
+                    args: vec![riv_ir::Arg { slot: v as u32, width: 0, signed: false, is_time: false }],
+                    dst: None,
+                    file: file_idx,
+                    line: self.line_of(*span),
+                    start: 0,
+                });
+                Ok(())
+            }
             Stmt::Disable { span, name } => Err(self.err(
                 *span,
                 format!("`disable {name}` lands at the behavioral batch (milestone R3)"),

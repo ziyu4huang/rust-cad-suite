@@ -377,6 +377,11 @@ pub enum Stmt {
         lhs: Expr,
         rhs: Expr,
     },
+    /// `-> ev` — named event trigger (R4-e).
+    Trigger {
+        span: Span,
+        name: String,
+    },
     Disable {
         span: Span,
         name: String,

@@ -135,6 +135,9 @@ pub struct Kernel {
     gate_pending: Vec<Option<(u64, Bits)>>,
     /// rivvp -n: $stop behaves like $finish (rivD2).
     pub stop_as_finish: bool,
+    /// -n $stop halted the run: like natural exhaustion — NO finish
+    /// banner (measured: iverilog -n prints only the stop-called line).
+    stopped_silently: bool,
 }
 
 /// Unit→precision scale parsed from meta.timescale (unit fs / precision fs).
@@ -252,6 +255,7 @@ impl Kernel {
             gate_due: BTreeMap::new(),
             gate_pending,
             stop_as_finish: false,
+            stopped_silently: false,
             vars,
             active: VecDeque::new(),
             inactive: VecDeque::new(),
@@ -298,7 +302,7 @@ impl Kernel {
                         Ok(Resume::None) => {}
                         Err(e) => return self.finish_out(sink, Some(e)),
                     }
-                    if self.finished.is_some() {
+                    if self.finished.is_some() || self.stopped_silently {
                         return self.finish_out(sink, None);
                     }
                 }
@@ -311,7 +315,7 @@ impl Kernel {
                         Ok(Resume::None) => {}
                         Err(e) => return self.finish_out(sink, Some(e)),
                     }
-                    if self.finished.is_some() {
+                    if self.finished.is_some() || self.stopped_silently {
                         return self.finish_out(sink, None);
                     }
                 }
@@ -321,7 +325,7 @@ impl Kernel {
                     if let Err(e) = self.commit(&lv, val, sink) {
                         return self.finish_out(sink, Some(e));
                     }
-                    if self.finished.is_some() {
+                    if self.finished.is_some() || self.stopped_silently {
                         return self.finish_out(sink, None);
                     }
                 }
@@ -385,6 +389,9 @@ impl Kernel {
                 1
             }
         };
+        if self.stopped_silently {
+            self.finished = None;
+        }
         if let Some((file, line)) = self.finished {
             let file = self
                 .d
@@ -738,18 +745,32 @@ impl Kernel {
                         self.monitor_enabled = true;
                     }
                     SysId::Stop => {
-                        // rivD2: default = iverilog's banner + CONTINUE
-                        // (EOF semantics; we never read stdin); -n makes
-                        // $stop equivalent to $finish.
+                        // rivD2, bytes measured on iverilog 13.0 (vvp,
+                        // stdin=/dev/null): the stop-called line, then the
+                        // four banner lines, then simulation CONTINUES
+                        // (EOF = continue). -n makes $stop ≡ $finish (the
+                        // stop-called line only, then halt).
+                        let file_name = self
+                            .d
+                            .strs
+                            .get(file as usize)
+                            .and_then(|p| p.first())
+                            .map(|p| match p {
+                                FmtPiece::Text(t) => t.clone(),
+                                _ => String::new(),
+                            })
+                            .unwrap_or_default();
+                        self.out.push_str(&format!(
+                            "{file_name}:{line}: $stop called at {} ({})\n",
+                            self.now, self.d.meta.precision
+                        ));
                         if self.stop_as_finish {
-                            self.finished = Some((file, line));
+                            self.stopped_silently = true;
                             self.threads[ti].status = Status::Done;
                             return Ok(Resume::None);
                         }
-                        let num = unit_ratio(&self.d.meta.timescale).unwrap_or(1).max(1) as u64;
-                        let _ = num;
                         self.out.push_str(&format!(
-                            "** VVP Stop(0) **\n** Flushing output streams.\n** Current simulation time is {} ticks.\n** Resuming simulation forever.\n",
+                            "** VVP Stop(0) **\n** Flushing output streams.\n** Current simulation time is {} ticks.\n** Continue **\n",
                             self.now
                         ));
                     }
