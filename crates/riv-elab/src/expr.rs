@@ -91,13 +91,70 @@ impl<'e, 'f> Lower<'e, 'f> {
         if let Some((_, k)) = self.scopes.iter().rev().find(|(n, _)| n == name) {
             return Some(*k);
         }
-        // Design vars resolve by name across the flat module (AGENTS §6:
-        // every declaration form is registered — no blind prefixes).
-        self.e
-            .vars
-            .iter()
-            .position(|v| v.name == name)
-            .map(|i| NameKind::Var(i as VarId))
+        // Design vars resolve innermost-first, walking OUT through
+        // transparent (generate) scopes to the enclosing module scope;
+        // instance scopes are opaque boundaries.
+        for sc in self.e.scopes.iter().rev() {
+            if let Some(v) = sc.names.get(name) {
+                return Some(NameKind::Var(*v));
+            }
+            if !sc.transparent {
+                break;
+            }
+        }
+        None
+    }
+
+    /// Resolve a hierarchical reference (`u1.u2.a`, `blk[3].z`) by dotted
+    /// path against the var arena, walking scopes outward from the current
+    /// prefix (Verilog name resolution: innermost scope first).
+    fn resolve_hier(&self, path: &str) -> Option<VarId> {
+        let mut pfx = self.e.cur().prefix.clone();
+        let found = loop {
+            let cand = format!("{pfx}{path}");
+            if let Some(i) = self.e.vars.iter().position(|v| v.name == cand) {
+                break Some(i as VarId);
+            }
+            match pfx.rfind('.') {
+                Some(i) if i > 0 => pfx.truncate(i + 1),
+                _ => break None,
+            }
+        }
+        .or_else(|| self.e.vars.iter().position(|v| v.name == path).map(|i| i as VarId))?;
+        // Collapsed-port aliases: the arena still holds the dead child row
+        // under its dotted name; follow it to the live storage var.
+        let mut v = found;
+        while let Some(next) = self.e.aliases.get(&v) {
+            v = *next;
+        }
+        Some(v)
+    }
+
+    /// Resolve a hierarchical path to a design var (hard error when
+    /// missing — AGENTS §6).
+    fn hier_var(&self, path: &str, span: rcs_diag::Span) -> ElabResult<VarId> {
+        self.resolve_hier(path).ok_or_else(|| {
+            self.err(span, format!("hierarchical name `{path}` does not resolve"))
+        })
+    }
+
+    /// Flatten a HierDot base into a path component (Ident / indexed
+    /// generate scope `blk[3]` with a constant index).
+    fn hier_base_path(&self, base: &Expr) -> Option<String> {
+        match base {
+            Expr::Ident { name, .. } => Some(name.clone()),
+            Expr::Index { base, index, .. } => {
+                let Expr::Ident { name, .. } = base.as_ref() else { return None };
+                let (b, _) = self.const_eval(index).ok()?;
+                if b.has_unknown() {
+                    return None;
+                }
+                Some(format!("{name}[{}]", b.to_u128_lossy()))
+            }
+            Expr::HierDot { base, name, .. } => Some(format!("{}.{}", self.hier_base_path(base)?, name)),
+            Expr::HierIdent { parts, .. } => Some(parts.join(".")),
+            _ => None,
+        }
     }
 
     pub fn note_read(&mut self, var: VarId) {
@@ -196,7 +253,7 @@ impl<'e, 'f> Lower<'e, 'f> {
             Expr::Ident { name, .. } => match self.lookup(name) {
                 Some(NameKind::Local { signed, .. }) => signed,
                 Some(NameKind::Var(v)) => self.e.vars[v as usize].signed,
-                None => self.e.params.get(name).map(|(_, s)| *s).unwrap_or(false),
+                None => self.scope_param(name).map(|(_, s)| *s).unwrap_or(false),
             },
             Expr::StrLit { .. } | Expr::RealLit { .. } => false,
             Expr::Call { func, .. } => match func.as_str() {
@@ -279,11 +336,15 @@ impl<'e, 'f> Lower<'e, 'f> {
                 m.abs_diff(l) + 1
             }
             Expr::IndexedPart { width, .. } => self.const_u32_of(width)?,
-            Expr::HierIdent { span, .. } | Expr::HierDot { span, .. } => {
-                return Err(self.err(
-                    *span,
-                    "hierarchical references need module instantiation (milestone R4)",
-                ))
+            Expr::HierIdent { parts, .. } => {
+                let v = self.hier_var(&parts.join("."), e.span())?;
+                self.e.vars[v as usize].width
+            }
+            Expr::HierDot { base, name, span } => {
+                let p = self.hier_base_path(base)
+                    .ok_or_else(|| self.err(*span, "hierarchical base must be a scope path here"))?;
+                let v = self.hier_var(format!("{p}.{name}").as_str(), *span)?;
+                self.e.vars[v as usize].width
             }
             Expr::RealLit { span, .. } => {
                 return Err(self.err(
@@ -311,8 +372,34 @@ impl<'e, 'f> Lower<'e, 'f> {
     }
 
     /// Resolve an identifier to a constant parameter value.
+    fn scope_param(&self, name: &str) -> Option<&(Bits, bool)> {
+        for sc in self.e.scopes.iter().rev() {
+            if let Some(p) = sc.params.get(name) {
+                return Some(p);
+            }
+            if !sc.transparent {
+                break;
+            }
+        }
+        None
+    }
+
+    /// Functions resolve innermost-first, walking out through transparent
+    /// (generate) scopes.
+    fn scope_func(&self, name: &str) -> Option<(u32, Vec<(u32, ast::Direction, u32, bool)>)> {
+        for sc in self.e.scopes.iter().rev() {
+            if let Some(f) = sc.funcs.get(name) {
+                return Some(f.clone());
+            }
+            if !sc.transparent {
+                break;
+            }
+        }
+        None
+    }
+
     pub fn param_bits(&self, name: &str) -> ElabResult<(Bits, bool)> {
-        match self.e.params.get(name) {
+        match self.scope_param(name) {
             Some((b, s)) => Ok((b.clone(), *s)),
             None => Err(err_at(
                 self.file,
@@ -422,11 +509,16 @@ impl<'e, 'f> Lower<'e, 'f> {
                 Ok(Val { slot: dst, w: v.w * times as u32, signed: false, is_time: false })
             }
             Expr::Index { base, index, .. } => {
-                let (var, _vw, _vs, _desc) = self.base_var(base)?;
+                let (var, vw, _vs, _desc) = self.base_var(base)?;
                 let i = self.lower(index, 0)?;
                 let dst = self.slot();
-                self.emit(Op::LoadBit { dst, var, idx: i.slot });
-                Ok(Val { slot: dst, w: 1, signed: false, is_time: false })
+                if self.e.vars[var as usize].kind == riv_ir::VarKind::Array {
+                    self.emit(Op::LoadElem { dst, var, idx: i.slot });
+                    Ok(Val { slot: dst, w: vw, signed: false, is_time: false })
+                } else {
+                    self.emit(Op::LoadBit { dst, var, idx: i.slot });
+                    Ok(Val { slot: dst, w: 1, signed: false, is_time: false })
+                }
             }
             Expr::PartSelect { base, msb, lsb, span } => {
                 let (var, _, _, desc) = self.base_var(base)?;
@@ -451,10 +543,24 @@ impl<'e, 'f> Lower<'e, 'f> {
                 *span,
                 "indexed part-selects (`+:`/`-:`) are not supported yet (see docs/RIVERILOG-PLAN.md §8)",
             )),
-            Expr::HierIdent { span, .. } | Expr::HierDot { span, .. } => Err(self.err(
-                *span,
-                "hierarchical references need module instantiation (milestone R4)",
-            )),
+            Expr::HierIdent { parts, span } => {
+                let v = self.hier_var(parts.join(".").as_str(), *span)?;
+                self.note_read(v);
+                let dst = self.slot();
+                self.emit(Op::LoadVar { dst, var: v });
+                let vi = self.e.vars[v as usize].clone();
+                Ok(Val { slot: dst, w: vi.width, signed: vi.signed, is_time: false })
+            }
+            Expr::HierDot { base, name, span } => {
+                let p = self.hier_base_path(base)
+                    .ok_or_else(|| self.err(*span, "hierarchical base must be a scope path here"))?;
+                let v = self.hier_var(format!("{p}.{name}").as_str(), *span)?;
+                self.note_read(v);
+                let dst = self.slot();
+                self.emit(Op::LoadVar { dst, var: v });
+                let vi = self.e.vars[v as usize].clone();
+                Ok(Val { slot: dst, w: vi.width, signed: vi.signed, is_time: false })
+            }
             Expr::Call { span, func, args } => self.lower_call(*span, func, args, ctx),
         }
     }
@@ -772,7 +878,7 @@ impl<'e, 'f> Lower<'e, 'f> {
             _ => {
                 // User-defined function (IEEE §10.3): evaluate args, call,
                 // the ret slot is the value.
-                let Some((fidx, formals)) = self.e.funcs.get(func).cloned() else {
+                let Some((fidx, formals)) = self.scope_func(func) else {
                     return Err(self.err(
                         span,
                         format!("system function `{func}` is not supported (see docs/RIVERILOG-PLAN.md §8)"),
@@ -793,7 +899,7 @@ impl<'e, 'f> Lower<'e, 'f> {
         let Expr::Ident { name, .. } = e else {
             return Err(self.err(
                 e.span(),
-                "bit/part-select base must be a plain identifier in flat designs (milestone R4)",
+                "bit/part-select base must be a plain identifier (hierarchical selects land with the strength batch)",
             ));
         };
         match self.lookup(name) {
@@ -905,7 +1011,7 @@ impl<'e, 'f> Lower<'e, 'f> {
             let Expr::Ident { span, name } = &edge.expr else {
                 return Err(self.err(
                     edge.expr.span(),
-                    "event expressions on non-identifiers need gates/arrays (milestone R4)",
+                    "event expressions must be plain identifiers (expression sensitivity needs the strength batch)",
                 ));
             };
             let var = match self.lookup(name) {
@@ -987,13 +1093,13 @@ impl<'e, 'f> Lower<'e, 'f> {
                         ast::DeclKind::Event => {
                             return Err(self.err(
                                 d.span,
-                                "named events land at the behavioral batch (milestone R3)",
+                                "block-local named events are not supported yet (declare events at module scope)",
                             ))
                         }
                         ast::DeclKind::Genvar => {
                             return Err(self.err(
                                 d.span,
-                                "genvars belong to generate constructs (milestone R4)",
+                                "genvars must be declared at module scope (generate constructs bind them at elaboration)",
                             ))
                         }
                         _ => {}
@@ -1001,7 +1107,7 @@ impl<'e, 'f> Lower<'e, 'f> {
                     if !d.entries.is_empty() && !d.entries.iter().all(|e| e.unpacked.is_empty()) {
                         return Err(self.err(
                             d.span,
-                            "unpacked arrays (memories) land with the structural batch (milestone R4)",
+                            "block-local unpacked arrays are not supported yet (declare memories at module scope; see docs/RIVERILOG-PLAN.md §8)",
                         ));
                     }
                     let (w_default, signed_default) = match d.kind {
@@ -1265,6 +1371,7 @@ impl<'e, 'f> Lower<'e, 'f> {
                     Lval::Bit { .. } => 1,
                     Lval::Part { hi, lo, .. } => hi.abs_diff(*lo) + 1,
                     Lval::PartDyn { .. } => 1,
+                    Lval::Elem { var, .. } => self.e.vars[*var as usize].width,
                     Lval::Concat { .. } => unreachable!(),
                 };
                 let v = self.lower(rhs, lw)?;
@@ -1286,7 +1393,7 @@ impl<'e, 'f> Lower<'e, 'f> {
             )),
             Stmt::SysCall { span, name, args } => self.lower_syscall(*span, name, args),
             Stmt::SubCall { span, name, args } => {
-                let Some((func, formals)) = self.e.funcs.get(name).cloned() else {
+                let Some((func, formals)) = self.scope_func(name) else {
                     return Err(self.err(
                         *span,
                         format!("task call `{name}` is not declared"),
@@ -1325,11 +1432,14 @@ impl<'e, 'f> Lower<'e, 'f> {
             Lval::Bit { .. } => 1,
             Lval::Part { hi, lo, .. } => hi.abs_diff(*lo) + 1,
             Lval::PartDyn { .. } => 1,
+            Lval::Elem { var, .. } => self.e.vars[*var as usize].width,
             Lval::Concat { parts } => parts.iter().map(|(_, w)| *w).sum(),
         };
         // Procedural assignment targets regs (nets get cont-assign drivers).
         if let Some(var) = lval_base_var(&lv) {
-            if self.e.vars[var as usize].kind != VarKind::Reg {
+            let vi = &self.e.vars[var as usize];
+            let ok = vi.kind == VarKind::Reg || (vi.kind == VarKind::Array && vi.array_of_reg);
+            if !ok {
                 return Err(self.err(
                     lhs.span(),
                     format!(
@@ -1364,7 +1474,11 @@ impl<'e, 'f> Lower<'e, 'f> {
             Expr::Index { base, index, .. } => {
                 let (var, _vw, _vs, _desc) = self.base_var(base)?;
                 let i = self.lower(index, 0)?;
-                Ok(Lval::Bit { var, idx: i.slot })
+                if self.e.vars[var as usize].kind == riv_ir::VarKind::Array {
+                    Ok(Lval::Elem { var, idx: i.slot })
+                } else {
+                    Ok(Lval::Bit { var, idx: i.slot })
+                }
             }
             Expr::PartSelect { base, msb, lsb, span } => {
                 let (var, _, _, desc) = self.base_var(base)?;
@@ -1398,10 +1512,16 @@ impl<'e, 'f> Lower<'e, 'f> {
                 *span,
                 "indexed part-selects (`+:`/`-:`) are not supported yet (see docs/RIVERILOG-PLAN.md §8)",
             )),
-            Expr::HierIdent { span, .. } | Expr::HierDot { span, .. } => Err(self.err(
-                *span,
-                "hierarchical assignment targets need module instantiation (milestone R4)",
-            )),
+            Expr::HierIdent { parts, span } => {
+                let v = self.hier_var(parts.join(".").as_str(), *span)?;
+                Ok(Lval::Var { var: v })
+            }
+            Expr::HierDot { base, name, span } => {
+                let p = self.hier_base_path(base)
+                    .ok_or_else(|| self.err(*span, "hierarchical base must be a scope path here"))?;
+                let v = self.hier_var(format!("{p}.{name}").as_str(), *span)?;
+                Ok(Lval::Var { var: v })
+            }
             other => Err(self.err(
                 other.span(),
                 "expression is not a valid assignment target",
@@ -1558,14 +1678,48 @@ impl<'e, 'f> Lower<'e, 'f> {
                 });
                 Ok(())
             }
-            "$stop" => Err(self.err(
-                span,
-                "`$stop` lands with the $finish family batch (milestone R3)",
-            )),
-            "$readmemh" | "$readmemb" => Err(self.err(
-                span,
-                format!("`{name}` lands with the IO batch (milestone R5)"),
-            )),
+            "$stop" => {
+                // rivD2: default = banner + CONTINUE (EOF semantics); -n in
+                // rivvp makes $stop equivalent to $finish.
+                self.emit(Op::SysCall { id: SysId::Stop, fmt: None, args: Vec::new(), dst: None, file: file_idx, line, start: 0 });
+                Ok(())
+            }
+            "$readmemh" | "$readmemb" => {
+                // $readmemh("file", mem[, start[, finish]]) — file name in
+                // the fmt pool; start/finish lowered into arg slots with
+                // width 0 marking absence.
+                let id = if name == "$readmemh" { SysId::ReadmemH } else { SysId::ReadmemB };
+                let Some(Expr::StrLit { value, .. }) = args.first() else {
+                    return Err(self.err(span, format!("{name} first argument must be a file name string")));
+                };
+                let Some(Expr::Ident { name: mem, span: mspan }) = args.get(1) else {
+                    return Err(self.err(span, format!("{name} second argument must be a memory")));
+                };
+                let Some(NameKind::Var(mv)) = self.lookup(mem) else {
+                    return Err(self.err(*mspan, format!("identifier `{mem}` is not declared")));
+                };
+                if self.e.vars[mv as usize].kind != riv_ir::VarKind::Array {
+                    return Err(self.err(*mspan, format!("`{mem}` is not a memory")));
+                }
+                let fidx = self.pool_str(vec![FmtPiece::Text(value.clone())]);
+                let mut ir_args = vec![riv_ir::Arg { slot: mv as u32, width: 0, signed: false, is_time: false }];
+                for bound in args.get(2..4).unwrap_or(&[]) {
+                    match bound {
+                        Expr::NumLit(_) | Expr::Ident { .. } => {
+                            let v = self.lower(bound, 0)?;
+                            ir_args.push(riv_ir::Arg { slot: v.slot, width: 32, signed: true, is_time: false });
+                        }
+                        _ => return Err(self.err(span, "readmem bounds must be constants")),
+                    }
+                }
+                while ir_args.len() < 3 {
+                    let dst = self.slot();
+                    self.emit(Op::Const { dst, lit: riv_ir::Literal { width: 32, signed: true, base: riv_ir::Base::Dec, digits: "0".into() } });
+                    ir_args.push(riv_ir::Arg { slot: dst, width: 0, signed: true, is_time: false });
+                }
+                self.emit(Op::SysCall { id, fmt: Some(fidx), args: ir_args, dst: None, file: file_idx, line, start: 0 });
+                Ok(())
+            }
             "$dumpall" | "$dumpoff" | "$dumpon" | "$dumpflush" | "$dumplimit" => Err(self.err(
                 span,
                 format!("`{name}` lands with the dump batch (milestone R5)"),
@@ -1607,7 +1761,8 @@ fn lval_base_var(lv: &Lval) -> Option<VarId> {
         Lval::Var { var }
         | Lval::Bit { var, .. }
         | Lval::Part { var, .. }
-        | Lval::PartDyn { var, .. } => Some(*var),
+        | Lval::PartDyn { var, .. }
+        | Lval::Elem { var, .. } => Some(*var),
         Lval::Concat { parts } => parts.first().map(|(p, _)| lval_base_var(p)).flatten(),
     }
 }
@@ -1618,6 +1773,7 @@ fn lval_width_of(lv: &Lval, e: &super::Elab) -> u32 {
         Lval::Bit { .. } => 1,
         Lval::Part { hi, lo, .. } => hi.abs_diff(*lo) + 1,
         Lval::PartDyn { .. } => 1,
+        Lval::Elem { var, .. } => e.vars[*var as usize].width,
         Lval::Concat { parts } => parts.iter().map(|(_, w)| *w).sum(),
     }
 }

@@ -1,12 +1,22 @@
-//! riv-elab — flat elaboration, Phase A of design §5: top auto-detection
-//! (un-instantiated rule), decl/param constant evaluation via vl-values,
-//! width/sign propagation baked into ops at lowering (IEEE 5.4/5.5,
-//! self-determined subcontexts), display format compilation including the
-//! StrLit→Bits path, and the milestone hard-error surface.
+//! riv-elab — elaboration for the RIV design: top auto-detection,
+//! module instantiation with parameter overrides and port binding (R4-a),
+//! generate constructs (R4-b), unpacked arrays (R4-c), gate primitives
+//! (R4-d), decl/param constant evaluation via vl-values, width/sign
+//! propagation baked into ops at lowering (IEEE 5.4/5.5, self-determined
+//! subcontexts), display format compilation including the StrLit→Bits
+//! path, and the milestone hard-error surface.
 //!
 //! Per design §1 the crate may use `vl-syntax` + `rcs-diag` + `riv-ir` +
 //! `vl-values`; semantics are implemented per spec (IEEE 1364-2005 +
 //! probed oracle behavior), not copied from vl-sim.
+//!
+//! Scope model (R4): the top module, every module instance and every
+//! generate-block iteration push a [`Scope`]; names/params/functions
+//! resolve innermost-first. Design vars live in one flat arena with
+//! dotted-path names (`u1.u2.a`), so hierarchical references resolve by
+//! path. Same-width net↔net port connections collapse onto one storage
+//! var; expression inputs and reg outputs become cont-assign
+//! drivers/followers.
 
 mod err;
 mod expr;
@@ -48,18 +58,58 @@ pub struct VarInfo {
     pub desc: bool,
     pub msb: u32,
     pub lsb: u32,
+    /// Unpacked dims (empty = scalar). Storage lives in the kernel's array
+    /// arena, indexed through the declared index space.
+    pub unpacked: Vec<(u32, u32)>,
+    /// Arrays of reg accept procedural element writes (wire arrays do
+    /// not — cont-assign only).
+    pub array_of_reg: bool,
 }
 
-pub struct Elab<'a> {
-    pub sm: &'a SourceMap,
-    pub vars: Vec<VarInfo>,
+/// One instantiation/generate scope (R4).
+#[derive(Clone, Default)]
+pub struct Scope {
+    /// Instance-local simple name → design var id (ports included; a port
+    /// bound to a parent net collapses onto the parent's id here).
+    pub names: HashMap<String, VarId>,
     pub params: HashMap<String, (Bits, bool)>,
     /// Task/function registry: name → (func idx, formals in declaration
     /// order with their frame slots). Frame layout: slot 0 = ret value
     /// (functions; unused for tasks), formals from 1.
     pub funcs: HashMap<String, (u32, Vec<(u32, ast::Direction, u32, bool)>)>,
+    /// Dotted hierarchical prefix of this scope, trailing dot included
+    /// ("" for the top module).
+    pub prefix: String,
+    /// Unnamed generate-block counter (LRM genblkN, 1-based, per scope).
+    pub genblk: u32,
+    /// `#(.P(v))` overrides for a module instance being walked: consumed
+    /// by decl_param as each header param is declared (the override
+    /// REPLACES the default initializer; values were evaluated in the
+    /// parent scope).
+    pub param_overrides: HashMap<String, Bits>,
+    /// Generate scopes are transparent: name resolution walks outward to
+    /// the enclosing (module/instance) scope. Instance scopes are opaque.
+    pub transparent: bool,
+}
+
+pub struct Elab<'a> {
+    pub sm: &'a SourceMap,
+    pub vars: Vec<VarInfo>,
+    /// Scope stack; the LAST entry is current (module instances and
+    /// generate iterations push/pop around their items).
+    pub scopes: Vec<Scope>,
     /// func idx → (ret width, ret signed) for call-site typing.
     pub ret_types: HashMap<u32, (u32, bool)>,
+    /// Collapsed-port aliases: child var id → the storage var it became.
+    /// Name-based (hierarchical) resolution chases these; op rewrites make
+    /// them invisible to already-lowered code.
+    pub aliases: HashMap<VarId, VarId>,
+}
+
+impl<'a> Elab<'a> {
+    pub fn cur(&self) -> &Scope {
+        self.scopes.last().expect("scope stack")
+    }
 }
 
 /// Top-module auto-detection: the module no other module instantiates
@@ -222,6 +272,7 @@ pub fn elaborate(input: ElabInput) -> Result<riv_ir::Design, ElabError> {
         vars: Vec::new(),
         arrays: Vec::new(),
         assigns: Vec::new(),
+        gates: Vec::new(),
         threads: Vec::new(),
         funcs: Vec::new(),
         strs: Vec::new(),
@@ -230,15 +281,17 @@ pub fn elaborate(input: ElabInput) -> Result<riv_ir::Design, ElabError> {
     let mut elab = Elab {
         sm,
         vars: Vec::new(),
-        params: HashMap::new(),
-        funcs: HashMap::new(),
+        scopes: vec![Scope { prefix: String::new(), ..Default::default() }],
         ret_types: HashMap::new(),
+        aliases: HashMap::new(),
     };
     let mut walker = Walker {
         e: &mut elab,
         design: &mut design,
         per_file: &per_file,
         top_ts: top_info,
+        modules,
+        chain: Vec::new(),
     };
     walker.walk_module(top_mod)?;
 
@@ -250,30 +303,15 @@ struct Walker<'a> {
     design: &'a mut riv_ir::Design,
     per_file: &'a HashMap<String, String>,
     top_ts: TsInfo,
+    modules: &'a [Module],
+    /// Instantiation chain (module names) for recursion detection.
+    chain: Vec<String>,
 }
 
-impl<'a> Walker<'a> {
-    fn file_of(&self, m: &Module) -> (String, TsInfo) {
-        let name = self.e.sm.file_name(m.span.file).to_string();
-        let ts = self.per_file.get(&name).cloned().unwrap_or_default();
-        let info = parse_timescale(&ts).unwrap_or_else(|| self.top_ts.clone());
-        (name, info)
-    }
-
-    fn line_of(&self, span: rcs_diag::Span) -> u32 {
-        self.e.sm.line_col(span.file, span.start).0
-    }
-
-}
-
-/// Build a fresh thread lowering session. `Elab` is only read from here
-/// on (vars/params fully registered), so the borrow is independent of the
-/// walker's design mutations.
-fn make_lower<'x, 'y>(
-    e: &'x Elab<'x>,
-    file: &'y str,
-    ts: &TsInfo,
-) -> Lower<'x, 'y> {
+/// Build a fresh thread lowering session in the CURRENT scope. `Elab` is
+/// only read from here on, so the borrow is independent of the walker's
+/// design mutations.
+fn make_lower<'x, 'y>(e: &'x Elab<'x>, file: &'y str, ts: &TsInfo) -> Lower<'x, 'y> {
     Lower {
         e,
         strs: Vec::new(),
@@ -289,12 +327,7 @@ fn make_lower<'x, 'y>(
 
 /// Append a finished thread; merges its local format pool into the design
 /// pool (rebasing SysCall fmt indices); returns the thread index.
-fn commit(
-    design: &mut riv_ir::Design,
-    mut low: Lower<'_, '_>,
-    kind: ThreadKind,
-    sens: Vec<SensItem>,
-) -> u32 {
+fn commit(design: &mut riv_ir::Design, mut low: Lower<'_, '_>, kind: ThreadKind, sens: Vec<SensItem>) -> u32 {
     let off = design.strs.len() as u32;
     if off > 0 {
         for op in low.ops.iter_mut() {
@@ -315,12 +348,26 @@ fn commit(
 }
 
 impl<'a> Walker<'a> {
+    fn file_of_span(&self, span: rcs_diag::Span) -> String {
+        self.e.sm.file_name(span.file).to_string()
+    }
+
+    fn ts_of_file(&self, file: &str) -> TsInfo {
+        let ts = self.per_file.get(file).cloned().unwrap_or_default();
+        parse_timescale(&ts).unwrap_or_else(|| self.top_ts.clone())
+    }
+
+    fn line_of(&self, span: rcs_diag::Span) -> u32 {
+        self.e.sm.line_col(span.file, span.start).0
+    }
 
     fn walk_module(&mut self, m: &Module) -> ElabResult<()> {
-        let (file, ts) = self.file_of(m);
+        let file = self.file_of_span(m.span);
         let file = &file;
+        let ts = self.ts_of_file(file);
 
-        // Header parameters (referenced by port ranges and decls).
+        // Header parameters (referenced by port ranges and decls); a child
+        // instance's scope arrives with overrides already applied.
         let mut port_names: HashMap<String, ()> = HashMap::new();
         for pe in &m.params {
             self.decl_param(pe, file)?;
@@ -330,11 +377,7 @@ impl<'a> Walker<'a> {
         for p in &m.ports {
             port_names.insert(p.name.clone(), ());
             if m.ansi {
-                let kind = if p.is_reg {
-                    VarKind::Reg
-                } else {
-                    VarKind::Net
-                };
+                let kind = if p.is_reg { VarKind::Reg } else { VarKind::Net };
                 let (w, hi, lo) = match &p.range {
                     Some(r) => {
                         let (hi, lo) = self.range_bounds(r, file)?;
@@ -342,13 +385,22 @@ impl<'a> Walker<'a> {
                     }
                     None => (1, 0, 0),
                 };
-                self.declare_var(&p.name, w, p.signed, kind, file, p.span, hi, lo)?;
+                self.declare_var(&p.name, w, p.signed, kind, file, p.span, hi, lo, Vec::new())?;
+            }
+        }
+
+        // Pre-pass: register every body declaration's NAME (module items
+        // are order-independent in Verilog — 59_i2c's `assign` references
+        // a reg declared later). Initializers stay deferred to the walk.
+        for item in &m.items {
+            if let ModuleItem::Decl(d) = item {
+                self.predeclare(d, file)?;
             }
         }
 
         for item in &m.items {
             match item {
-                ModuleItem::Decl(d) => self.walk_decl(d, file)?,
+                ModuleItem::Decl(d) => self.walk_decl(d, file, &ts)?,
                 ModuleItem::ContAssign(pairs) => {
                     for pair in pairs {
                         self.lower_cont_assign(pair, file, &ts)?;
@@ -360,30 +412,36 @@ impl<'a> Walker<'a> {
                 ModuleItem::Initial { body, .. } => {
                     self.lower_thread(ThreadKind::Initial, Vec::new(), body, file, &ts)?
                 }
-                ModuleItem::Instance(i) => {
-                    return Err(err_at(
-                        file,
-                        self.line_of(i.span),
-                        "module instantiation needs the structural batch (milestone R4)",
-                    ))
-                }
+                ModuleItem::Instance(i) => self.walk_instance(i, file, &ts)?,
                 ModuleItem::Defparam(_) => {
                     return Err(err_at(
                         file,
                         self.line_of(m.span),
-                        "defparam overrides need the structural batch (milestone R4)",
+                        "defparam overrides are not planned (`#(.P(v))`/positional overrides are; see docs/RIVERILOG-PLAN.md §8.1)",
                     ))
                 }
-                ModuleItem::GenerateRegion(_)
-                | ModuleItem::GenIf { .. }
-                | ModuleItem::GenFor { .. }
-                | ModuleItem::GenCase { .. }
-                | ModuleItem::GenBlock { .. } => {
-                    return Err(err_at(
-                        file,
-                        self.line_of(m.span),
-                        "generate constructs need the structural batch (milestone R4)",
-                    ))
+                ModuleItem::GenerateRegion(items) => {
+                    for it in items {
+                        self.walk_generate_item(it, file, &ts)?;
+                    }
+                }
+                ModuleItem::GenIf { span, cond, then, els } => {
+                    let taken = self.const_eval_bool(cond, *span, file)?;
+                    self.walk_gen_scope(taken, then.as_slice(), els.as_deref().map(|v| &v[..]).unwrap_or(&[]), file, &ts)?;
+                }
+                ModuleItem::GenFor { span, var, init, cond, step, block, items } => {
+                    self.walk_gen_for(*span, var, init, cond, step, block.as_deref(), items, file, &ts)?;
+                }
+                ModuleItem::GenCase { span, expr, items, default } => {
+                    self.walk_gen_case(*span, expr, items, default.as_deref(), file)?;
+                }
+                ModuleItem::GenBlock { name, items, .. } => {
+                    let blk = self.genblk_name(name.as_deref());
+                    self.push_gen_scope(blk);
+                    for it in items {
+                        self.walk_generate_item(it, file, &ts)?;
+                    }
+                    self.pop_scope();
                 }
                 ModuleItem::Function(f) => self.build_func(f, file, &ts)?,
                 ModuleItem::Task(f) => self.build_func(f, file, &ts)?,
@@ -396,11 +454,638 @@ impl<'a> Walker<'a> {
         if !m.ansi {
             let names: Vec<String> = port_names.keys().cloned().collect();
             for name in names {
-                self.declare_var(&name, 1, false, VarKind::Net, file, m.span, 0, 0)?;
+                self.declare_var(&name, 1, false, VarKind::Net, file, m.span, 0, 0, Vec::new())?;
             }
         }
         Ok(())
     }
+
+    // ------------------------------------------------------------------
+    // Generate constructs (R4-b)
+    // ------------------------------------------------------------------
+
+    fn genblk_name(&mut self, label: Option<&str>) -> String {
+        match label {
+            Some(l) => l.to_string(),
+            None => {
+                let s = self.e.scopes.last_mut().unwrap();
+                s.genblk += 1;
+                format!("genblk{}", s.genblk)
+            }
+        }
+    }
+
+    /// Push a generate scope inheriting the current params (localparams of
+    /// the enclosing module stay visible inside generate blocks).
+    fn push_gen_scope(&mut self, name: String) {
+        let prefix = format!("{}{name}.", self.e.cur().prefix);
+        let params = self.e.cur().params.clone();
+        self.e.scopes.push(Scope { prefix, params, transparent: true, ..Default::default() });
+    }
+
+    fn push_inst_scope(&mut self, inst_name: &str) {
+        let prefix = format!("{}{inst_name}.", self.e.cur().prefix);
+        self.e.scopes.push(Scope { prefix, transparent: false, ..Default::default() });
+    }
+
+    fn pop_scope(&mut self) {
+        self.e.scopes.pop();
+    }
+
+    fn const_eval_bool(&mut self, e: &Expr, span: rcs_diag::Span, file: &str) -> ElabResult<bool> {
+        let (b, _) = self.const_eval_at(e, file)?;
+        if b.has_unknown() {
+            return Err(err_at(file, self.line_of(span), "generate condition is unknown (x/z)"));
+        }
+        Ok(b.truthy().map_err(|er| err_at(file, self.line_of(span), er.0))? == Some(true))
+    }
+
+    fn walk_generate_item(&mut self, item: &ModuleItem, file: &str, ts: &TsInfo) -> ElabResult<()> {
+        match item {
+            ModuleItem::GenerateRegion(items) => {
+                for it in items {
+                    self.walk_generate_item(it, file, ts)?;
+                }
+                Ok(())
+            }
+            ModuleItem::GenIf { span, cond, then, els } => {
+                let taken = self.const_eval_bool(cond, *span, file)?;
+                self.walk_gen_scope(taken, then.as_slice(), els.as_deref().map(|v| &v[..]).unwrap_or(&[]), file, ts)
+            }
+            ModuleItem::GenFor { span, var, init, cond, step, block, items } => {
+                self.walk_gen_for(*span, var, init, cond, step, block.as_deref(), items, file, ts)
+            }
+            ModuleItem::GenCase { span, expr, items, default } => {
+                self.walk_gen_case(*span, expr, items, default.as_deref(), file)
+            }
+            ModuleItem::GenBlock { name, items, .. } => {
+                let blk = self.genblk_name(name.as_deref());
+                self.push_gen_scope(blk);
+                for it in items {
+                    self.walk_generate_item(it, file, ts)?;
+                }
+                self.pop_scope();
+                Ok(())
+            }
+            other => self.walk_plain_item(other, file, ts),
+        }
+    }
+
+    fn walk_plain_item(&mut self, item: &ModuleItem, file: &str, ts: &TsInfo) -> ElabResult<()> {
+        match item {
+            ModuleItem::Decl(d) => self.walk_decl(d, file, ts),
+            ModuleItem::ContAssign(pairs) => {
+                for pair in pairs {
+                    self.lower_cont_assign(pair, file, ts)?;
+                }
+                Ok(())
+            }
+            ModuleItem::Always { span, ctrl, body } => self.lower_always(*span, ctrl.as_ref(), body, file, ts),
+            ModuleItem::Initial { body, .. } => self.lower_thread(ThreadKind::Initial, Vec::new(), body, file, ts),
+            ModuleItem::Instance(i) => self.walk_instance(i, file, ts),
+            ModuleItem::Function(f) => self.build_func(f, file, ts),
+            ModuleItem::Task(f) => self.build_func(f, file, ts),
+            ModuleItem::Empty => Ok(()),
+            ModuleItem::Defparam(_) => Err(err_at(
+                file,
+                0,
+                "defparam overrides are not planned (`#(.P(v))`/positional overrides are; see docs/RIVERILOG-PLAN.md §8.1)",
+            )),
+            ModuleItem::GenIf { .. }
+            | ModuleItem::GenFor { .. }
+            | ModuleItem::GenCase { .. }
+            | ModuleItem::GenBlock { .. }
+            | ModuleItem::GenerateRegion(_) => {
+                unreachable!("generate constructs dispatch through walk_generate_item")
+            }
+        }
+    }
+
+    fn walk_gen_scope(&mut self, taken: bool, then: &[ModuleItem], els: &[ModuleItem], file: &str, ts: &TsInfo) -> ElabResult<()> {
+        let items = if taken { then } else { els };
+        if items.is_empty() {
+            return Ok(());
+        }
+        let blk = self.genblk_name(None);
+        self.push_gen_scope(blk);
+        for it in items {
+            self.walk_generate_item(it, file, ts)?;
+        }
+        self.pop_scope();
+        Ok(())
+    }
+
+    fn walk_gen_for(
+        &mut self,
+        span: rcs_diag::Span,
+        var: &str,
+        init: &Expr,
+        cond: &Expr,
+        step: &ast::AssignPair,
+        block: Option<&str>,
+        items: &[ModuleItem],
+        file: &str,
+        ts: &TsInfo,
+    ) -> ElabResult<()> {
+        let line = self.line_of(span);
+        let (mut i, _) = self.const_eval_at(init, file)?;
+        if i.has_unknown() {
+            return Err(err_at(file, line, "genvar initializer is unknown (x/z)"));
+        }
+        let blk = self.genblk_name(block);
+        let mut guard = 0u64;
+        let one = Bits::from_u64(32, 1).unwrap();
+        loop {
+            self.push_gen_scope(format!("{blk}[{}]", i.to_u128_lossy()));
+            self.e
+                .scopes
+                .last_mut()
+                .unwrap()
+                .params
+                .insert(var.to_string(), (i.clone(), false));
+            let go = self.const_eval_bool(cond, span, file)?;
+            if !go {
+                self.pop_scope();
+                break;
+            }
+            for it in items {
+                self.walk_generate_item(it, file, ts)?;
+            }
+            // Step RHS re-evaluated with the genvar bound to the current
+            // iteration's value (`i = i + 1`).
+            let (nv, _) = self.const_eval_at(&step.rhs, file)?;
+            self.pop_scope();
+            // Step advancing by 0 (or oscillating) never terminates.
+            let advanced = nv
+                .cmp_unsigned(&i)
+                .map(|o| o.is_gt())
+                .unwrap_or(true);
+            if !advanced || nv.width > 64 || nv.to_u128_lossy() > 1 << 24 {
+                return Err(err_at(
+                    file,
+                    line,
+                    "generate loop step must monotonically increase the genvar",
+                ));
+            }
+            let _ = one;
+            i = nv;
+            guard += 1;
+            if guard > 1 << 16 {
+                return Err(err_at(file, line, "generate loop exceeds 65536 iterations"));
+            }
+        }
+        Ok(())
+    }
+
+    fn walk_gen_case(
+        &mut self,
+        span: rcs_diag::Span,
+        expr: &Expr,
+        items: &[(Vec<Expr>, Vec<ModuleItem>)],
+        default: Option<&[ModuleItem]>,
+        file: &str,
+    ) -> ElabResult<()> {
+        let line = self.line_of(span);
+        let (v, _) = self.const_eval_at(expr, file)?;
+        for (labels, body) in items {
+            for l in labels {
+                let (lv, _) = self.const_eval_at(l, file)?;
+                if lv.case_eq(&v).map_err(|e| err_at(file, line, e.0))? == Bits::from_u64(1, 1).unwrap() {
+                    let blk = self.genblk_name(None);
+                    self.push_gen_scope(blk);
+                    // The file/ts of the body items is the module's own; the
+                    // caller threads it through walk_generate_item.
+                    return self.walk_gen_items_body(body, file);
+                }
+            }
+        }
+        if let Some(body) = default {
+            let blk = self.genblk_name(None);
+            self.push_gen_scope(blk);
+            return self.walk_gen_items_body(body, file);
+        }
+        Ok(())
+    }
+
+    fn walk_gen_items_body(&mut self, items: &[ModuleItem], file: &str) -> ElabResult<()> {
+        // ts of the module file (items in a gen-case live in the module).
+        let ts = self.ts_of_file(file);
+        for it in items {
+            self.walk_generate_item(it, file, &ts)?;
+        }
+        self.pop_scope();
+        Ok(())
+    }
+
+    // ------------------------------------------------------------------
+    // Module instantiation (R4-a) + gates (R4-d)
+    // ------------------------------------------------------------------
+
+    fn walk_instance(&mut self, i: &ast::Instance, file: &str, ts: &TsInfo) -> ElabResult<()> {
+        if is_gate_name(&i.mod_name) {
+            for unit in &i.insts {
+                if unit.array.is_some() {
+                    return Err(err_at(file, self.line_of(unit.span), "gate arrays are not supported yet"));
+                }
+                self.lower_gate(i, unit, file, ts)?;
+            }
+            return Ok(());
+        }
+        let Some(sub) = self.modules.iter().find(|m| m.name == i.mod_name) else {
+            return Err(err_at(
+                file,
+                self.line_of(i.span),
+                format!("module `{}` is not defined (searched the given sources; -y library dirs apply at the CLI driver)", i.mod_name),
+            ));
+        };
+        if self.chain.iter().any(|m| m == &sub.name) {
+            return Err(err_at(
+                file,
+                self.line_of(i.span),
+                format!("recursive instantiation of `{}` is not supported (chain: {})", sub.name, self.chain.join(" -> ")),
+            ));
+        }
+        // Parameter overrides: named evaluated here (PARENT scope),
+        // positional bound by header order (38_param_chain pins `.W(DW)`
+        // referencing a parent localparam).
+        let mut overrides: Vec<(String, Bits, bool)> = Vec::new();
+        let mut positional_exprs: Vec<Option<&Expr>> = Vec::new();
+        for pc in &i.params {
+            match (&pc.name, &pc.expr) {
+                (Some(n), Some(e)) => {
+                    let (b, signed) = self.const_eval_at(e, file)?;
+                    overrides.push((n.clone(), b, signed));
+                }
+                (Some(_), None) => {} // `.P()` = keep default
+                (None, e) => positional_exprs.push(e.as_ref()),
+            }
+        }
+        for (idx, e) in positional_exprs.iter().enumerate() {
+            let Some(e) = e else { continue };
+            let Some(pe) = sub.params.get(idx) else {
+                return Err(err_at(
+                    file,
+                    self.line_of(i.span),
+                    format!("module `{}` has no parameter #{}", sub.name, idx + 1),
+                ));
+            };
+            let (b, signed) = self.const_eval_at(e, file)?;
+            overrides.push((pe.name.clone(), b, signed));
+        }
+        for unit in &i.insts {
+            // Instance arrays unroll into per-element scopes.
+            let indices: Vec<Option<u64>> = match &unit.array {
+                Some(r) => {
+                    let (hi, lo) = self.range_bounds(r, file)?;
+                    let (a, b) = (hi as u64, lo as u64);
+                    let (lo_i, hi_i) = (a.min(b), a.max(b));
+                    (lo_i..=hi_i).map(Some).collect()
+                }
+                None => vec![None],
+            };
+            for idx in indices {
+                let inst_name = match idx {
+                    Some(k) => format!("{}[{}]", unit.name, k),
+                    None => unit.name.clone(),
+                };
+                self.instantiate(sub, &unit.conns, &overrides, &inst_name, file, i.span)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn instantiate(
+        &mut self,
+        sub: &Module,
+        conns: &[ast::PortConn],
+        overrides: &[(String, Bits, bool)],
+        inst_name: &str,
+        file: &str,
+        span: rcs_diag::Span,
+    ) -> ElabResult<()> {
+        let line = self.line_of(span);
+        let parent_scope = self.e.scopes.last().unwrap().clone();
+        self.push_inst_scope(inst_name);
+        // Header params are declared by walk_module; overrides (evaluated
+        // in the PARENT scope) ride in the scope and replace each default
+        // at declaration, re-typed at the declared width/sign (15_params).
+        for (name, val, _) in overrides {
+            if !sub.params.iter().any(|p| &p.name == name) {
+                return Err(err_at(file, line, format!("module `{}` has no parameter `{name}`", sub.name)));
+            }
+            self.e
+                .scopes
+                .last_mut()
+                .unwrap()
+                .param_overrides
+                .insert(name.clone(), val.clone());
+        }
+        // Walk the child module body in its scope.
+        self.chain.push(sub.name.clone());
+        let r = self.walk_module(sub);
+        self.chain.pop();
+        if let Err(e) = r {
+            self.pop_scope();
+            return Err(e);
+        }
+        // ---- Port binding (parent exprs against child ports). ----
+        let mut conns_by_name: HashMap<&str, &Expr> = HashMap::new();
+        let mut positional: Vec<Option<&Expr>> = Vec::new();
+        for c in conns {
+            match (&c.name, &c.expr) {
+                (Some(n), Some(e)) => {
+                    conns_by_name.insert(n.as_str(), e);
+                }
+                (Some(_), None) => {} // `.p()` = unconnected
+                (None, e) => positional.push(e.as_ref()),
+            }
+        }
+        let mut bind_err: Option<ElabError> = None;
+        for (pi, port) in sub.ports.iter().enumerate() {
+            let conn: Option<&Expr> = conns_by_name
+                .get(port.name.as_str())
+                .copied()
+                .or_else(|| positional.get(pi).copied().flatten());
+            let Some(expr) = conn else { continue }; // unconnected: own var, undriven
+            let Some(child_var) = self.e.cur().names.get(&port.name).copied() else {
+                bind_err = Some(err_at(file, line, format!("port `{}` not declared in module `{}`", port.name, sub.name)));
+                break;
+            };
+            let dir = port.dir.unwrap_or(ast::Direction::Input);
+            let res = match (dir, expr) {
+                (ast::Direction::Input, Expr::Ident { name, .. }) => {
+                    let parent_var = parent_scope.names.get(name).copied();
+                    match parent_var {
+                        Some(pv)
+                            if self.e.vars[pv as usize].kind == VarKind::Net
+                                && self.e.vars[pv as usize].width == self.e.vars[child_var as usize].width =>
+                        {
+                            self.collapse_port(child_var, pv, &port.name)
+                        }
+                        _ => self.emit_port_driver(child_var, expr, &parent_scope, file),
+                    }
+                }
+                (ast::Direction::Input, _) => self.emit_port_driver(child_var, expr, &parent_scope, file),
+                (ast::Direction::Output, Expr::Ident { name, .. }) => {
+                    let parent_var = parent_scope.names.get(name).copied();
+                    let child_is_reg = self.e.vars[child_var as usize].kind == VarKind::Reg;
+                    match parent_var {
+                        Some(pv)
+                            if !child_is_reg
+                                && self.e.vars[pv as usize].kind == VarKind::Net
+                                && self.e.vars[pv as usize].width == self.e.vars[child_var as usize].width =>
+                        {
+                            // Net output port: collapse the child port onto
+                            // the parent var (both names = one storage; the
+                            // child's internal drivers rebind to it).
+                            self.collapse_port(child_var, pv, &port.name)
+                        }
+                        Some(_) => self.emit_port_follower(child_var, expr, &parent_scope, file),
+                        None => Err(err_at(file, line, format!("port connection target `{name}` is not declared"))),
+                    }
+                }
+                (ast::Direction::Output, _) => self.emit_port_follower(child_var, expr, &parent_scope, file),
+                (ast::Direction::Inout, Expr::Ident { name, .. }) => {
+                    let pv = parent_scope.names.get(name).copied().ok_or_else(|| {
+                        err_at(file, line, format!("inout port target `{name}` is not declared"))
+                    })?;
+                    if self.e.vars[pv as usize].kind != VarKind::Net
+                        || self.e.vars[child_var as usize].kind == VarKind::Reg
+                        || self.e.vars[pv as usize].width != self.e.vars[child_var as usize].width
+                    {
+                        return Err(err_at(
+                            file,
+                            line,
+                            "inout ports need same-width net-to-net connections (transactional merges land with the strength batch, milestone R9)",
+                        ));
+                    }
+                    self.collapse_port(child_var, pv, &port.name)
+                }
+                (ast::Direction::Inout, _) => Err(err_at(file, line, "inout ports need plain identifier connections")),
+            };
+            if let Err(e) = res {
+                bind_err = Some(e);
+                break;
+            }
+        }
+        self.pop_scope();
+        match bind_err {
+            Some(e) => Err(e),
+            None => Ok(()),
+        }
+    }
+
+    /// Same-width net↔net port connection: one storage var (the parent's).
+    /// All already-emitted references to the child var id are rewritten.
+    fn collapse_port(&mut self, child_var: VarId, parent_var: VarId, port_name: &str) -> ElabResult<()> {
+        debug_assert_ne!(child_var, parent_var);
+        // Design-side rewrite of every reference.
+        let rewrite = |ops: &mut Vec<Op>| {
+            for op in ops.iter_mut() {
+                rewrite_var_ids(op, child_var, parent_var);
+            }
+        };
+        for t in self.design.threads.iter_mut() {
+            rewrite(&mut t.body);
+            for s in t.sens.iter_mut() {
+                if s.var == child_var {
+                    s.var = parent_var;
+                }
+            }
+        }
+        for f in self.design.funcs.iter_mut() {
+            rewrite(&mut f.body);
+        }
+        for g in self.design.gates.iter_mut() {
+            if g.out == child_var {
+                g.out = parent_var;
+            }
+            for t in g.inputs.iter_mut() {
+                if *t == child_var {
+                    *t = parent_var;
+                }
+            }
+        }
+        for (_, v) in self.design.assigns.iter_mut() {
+            if *v == child_var {
+                *v = parent_var;
+            }
+        }
+        // Name maps in every scope that resolved to the child var (the
+        // child's own port name, plus nested scopes that captured it).
+        for s in self.e.scopes.iter_mut() {
+            for (_, v) in s.names.iter_mut() {
+                if *v == child_var {
+                    *v = parent_var;
+                }
+            }
+        }
+        // The child port's var row is now dead — leave it in the arena
+        // (ids are dense; the kernel tolerates unreferenced vars) but
+        // record the alias so hierarchical NAME lookups follow it.
+        self.e.aliases.insert(child_var, parent_var);
+        self.e.scopes.last_mut().unwrap().names.insert(port_name.to_string(), parent_var);
+        Ok(())
+    }
+
+    /// Input port driven by a parent expression: cont-assign-shaped thread
+    /// lowered in the PARENT scope (reads parent vars, wakes on them). The
+    /// child scope is swapped out for the parent's during lowering and
+    /// restored after.
+    fn emit_port_driver(&mut self, child_var: VarId, rhs: &Expr, parent_scope: &Scope, file: &str) -> ElabResult<()> {
+        let w = self.e.vars[child_var as usize].width;
+        let ts0 = self.ts_of_file(file);
+        let saved = std::mem::replace(self.e.scopes.last_mut().unwrap(), parent_scope.clone());
+        let r = (|| -> ElabResult<()> {
+            let mut low = make_lower(&*self.e, file, &ts0);
+            let v = low.lower(rhs, w)?;
+            low.emit(Op::AssignBlk { lv: Lval::Var { var: child_var }, src: v.slot });
+            let reads = std::mem::take(&mut low.reads);
+            low.emit(Op::WaitEdge {
+                items: reads
+                    .into_iter()
+                    .map(|var| SensItem { var, edge: riv_ir::EdgeKind::Any })
+                    .collect(),
+            });
+            low.emit(Op::Jump { to: 0 });
+            low.emit(Op::EndThread);
+            let tidx = commit(self.design, low, ThreadKind::ContAssign, Vec::new());
+            self.design.assigns.push((tidx, child_var));
+            Ok(())
+        })();
+        *self.e.scopes.last_mut().unwrap() = saved;
+        r
+    }
+
+    /// Output port followed by the parent: cont-assign parent target =
+    /// child port var (the child port can be a reg, procedurally driven).
+    fn emit_port_follower(&mut self, child_var: VarId, target: &Expr, parent_scope: &Scope, file: &str) -> ElabResult<()> {
+        let ts0 = self.ts_of_file(file);
+        let saved = std::mem::replace(self.e.scopes.last_mut().unwrap(), parent_scope.clone());
+        let r = (|| -> ElabResult<()> {
+            let mut low = make_lower(&*self.e, file, &ts0);
+            let lv = low.lower_lvalue(target)?;
+            low.emit(Op::LoadVar { dst: 0, var: child_var });
+            low.emit(Op::AssignBlk { lv: lv.clone(), src: 0 });
+            low.emit(Op::WaitEdge {
+                items: vec![SensItem { var: child_var, edge: riv_ir::EdgeKind::Any }],
+            });
+            low.emit(Op::Jump { to: 0 });
+            low.emit(Op::EndThread);
+            let first_var = lval_first_var(&lv);
+            let tidx = commit(self.design, low, ThreadKind::ContAssign, Vec::new());
+            self.design.assigns.push((tidx, first_var));
+            Ok(())
+        })();
+        *self.e.scopes.last_mut().unwrap() = saved;
+        r
+    }
+
+    /// Gate primitive instantiation (R4-d): `and #6 g(y, a, b)`.
+    fn lower_gate(&mut self, i: &ast::Instance, unit: &ast::InstUnit, file: &str, ts: &TsInfo) -> ElabResult<()> {
+        let line = self.line_of(unit.span);
+        let kind = match i.mod_name.as_str() {
+            "and" => riv_ir::GateKind::And,
+            "nand" => riv_ir::GateKind::Nand,
+            "or" => riv_ir::GateKind::Or,
+            "nor" => riv_ir::GateKind::Nor,
+            "xor" => riv_ir::GateKind::Xor,
+            "xnor" => riv_ir::GateKind::Xnor,
+            "buf" => riv_ir::GateKind::Buf,
+            "not" => riv_ir::GateKind::Not,
+            "bufif0" => riv_ir::GateKind::Bufif0,
+            "bufif1" => riv_ir::GateKind::Bufif1,
+            "notif0" => riv_ir::GateKind::Notif0,
+            "notif1" => riv_ir::GateKind::Notif1,
+            other => {
+                return Err(err_at(
+                    file,
+                    line,
+                    format!("gate primitive `{other}` is not supported (see docs/RIVERILOG-PLAN.md §8)"),
+                ))
+            }
+        };
+        // Delay: `#6` single value, or `#(r, f[, t])` (parser wraps the
+        // paren list as a Concat). Plain decimals in the corpus; delay
+        // literals scale by the module's unit/precision ratio.
+        let lit_ticks = |e: &Expr| -> ElabResult<u64> {
+            match e {
+                Expr::NumLit(n) => {
+                    let (num, den) = expr::parse_delay_rational(&n.digits).ok_or_else(|| {
+                        err_at(file, line, format!("bad gate delay literal `{}`", n.digits))
+                    })?;
+                    Ok(expr::scale_rational(num, den, ts.num, ts.den))
+                }
+                _ => Err(err_at(file, line, "gate delays must be decimal literals here")),
+            }
+        };
+        let (rise, fall, turnoff) = match i.params.first().map(|pc| &pc.expr) {
+            None => (0u64, 0u64, 0u64),
+            Some(Some(e)) => match e {
+                Expr::Concat { parts, .. } if parts.len() == 2 || parts.len() == 3 => {
+                    let r = lit_ticks(&parts[0])?;
+                    let f = lit_ticks(&parts[1])?;
+                    let t = match parts.get(2) {
+                        Some(p) => lit_ticks(p)?,
+                        None => 0,
+                    };
+                    (r, f, t)
+                }
+                other => {
+                    let v = lit_ticks(other)?;
+                    (v, v, v)
+                }
+            },
+            Some(None) => (0, 0, 0),
+        };
+        // Terminals: output first, then inputs.
+        let mut terms = Vec::new();
+        for c in &unit.conns {
+            let Some(e) = &c.expr else {
+                return Err(err_at(file, line, "gate terminal cannot be empty"));
+            };
+            let Expr::Ident { name, .. } = e else {
+                return Err(err_at(
+                    file,
+                    line,
+                    "gate terminals must be plain identifiers in R4 (expression terminals land with the strength batch, milestone R9)",
+                ));
+            };
+            let Some(var) = self.e.cur().names.get(name).copied() else {
+                return Err(err_at(file, line, format!("identifier `{name}` is not declared")));
+            };
+            terms.push(var);
+        }
+        let nin_expected = match kind {
+            riv_ir::GateKind::Buf | riv_ir::GateKind::Not => 2,
+            _ => 3,
+        };
+        if terms.len() != nin_expected {
+            return Err(err_at(
+                file,
+                line,
+                format!("gate `{}` takes {nin_expected} terminals, got {}", i.mod_name, terms.len()),
+            ));
+        }
+        let out = terms[0];
+        let inputs = terms[1..].to_vec();
+        for &t in terms.iter() {
+            if self.e.vars[t as usize].width != 1 {
+                return Err(err_at(
+                    file,
+                    line,
+                    "vector gates are not supported yet (see docs/RIVERILOG-PLAN.md §8)",
+                ));
+            }
+        }
+        self.net_driver_check(out, file, unit.span, true)?;
+        self.design.gates.push(riv_ir::Gate { kind, out, inputs, rise, fall, turnoff });
+        Ok(())
+    }
+
+    // ------------------------------------------------------------------
+    // Declarations
+    // ------------------------------------------------------------------
 
     fn range_bounds(&self, r: &ast::Range, file: &str) -> ElabResult<(u32, u32)> {
         let (mh, _) = self.const_eval_at(&r.msb, file)?;
@@ -440,34 +1125,33 @@ impl<'a> Walker<'a> {
         span: rcs_diag::Span,
         msb: u32,
         lsb: u32,
+        unpacked: Vec<(u32, u32)>,
     ) -> ElabResult<VarId> {
-        if let Some(v) = self.e.vars.iter().find(|v| v.name == name) {
-            return Err(err_at(
-                file,
-                self.line_of(span),
-                format!("`{name}` is already declared (width {})", v.width),
-            ));
+        let line = self.line_of(span);
+        if self.e.cur().names.contains_key(name) {
+            return Err(err_at(file, line, format!("`{name}` is already declared in this scope")));
         }
-        if self.e.params.contains_key(name) {
-            return Err(err_at(
-                file,
-                self.line_of(span),
-                format!("`{name}` is already declared as a parameter"),
-            ));
+        if self.e.cur().params.contains_key(name) {
+            return Err(err_at(file, line, format!("`{name}` is already declared as a parameter")));
         }
+        let full = format!("{}{name}", self.e.cur().prefix);
         let id = self.design.vars.len() as u32;
+        let array_of_reg = kind == VarKind::Reg;
+        let kind = if !unpacked.is_empty() { VarKind::Array } else { kind };
         self.e.vars.push(VarInfo {
-            name: name.to_string(),
+            name: full.clone(),
             width,
             signed,
             kind,
             desc: msb >= lsb,
             msb,
             lsb,
+            unpacked: unpacked.clone(),
+            array_of_reg,
         });
         self.design.vars.push(riv_ir::Var {
             id,
-            name: name.to_string(),
+            name: full,
             width,
             signed,
             kind,
@@ -475,6 +1159,10 @@ impl<'a> Walker<'a> {
             msb,
             lsb,
         });
+        if !unpacked.is_empty() {
+            self.design.arrays.push(riv_ir::ArrayDim { var: id, dims: unpacked });
+        }
+        self.e.scopes.last_mut().unwrap().names.insert(name.to_string(), id);
         Ok(id)
     }
 
@@ -506,27 +1194,94 @@ impl<'a> Walker<'a> {
             (None, Some((w, s))) => (w, s),
             (None, None) => (32, pe.signed),
         };
-        let (val, _) = self.const_eval_at(&pe.init, file)?;
+        let (val, _) = match self.e.scopes.last_mut().unwrap().param_overrides.remove(&pe.name) {
+            // Instance override (evaluated in the parent scope): replaces
+            // the default initializer; still typed at the declared width.
+            Some(v) => (v, false),
+            None => self.const_eval_at(&pe.init, file)?,
+        };
         let val = if signed {
             val.sadjust(w)
         } else {
             val.uadjust(w)
         }
         .map_err(|e| err_at(file, line, format!("parameter value: {}", e.0)))?;
-        if self.e.params.contains_key(&pe.name)
-            || self.e.vars.iter().any(|v| v.name == pe.name)
+        if self.e.cur().params.contains_key(&pe.name)
+            || self.e.cur().names.contains_key(&pe.name)
         {
             return Err(err_at(file, line, format!("`{}` is already declared", pe.name)));
         }
-        self.e.params.insert(pe.name.clone(), (val, signed));
+        self.e
+            .scopes
+            .last_mut()
+            .unwrap()
+            .params
+            .insert(pe.name.clone(), (val, signed));
         Ok(())
     }
 
-    fn walk_decl(&mut self, d: &ast::Decl, file: &str) -> ElabResult<()> {
+    /// Register declaration names (no initializers) — the forward-ref
+    /// pre-pass. Params/localparams are fully declared here (their values
+    /// are order-significant: a width referencing a LATER localparam
+    /// still errors, matching a conservative subset).
+    fn predeclare(&mut self, d: &ast::Decl, file: &str) -> ElabResult<()> {
+        match d.kind {
+            DeclKind::Parameter | DeclKind::Localparam => self.walk_decl(d, file, &self.top_ts.clone()),
+            DeclKind::Event => {
+                for entry in &d.entries {
+                    if !self.e.cur().names.contains_key(&entry.name) {
+                        self.declare_var(&entry.name, 1, false, VarKind::Event, file, entry.span, 0, 0, Vec::new())?;
+                    }
+                }
+                Ok(())
+            }
+            DeclKind::Genvar | DeclKind::Real | DeclKind::Realtime => Ok(()),
+            DeclKind::Integer | DeclKind::Time | DeclKind::Reg | DeclKind::Net(_) => {
+                let (kind, w_default, signed_default) = match d.kind {
+                    DeclKind::Integer => (VarKind::Reg, 32u32, true),
+                    DeclKind::Time => (VarKind::Reg, 64u32, false),
+                    DeclKind::Reg => (VarKind::Reg, 1u32, d.signed),
+                    DeclKind::Net(_) => (VarKind::Net, 1u32, d.signed),
+                    _ => unreachable!(),
+                };
+                let (w, hi, lo) = match &d.range {
+                    Some(r) => {
+                        let (hi, lo) = self.range_bounds(r, file)?;
+                        (hi.abs_diff(lo) + 1, hi, lo)
+                    }
+                    None => (w_default, w_default - 1, 0),
+                };
+                for entry in &d.entries {
+                    if self.e.cur().names.contains_key(&entry.name)
+                        || self.e.cur().params.contains_key(&entry.name)
+                    {
+                        continue; // already registered (ANSI port or an earlier decl)
+                    }
+                    if entry.unpacked.len() > 1 {
+                        return Err(err_at(file, self.line_of(entry.span), "multi-dimensional unpacked arrays are not supported yet (see docs/RIVERILOG-PLAN.md §8)"));
+                    }
+                    let unpacked: Vec<(u32, u32)> = entry
+                        .unpacked
+                        .iter()
+                        .map(|r| self.range_bounds(r, file))
+                        .collect::<Result<_, _>>()?;
+                    self.declare_var(&entry.name, w, signed_default, kind, file, entry.span, hi, lo, unpacked)?;
+                }
+                Ok(())
+            }
+        }
+    }
+
+    fn walk_decl(&mut self, d: &ast::Decl, file: &str, ts: &TsInfo) -> ElabResult<()> {
         let line = self.line_of(d.span);
         match d.kind {
             DeclKind::Parameter | DeclKind::Localparam => {
                 for entry in &d.entries {
+                    if self.e.cur().params.contains_key(&entry.name)
+                        || self.e.cur().names.contains_key(&entry.name)
+                    {
+                        continue; // pre-pass declared it (order-significant values)
+                    }
                     let Some(init) = &entry.init else {
                         return Err(err_at(
                             file,
@@ -551,16 +1306,26 @@ impl<'a> Walker<'a> {
                 line,
                 "`real` variables are not supported (real types are not in the planned R2-R5 surface; see docs/RIVERILOG-PLAN.md §8)",
             )),
-            DeclKind::Event => Err(err_at(
-                file,
-                line,
-                "named events land at the behavioral batch (milestone R3)",
-            )),
-            DeclKind::Genvar => Err(err_at(
-                file,
-                line,
-                "genvars belong to generate constructs (milestone R4)",
-            )),
+            DeclKind::Event => {
+                // Named events (R4-e): 1-bit event vars, no value storage.
+                for entry in &d.entries {
+                    if !entry.unpacked.is_empty() {
+                        return Err(err_at(file, line, "event arrays are not supported"));
+                    }
+                    self.declare_var(&entry.name, 1, false, VarKind::Event, file, entry.span, 0, 0, Vec::new())?;
+                }
+                Ok(())
+            }
+            DeclKind::Genvar => {
+                // Genvars are elaboration-time constants bound by the
+                // enclosing GenFor; declaring them just registers the name.
+                for entry in &d.entries {
+                    if self.e.cur().names.contains_key(&entry.name) {
+                        return Err(err_at(file, line, format!("`{}` is already declared", entry.name)));
+                    }
+                }
+                Ok(())
+            }
             DeclKind::Integer | DeclKind::Time | DeclKind::Reg | DeclKind::Net(_) => {
                 let (kind, w_default, signed_default) = match d.kind {
                     DeclKind::Integer => (VarKind::Reg, 32u32, true),
@@ -578,31 +1343,46 @@ impl<'a> Walker<'a> {
                 };
                 for entry in &d.entries {
                     let eline = self.line_of(entry.span);
-                    if !entry.unpacked.is_empty() {
+                    if entry.unpacked.len() > 1 {
                         return Err(err_at(
                             file,
                             eline,
-                            "unpacked arrays (memories) land with the structural batch (milestone R4)",
+                            "multi-dimensional unpacked arrays are not supported yet (see docs/RIVERILOG-PLAN.md §8)",
                         ));
                     }
-                    let id = match self.e.vars.iter().position(|v| v.name == entry.name) {
-                        Some(existing) => {
-                            // Re-declaration of an ANSI port by a body decl
-                            // (legacy style) — keep the existing var.
-                            existing as VarId
-                        }
-                        None => {
-                            self.declare_var(&entry.name, w, signed_default, kind, file, entry.span, hi, lo)?
-                        }
+                    let unpacked: Vec<(u32, u32)> = entry
+                        .unpacked
+                        .iter()
+                        .map(|r| self.range_bounds(r, file))
+                        .collect::<Result<_, _>>()?;
+                    let id = match self.e.cur().names.get(&entry.name).copied() {
+                        Some(existing) => existing as VarId, // pre-registered
+                        None => self.declare_var(
+                            &entry.name,
+                            w,
+                            signed_default,
+                            kind,
+                            file,
+                            entry.span,
+                            hi,
+                            lo,
+                            unpacked,
+                        )?,
                     };
                     let Some(init) = &entry.init else { continue };
-                    match kind {
+                    if self.e.vars[id as usize].kind == VarKind::Array {
+                        return Err(err_at(
+                            file,
+                            eline,
+                            "array declaration initializers are not supported (initialize per-element or with $readmemh/b)",
+                        ));
+                    }
+                    match self.e.vars[id as usize].kind {
                         VarKind::Reg => {
                             // Declaration initializer → an initial thread;
                             // its t0 change events wake @* waiters (the
                             // 21_always_comb golden depends on this).
-                            let ts0 = self.top_ts.clone();
-                            let mut low = make_lower(&*self.e, file, &ts0);
+                            let mut low = make_lower(&*self.e, file, ts);
                             let v = low.lower(init, w)?;
                             low.emit(Op::AssignBlk { lv: Lval::Var { var: id }, src: v.slot });
                             low.emit(Op::EndThread);
@@ -610,9 +1390,8 @@ impl<'a> Walker<'a> {
                         }
                         VarKind::Net => {
                             // Net declaration assignment = continuous driver.
-                            self.net_driver_check(id, file, entry.span)?;
-                            let ts0 = self.top_ts.clone();
-                            let mut low = make_lower(&*self.e, file, &ts0);
+                            self.net_driver_check(id, file, entry.span, true)?;
+                            let mut low = make_lower(&*self.e, file, ts);
                             let v = low.lower(init, w)?;
                             low.emit(Op::AssignBlk { lv: Lval::Var { var: id }, src: v.slot });
                             let reads = std::mem::take(&mut low.reads);
@@ -635,7 +1414,7 @@ impl<'a> Walker<'a> {
         }
     }
 
-    fn net_driver_check(&self, id: VarId, file: &str, span: rcs_diag::Span) -> ElabResult<()> {
+    fn net_driver_check(&self, id: VarId, file: &str, span: rcs_diag::Span, whole_var: bool) -> ElabResult<()> {
         let vi = self.e.vars[id as usize].clone();
         if vi.kind == VarKind::Reg {
             return Err(err_at(
@@ -644,12 +1423,12 @@ impl<'a> Walker<'a> {
                 format!("continuous assignment to reg `{}` (regs are procedural-only)", vi.name),
             ));
         }
-        if self.design.assigns.iter().any(|(_, v)| *v == id) {
+        if whole_var && self.design.assigns.iter().any(|(_, v)| *v == id) {
             return Err(err_at(
                 file,
                 self.line_of(span),
                 format!(
-                    "multiple continuous drivers on `{}` need multi-driver arbitration (milestone R4)",
+                    "multiple continuous drivers on `{}` need multi-driver arbitration (milestone R4 strength batch)",
                     vi.name
                 ),
             ));
@@ -663,19 +1442,23 @@ impl<'a> Walker<'a> {
         // index lvalues emit ops).
         let lv = low.lower_lvalue(&pair.lhs)?;
         let lw = lval_width(&lv, &self.e.vars);
-        if let Lval::Var { var } | Lval::Bit { var, .. } | Lval::Part { var, .. } = &lv {
-            self.net_driver_check(*var, file, pair.span)?;
+        if let Lval::Var { var } = &lv {
+            self.net_driver_check(*var, file, pair.span, true)?;
+        } else if let Lval::Bit { var, .. } | Lval::Part { var, .. } = &lv {
+            // Bit/part-level assigns from generate unrolls are legal when
+            // disjoint; overlap arbitration stays with the strength batch.
+            self.net_driver_check(*var, file, pair.span, false)?;
         }
         // Context = LHS width (probe: carry preservation in wire assigns).
         let v = low.lower(&pair.rhs, lw)?;
         low.emit(Op::AssignBlk { lv: lv.clone(), src: v.slot });
         let reads = std::mem::take(&mut low.reads);
         if reads.is_empty() {
-            return Err(err_at(
-                file,
-                low.line_of(pair.span),
-                "continuous assignment with an empty RHS read set",
-            ));
+            // Constant RHS (`assign y = 1'b0;`): a one-shot initial thread;
+            // nothing to wait on.
+            low.emit(Op::EndThread);
+            commit(self.design, low, ThreadKind::Initial, Vec::new());
+            return Ok(());
         }
         low.emit(Op::WaitEdge {
             items: reads
@@ -780,8 +1563,8 @@ impl<'a> Walker<'a> {
     /// binds to one shared frame at load; `automatic` gets per-activation
     /// frames — both expressed by Func.automatic + frame_len.
     fn build_func(&mut self, f: &ast::Function, file: &str, ts: &TsInfo) -> ElabResult<()> {
-        if self.e.funcs.contains_key(&f.name)
-            || self.e.vars.iter().any(|v| v.name == f.name)
+        if self.e.cur().funcs.contains_key(&f.name)
+            || self.e.cur().names.contains_key(&f.name)
         {
             return Err(err_at(
                 file,
@@ -833,7 +1616,7 @@ impl<'a> Walker<'a> {
                     return Err(err_at(
                         file,
                         self.line_of(entry.span),
-                        "formal unpacked arrays land with the structural batch (milestone R4)",
+                        "formal unpacked arrays are not supported yet (see docs/RIVERILOG-PLAN.md §8)",
                     ));
                 }
                 low.scopes.push((
@@ -873,7 +1656,7 @@ impl<'a> Walker<'a> {
                     return Err(err_at(
                         file,
                         self.line_of(entry.span),
-                        "local unpacked arrays land with the structural batch (milestone R4)",
+                        "local unpacked arrays are not supported yet (see docs/RIVERILOG-PLAN.md §8)",
                     ));
                 }
                 low.scopes.push((
@@ -890,7 +1673,7 @@ impl<'a> Walker<'a> {
         low.emit(Op::Ret { src: 0 });
         let idx = self.design.funcs.len() as u32;
         self.design.funcs.push(riv_ir::Func {
-            name: f.name.clone(),
+            name: format!("{}{}", self.e.cur().prefix, f.name),
             is_task: f.is_task,
             automatic: f.automatic,
             frame_len: low.next_slot,
@@ -898,8 +1681,75 @@ impl<'a> Walker<'a> {
             body: low.ops,
         });
         self.e.ret_types.insert(idx, (ret_w, f.ret_signed));
-        self.e.funcs.insert(f.name.clone(), (idx, formals));
+        self.e
+            .scopes
+            .last_mut()
+            .unwrap()
+            .funcs
+            .insert(f.name.clone(), (idx, formals));
         Ok(())
+    }
+}
+
+fn is_gate_name(n: &str) -> bool {
+    matches!(
+        n,
+        "and" | "nand" | "or" | "nor" | "xor" | "xnor" | "buf" | "not" | "bufif0" | "bufif1"
+            | "notif0" | "notif1" | "pullup" | "pulldown"
+    )
+}
+
+/// Rewrite every reference to var `from` → `to` inside one op (port
+/// collapsing).
+fn rewrite_var_ids(op: &mut Op, from: VarId, to: VarId) {
+    let lv = |l: &mut Lval| rewrite_lval(l, from, to);
+    let sens = |items: &mut Vec<SensItem>| {
+        for s in items.iter_mut() {
+            if s.var == from {
+                s.var = to;
+            }
+        }
+    };
+    match op {
+        Op::LoadVar { var, .. }
+        | Op::LoadBit { var, .. }
+        | Op::LoadPart { var, .. }
+        | Op::LoadPartDyn { var, .. }
+        | Op::LoadElem { var, .. } => {
+            if *var == from {
+                *var = to;
+            }
+        }
+        Op::AssignBlk { lv: l, .. }
+        | Op::AssignNba { lv: l, .. }
+        | Op::AssignForce { lv: l, .. }
+        | Op::Release { lv: l } => lv(l),
+        Op::Call { outs, .. } => {
+            for (l, _) in outs.iter_mut() {
+                lv(l);
+            }
+        }
+        Op::WaitEdge { items } => sens(items),
+        _ => {}
+    }
+}
+
+fn rewrite_lval(l: &mut Lval, from: VarId, to: VarId) {
+    match l {
+        Lval::Var { var }
+        | Lval::Bit { var, .. }
+        | Lval::Part { var, .. }
+        | Lval::PartDyn { var, .. }
+        | Lval::Elem { var, .. } => {
+            if *var == from {
+                *var = to;
+            }
+        }
+        Lval::Concat { parts } => {
+            for (p, _) in parts.iter_mut() {
+                rewrite_lval(p, from, to);
+            }
+        }
     }
 }
 
@@ -920,6 +1770,7 @@ fn lval_width(lv: &Lval, vars: &[VarInfo]) -> u32 {
         Lval::Bit { .. } => 1,
         Lval::Part { hi, lo, .. } => hi.abs_diff(*lo) + 1,
         Lval::PartDyn { .. } => 1,
+        Lval::Elem { var, .. } => vars[*var as usize].width,
         Lval::Concat { parts } => parts.iter().map(|(_, w)| *w).sum(),
     }
 }
@@ -929,7 +1780,8 @@ fn lval_first_var(lv: &Lval) -> VarId {
         Lval::Var { var }
         | Lval::Bit { var, .. }
         | Lval::Part { var, .. }
-        | Lval::PartDyn { var, .. } => *var,
+        | Lval::PartDyn { var, .. }
+        | Lval::Elem { var, .. } => *var,
         Lval::Concat { parts } => parts.first().map(|(p, _)| lval_first_var(p)).unwrap_or(0),
     }
 }

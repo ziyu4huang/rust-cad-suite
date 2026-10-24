@@ -1,0 +1,1 @@
+REGISTERED DIVERGENCE rivD10: unwritten memory elements read x on iverilog 13.0 (4-state) vs 0 on the verilator-recorded golden (2-state); riv matches iverilog byte-for-byte (tri-div-iv, evidence: expected.iv.stdout line 2 = xxxx where expected.stdout says 0000)

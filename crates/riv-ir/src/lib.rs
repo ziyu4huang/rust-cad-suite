@@ -24,7 +24,10 @@
 /// behavioral batch (casez/casex wildcards, $time/$monitor family,
 /// plusargs). v3 = the C6/R3-B procedural batch: Call with explicit
 /// formal-slot wiring (ins/outs), fork/join ops, force/release ops.
-pub const FORMAT_VERSION: u32 = 3;
+/// v4 = the R4 structural batch: array element access (`Lval::Elem` +
+/// `LoadElem`), the `gates` section (primitives + delay triples), event
+/// vars (`->ev`/`@ev`), `$stop`, and `$readmemh/b`.
+pub const FORMAT_VERSION: u32 = 4;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Design {
@@ -36,6 +39,10 @@ pub struct Design {
     pub arrays: Vec<ArrayDim>,
     /// Cont-assign thread indices with their LHS var (design §3 `assigns`).
     pub assigns: Vec<(u32, u32)>,
+    /// Gate primitives (R4 structural batch): evaluated by the kernel on
+    /// input change, output updates scheduled with rise/fall/turn-off
+    /// delays (inertial — a newer evaluation replaces the pending one).
+    pub gates: Vec<Gate>,
     pub threads: Vec<Thread>,
     pub funcs: Vec<Func>,
     /// Compiled display-format pool (design §3 strs + §5-4: entries are
@@ -64,6 +71,76 @@ pub enum VarKind {
     Reg,
     Net,
     Array,
+    /// Named event (R4-e): no value storage; `->ev` triggers, `@ev` waits
+    /// fire on the trigger in the slot the trigger happens.
+    Event,
+}
+
+/// Gate primitive kinds (IEEE §7 table families; bufif/notif output z when
+/// disabled — 4-state tables live in the kernel).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum GateKind {
+    And,
+    Nand,
+    Or,
+    Nor,
+    Xor,
+    Xnor,
+    Buf,
+    Not,
+    Bufif0,
+    Bufif1,
+    Notif0,
+    Notif1,
+}
+
+impl GateKind {
+    pub fn tag(self) -> &'static str {
+        match self {
+            GateKind::And => "and",
+            GateKind::Nand => "nand",
+            GateKind::Or => "or",
+            GateKind::Nor => "nor",
+            GateKind::Xor => "xor",
+            GateKind::Xnor => "xnor",
+            GateKind::Buf => "buf",
+            GateKind::Not => "not",
+            GateKind::Bufif0 => "bufif0",
+            GateKind::Bufif1 => "bufif1",
+            GateKind::Notif0 => "notif0",
+            GateKind::Notif1 => "notif1",
+        }
+    }
+    pub fn from_tag(s: &str) -> Option<GateKind> {
+        Some(match s {
+            "and" => GateKind::And,
+            "nand" => GateKind::Nand,
+            "or" => GateKind::Or,
+            "nor" => GateKind::Nor,
+            "xor" => GateKind::Xor,
+            "xnor" => GateKind::Xnor,
+            "buf" => GateKind::Buf,
+            "not" => GateKind::Not,
+            "bufif0" => GateKind::Bufif0,
+            "bufif1" => GateKind::Bufif1,
+            "notif0" => GateKind::Notif0,
+            "notif1" => GateKind::Notif1,
+            _ => return None,
+        })
+    }
+}
+
+/// One gate primitive instance (R4): output var + input vars + the delay
+/// triple in precision ticks (rise, fall, turn-off; turn-off = transition
+/// to z, bufif/notif only). Zero delays behave like a cont-assign.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Gate {
+    pub kind: GateKind,
+    pub out: VarId,
+    pub inputs: Vec<VarId>,
+    pub rise: u64,
+    pub fall: u64,
+    pub turnoff: u64,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -450,6 +527,16 @@ pub enum SysId {
     /// `$value$plusargs("N=%d", out)` — parsed value written into
     /// args[0].slot, dst = 1 iff matched.
     ValuePlusargs,
+    /// `$stop` — rivD2: without -n the banner prints and simulation
+    /// CONTINUES (EOF semantics); with -n rivvp treats it as $finish.
+    Stop,
+    /// `$readmemh("file", mem[, start[, finish]])` — file name in `fmt`,
+    /// optional bounds in args[0]/args[1] slots (width 0 = absent).
+    ReadmemH,
+    /// `$readmemb` — same shape as ReadmemH, binary digits.
+    ReadmemB,
+    /// `-> ev` — trigger the named event var.
+    Trigger,
 }
 
 impl SysId {
@@ -468,6 +555,10 @@ impl SysId {
             SysId::MonitorOn => "monitoron",
             SysId::TestPlusargs => "testplusargs",
             SysId::ValuePlusargs => "valueplusargs",
+            SysId::Stop => "stop",
+            SysId::ReadmemH => "readmemh",
+            SysId::ReadmemB => "readmemb",
+            SysId::Trigger => "trigger",
         }
     }
     pub fn from_tag(s: &str) -> Option<SysId> {
@@ -485,6 +576,10 @@ impl SysId {
             "monitoron" => SysId::MonitorOn,
             "testplusargs" => SysId::TestPlusargs,
             "valueplusargs" => SysId::ValuePlusargs,
+            "stop" => SysId::Stop,
+            "readmemh" => SysId::ReadmemH,
+            "readmemb" => SysId::ReadmemB,
+            "trigger" => SysId::Trigger,
             _ => return None,
         })
     }
@@ -511,6 +606,9 @@ pub enum Lval {
     Part { var: VarId, hi: u32, lo: u32 },
     /// Variable-bounds part select, absolute positions in slots.
     PartDyn { var: VarId, hi: Slot, lo: Slot },
+    /// Unpacked-array element: `mem[idx]` (idx a slot, declared index
+    /// space — the kernel maps it through the array dims).
+    Elem { var: VarId, idx: Slot },
     /// Concat lvalue, flattened: parts in bit order, each with its width
     /// (the RHS is sliced left-to-right by these widths).
     Concat { parts: Vec<(Lval, u32)> },
@@ -550,6 +648,9 @@ pub enum Op {
     LoadBit { dst: Slot, var: VarId, idx: Slot },
     LoadPart { dst: Slot, var: VarId, hi: u32, lo: u32 },
     LoadPartDyn { dst: Slot, var: VarId, hi: Slot, lo: Slot },
+    /// Unpacked-array element read: `mem[idx]` → element value (width =
+    /// the array's packed width); unknown/out-of-range index → x.
+    LoadElem { dst: Slot, var: VarId, idx: Slot },
     /// `force lhs = rhs;` — procedural override; reads see the forced
     /// value, writes are ignored until `Release` (04_force golden: the
     /// reg keeps the forced value after release).
@@ -702,6 +803,7 @@ impl Design {
                     VarKind::Reg => "reg",
                     VarKind::Net => "net",
                     VarKind::Array => "array",
+                    VarKind::Event => "event",
                 },
                 v.width,
                 if v.signed { 1 } else { 0 },
@@ -724,6 +826,24 @@ impl Design {
         o.push_str("assigns\n");
         for (t, v) in &self.assigns {
             o.push_str(&format!("assign {t} {v}\n"));
+        }
+        o.push_str("end\n");
+        o.push_str("gates\n");
+        for g in &self.gates {
+            let mut line = format!(
+                "gate {} {} {} {} {} {}",
+                g.kind.tag(),
+                g.out,
+                g.inputs.len(),
+                g.rise,
+                g.fall,
+                g.turnoff
+            );
+            for i in &g.inputs {
+                line.push_str(&format!(" {i}"));
+            }
+            line.push('\n');
+            o.push_str(&line);
         }
         o.push_str("end\n");
         o.push_str("threads\n");
@@ -808,6 +928,7 @@ fn op_encode(op: &Op) -> String {
         Op::LoadBit { dst, var, idx } => format!("loadbit {dst} {var} {idx}"),
         Op::LoadPart { dst, var, hi, lo } => format!("loadpart {dst} {var} {hi} {lo}"),
         Op::LoadPartDyn { dst, var, hi, lo } => format!("loadpartdyn {dst} {var} {hi} {lo}"),
+        Op::LoadElem { dst, var, idx } => format!("loadelem {dst} {var} {idx}"),
         Op::AssignBlk { lv, src } => format!("assignblk {} {src}", lval_encode(lv)),
         Op::AssignNba { lv, src } => format!("assignnba {} {src}", lval_encode(lv)),
         Op::Branch { cond, then, els } => format!("branch {cond} {then} {els}"),
@@ -871,6 +992,7 @@ fn lval_encode(lv: &Lval) -> String {
         Lval::Bit { var, idx } => format!("bit {var} {idx}"),
         Lval::Part { var, hi, lo } => format!("part {var} {hi} {lo}"),
         Lval::PartDyn { var, hi, lo } => format!("partdyn {var} {hi} {lo}"),
+        Lval::Elem { var, idx } => format!("elem {var} {idx}"),
         Lval::Concat { parts } => {
             let mut s = format!("concat {}", parts.len());
             for (p, w) in parts {
@@ -923,6 +1045,7 @@ pub fn read(text: &str) -> Result<Design, ReadError> {
         vars: Vec::new(),
         arrays: Vec::new(),
         assigns: Vec::new(),
+        gates: Vec::new(),
         threads: Vec::new(),
         funcs: Vec::new(),
         strs: Vec::new(),
@@ -965,6 +1088,7 @@ pub fn read(text: &str) -> Result<Design, ReadError> {
             "reg" => VarKind::Reg,
             "net" => VarKind::Net,
             "array" => VarKind::Array,
+            "event" => VarKind::Event,
             other => return Err(bad(&format!("unknown var kind `{other}`"), it.n)),
         };
         let init = if t[6] == "-" {
@@ -1028,6 +1152,34 @@ pub fn read(text: &str) -> Result<Design, ReadError> {
         let th: u32 = t[1].parse().map_err(|_| bad("bad thread idx", it.n))?;
         let v: u32 = t[2].parse().map_err(|_| bad("bad assign var", it.n))?;
         d.assigns.push((th, v));
+    }
+    // gates
+    expect(&mut it, "gates", &mut |l, n| bad(l, n))?;
+    loop {
+        let Some(l) = it.next() else { return Err(bad("unterminated gates", it.n)) };
+        if l == "end" {
+            break;
+        }
+        let t: Vec<&str> = fields(l);
+        // `gate <kind> <out> <nin> <rise> <fall> <turnoff> <in...>`
+        if t[0] != "gate" || t.len() < 8 {
+            return Err(bad("expected gate line", it.n));
+        }
+        let kind = GateKind::from_tag(t[1]).ok_or_else(|| bad(&format!("unknown gate kind `{}`", t[1]), it.n))?;
+        let nin: usize = t[3].parse().map_err(|_| bad("bad gate arity", it.n))?;
+        if t.len() != 7 + nin {
+            return Err(bad("gate arity mismatch", it.n));
+        }
+        d.gates.push(Gate {
+            kind,
+            out: t[2].parse().map_err(|_| bad("bad gate out", it.n))?,
+            inputs: (0..nin)
+                .map(|i| t[7 + i].parse::<u32>().map_err(|_| bad("bad gate input", it.n)))
+                .collect::<Result<_, _>>()?,
+            rise: t[4].parse().map_err(|_| bad("bad gate rise", it.n))?,
+            fall: t[5].parse().map_err(|_| bad("bad gate fall", it.n))?,
+            turnoff: t[6].parse().map_err(|_| bad("bad gate turnoff", it.n))?,
+        });
     }
     // threads
     expect(&mut it, "threads", &mut |l, n| bad(l, n))?;
@@ -1272,6 +1424,7 @@ fn op_decode(t: &[&str], n: usize) -> Result<Op, ReadError> {
         "loadbit" => Ok(Op::LoadBit { dst: pu(t, 1, n)?, var: pu(t, 2, n)?, idx: pu(t, 3, n)? }),
         "loadpart" => Ok(Op::LoadPart { dst: pu(t, 1, n)?, var: pu(t, 2, n)?, hi: pu(t, 3, n)?, lo: pu(t, 4, n)? }),
         "loadpartdyn" => Ok(Op::LoadPartDyn { dst: pu(t, 1, n)?, var: pu(t, 2, n)?, hi: pu(t, 3, n)?, lo: pu(t, 4, n)? }),
+        "loadelem" => Ok(Op::LoadElem { dst: pu(t, 1, n)?, var: pu(t, 2, n)?, idx: pu(t, 3, n)? }),
         "assignblk" => Ok(Op::AssignBlk { lv: lval_decode(&t[1..t.len() - 1], n)?, src: pu(t, t.len() - 1, n)? }),
         "assignnba" => Ok(Op::AssignNba { lv: lval_decode(&t[1..t.len() - 1], n)?, src: pu(t, t.len() - 1, n)? }),
         "branch" => Ok(Op::Branch { cond: pu(t, 1, n)?, then: pu(t, 2, n)?, els: pu(t, 3, n)? }),
@@ -1363,7 +1516,7 @@ fn op_decode(t: &[&str], n: usize) -> Result<Op, ReadError> {
             for _ in 0..nout {
                 let sub_len = match p(t, i, n)? {
                     "var" => 2,
-                    "bit" => 3,
+                    "bit" | "elem" => 3,
                     "part" | "partdyn" => 4,
                     other => return Err(e(&format!("bad call out lvalue `{other}`"))),
                 };
@@ -1395,6 +1548,7 @@ fn lval_decode(t: &[&str], n: usize) -> Result<Lval, ReadError> {
         "bit" => Ok(Lval::Bit { var: pu(t, 1, n)?, idx: pu(t, 2, n)? }),
         "part" => Ok(Lval::Part { var: pu(t, 1, n)?, hi: pu(t, 2, n)?, lo: pu(t, 3, n)? }),
         "partdyn" => Ok(Lval::PartDyn { var: pu(t, 1, n)?, hi: pu(t, 2, n)?, lo: pu(t, 3, n)? }),
+        "elem" => Ok(Lval::Elem { var: pu(t, 1, n)?, idx: pu(t, 2, n)? }),
         "concat" => {
             let nn: usize = pu(t, 1, n)? as usize;
             let mut rest = &t[2..];
@@ -1405,7 +1559,7 @@ fn lval_decode(t: &[&str], n: usize) -> Result<Lval, ReadError> {
                 }
                 let sub_len = match rest[0] {
                     "var" => 2,
-                    "bit" => 3,
+                    "bit" | "elem" => 3,
                     "part" => 4,
                     "partdyn" => 4,
                     "concat" => return Err(e("nested concat must be flattened at lowering")),
@@ -1442,9 +1596,14 @@ mod tests {
             vars: vec![
                 Var { id: 0, name: "a b".into(), width: 8, signed: false, kind: VarKind::Reg, init: Some(Literal { width: 8, signed: false, base: Base::Hex, digits: "1z".into() }), msb: 7, lsb: 0 },
                 Var { id: 1, name: "sum9".into(), width: 9, signed: false, kind: VarKind::Net, init: None, msb: 8, lsb: 0 },
+                Var { id: 2, name: "ev".into(), width: 1, signed: false, kind: VarKind::Event, init: None, msb: 0, lsb: 0 },
             ],
             arrays: vec![ArrayDim { var: 0, dims: vec![(255, 0), (3, 0)] }],
             assigns: vec![(3, 1)],
+            gates: vec![
+                Gate { kind: GateKind::Nand, out: 1, inputs: vec![0, 0], rise: 6000, fall: 6000, turnoff: 0 },
+                Gate { kind: GateKind::Bufif1, out: 1, inputs: vec![0, 1], rise: 0, fall: 1, turnoff: 2 },
+            ],
             threads: vec![
                 Thread {
                     kind: ThreadKind::Initial,
@@ -1476,8 +1635,13 @@ mod tests {
                         Op::LoadBit { dst: 3, var: 0, idx: 0 },
                         Op::LoadPart { dst: 3, var: 0, hi: 7, lo: 4 },
                         Op::LoadPartDyn { dst: 3, var: 0, hi: 1, lo: 0 },
+                        Op::LoadElem { dst: 3, var: 0, idx: 2 },
                         Op::AssignBlk { lv: Lval::Var { var: 0 }, src: 3 },
                         Op::AssignNba { lv: Lval::Bit { var: 0, idx: 1 }, src: 3 },
+                        Op::AssignNba { lv: Lval::Elem { var: 0, idx: 2 }, src: 3 },
+                        Op::SysCall { id: SysId::Trigger, fmt: None, args: vec![], dst: None, file: 0, line: 7, start: 0 },
+                        Op::SysCall { id: SysId::Stop, fmt: None, args: vec![], dst: None, file: 0, line: 8, start: 0 },
+                        Op::SysCall { id: SysId::ReadmemH, fmt: Some(1), args: vec![Arg { slot: 0, width: 32, signed: false, is_time: false }, Arg { slot: 1, width: 0, signed: false, is_time: false }], dst: None, file: 0, line: 9, start: 0 },
                         Op::AssignBlk { lv: Lval::Part { var: 0, hi: 7, lo: 4 }, src: 3 },
                         Op::AssignNba { lv: Lval::PartDyn { var: 0, hi: 1, lo: 0 }, src: 3 },
                         Op::AssignBlk {
@@ -1601,7 +1765,7 @@ mod tests {
         // accidental format drift is caught by this shape.
         let d = sample();
         let text = d.write();
-        assert!(text.starts_with("riv 3\nmeta\ntop tb\ntimescale 1ns/1ps\nunit 1ns\nprecision 1ps\nsources 2\nsrc dir\\ with\\ space/tb.v\nsrc tb2.v\nend\n"));
+        assert!(text.starts_with("riv 4\nmeta\ntop tb\ntimescale 1ns/1ps\nunit 1ns\nprecision 1ps\nsources 2\nsrc dir\\ with\\ space/tb.v\nsrc tb2.v\nend\n"));
         assert!(text.ends_with("riv end\n"));
     }
 }

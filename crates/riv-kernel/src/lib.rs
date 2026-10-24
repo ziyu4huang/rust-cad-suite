@@ -12,7 +12,7 @@
 
 use std::collections::{BTreeMap, VecDeque};
 
-use riv_ir::{Arg, Base, Design, EdgeKind, FmtPiece, Lval, Op, SensItem, Slot, SysId, VarId};
+use riv_ir::{Arg, Base, Design, EdgeKind, FmtPiece, GateKind, Lval, Op, SensItem, Slot, SysId, VarId, VarKind};
 use vl_values::{from_numlit_parts, Bits, Base as VB};
 
 #[derive(Debug)]
@@ -123,6 +123,18 @@ pub struct Kernel {
     forces: Vec<Option<Bits>>,
     /// fork...join groups: (remaining branch count, waiter thread).
     join_groups: Vec<(u32, usize)>,
+    /// Unpacked-array storage, parallel to `d.vars` (empty vec for
+    /// non-array vars).
+    arrays: Vec<Vec<Bits>>,
+    /// Per-array (declared lsb, element count) for index mapping.
+    array_dims: Vec<Option<(u64, u64)>>,
+    /// Scheduled inertial gate updates: time → gate indices (a newer
+    /// evaluation cancels the pending entry first).
+    gate_due: BTreeMap<u64, Vec<usize>>,
+    /// Pending (time, value) per gate; None = nothing scheduled.
+    gate_pending: Vec<Option<(u64, Bits)>>,
+    /// rivvp -n: $stop behaves like $finish (rivD2).
+    pub stop_as_finish: bool,
 }
 
 /// Unit→precision scale parsed from meta.timescale (unit fs / precision fs).
@@ -194,6 +206,24 @@ impl Kernel {
             shared_frames.push(frame);
         }
         let forces = (0..d.vars.len()).map(|_| None).collect::<Vec<_>>();
+        let mut arrays = Vec::with_capacity(d.vars.len());
+        let mut array_dims = Vec::with_capacity(d.vars.len());
+        for v in &d.vars {
+            let dim = d.arrays.iter().find(|a| a.var == v.id).and_then(|a| a.dims.first().copied());
+            match dim {
+                Some((msb, lsb)) => {
+                    let (lo, hi) = (msb.min(lsb) as u64, msb.max(lsb) as u64);
+                    let n = (hi - lo + 1) as usize;
+                    arrays.push((0..n).map(|_| Bits::all_x(v.width).unwrap()).collect());
+                    array_dims.push(Some((lo, hi)));
+                }
+                None => {
+                    arrays.push(Vec::new());
+                    array_dims.push(None);
+                }
+            }
+        }
+        let gate_pending = (0..d.gates.len()).map(|_| None).collect::<Vec<_>>();
         let mut threads = Vec::with_capacity(d.threads.len());
         for t in &d.threads {
             threads.push(ThreadState {
@@ -217,6 +247,11 @@ impl Kernel {
             shared_frames,
             forces,
             join_groups: Vec::new(),
+            arrays,
+            array_dims,
+            gate_due: BTreeMap::new(),
+            gate_pending,
+            stop_as_finish: false,
             vars,
             active: VecDeque::new(),
             inactive: VecDeque::new(),
@@ -246,6 +281,11 @@ impl Kernel {
             if matches!(self.threads[ti].status, Status::Ready) {
                 self.active.push_back(ti);
             }
+        }
+        // Gates evaluate once at t0 (iverilog semantics): output deltas
+        // schedule through the inertial wheel like any input change.
+        for gi in 0..self.d.gates.len() {
+            self.eval_gate(gi);
         }
         // Main slot loop (design §4).
         loop {
@@ -285,25 +325,52 @@ impl Kernel {
                         return self.finish_out(sink, None);
                     }
                 }
+                // 3.5 Gate updates due NOW (inertial commits). Commits can
+                // wake threads (next inner iteration) and cascade into more
+                // zero-delay gate updates — drain until stable.
+                let mut cascades = 0usize;
+                while let Some(gates) = self.gate_due.remove(&self.now) {
+                    for gi in gates {
+                        if let Err(e) = self.commit_gate(gi, sink) {
+                            return self.finish_out(sink, Some(e));
+                        }
+                    }
+                    cascades += 1;
+                    if cascades > 100_000 {
+                        return self.finish_out(sink, Some(RunError("gate cascade exceeds 100000 updates in one slot".into())));
+                    }
+                }
                 // 4. Monitor region: $strobe (source order) then $monitor
                 // (on-change, at most once per slot, t0 arm) — design §4.
                 if let Err(e) = self.run_monitor_region(sink) {
                     return self.finish_out(sink, Some(e));
                 }
-                if self.active.is_empty() && self.inactive.is_empty() && self.nba.is_empty() {
+                if self.active.is_empty()
+                    && self.inactive.is_empty()
+                    && self.nba.is_empty()
+                    && !self.gate_due.contains_key(&self.now)
+                {
                     break;
                 }
             }
             // Slot settled: flush dump changes under this time.
             sink.flush_slot(self.now);
-            // Advance the wheel.
-            let Some((at, wake)) = self.wheel.pop_first() else {
-                break; // no more events: natural stop (exit 0)
+            // Advance the wheel: threads and pending gate updates both.
+            let next_thread = self.wheel.keys().next().copied();
+            let next_gate = self.gate_due.keys().next().copied();
+            let at = match (next_thread, next_gate) {
+                (Some(a), Some(b)) => a.min(b),
+                (Some(a), None) => a,
+                (None, Some(b)) => b,
+                (None, None) => break, // no more events: natural stop (exit 0)
             };
             self.now = at;
-            for ti in wake {
-                self.threads[ti].status = Status::Ready;
-                self.active.push_back(ti);
+            if next_thread == Some(at) {
+                let (_, wake) = self.wheel.pop_first().unwrap();
+                for ti in wake {
+                    self.threads[ti].status = Status::Ready;
+                    self.active.push_back(ti);
+                }
             }
         }
         self.finish_out(sink, None)
@@ -551,9 +618,15 @@ impl Kernel {
                     let r = dyn_part(&vv, &hv, &lv)?;
                     self.set_slot(ti, dst, r);
                 }
+                Op::LoadElem { dst, var, idx } => {
+                    let iv = self.slot(ti, idx)?.clone();
+                    let r = self.load_elem(var, &iv)?;
+                    self.set_slot(ti, dst, r);
+                }
                 Op::AssignBlk { lv, src } => {
                     let val = self.slot(ti, src)?.clone();
-                    self.commit(&lv, val, sink)?;
+                    let resolved = self.resolve_lvalue(ti, &lv)?;
+                    self.commit(&resolved, val, sink)?;
                 }
                 Op::AssignNba { lv, src } => {
                     let val = self.slot(ti, src)?.clone();
@@ -663,6 +736,54 @@ impl Kernel {
                             last: None,
                         });
                         self.monitor_enabled = true;
+                    }
+                    SysId::Stop => {
+                        // rivD2: default = iverilog's banner + CONTINUE
+                        // (EOF semantics; we never read stdin); -n makes
+                        // $stop equivalent to $finish.
+                        if self.stop_as_finish {
+                            self.finished = Some((file, line));
+                            self.threads[ti].status = Status::Done;
+                            return Ok(Resume::None);
+                        }
+                        let num = unit_ratio(&self.d.meta.timescale).unwrap_or(1).max(1) as u64;
+                        let _ = num;
+                        self.out.push_str(&format!(
+                            "** VVP Stop(0) **\n** Flushing output streams.\n** Current simulation time is {} ticks.\n** Resuming simulation forever.\n",
+                            self.now
+                        ));
+                    }
+                    SysId::ReadmemH | SysId::ReadmemB => {
+                        let path = fmt
+                            .and_then(|f| self.d.strs.get(f as usize))
+                            .and_then(|p| p.first())
+                            .map(|p| match p {
+                                FmtPiece::Text(t) => t.clone(),
+                                _ => String::new(),
+                            })
+                            .unwrap_or_default();
+                        let var = args.first().map(|a| a.slot as VarId).ok_or_else(|| {
+                            RunError("readmem without a memory argument".into())
+                        })?;
+                        let mut bounds: Vec<Option<u64>> = Vec::new();
+                        for a in args[1..3.min(args.len())].iter() {
+                            if a.width == 0 {
+                                bounds.push(None);
+                            } else {
+                                let v = self.slot(ti, a.slot)?.clone();
+                                if v.has_unknown() {
+                                    return Err(RunError("readmem bound is unknown".into()));
+                                }
+                                bounds.push(Some(v.to_u128_lossy() as u64));
+                            }
+                        }
+                        self.run_readmem(id == SysId::ReadmemH, &path, var, bounds, sink)?;
+                    }
+                    SysId::Trigger => {
+                        let ev = args.first().map(|a| a.slot as VarId).ok_or_else(|| {
+                            RunError("-> trigger without an event".into())
+                        })?;
+                        self.fire_event(ev)?;
                     }
                     SysId::MonitorOff => self.monitor_enabled = false,
                     SysId::MonitorOn => self.monitor_enabled = true,
@@ -803,6 +924,9 @@ impl Kernel {
                         | Lval::Bit { var, .. }
                         | Lval::Part { var, .. }
                         | Lval::PartDyn { var, .. } => var,
+                        Lval::Elem { .. } => {
+                            return Err(RunError("force on array elements is not supported".into()))
+                        }
                         Lval::Concat { .. } => {
                             return Err(RunError("force on a concatenation is not supported".into()))
                         }
@@ -826,6 +950,9 @@ impl Kernel {
                         | Lval::Bit { var, .. }
                         | Lval::Part { var, .. }
                         | Lval::PartDyn { var, .. } => var,
+                        Lval::Elem { .. } => {
+                            return Err(RunError("release on array elements is not supported".into()))
+                        }
                         Lval::Concat { .. } => {
                             return Err(RunError("release on a concatenation is not supported".into()))
                         }
@@ -1040,6 +1167,15 @@ impl Kernel {
                 }
             }
             Lval::Part { .. } => lv.clone(),
+            // Array element with a known index folds into the Part
+            // encoding below; unknown indices become the no-op Bit form.
+            Lval::Elem { var, idx } => {
+                let iv = self.slot(ti, *idx)?.clone();
+                match self.elem_index(*var, &iv)? {
+                    Some(abs) => Lval::Part { var: *var, hi: abs as u32, lo: abs as u32 },
+                    None => Lval::Bit { var: *var, idx: *idx },
+                }
+            }
             Lval::PartDyn { var, hi, lo } => {
                 let hv = self.slot(ti, *hi)?.clone();
                 let lv2 = self.slot(ti, *lo)?.clone();
@@ -1086,8 +1222,17 @@ impl Kernel {
             // dynamic bounds before NBA scheduling, and elaboration only
             // emits dynamic loads for `+:`/`-:` (unsupported, hard-errored).
             Lval::PartDyn { .. } => unreachable!("unresolved dynamic part in commit"),
+            Lval::Elem { .. } => unreachable!("unresolved array element in commit"),
             Lval::Part { var, hi, lo } => {
                 let vi = self.d.vars[*var as usize].clone();
+                // Resolved array element (resolve_lvalue encodes the
+                // absolute element index in hi==lo; presence in the arrays
+                // section is the criterion).
+                if self.array_dims.get(*var as usize).map_or(false, |d| d.is_some()) {
+                    let w = vi.width;
+                    let part_val = val.trunc(w).map_err(|e| RunError(e.0))?;
+                    return self.store_elem(*var, *hi as u64, part_val, sink);
+                }
                 let w = hi.abs_diff(*lo) + 1;
                 if *hi >= vi.width {
                     return Ok(()); // out-of-range write: no effect
@@ -1133,7 +1278,8 @@ impl Kernel {
     }
 
     /// Wake suspended threads whose wait matches this change (thread-index
-    /// order = declaration order, ADR-0001).
+    /// order = declaration order, ADR-0001), then re-evaluate gates that
+    /// watch this var (inertial scheduling).
     fn wake(&mut self, var: VarId, old: &Bits, new: &Bits) {
         for ti in 0..self.threads.len() {
             let items = match &self.threads[ti].status {
@@ -1156,6 +1302,197 @@ impl Kernel {
                 }
             }
         }
+        for gi in 0..self.d.gates.len() {
+            let g = &self.d.gates[gi];
+            if g.out == var || g.inputs.iter().any(|i| *i == var) {
+                self.eval_gate(gi);
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Named events (R4-e)
+    // ------------------------------------------------------------------
+
+    /// `-> ev`: wake threads currently waiting on the event var (IEEE:
+    /// a trigger with no waiter is lost). Event vars carry no value.
+    fn fire_event(&mut self, ev: VarId) -> Result<(), RunError> {
+        if self.d.vars.get(ev as usize).map(|v| v.kind) != Some(VarKind::Event) {
+            return Err(RunError(format!("`->` target var {} is not an event", ev)));
+        }
+        for ti in 0..self.threads.len() {
+            let items = match &self.threads[ti].status {
+                Status::Wait(items) => items.clone(),
+                _ => continue,
+            };
+            if items.iter().any(|i| i.var == ev && i.edge == EdgeKind::Any) {
+                self.threads[ti].status = Status::Ready;
+                self.active.push_back(ti);
+            }
+        }
+        Ok(())
+    }
+
+    // ------------------------------------------------------------------
+    // Unpacked arrays (R4-c)
+    // ------------------------------------------------------------------
+
+    /// Declared element index → storage position; None for unknown/OOB.
+    fn elem_index(&self, var: VarId, idx: &Bits) -> Result<Option<u64>, RunError> {
+        if idx.has_unknown() {
+            return Ok(None);
+        }
+        let Some(Some((lo, hi))) = self.array_dims.get(var as usize) else {
+            return Err(RunError(format!("var {} is not an array", var)));
+        };
+        let i = idx.to_u128_lossy() as u64;
+        Ok(if i >= *lo && i <= *hi { Some(i - lo) } else { None })
+    }
+
+    fn load_elem(&self, var: VarId, idx: &Bits) -> Result<Bits, RunError> {
+        let w = self.d.vars[var as usize].width;
+        match self.elem_index(var, idx)? {
+            Some(abs) => Ok(self.arrays[var as usize][abs as usize].clone()),
+            None => Bits::all_x(w).map_err(|e| RunError(e.0)),
+        }
+    }
+
+    /// Element write: value change wakes waiters on the ARRAY var (the
+    /// @*/cont-assign read set uses the var id; per-element granularity is
+    /// coarser than IEEE but conservative-correct for wake purposes).
+    fn store_elem(&mut self, var: VarId, abs: u64, val: Bits, sink: &mut dyn DumpSink) -> Result<(), RunError> {
+        let slot = self
+            .arrays
+            .get_mut(var as usize)
+            .and_then(|a| a.get_mut(abs as usize))
+            .ok_or_else(|| RunError(format!("element {} out of range for var {}", abs, var)))?;
+        if *slot == val {
+            return Ok(());
+        }
+        let old = slot.clone();
+        *slot = val.clone();
+        let _ = old;
+        // Per-element VCD dump is R5 (riv_vcd gate); flat dumps skip arrays.
+        let _ = sink;
+        self.wake(var, &old, &val);
+        Ok(())
+    }
+
+    /// $readmemh/$readmemb (R4-c, pulled forward from R5): whitespace-
+    /// separated tokens, @addr jumps, // and /* */ comments, x/z digits;
+    /// optional start/finish bounds (absent args carry width 0).
+    fn run_readmem(
+        &mut self,
+        hex: bool,
+        path: &str,
+        var: VarId,
+        bounds: Vec<Option<u64>>,
+        sink: &mut dyn DumpSink,
+    ) -> Result<(), RunError> {
+        if self.d.vars.get(var as usize).map(|v| v.kind) != Some(VarKind::Array) {
+            return Err(RunError("readmem target is not a memory".into()));
+        }
+        let text = std::fs::read_to_string(path).map_err(|e| RunError(format!("readmem `{path}`: {e}")))?;
+        let Some(Some((lo, hi))) = self.array_dims.get(var as usize).copied() else {
+            return Err(RunError("readmem target is not a memory".into()));
+        };
+        let start = bounds.first().copied().flatten().unwrap_or(lo);
+        let finish = bounds.get(1).copied().flatten().unwrap_or(hi);
+        let w = self.d.vars[var as usize].width;
+        // Strip comments, then tokenize.
+        let mut clean = String::with_capacity(text.len());
+        let bytes: Vec<char> = text.chars().collect();
+        let mut i = 0usize;
+        while i < bytes.len() {
+            let c = bytes[i];
+            if c == '/' && bytes.get(i + 1) == Some(&'/') {
+                while i < bytes.len() && bytes[i] != '\n' {
+                    i += 1;
+                }
+            } else if c == '/' && bytes.get(i + 1) == Some(&'*') {
+                i += 2;
+                while i + 1 < bytes.len() && !(bytes[i] == '*' && bytes[i + 1] == '/') {
+                    i += 1;
+                }
+                i = (i + 2).min(bytes.len());
+            } else {
+                clean.push(c);
+                i += 1;
+            }
+        }
+        let mut addr: u64 = start;
+        for tok in clean.split_whitespace() {
+            if let Some(rest) = tok.strip_prefix('@') {
+                addr = rest.parse::<u64>().map_err(|_| RunError(format!("readmem bad address `{rest}`")))?;
+                continue;
+            }
+            if addr > finish {
+                break;
+            }
+            let bits = from_numlit_parts(Some(w), false, if hex { VB::Hex } else { VB::Bin }, &tok.to_ascii_lowercase())
+                .map_err(|e| RunError(format!("readmem token `{tok}`: {}", e.0)))?;
+            let abs = addr.checked_sub(lo).ok_or_else(|| RunError("readmem address below the array range".to_string()))?;
+            self.store_elem(var, abs, bits, sink)?;
+            addr += 1;
+        }
+        Ok(())
+    }
+
+    // ------------------------------------------------------------------
+    // Gate primitives (R4-d): 4-state tables + inertial scheduling
+    // ------------------------------------------------------------------
+
+    /// Effective gate output: the pending value if one is scheduled, else
+    /// the stored var.
+    fn gate_current(&self, gi: usize) -> Bits {
+        if let Some(Some((_, v))) = self.gate_pending.get(gi) {
+            return v.clone();
+        }
+        let out = self.d.gates[gi].out;
+        self.vars[out as usize].clone()
+    }
+
+    /// Evaluate gate gi's table with current inputs; a delta vs the
+    /// effective output reschedules the pending update (pure inertial: the
+    /// previous pending entry is cancelled).
+    fn eval_gate(&mut self, gi: usize) {
+        let g = self.d.gates[gi].clone();
+        let inputs: Vec<Bits> = g.inputs.iter().map(|v| self.vars[*v as usize].clone()).collect();
+        let out = gate_table(g.kind, &inputs);
+        let cur = self.gate_current(gi);
+        if out == cur {
+            return;
+        }
+        // Transition-selected delay (IEEE §7.7): to 1 = rise, to 0 = fall,
+        // to z = turn-off, to x = min of the delays used.
+        let delay = gate_delay(g.rise, g.fall, g.turnoff, &out);
+        // Cancel any pending entry for this gate.
+        if let Some(Some((at, _))) = self.gate_pending.get(gi).cloned() {
+            if let Some(v) = self.gate_due.get_mut(&at) {
+                v.retain(|x| *x != gi);
+                if v.is_empty() {
+                    self.gate_due.remove(&at);
+                }
+            }
+        }
+        let at = self.now.saturating_add(delay);
+        self.gate_pending[gi] = Some((at, out));
+        self.gate_due.entry(at).or_default().push(gi);
+    }
+
+    /// Commit a due gate update (the slot loop drains `gate_due` at `now`).
+    fn commit_gate(&mut self, gi: usize, sink: &mut dyn DumpSink) -> Result<(), RunError> {
+        let Some(Some((at, val))) = self.gate_pending.get(gi).cloned() else {
+            return Ok(());
+        };
+        if at != self.now {
+            // Re-scheduled for later by a newer evaluation.
+            self.gate_due.entry(at).or_default().push(gi);
+            return Ok(());
+        }
+        self.gate_pending[gi] = None;
+        let out = self.d.gates[gi].out;
+        self.store_var(out, val, sink)
     }
 
     // ------------------------------------------------------------------
@@ -1356,6 +1693,11 @@ impl Kernel {
                     let r = dyn_part(&vv, &hv, &lv)?;
                     self.set_slot(ti, *dst, r);
                 }
+                Op::LoadElem { dst, var, idx } => {
+                    let iv = self.slot(ti, *idx)?.clone();
+                    let r = self.load_elem(*var, &iv)?;
+                    self.set_slot(ti, *dst, r);
+                }
                 Op::ScaleTime { dst, src, num, den } => {
                     let sv = self.slot(ti, *src)?.clone();
                     if sv.has_unknown() {
@@ -1531,6 +1873,7 @@ fn op_tag(op: &Op) -> &'static str {
         Op::LoadBit { .. } => "loadbit",
         Op::LoadPart { .. } => "loadpart",
         Op::LoadPartDyn { .. } => "loadpartdyn",
+        Op::LoadElem { .. } => "loadelem",
         Op::AssignBlk { .. } => "assignblk",
         Op::AssignNba { .. } => "assignnba",
         Op::Branch { .. } => "branch",
@@ -1588,6 +1931,152 @@ fn edge_fire(old: &Bits, new: &Bits, pos: bool) -> bool {
                 | (false, true, false, false)
                 | (true, true, false, false)
         )
+    }
+}
+
+/// One-bit 4-state value classification.
+#[derive(Clone, Copy, PartialEq)]
+enum B4 {
+    Zero,
+    One,
+    X,
+    Z,
+}
+
+fn b4(v: &Bits) -> B4 {
+    if v.width == 0 {
+        return B4::X;
+    }
+    let lsb = v.part(0, 0).unwrap();
+    if lsb.has_unknown() {
+        // vl-values layout: z = (data 1, mask 1), x = (data 0, mask 1).
+        let data = lsb.to_u128_lossy() & 1 == 1;
+        if data {
+            B4::Z
+        } else {
+            B4::X
+        }
+    } else if lsb.to_u128_lossy() & 1 == 1 {
+        B4::One
+    } else {
+        B4::Zero
+    }
+}
+
+fn b4_bits(v: B4) -> Bits {
+    match v {
+        B4::Zero => vl_values::from_numlit_parts(Some(1), false, VB::Bin, "0").unwrap(),
+        B4::One => vl_values::from_numlit_parts(Some(1), false, VB::Bin, "1").unwrap(),
+        B4::X => Bits::all_x(1).unwrap(),
+        B4::Z => vl_values::from_numlit_parts(Some(1), false, VB::Bin, "z").unwrap(),
+    }
+}
+
+/// IEEE §7 gate tables (1-bit): and/nand/or/nor/xor/xnor two-or-more
+/// inputs, buf/not one input, bufif/notif with z when disabled.
+fn gate_table(kind: GateKind, inputs: &[Bits]) -> Bits {
+    let vals: Vec<B4> = inputs.iter().map(b4).collect();
+    let out = match kind {
+        GateKind::And | GateKind::Nand => {
+            let mut acc = B4::One;
+            for v in &vals {
+                acc = match (acc, v) {
+                    (B4::Zero, _) | (_, B4::Zero) => B4::Zero,
+                    (B4::One, B4::One) => B4::One,
+                    _ => B4::X,
+                };
+            }
+            if kind == GateKind::Nand {
+                not4(acc)
+            } else {
+                acc
+            }
+        }
+        GateKind::Or | GateKind::Nor => {
+            let mut acc = B4::Zero;
+            for v in &vals {
+                acc = match (acc, v) {
+                    (B4::One, _) | (_, B4::One) => B4::One,
+                    (B4::Zero, B4::Zero) => B4::Zero,
+                    _ => B4::X,
+                };
+            }
+            if kind == GateKind::Nor {
+                not4(acc)
+            } else {
+                acc
+            }
+        }
+        GateKind::Xor | GateKind::Xnor => {
+            if vals.iter().any(|v| matches!(v, B4::X | B4::Z)) {
+                B4::X
+            } else {
+                let par = vals.iter().filter(|v| **v == B4::One).count() % 2 == 1;
+                let r = if par { B4::One } else { B4::Zero };
+                if kind == GateKind::Xnor {
+                    not4(r)
+                } else {
+                    r
+                }
+            }
+        }
+        GateKind::Buf => vals.first().copied().unwrap_or(B4::X),
+        GateKind::Not => not4(vals.first().copied().unwrap_or(B4::X)),
+        GateKind::Bufif0 | GateKind::Notif0 | GateKind::Bufif1 | GateKind::Notif1 => {
+            let data = vals.first().copied().unwrap_or(B4::X);
+            let en = vals.get(1).copied().unwrap_or(B4::X);
+            let active = matches!(kind, GateKind::Bufif0 | GateKind::Notif0)
+                == (en == B4::Zero);
+            match en {
+                B4::Zero | B4::One => {
+                    if active {
+                        let d = if matches!(kind, GateKind::Notif0 | GateKind::Notif1) {
+                            not4(data)
+                        } else {
+                            data
+                        };
+                        // buf gating is by the ENABLE level: bufif0 passes
+                        // data when en==0, bufif1 when en==1.
+                        if (en == B4::Zero) == matches!(kind, GateKind::Bufif0 | GateKind::Notif0) {
+                            d
+                        } else {
+                            B4::Z
+                        }
+                    } else {
+                        B4::Z
+                    }
+                }
+                _ => {
+                    // Unknown enable: x unless the output would be z
+                    // anyway (data z keeps z).
+                    if data == B4::Z {
+                        B4::Z
+                    } else {
+                        B4::X
+                    }
+                }
+            }
+        }
+    };
+    b4_bits(out)
+}
+
+fn not4(v: B4) -> B4 {
+    match v {
+        B4::Zero => B4::One,
+        B4::One => B4::Zero,
+        B4::X | B4::Z => B4::X,
+    }
+}
+
+/// Transition-selected delay (IEEE §7.7.3): to 1 = rise, to 0 = fall,
+/// to z = turn-off, to x = min of the applicable delays.
+fn gate_delay(rise: u64, fall: u64, turnoff: u64, new: &Bits) -> u64 {
+    match b4(new) {
+        B4::One => rise,
+        B4::Zero => fall,
+        B4::Z => turnoff,
+        B4::X => * [rise, fall, turnoff].iter().filter(|d| **d > 0).min().unwrap_or(&0),
     }
 }
 
@@ -1754,6 +2243,10 @@ mod tests {
         Var { id, name: name.into(), width: w, signed: false, kind: VarKind::Reg, init: None, msb: w - 1, lsb: 0 }
     }
 
+    fn net(id: u32, name: &str, w: u32) -> Var {
+        Var { id, name: name.into(), width: w, signed: false, kind: VarKind::Net, init: None, msb: w - 1, lsb: 0 }
+    }
+
     fn meta(top: &str) -> riv_ir::Meta {
         riv_ir::Meta {
             top: top.into(),
@@ -1784,6 +2277,7 @@ mod tests {
             vars: vec![var(0, "a", 1)],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -1869,6 +2363,7 @@ mod tests {
             vars: vec![var(0, "q", 4)],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -1937,6 +2432,7 @@ mod tests {
             vars: vec![var(0, "clk", 1), var(1, "hits", 8)],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -1999,6 +2495,7 @@ mod tests {
             vars: vec![],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -2047,6 +2544,7 @@ mod tests {
             vars: vec![var(0, "c", 8)],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -2130,6 +2628,7 @@ mod tests {
             vars: vec![],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -2185,6 +2684,7 @@ mod tests {
             vars: vec![var(0, "s", 2), var(1, "r", 8)],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -2247,6 +2747,7 @@ mod tests {
             vars: vec![var(0, "o1", 8), var(1, "o2", 8)],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -2316,6 +2817,7 @@ mod tests {
             vars: vec![],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -2380,6 +2882,7 @@ mod tests {
             vars: vec![var(0, "r", 1), var(1, "w", 1)],
             arrays: vec![],
             assigns: vec![],
+            gates: vec![],
             threads: vec![],
             funcs: vec![],
             strs: vec![],
@@ -2468,6 +2971,152 @@ mod tests {
             out.output,
             "r=1 w=1\nr=1 w=1\nr=1 w=1\ntb.v:8: $finish called at 2000 (1ps)\n"
         );
+    }
+
+    /// R4-a probe: blocking assignments to bit selects and array elements
+    /// (the latent no-op commit path — blocking bit writes were silently
+    /// dropped before resolve_lvalue routing; found while wiring arrays).
+    #[test]
+    fn blocking_bit_and_elem_assigns_commit() {
+        let mut d = Design {
+            meta: meta("tb"),
+            vars: vec![var(0, "q", 4), var(1, "mem", 8)],
+            arrays: vec![riv_ir::ArrayDim { var: 1, dims: vec![(2, 0)] }],
+            assigns: vec![],
+            gates: vec![],
+            threads: vec![],
+            funcs: vec![],
+            strs: vec![],
+        };
+        let _ = &mut d;
+        let mut d2 = Design {
+            meta: meta("tb"),
+            vars: vec![var(0, "q", 4), var(1, "mem", 8)],
+            arrays: vec![riv_ir::ArrayDim { var: 1, dims: vec![(2, 0)] }],
+            assigns: vec![],
+            gates: vec![],
+            threads: vec![],
+            funcs: vec![],
+            strs: vec![],
+        };
+        d2.threads.push(Thread {
+            kind: ThreadKind::Initial,
+            sens: vec![],
+            frame_len: 2,
+            body: vec![
+                // q[1] = 1'b1 (dynamic index in a slot)
+                Op::Const { dst: 0, lit: lit_dec(4, 1) },
+                Op::Const { dst: 1, lit: lit_dec(1, 1) },
+                Op::AssignBlk { lv: Lval::Bit { var: 0, idx: 0 }, src: 1 },
+                // mem[2] = 8'hA5
+                Op::Const { dst: 0, lit: lit_dec(4, 2) },
+                Op::Const { dst: 1, lit: Literal { width: 8, signed: false, base: Base::Hex, digits: "a5".into() } },
+                Op::AssignBlk { lv: Lval::Elem { var: 1, idx: 0 }, src: 1 },
+                Op::EndThread,
+            ],
+        });
+        let mut k = Kernel::new(d2).unwrap();
+        let out = k.run(&mut NoDump);
+        assert_eq!(out.exit, 0);
+        assert_eq!(k.vars[0].fmt_bin(), "xx1x", "q[1] blocking write committed (unwritten bits stay x)");
+        assert_eq!(k.arrays[1][2].fmt_hex(), "a5", "mem[2] blocking write committed");
+    }
+
+    /// R4-d probe: the inertial cancel window. `nand #6 g(y, x, x)` with a
+    /// 4-tick pulse (x 0→1 at t3, back at t7) must NOT produce the
+    /// transport glitch — the pending rise at t13 is the only update.
+    #[test]
+    fn gate_delay_is_inertial_not_transport() {
+        let mut d = Design {
+            meta: meta("tb"),
+            vars: vec![var(0, "x", 1), net(1, "y", 1)],
+            arrays: vec![],
+            assigns: vec![],
+            gates: vec![riv_ir::Gate {
+                kind: riv_ir::GateKind::Nand,
+                out: 1,
+                inputs: vec![0, 0],
+                rise: 6000,
+                fall: 6000,
+                turnoff: 0,
+            }],
+            threads: vec![],
+            funcs: vec![],
+            strs: vec![],
+        };
+        // x: =0 at t0, =1 at t3, =0 at t7 (pulse shorter than the delay).
+        d.threads.push(Thread {
+            kind: ThreadKind::Initial,
+            sens: vec![],
+            frame_len: 1,
+            body: vec![
+                Op::Const { dst: 0, lit: lit_dec(1, 0) },
+                Op::AssignBlk { lv: Lval::Var { var: 0 }, src: 0 },
+                Op::Const { dst: 0, lit: lit_dec(64, 3000) },
+                Op::Delay { amount: 0 },
+                Op::Const { dst: 0, lit: lit_dec(1, 1) },
+                Op::AssignBlk { lv: Lval::Var { var: 0 }, src: 0 },
+                Op::Const { dst: 0, lit: lit_dec(64, 4000) },
+                Op::Delay { amount: 0 },
+                Op::Const { dst: 0, lit: lit_dec(1, 0) },
+                Op::AssignBlk { lv: Lval::Var { var: 0 }, src: 0 },
+                Op::Const { dst: 0, lit: lit_dec(64, 10_000) },
+                Op::Delay { amount: 0 },
+                Op::EndThread,
+            ],
+        });
+        let mut k = Kernel::new(d).unwrap();
+        let out = k.run(&mut NoDump);
+        assert_eq!(out.exit, 0);
+        // Inertial: the t9 fall is cancelled by the t7 re-rise → y goes
+        // straight to 1 at t13 (x's t7 pulse never reaches the output).
+        assert_eq!(k.vars[1].fmt_bin(), "1", "y settles to 1 at t13");
+    }
+
+    /// R4-d probe: bufif1 z-drive on disable (54_gates never observes it —
+    /// en=0 arrives after the last display).
+    #[test]
+    fn bufif_disable_drives_z() {
+        let mut d = Design {
+            meta: meta("tb"),
+            vars: vec![var(0, "a", 1), var(1, "en", 1), net(2, "w", 1)],
+            arrays: vec![],
+            assigns: vec![],
+            gates: vec![riv_ir::Gate {
+                kind: riv_ir::GateKind::Bufif1,
+                out: 2,
+                inputs: vec![0, 1],
+                rise: 0,
+                fall: 0,
+                turnoff: 0,
+            }],
+            threads: vec![],
+            funcs: vec![],
+            strs: vec![],
+        };
+        d.threads.push(Thread {
+            kind: ThreadKind::Initial,
+            sens: vec![],
+            frame_len: 1,
+            body: vec![
+                Op::Const { dst: 0, lit: lit_dec(1, 1) }, // a = 1
+                Op::AssignBlk { lv: Lval::Var { var: 0 }, src: 0 },
+                Op::Const { dst: 0, lit: lit_dec(1, 1) }, // en = 1
+                Op::AssignBlk { lv: Lval::Var { var: 1 }, src: 0 },
+                Op::Const { dst: 0, lit: lit_dec(64, 1000) },
+                Op::Delay { amount: 0 },
+                Op::Const { dst: 0, lit: lit_dec(1, 0) }, // en = 0 → z
+                Op::AssignBlk { lv: Lval::Var { var: 1 }, src: 0 },
+                Op::Const { dst: 0, lit: lit_dec(64, 1000) },
+                Op::Delay { amount: 0 },
+                Op::EndThread,
+            ],
+        });
+        let mut k = Kernel::new(d).unwrap();
+        let out = k.run(&mut NoDump);
+        assert_eq!(out.exit, 0);
+        // a=1, en=1 → w=1; en→0 → w=z (zero turnoff delay).
+        assert_eq!(k.vars[2].fmt_bin(), "z", "bufif1 disabled drives z");
     }
 
     /// IEEE edge tables: x→1 is a posedge, 1→x is a negedge (10_gates

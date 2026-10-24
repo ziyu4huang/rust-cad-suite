@@ -220,7 +220,7 @@ pub fn eval_ops(ops: &[Op], frame: &mut Vec<Bits>) -> Result<Bits, NotConst> {
                 last = r.clone();
                 frame[*dst as usize] = r;
             }
-            Op::LoadVar { .. } | Op::LoadBit { .. } | Op::LoadPart { .. } | Op::LoadPartDyn { .. } => {
+            Op::LoadVar { .. } | Op::LoadBit { .. } | Op::LoadPart { .. } | Op::LoadPartDyn { .. } | Op::LoadElem { .. } => {
                 return Err(NotConst(
                     "reads a non-constant variable".into(),
                 ))
