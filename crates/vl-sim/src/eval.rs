@@ -27,7 +27,7 @@ impl Val {
     /// Bits view (strings pack as ASCII, MSB = first char; §2.6.1).
     pub fn to_bits(&self, span: Span) -> SResult<(Bits, bool)> {
         match self {
-            Val::Bits { bits, signed } => Ok((*bits, *signed)),
+            Val::Bits { bits, signed } => Ok((bits.clone(), *signed)),
             Val::Str(s) => Ok((str_bits(s, span)?, false)),
         }
     }
@@ -153,7 +153,14 @@ pub fn nat_width(e: &Expr, ctx: &mut dyn Lookup) -> SResult<u32> {
         }
         Expr::Repeat { span, count, value } => {
             let c = const_u64(count, ctx, *span)?;
-            (nat_width(value, ctx)? as u64 * c) as u32
+            let total = nat_width(value, ctx)? as u64 * c;
+            if total > value::MAX_WIDTH as u64 {
+                return Err(SimError::at(
+                    format!("repetition width {total} exceeds the {}-bit limit", value::MAX_WIDTH),
+                    *span,
+                ));
+            }
+            total as u32
         }
         Expr::HierDot { span, .. } => {
             let _ = span;
@@ -172,7 +179,7 @@ pub fn nat_width(e: &Expr, ctx: &mut dyn Lookup) -> SResult<u32> {
         Expr::PartSelect { span, msb, lsb, .. } => {
             let m = const_i64_expr(msb, ctx, *span)?;
             let l = const_i64_expr(lsb, ctx, *span)?;
-            (m - l).unsigned_abs() as u32 + 1
+            value::range_width(m, l).map_err(|e| SimError::at(e.0, *span))?
         }
         Expr::IndexedPart { span, width, .. } => const_u64(width, ctx, *span)? as u32,
         Expr::Call { span, func, args } => match func.as_str() {
@@ -258,7 +265,7 @@ pub fn eval_ctx(e: &Expr, ctx: &mut dyn Lookup, lhs_w: u32) -> SResult<Val> {
     }
     let nw = nat_width(e, ctx)?;
     let s = is_signed(e, ctx)?;
-    let w = lhs_w.max(nw).min(value::MAX_WIDTH);
+    let w = lhs_w.max(nw);
     let bits = eval_w(e, ctx, w, s)?;
     let bits = if s { bits.sadjust(lhs_w)? } else { bits.uadjust(lhs_w)? };
     Ok(Val::Bits { bits, signed: s })
@@ -345,37 +352,22 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                     BinOp::Sub => a.sub(&b)?,
                     BinOp::Mul => a.mul(&b)?,
                     BinOp::Div => {
-                        if signed && a.is_known() && b.is_known() && b.to_u128_lossy() != 0 {
-                            let q = a.to_i128_lossy().wrapping_div(b.to_i128_lossy());
-                            Bits::from_u128(w, (q as u128) & value::low_bits(w))?
+                        if signed {
+                            a.sdiv(&b)?
                         } else {
                             a.div(&b)?
                         }
                     }
                     BinOp::Mod => {
-                        if signed && a.is_known() && b.is_known() && b.to_u128_lossy() != 0 {
-                            let q = a.to_i128_lossy().wrapping_rem(b.to_i128_lossy());
-                            Bits::from_u128(w, (q as u128) & value::low_bits(w))?
+                        if signed {
+                            a.srem(&b)?
                         } else {
                             a.rem(&b)?
                         }
                     }
                     _ => {
-                        if signed && a.is_known() && b.is_known() {
-                            // Signed power per §5.1.5 table (base/exponent sign cases).
-                            let base = a.to_i128_lossy();
-                            let exp = b.to_i128_lossy();
-                            let r: i128 = if exp < 0 {
-                                match base {
-                                    1 => 1,
-                                    -1 => if exp % 2 == 0 { 1 } else { -1 },
-                                    0 => return Ok(Bits::all_x(w)?),
-                                    _ => 0,
-                                }
-                            } else {
-                                base.checked_pow(exp.min(126) as u32).unwrap_or(0)
-                            };
-                            Bits::from_u128(w, (r as u128) & value::low_bits(w))?
+                        if signed {
+                            a.spow(&b)?
                         } else {
                             a.pow(&b)?
                         }
@@ -413,28 +405,24 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                     BinOp::EqCase => a.case_eq(&b)?,
                     BinOp::NeCase => a.case_eq(&b)?.bit_not(),
                     _ => {
-                        if a.has_unknown() || b.has_unknown() {
-                            Bits::all_x(1)?
+                        let ord = if cs {
+                            a.cmp_signed(&b)
                         } else {
-                            let res = if cs {
-                                let (x, y) = (a.to_i64_lossy(), b.to_i64_lossy());
-                                match op {
-                                    BinOp::Lt => x < y,
-                                    BinOp::Le => x <= y,
-                                    BinOp::Gt => x > y,
-                                    _ => x >= y,
-                                }
-                            } else {
-                                let (x, y) = (a.to_u64_lossy(), b.to_u64_lossy());
-                                match op {
-                                    BinOp::Lt => x < y,
-                                    BinOp::Le => x <= y,
-                                    BinOp::Gt => x > y,
-                                    _ => x >= y,
-                                }
-                            };
-                            Bits::from_u64(1, res as u64)?
-                        }
+                            a.cmp_unsigned(&b)
+                        };
+                        // Limb-aware compare — the pre-M8 paths truncated
+                        // through i64 and diverged from the oracle at
+                        // 65..=128 bits (live bug, pinned in value.rs tests).
+                        let res = match ord {
+                            None => return ext(Bits::all_x(1)?, false, w),
+                            Some(o) => match op {
+                                BinOp::Lt => o.is_lt(),
+                                BinOp::Le => o.is_le(),
+                                BinOp::Gt => o.is_gt(),
+                                _ => o.is_ge(),
+                            },
+                        };
+                        Bits::from_u64(1, res as u64)?
                     }
                 };
                 ext(r, false, w)
@@ -540,7 +528,7 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                 (Some(h), Some(l2)) if h >= 0 && l2 >= 0 && (h.max(l2) as u32) < b.width => {
                     b.part(h as u32, l2 as u32)?
                 }
-                _ => Bits::all_x((m - l).unsigned_abs() as u32 + 1)?,
+                _ => Bits::all_x(value::range_width(m, l)?)?,
             };
             ext(r, false, w)
         }
@@ -583,9 +571,7 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                     if b.has_unknown() {
                         Bits::all_x(32)?
                     } else {
-                        let v = b.to_u64_lossy();
-                        let r = if v <= 1 { 0 } else { 64 - (v - 1).leading_zeros() as u64 };
-                        Bits::from_u64(32, r)?
+                        Bits::from_u64(32, b.clog2().map_err(|e| SimError::at(e.0, *span))?)?
                     }
                 }
                 "$time" | "$stime" => {

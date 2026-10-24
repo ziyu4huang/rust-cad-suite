@@ -485,23 +485,19 @@ impl Sim {
                 }
                 let width = 64 - (data | mask).leading_zeros().max(1);
                 let _ = width;
-                Bits {
-                    width: 64,
-                    data: data as u128,
-                    mask: mask as u128,
-                }
+                Bits::n(64, data as u128, mask as u128)
             }
-            VpiValue::Scalar(sc) => Bits {
-                width: 1,
-                data: match sc {
+            VpiValue::Scalar(sc) => Bits::n(
+                1,
+                match sc {
                     Scalar::One | Scalar::Z => 1,
                     _ => 0,
                 },
-                mask: match sc {
+                match sc {
                     Scalar::X | Scalar::Z => 1,
                     _ => 0,
                 },
-            },
+            ),
             VpiValue::Time(_) => {
                 return Err(SimError::new("cannot put a Time value", None));
             }
@@ -730,8 +726,8 @@ impl Sim {
 }
 
 fn scalar_of(b: &Bits) -> Scalar {
-    let unknown = b.mask & 1 != 0;
-    let bit = b.data & 1 != 0;
+    let unknown = b.low_mask() & 1 != 0;
+    let bit = b.low_data() & 1 != 0;
     match (unknown, bit) {
         (false, false) => Scalar::Zero,
         (false, true) => Scalar::One,

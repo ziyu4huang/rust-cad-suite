@@ -9,7 +9,7 @@
 //! async code per segment chain from the same lowering.
 
 use crate::eval::{self, eval, eval_ctx, Lookup, SimError, SResult, Val};
-use crate::value::{low_bits, Bits};
+use crate::value::Bits;
 pub use crate::vpi::{CellKind, VpiHandle, VpiState};
 use rcs_diag::Span;
 use std::collections::{BTreeMap, HashMap, VecDeque};
@@ -283,10 +283,10 @@ fn defparam_path(e: &ast::Expr) -> SResult<Vec<String>> {
     }
 }
 
-const GATE_X: Bits = Bits { width: 1, data: 0, mask: 1 };
-const GATE_Z: Bits = Bits { width: 1, data: 1, mask: 1 };
+const GATE_X: Bits = Bits::n(1, 0, 1);
+const GATE_Z: Bits = Bits::n(1, 1, 1);
 const fn gate_b(t: bool) -> Bits {
-    Bits { width: 1, data: t as u128, mask: 0 }
+    Bits::n(1, t as u128, 0)
 }
 
 /// IEEE 1364-2005 §7 primitive tables (4-state; no strengths — a disabled
@@ -398,11 +398,16 @@ fn readmem_val(tok: &[char], bin: bool, w: u32, task: &str) -> SResult<Bits> {
         let pad = width - nbits;
         (data << pad, mask << pad)
     };
-    Ok(Bits {
-        width: w,
-        data,
-        mask,
-    })
+    if w <= 128 {
+        Ok(Bits::n(w, data, mask))
+    } else {
+        Err(SimError::new(
+            format!(
+                "{task}: memory words wider than 128 bits are not yet supported (M8 readmem)"
+            ),
+            None,
+        ))
+    }
 }
 
 // ---------- build / elaboration ----------
@@ -499,7 +504,7 @@ impl Sim {
                 self.cells.insert(
                     full,
                     Cell {
-                        bits: *v,
+                        bits: v.clone(),
                         signed: *param_override_signed.get(&p.name).unwrap_or(&false),
                         msb: v.to_i64_lossy(),
                         lsb: 0,
@@ -512,12 +517,13 @@ impl Sim {
             let pe = self.prefix_expr(&p.init, scope)?;
             let v = eval(&pe, self)?;
             let (bits, signed) = v.to_bits(p.span)?;
+            let msb = bits.to_i64_lossy();
             self.cells.insert(
                 full,
                 Cell {
                     bits,
                     signed,
-                    msb: bits.to_i64_lossy(),
+                    msb,
                     lsb: 0,
                     mem: None,
                     kind: CellKind::Param,
@@ -565,7 +571,7 @@ impl Sim {
                     let lpe = self.prefix_expr(&r.lsb, scope)?;
                     let msv = eval(&mpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
                     let lsv = eval(&lpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
-                    let w = (msv - lsv).unsigned_abs() as u32 + 1;
+                    let w = crate::value::range_width(msv, lsv).map_err(SimError::from)?;
                     (w, msv, lsv)
                 }
                 None => (1, 0, 0),
@@ -662,13 +668,14 @@ impl Sim {
             let pe = self.prefix_expr(init, scope)?;
             let v = eval(&pe, self)?;
             let (bits, signed) = v.to_bits(e.span)?;
+            let msb = bits.to_i64_lossy();
             let name = format!("{}{}", scope.innermost(), e.name);
             self.cells.insert(
                 name,
                 Cell {
                     bits,
                     signed,
-                    msb: bits.to_i64_lossy(),
+                    msb,
                     lsb: 0,
                     mem: None,
                     kind: if matches!(d.kind, DeclKind::Localparam) { CellKind::Localparam } else { CellKind::Param },
@@ -694,7 +701,7 @@ impl Sim {
                         let lpe = self.prefix_expr(&r.lsb, scope)?;
                         let msv = eval(&mpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
                         let lsv = eval(&lpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
-                        let w = (msv - lsv).unsigned_abs() as u32 + 1;
+                        let w = crate::value::range_width(msv, lsv).map_err(SimError::from)?;
                         (w, d.signed, msv, lsv)
                     }
                     None => match d.kind {
@@ -721,9 +728,18 @@ impl Sim {
                             }
                             let (m, l) = (mb.to_i64_lossy(), lb.to_i64_lossy());
                             let (lo, hi) = (m.min(l), m.max(l));
+                            let wc = (hi - lo + 1).max(0) as u128;
+                            if wc.saturating_mul(width as u128) > 1 << 30 {
+                                return Err(SimError::at(
+                                    format!(
+                                        "memory of {wc} words x {width} bits exceeds the total-bits allocation guard"
+                                    ),
+                                    e.span,
+                                ));
+                            }
                             Some(Memory {
                                 addr_lsb: lo,
-                                words: vec![Bits::zeros(width)?; (hi - lo + 1).max(0) as usize],
+                                words: vec![Bits::zeros(width)?; wc as usize],
                             })
                         }
                         _ => {
@@ -832,7 +848,7 @@ impl Sim {
                     let lpe = self.prefix_expr(&r.lsb, scope)?;
                     let msv = eval(&mpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
                     let lsv = eval(&lpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
-                    let w = (msv - lsv).unsigned_abs() as u32 + 1;
+                    let w = crate::value::range_width(msv, lsv).map_err(SimError::from)?;
                     (w, msv, lsv)
                 }
                 (None, Some((tw, _))) => (tw, tw as i64 - 1, 0),
@@ -898,7 +914,7 @@ impl Sim {
                     let lpe = self.prefix_expr(&r.lsb, scope)?;
                     let msv = eval(&mpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
                     let lsv = eval(&lpe, self)?.to_bits(r.span)?.0.to_i64_lossy();
-                    let w = (msv - lsv).unsigned_abs() as u32 + 1;
+                    let w = crate::value::range_width(msv, lsv).map_err(SimError::from)?;
                     (w, msv, lsv)
                 }
                 (None, Some((tw, _))) => (tw, tw as i64 - 1, 0),
@@ -1084,7 +1100,12 @@ impl Sim {
                     self.cells.insert(
                         gname,
                         Cell {
-                            bits: Bits::from_u64(32, i as u64)?,
+                            // Negative genvars are legal (downward loops):
+                            // store the 32-bit two's complement, not
+                            // `i as u64` (which is 2^64-1 for i=-1 and
+                            // errored — masked for years by gen_test5's
+                            // wide-port error ahead of it).
+                            bits: Bits::from_u64(32, i as u32 as u64)?,
                             signed: true,
                             msb: 31,
                             lsb: 0,
@@ -1258,7 +1279,7 @@ impl Sim {
                 unit.name
             )) {
                 for (k, (bits, signed)) in dp {
-                    overrides.insert(k.clone(), *bits);
+                    overrides.insert(k.clone(), bits.clone());
                     ovs_signed.insert(k.clone(), *signed);
                 }
             }
@@ -2001,7 +2022,7 @@ impl Sim {
     fn read_name(&mut self, name: &str, span: Span) -> SResult<(Bits, bool)> {
         let root = self.find(name);
         match self.cells.get(&root) {
-            Some(c) => Ok((c.bits, c.signed)),
+            Some(c) => Ok((c.bits.clone(), c.signed)),
             None => Err(SimError::at(
                 format!("undeclared identifier `{name}`"),
                 span,
@@ -2018,7 +2039,7 @@ impl Sim {
                 } else {
                     bits.uadjust(c.bits.width)?
                 };
-                c.bits
+                c.bits.clone()
             }
             None => {
                 return Err(SimError::new(
@@ -2150,7 +2171,7 @@ impl Sim {
                         if self.vpi.has_vc_callbacks() {
                             let en = format!("{root}[{}]", lsb + wi);
                             if let Some(idx) = self.vpi.index.get(&en).copied() {
-                                self.vpi.pending_vc.insert(idx, word);
+                                self.vpi.pending_vc.insert(idx, word.clone());
                             }
                         }
                         if let Some(w) = self.vcd.as_mut() {
@@ -2381,7 +2402,7 @@ impl Sim {
             Expr::Ident { name, .. } => {
                 let root = self.find(name);
                 Ok(match self.cells.get(&root) {
-                    Some(c) => (c.bits, c.signed),
+                    Some(c) => (c.bits.clone(), c.signed),
                     None => (Bits::zeros(1)?, false),
                 })
             }
@@ -2754,20 +2775,10 @@ impl Sim {
     }
 
     fn case_matches(&self, kind: CaseKind, v: &Bits, label: &Bits) -> SResult<bool> {
-        let w = v.width.max(label.width);
-        let a = v.uadjust(w)?;
-        let b = label.uadjust(w)?;
         match kind {
-            CaseKind::Case => Ok(a.case_eq(&b)?.to_u64_lossy() == 1),
-            CaseKind::Casez => {
-                // x AND z in the case item are don't-care (§9.5.2).
-                let care = !b.mask & low_bits(w);
-                Ok(((a.data ^ b.data) & care) == 0 && ((a.mask ^ b.mask) & care) == 0)
-            }
-            CaseKind::Casex => {
-                let care = !(a.mask | b.mask) & low_bits(w);
-                Ok(((a.data ^ b.data) & care) == 0)
-            }
+            CaseKind::Case => Ok(v.case_eq(label)?.to_u64_lossy() == 1),
+            CaseKind::Casez => v.casez_eq(label).map_err(SimError::from), // x AND z in the item are don't-care (§9.5.2)
+            CaseKind::Casex => v.casex_eq(label).map_err(SimError::from),
         }
     }
 
@@ -3035,23 +3046,12 @@ impl Sim {
                     .to_string(),
                 ('d' | 'D', Val::Bits { bits, signed }) => {
                     let natural = if *signed {
-                        bits
-                            .to_i128_lossy()
-                            .checked_abs()
-                            .unwrap_or(i128::MAX)
-                            .to_string()
-                            .len()
-                            + (bits.to_i128_lossy() < 0) as usize
+                        bits.dec_natural_len(true)
                     } else {
-                        let maxv: u128 = if bits.width >= 128 {
-                            u128::MAX
-                        } else {
-                            low_bits(bits.width)
-                        };
-                        maxv.to_string().len()
+                        bits.dec_natural_len(false)
                     };
                     let mut s = if *signed {
-                        if bits.has_unknown() { "x".to_string() } else { bits.to_i128_lossy().to_string() }
+                        if bits.has_unknown() { "x".to_string() } else { bits.fmt_dec_signed() }
                     } else {
                         bits.fmt_dec()
                     };
@@ -3083,13 +3083,7 @@ impl Sim {
                     }
                     s
                 }
-                ('o' | 'O', Val::Bits { bits, .. }) => {
-                    if bits.has_unknown() {
-                        "x".to_string()
-                    } else {
-                        format!("{:o}", bits.to_u64_lossy())
-                    }
-                }
+                ('o' | 'O', Val::Bits { bits, .. }) => bits.fmt_oct(),
                 ('t' | 'T', Val::Bits { bits, .. }) => {
                     // %t prints in time-precision units; the argument ($time)
                     // is in time-unit units (§17.1.1/§17.3.3).
@@ -3306,7 +3300,7 @@ impl Lookup for Sim {
         }
         let root = self.find(&def.ret);
         let (bits, signed) = match self.cells.get(&root) {
-            Some(c) => (c.bits, c.signed),
+            Some(c) => (c.bits.clone(), c.signed),
             None => (Bits::zeros(def.ret_w)?, def.ret_s),
         };
         Ok(Val::Bits { bits, signed })

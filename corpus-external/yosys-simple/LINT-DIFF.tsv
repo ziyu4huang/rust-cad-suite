@@ -18,9 +18,9 @@ case_expr_non_const.v	0	0	match-accept
 case_large.v	0	0	match-accept
 const_branch_finish.v	0	0	match-accept
 const_fold_func.v	0	0	match-accept
-const_func_shadow.v	1	0	OURS-ONLY-REJECT
+const_func_shadow.v	0	0	match-accept
 constmuldivmod.v	0	0	match-accept
-constpower.v	1	0	OURS-ONLY-REJECT
+constpower.v	0	0	match-accept
 dff_different_styles.v	0	0	match-accept
 dff_init.v	0	0	match-accept
 dynslice.v	0	0	match-accept
@@ -36,7 +36,7 @@ genblk_collide.v	0	0	match-accept
 genblk_dive.v	0	0	match-accept
 genblk_order.v	0	0	match-accept
 genblk_port_shadow.v	0	0	match-accept
-generate.v	1	0	OURS-ONLY-REJECT
+generate.v	0	0	match-accept
 graphtest.v	0	0	match-accept
 hierarchy.v	0	0	match-accept
 hierdefparam.v	1	1	match-reject
