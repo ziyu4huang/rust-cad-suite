@@ -1,6 +1,1 @@
-{
- "files": ["tb.v"],
- "g": "2005",
- "plusargs": [],
- "enforced": false
-}
+{"files": ["tb.v"], "g": "2005", "plusargs": [], "enforced": true}

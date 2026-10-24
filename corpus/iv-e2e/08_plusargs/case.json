@@ -1,6 +1,1 @@
-{
- "files": ["tb.v"],
- "g": "2005",
- "plusargs": ["+N=42"],
- "enforced": false
-}
+{"files": ["tb.v"], "g": "2005", "plusargs": ["+N=42"], "enforced": true}

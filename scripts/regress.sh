@@ -42,15 +42,32 @@ if [ -x /opt/homebrew/bin/verilator ]; then
     fi
 fi
 
-# riverilog R0: CLI contract goldens (byte-exact, zero oracle dependency)
-# + iv-e2e chase ledger (pending cases must answer the milestone hard-error;
-# flipping a case to enforced requires a committed case.json edit).
+# riverilog: CLI contract goldens (byte-exact, zero oracle dependency)
+# + C4 runner gates: exact-count baselines on both arms (e2e via
+# riverilog->rivvp + normalization; iv via case.json enforced/pending),
+# UNLEDGERED/DRIFT red-light greps == 0. Flipping a case.json
+# enforced<->pending or editing a riv-pending.txt ledger moves the exact
+# counts and must land in the same commit as the capability change
+# (AGENTS 10.5 riv ledger row).
 if [ -f crates/riv-cli/Cargo.toml ]; then
     ct=$(cargo test -p riv-cli 2>&1 | grep -E "^test result" | tail -1)
     echo "$ct" | grep -q "test result: ok" || { echo "GATE FAIL: riv-cli goldens: $ct"; fail=1; }
-    riv=$(cargo run -q -p riv-difftest 2>&1 | tail -1)
-    echo "$riv" | grep -q "== riverilog e2e:" || { echo "GATE FAIL: riv-difftest: $riv"; fail=1; }
-    echo "$riv"
+    e2e_out=$(cargo run -q -p riv-difftest -- --e2e --corpus corpus/e2e 2>&1)
+    iv_out=$(cargo run -q -p riv-difftest -- --corpus corpus/iv-e2e 2>&1)
+    e2e_sum=$(echo "$e2e_out" | grep -E "^SUMMARY e2e=" || true)
+    iv_sum=$(echo "$iv_out" | grep -E "^SUMMARY .*iv=" || true)
+    [ -n "$e2e_sum" ] || { echo "GATE FAIL: riv e2e SUMMARY missing"; fail=1; }
+    [ -n "$iv_sum" ] || { echo "GATE FAIL: riv iv SUMMARY missing"; fail=1; }
+    echo "$e2e_sum" | grep -q "SUMMARY e2e=42/59 iv=0/0" || { echo "GATE FAIL: riv e2e baseline (want exact 42/59): $e2e_sum"; fail=1; }
+    echo "$iv_sum" | grep -q "SUMMARY e2e=0/0 iv=8/10" || { echo "GATE FAIL: riv iv baseline (want exact 8/10): $iv_sum"; fail=1; }
+    riv_all="$e2e_out
+$iv_out"
+    riv_unledgered=$(echo "$riv_all" | grep -c "UNLEDGERED" || true)
+    [ "$riv_unledgered" -eq 0 ] || { echo "GATE FAIL: riv UNLEDGERED x$riv_unledgered (byte-diff without a riv-pending.txt ledger)"; echo "$riv_all" | grep "UNLEDGERED"; fail=1; }
+    riv_drift=$(echo "$riv_all" | grep -c "DRIFT" || true)
+    [ "$riv_drift" -eq 0 ] || { echo "GATE FAIL: riv DRIFT x$riv_drift (ledger stale — flip case.json/ledger in the same commit)"; echo "$riv_all" | grep "DRIFT"; fail=1; }
+    echo "$e2e_sum"
+    echo "$iv_sum"
 fi
 
 # WASM differential gate: the wasm engine must reproduce the same oracle
