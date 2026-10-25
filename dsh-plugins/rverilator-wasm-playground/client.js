@@ -137,6 +137,7 @@ endmodule
       xlsPaneTb: 'testbench (race-safe)',
       xlsDocsFailed: 'could not load the provenance files: ',
       xlsProvenance: 'Harvested by the repo xls-harvest workflow (DSLX → IR → codegen_main). The pipeline normalizes two things: always_ff → always and an injected timescale (REGISTRY D16). Apache-2.0 snapshot; the expectation is recorded from the Verilator oracle, and the TB carries no $dumpvars — the facade forces the dump instead of editing the testbench.',
+      xlsFacesNote: 'One core, four faces: rverilator CLI · wasm (this panel) · Bun FFI · rv-xls-sim (the XLS process adapter). This panel is the zero-install review face — the adapter is what XLS itself calls.',
     };
 
     const ZH_TW = {
@@ -205,6 +206,7 @@ endmodule
       xlsPaneTb: '測試台(race-safe)',
       xlsDocsFailed: '出處檔案載入失敗:',
       xlsProvenance: '由 repo 的 xls-harvest workflow 收割(DSLX → IR → codegen_main)。管線內正規化兩點:always_ff → always、注入 timescale(REGISTRY D16)。Apache-2.0 快照;期望值由 Verilator oracle 錄製,TB 不帶 $dumpvars——由 facade 強制 dump,不改測試台。',
+      xlsFacesNote: '同一個核心、四張臉:rverilator CLI · wasm(這個面板)· Bun FFI · rv-xls-sim(XLS 進程適配器)。面板是零安裝的覆核面,XLS 自己呼叫的是適配器。',
     };
 
     // Simplified Chinese dictionary: the shipped Harness UI runs zh-CN by default,
@@ -275,6 +277,7 @@ endmodule
       xlsPaneTb: '测试台(race-safe)',
       xlsDocsFailed: '出处文件载入失败:',
       xlsProvenance: '由 repo 的 xls-harvest workflow 收割(DSLX → IR → codegen_main)。流水线内规范化两点:always_ff → always、注入 timescale(REGISTRY D16)。Apache-2.0 快照;期望值由 Verilator oracle 录制,TB 不带 $dumpvars——由 facade 强制 dump,不改测试台。',
+      xlsFacesNote: '同一个核心、四张脸:rverilator CLI · wasm(这个面板)· Bun FFI · rv-xls-sim(XLS 进程适配器)。面板是零安装的复核面,XLS 自己调用的是适配器。',
     };
 
     const CSS = `
@@ -918,6 +921,9 @@ endmodule
               : xlsCases.length === 0
                 ? h('div', { className: 'rvw-status' }, t('xlsEmpty'))
                 : xlsCases.map((entry) => h(XlsCard, { key: entry.id, t, mod, entry })),
+          xlsCases && xlsCases.length > 0
+            ? h('p', { className: 'rvw-note' }, t('xlsFacesNote'))
+            : null,
           h('h2', { className: 'rvw-h2' }, t('verifyHeading')),
           h('p', { className: 'rvw-sub' }, t('verifyIntro')),
           CASES.map((target) => h(VerifyCard, { key: target.dir, t, mod, target })),

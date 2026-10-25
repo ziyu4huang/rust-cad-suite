@@ -17,6 +17,7 @@ switching, locale, and layout instead of living in a separate document.
 | Engines | `rverilator` → `WasmSim` (vl-sim) · `riverilog` → `riv_build` + `riv_run` (riv-elab + riv-kernel), the same two-step CLI contract, RIV-1 byte count shown |
 | Waveforms | `vcd_parse` → `to_svg` from the shared Rust `vl-vcd` renderer (ADR-0005: no canvas), signal toggles, deterministic SVG |
 | XLS bridge | Per harvested XLS sample: the provenance chain (DSLX source → XLS IR → normalized Verilog → race-safe TB) in four panes, then run in wasm and byte-diff stdout against the Verilator-recorded expectation. `force_dump` supplies the waveform because XLS TBs carry no `$dumpvars` |
+| Four-faces note | Under the XLS cards: the core's four faces (rverilator CLI · wasm · Bun FFI · `rv-xls-sim`) and why this panel is the zero-install review face while XLS itself calls the adapter |
 | Verification card | `51_vcd_counter` (reference case) runs in wasm and byte-diffs against the recorded expectation |
 | Spec card | `i2c_spec_check` lockstep: pick a surgically broken RTL variant and read the named protocol violations |
 
@@ -96,13 +97,14 @@ route:
 | engine → riverilog | `RIV-1 bytes: 1094`, stdout carries the iverilog-face banner `$finish called at 76000 (1ps)` + `VCD info:` line |
 | XLS add3 card | four provenance panes loaded; `✓` byte-exact; stdout `add3=6` / `add3=355`; waveform from the forced dump |
 | XLS acc_pipe card | `✓` byte-exact; stdout `pipe=24` / `pipe=780`; pipeline waveform with time axis |
+| four-faces note | renders under the XLS cards, naming `rv-xls-sim` as the face XLS calls |
 | verification card | `✓ byte-exact against the recorded expectation` (corpus fetched through the Host route) |
 
-Mechanically: `test/smoke.mjs` — 65 checks, ALL PASS (asset MIME/bytes/no-store,
+Mechanically: `test/smoke.mjs` — 66 checks, ALL PASS (asset MIME/bytes/no-store,
 corpus allowlist, traversal, method, the carrier prefix-match rule, XLS manifest
 and asset surface, `main`/`panellist` registrations, four locale registrations,
 SSR markup, and in jsdom with the real wasm artifact: Run `q=8`, riv face banner,
-XLS four-pane card + byte-exact, byte-exact corpus badge, named spec violation).
+XLS four-pane card + byte-exact + the four-faces note, byte-exact corpus badge, named spec violation).
 Live probes: the asset route answers `200 text/javascript`,
 `200 application/wasm` (the 1.2 MB artifact), `200` allowlisted corpus,
 `200` XLS manifest/DSLX/IR, `403` non-allowlisted/traversal/extension.

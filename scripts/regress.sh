@@ -249,6 +249,18 @@ if [ -x target/debug/rv-xls-sim ]; then
     [ "$xlsbad" -eq 0 ] && echo "xls adapter: add3 byte-exact + syntax + json + sv-refusal"
 fi
 
+# S3 XLS harvest chain (hermetic): manifest sha256 + adapter syntax gate,
+# two-phase adopt (tamper refusal, idempotence, normalization).
+if [ -x target/debug/rv-xls-sim ] && command -v python3 >/dev/null; then
+    bash scripts/xls_harvest_selftest.sh || { echo "GATE FAIL: xls harvest selftest"; fail=1; }
+fi
+
+# S3 XLS C++ subclass: opt-in (needs network + protoc + abseil for the pinned
+# upstream header clone). Run with WITH_XLS_CPP=1.
+if [ "${WITH_XLS_CPP:-0}" = "1" ]; then
+    bash scripts/xls-cpp-gate.sh || { echo "GATE FAIL: xls cpp subclass"; fail=1; }
+fi
+
 if [ "${1:-}" = "--with-record" ]; then
     echo "== extra: re-record from oracle (requires verilator; review diff!) =="
     ./target/debug/vl-difftest --record 2>&1 | tail -1

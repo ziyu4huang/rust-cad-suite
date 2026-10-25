@@ -353,6 +353,7 @@ check('riverilog face reports RIV-1 bytes', container.textContent.includes('RIV-
 await settle(120)
 const xlsCards = [...container.querySelectorAll('.rvw-xls-card')]
 check('XLS bridge mounted both harvested cases', xlsCards.length === 2, String(xlsCards.length))
+check('XLS section names the four faces', container.textContent.includes('rv-xls-sim'), container.textContent.slice(0, 200))
 const add3Card = xlsCards.find((card) => card.textContent.includes('fn add3'))
 check('XLS card loaded its DSLX source', Boolean(add3Card), xlsCards.map((card) => card.textContent.slice(0, 60)).join(' | '))
 if (add3Card) {

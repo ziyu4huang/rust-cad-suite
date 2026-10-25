@@ -1,8 +1,9 @@
 name: xls-harvest
 # One-shot (workflow_dispatch) harvest: XLS DSLX -> IR -> Verilog codegen on
-# the linux-x64 release binary; generated Verilog uploaded as an artifact for
-# local corpus adoption (corpus-external/xls/). Apache-2.0: LICENSE travels
-# with every snapshot.
+# the linux-x64 release binary; the artifact is self-contained so
+# `python3 scripts/xls_adopt.py <artifact>` can verify (sha256 + adapter syntax
+# check) and adopt it into corpus-external/xls without touching the rest of the
+# snapshot. Apache-2.0: LICENSE travels with every snapshot.
 on:
   workflow_dispatch: {}
 jobs:
@@ -12,6 +13,21 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Capture XLS release tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=$(gh release view --repo google/xls --json tagName --jq .tagName)
+          test -n "$TAG"
+          echo "XLS_TAG=$TAG" >> "$GITHUB_ENV"
+          echo "harvesting google/xls $TAG"
+
+      - name: Build rv-xls-sim (harvest syntax gate)
+        run: cargo build -p rv-xls-sim
+
       - name: Fetch XLS release (linux-x64)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -20,6 +36,7 @@ jobs:
           curl -L "$URL" -o xls.tar.gz
           mkdir xls-dist && tar xzf xls.tar.gz -C xls-dist
           find xls-dist -type f -name '*main*' | head
+
       - name: DSLX -> IR -> Verilog
         run: |
           mkdir -p out
@@ -36,26 +53,46 @@ jobs:
               || $CGEN --top=acc_pipe --generator combinational out/acc_pipe.ir > out/acc_pipe.v \
               || echo "WARN acc_pipe codegen failed (acceptable for MVP)"
           fi
+
+      - name: Normalize + stage the adoptable artifact
+        run: |
           # rverilator targets Verilog-2005: always_ff -> always (semantics
-          # identical for these single-clock flop blocks; raw copy kept).
-          # XLS has no timescale concept; inject the harness convention or
-          # TIMESCALEMOD warnings fire when the file precedes the TB
-          # (verilator default-fatal; see REGISTRY D16).
+          # identical for these single-clock flop blocks; raw copy kept under
+          # artifact/raw/). XLS has no timescale concept; inject the harness
+          # convention or TIMESCALEMOD warnings fire when the file precedes the
+          # TB (verilator default-fatal; REGISTRY D16).
+          mkdir -p artifact/generated artifact/dslx artifact/raw
           for v in out/*.v; do
             [ -s "$v" ] || continue
-            cp "$v" "$v.raw"
-            sed -i 's/always_ff @/always @/g' "$v"
-            printf '`timescale 1ns/1ps\n' | cat - "$v" > "$v.tmp" && mv "$v.tmp" "$v"
+            base=$(basename "$v")
+            cp "$v" "artifact/raw/$base"
+            sed 's/always_ff @/always @/g' "$v" > "/tmp/$base"
+            if grep -q '^`timescale' "/tmp/$base"; then
+              cp "/tmp/$base" "artifact/generated/$base"
+            else
+              { printf '`timescale 1ns/1ps\n'; cat "/tmp/$base"; } > "artifact/generated/$base"
+            fi
           done
-          ls -la out/ || true
-      - name: License
+          cp out/*.ir artifact/generated/
+          cp corpus-external/xls/dslx/*.x artifact/dslx/
+
+      - name: License + notice
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh api repos/google/xls/license --jq '.content' | base64 -d > out/XLS-LICENSE.txt
-          echo "https://github.com/google/xls (Apache-2.0)" > out/XLS-NOTICE.txt
-          echo "Snapshot: generated Verilog via XLS codegen_main (release v0.0.0-$(date +%Y%m%d))" >> out/XLS-NOTICE.txt
+          gh api repos/google/xls/license --jq '.content' | base64 -d > artifact/XLS-LICENSE.txt
+          {
+            echo "https://github.com/google/xls (Apache-2.0)"
+            echo "Snapshot: generated Verilog via XLS codegen_main ($XLS_TAG)"
+          } > artifact/XLS-NOTICE.txt
+
+      - name: Manifest + adapter syntax gate
+        run: |
+          python3 scripts/xls_harvest_manifest.py \
+            --dir artifact --tag "$XLS_TAG" --adapter target/debug/rv-xls-sim
+          cat artifact/manifest.json
+
       - uses: actions/upload-artifact@v4
         with:
           name: xls-generated
-          path: out/
+          path: artifact/

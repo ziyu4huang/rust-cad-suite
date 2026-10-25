@@ -175,8 +175,9 @@
   <div class="meta">
     <span class="pill ok">S1 已落地 · 真 app 驗證</span>
     <span class="pill ok">S2 已落地 · adapter 21 tests</span>
-    <span class="pill wait">S3 上游子類 + CI · 待做</span>
-    <span class="pill">smoke 65/65 PASS</span>
+    <span class="pill ok">S3 子類 + 收割鏈 · 已落地</span>
+    <span class="pill wait">Bazel in-tree · 待跑</span>
+    <span class="pill">smoke 66/66 PASS</span>
     <span class="pill">e2e 59/59 byte-exact</span>
   </div>
   <nav class="toc">
@@ -249,7 +250,7 @@
       <div class="tag">Layer 3 · 計算</div>
       <h3>核心共用</h3>
       <p>vl-sim / vl-vcd 一份核心，四張臉：CLI、wasm、Bun FFI、XLS 適配器；新能力先落核心再露面（AGENTS §10.7）。</p>
-      <div class="state">CLI / wasm / FFI / XLS adapter 已共用</div>
+      <div class="state">CLI / wasm / FFI / XLS adapter 已共用；XLS 子類已對真 header 編譯</div>
     </div>
   </div>
 
@@ -307,8 +308,8 @@
 
   <p class="note">
     為什麼要「進程邊界」而不是直接把 XLS 原始碼拉進來編？XLS 是 Bazel/C++ 大樹，綁進去等於把
-    Apache-2.0 的上游編譯鏈變成我們的建置前提。先用穩定的 JSON/argv 協定對接，上游只要加一個
-    薄薄的 <code>.cc</code> 子類；我們的建置與授權邊界都乾淨。
+    Apache-2.0 的上游編譯鏈變成我們的建置前提。已用穩定的 JSON/argv 協定對接；上游子類（<code>cpp/xls/...</code>）已對 pinned 真 header 編譯，
+    只剩 XLS 樹內 Bazel 連結未跑。我們的建置與授權邊界保持乾淨。
   </p>
 </section>
 
@@ -382,7 +383,7 @@ rv-xls-sim --file top.v --syntax-check
 
 <section id="plan">
   <h2><span class="num">05</span>三階段計畫</h2>
-  <p class="sec-sub">S1 與 S2 已在本輪落地；S3 的驗收閘先寫死，避免「有畫面就算完成」。</p>
+  <p class="sec-sub">S1、S2 已落地；S3 的子類與收割鏈已落地，只剩 XLS 樹內 Bazel 實跑（本機沒有 Bazel，且 XLS release 只有 linux-x64）。</p>
 
   <div class="phase">
     <div class="phase-head">
@@ -395,7 +396,7 @@ rv-xls-sim --file top.v --syntax-check
       <li>XLS 的 TB 不帶 <code>$dumpvars</code>：由 facade 的 <code>force_dump</code> 產生波形，不動收割下來的測試台。</li>
       <li>原本三張驗證卡改為「counter 參考卡 + 兩張 XLS 卡」，避免同一案例兩處各跑一次。</li>
     </ul>
-    <div class="gate"><strong>驗收：</strong>smoke 65/65（含 manifest、MIME/no-store、403 traversal、SSR、jsdom 真 wasm）；真 app 兩張卡都出現「✓ 與錄製期望值逐位元組相符」。</div>
+    <div class="gate"><strong>驗收：</strong>smoke 66/66（含 manifest、MIME/no-store、403 traversal、SSR、jsdom 真 wasm、四張臉註記）；真 app 兩張卡都出現「✓ 與錄製期望值逐位元組相符」。</div>
   </div>
 
   <div class="phase">
@@ -415,16 +416,18 @@ rv-xls-sim --file top.v --syntax-check
 
   <div class="phase">
     <div class="phase-head">
-      <span class="badge wait">S3 · 上游</span>
+      <span class="badge ok">S3 · 子類/收割鏈已落地</span>
       <h3>XLS 子類 + 收割自動化 + 零安裝驗證面</h3>
     </div>
     <ul>
-      <li>照 <code>iverilog_simulator.cc</code> 的形狀寫 <code>rverilator_simulator.cc</code>：寫暫存檔 → 呼叫 <code>rv-xls-sim</code> → 回傳 <code>SimulationResult</code>；不碰 XLS 的 IR/DSLX 層。</li>
-      <li><code>xls-harvest.yml</code> 從「上傳 artifact」升級成「收編 + 錄期望 + 跑 regress」；新樣本零手改。</li>
-      <li>面板卡成為 XLS 使用者的零安裝覆核面：不裝 XLS、不裝 Verilator，開瀏覽器就能看到出處鏈與 byte-exact 結果。</li>
-      <li>分歧登記：stderr 措辭、<code>.sv</code> 範圍、timescale 正規化（D16）、<code>$finish</code> 與 exit code 對映。</li>
+      <li><code>crates/rv-xls-sim/cpp/xls/simulation/simulators/</code> 已有 <code>rverilator_simulator.{h,cc}</code> 與 drop-in <code>BUILD</code>：照 <code>IcarusVerilogSimulator</code> 的形狀寫 <code>top.v</code>＋<code>VerilogInclude</code>(text)、<code>-D SIMULATION -D ASSERT_ON</code>、exit→absl status、<code>.sv</code>→Unimplemented。</li>
+      <li><code>scripts/xls-cpp-gate.sh</code> 下載 pinned <code>google/xls</code> header、用 protoc 生成 <code>op.pb.h</code> 族、<b>對真 header 編譯</b>，再以本地 <code>InvokeSubprocess</code> double 跑 10 項 harness 檢查（add3 byte-exact、巨集、include、語法錯、<code>.sv</code>）。</li>
+      <li><code>xls-harvest.yml</code> 現在輸出可自我驗證的 artifact：<code>manifest.json</code>(tag+sha256)、<code>generated/</code>、<code>dslx/</code>、raw、LICENSE；CI 內先用 <code>rv-xls-sim --syntax-check</code> 過語法閘。</li>
+      <li><code>scripts/xls_adopt.py</code> 兩階段收編：先驗全部 sha256／拒收 syntax 失敗，再正規化寫入；竄改=整批拒絕，重跑 idempotent；刻意不生成 e2e（TB 人寫、期望 oracle 錄）。</li>
+      <li>面板新增「同一個核心、四張臉」註記（CLI · wasm · FFI · rv-xls-sim），零安裝覆核面。</li>
+      <li><b>未完成</b>：在 XLS Bazel 樹內 <code>bazel test</code>（本機無 Bazel，release 只有 linux-x64）、實際跑一次 GitHub Actions、上游 PR。</li>
     </ul>
-    <div class="gate"><strong>驗收：</strong>在 XLS 樹內以 <code>--simulator=rverilator</code> 跑一組上游測試；差異只允許已登記項；CI artifact 可重現。</div>
+    <div class="gate"><strong>驗收：</strong><code>bash scripts/xls-cpp-gate.sh</code> 全綠（10/10 harness）；adopt 對正常/竄改/idempotent 三形都符合預期；in-tree Bazel 仍標 TODO。</div>
   </div>
 </section>
 
@@ -457,7 +460,7 @@ rv-xls-sim --file top.v --syntax-check
       <tr><td>Host manifest 與檔案 allowlist</td><td><code>curl -s localhost:PORT/rverilator-wasm/xls/manifest.json</code></td><td>200 JSON，兩個案例，<code>forceDump: true</code>，e2e 目錄正確</td></tr>
       <tr><td>DSLX / IR / Verilog / licence</td><td><code>curl -sI .../xls/dslx/add3.x</code> 等</td><td>200，<code>text/plain</code>，<code>no-store</code></td></tr>
       <tr><td>越界與副檔名</td><td><code>.../xls/generated/../../Cargo.toml</code>、<code>.../top.sh</code></td><td>403</td></tr>
-      <tr><td>面板（jsdom + 真 wasm）</td><td><code>NODE_PATH=... node test/smoke.mjs</code></td><td>65 checks PASS，含四格內容、byte-exact、波形 SVG</td></tr>
+      <tr><td>面板（jsdom + 真 wasm）</td><td><code>NODE_PATH=... node test/smoke.mjs</code></td><td>66 checks PASS，含四格內容、byte-exact、波形、四張臉註記</td></tr>
     </tbody>
   </table>
 
@@ -482,6 +485,42 @@ add3=355
       <tr><td><code>regress.sh</code></td><td>新增「xls adapter: add3 byte-exact + syntax + json + sv-refusal」一行</td></tr>
     </tbody>
   </table>
+
+  <h3>f. S3 子類與收割鏈：對真 header 編譯，對真 artifact 收編</h3>
+  <pre><span class="c">$ bash scripts/xls-cpp-gate.sh        # 會下載 pinned google/xls header</span>
+== upstream: 8ddae8b (v0.0.0-10898-g8ddae8bf4) ==
+== syntax pass: real header + module initializer ==
+== compile harness (local InvokeSubprocess double) ==
+== run harness ==
+  PASS  Run(add3) succeeds
+  PASS  Run(add3) stdout is byte-exact
+  PASS  Run(macros) applies -D BIG
+  PASS  Run(includes) writes VerilogInclude text
+  PASS  Run(.sv) is Unimplemented
+  ...
+ALL CHECKS PASS
+
+<span class="c">$ python3 scripts/xls_adopt.py /tmp/xls-artifact --dest /tmp/snapshot</span>
+acc_pipe: adopted generated/acc_pipe.v, generated/acc_pipe.ir, dslx/acc_pipe.x
+add3: adopted generated/add3.v, generated/add3.ir, dslx/add3.x
+adopted 2 case(s) from google/xls v0.0.0-test into /tmp/snapshot</pre>
+
+  <table>
+    <thead><tr><th>契約</th><th>結果</th></tr></thead>
+    <tbody>
+      <tr><td>子類對真 header</td><td><code>-fsyntax-only</code> 通過（含 module initializer；pinned tag 的 <code>FileType</code>／<code>VerilogInclude</code>／<code>MacroDefinition</code> 全對位）</td></tr>
+      <tr><td>harness</td><td>10/10（add3 byte-exact、巨集真的生效、include text 落檔、語法錯→status、<code>.sv</code>→Unimplemented）</td></tr>
+      <tr><td>artifact manifest</td><td>sha256 + tag + adapter <code>syntax_check</code>；manifest 寫在 artifact 根</td></tr>
+      <tr><td>adopt</td><td>正規化（always_ff→always、timescale 冪等）＋先驗後寫；竄改整批拒絕、dest 不建立</td></tr>
+      <tr><td>未驗</td><td>XLS Bazel 樹內連結與上游測試（本機無 Bazel；release 只有 linux-x64）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>g. 面板四張臉註記（真 app）</h3>
+  <figure>
+    <img src="../e2e-report/dsh-xls-faces.png" alt="面板 XLS 段末尾的註記：同一個核心、四張臉：rverilator CLI、wasm、Bun FFI、rv-xls-sim">
+    <figcaption><b>真 app</b>：XLS 兩張卡之後、獨立驗證卡之前，面板寫明「同一個核心、四張臉：rverilator CLI · wasm（這個面板）· Bun FFI · rv-xls-sim（XLS 進程適配器）」——面板是零安裝覆核面，XLS 自己呼叫的是適配器。</figcaption>
+  </figure>
 </section>
 
 <section id="risk">
@@ -514,6 +553,11 @@ add3=355
         <td>面板綠了不代表 XLS 的 C++ 呼叫端可用。</td>
         <td>L1 與 L2 分開驗收；S3 以上游測試實跑為準。</td>
       </tr>
+      <tr>
+        <td>XLS 樹內驗證</td>
+        <td>本機沒有 Bazel；XLS release 只提供 linux-x64，macOS arm64 不能直接執行。</td>
+        <td>子類對真 header 編譯＋harness 實跑；in-tree <code>bazel test</code> 明標 TODO，不假裝已驗。</td>
+      </tr>
     </tbody>
   </table>
 </section>
@@ -528,10 +572,14 @@ add3=355
         <tbody>
           <tr><td><code>dsh-plugins/rverilator-wasm-playground/index.js</code></td><td>manifest 掃描、xls 路由、授權檔、403 邊界</td></tr>
           <tr><td><code>.../client.js</code></td><td>XLS 橋接段、四格出處鏈、<code>force_dump</code> 執行、三語字典</td></tr>
-          <tr><td><code>.../test/smoke.mjs</code></td><td>65 項檢查（Host + 註冊 + SSR + jsdom 真 wasm）</td></tr>
+          <tr><td><code>.../test/smoke.mjs</code></td><td>66 項檢查（Host + 註冊 + SSR + jsdom 真 wasm）</td></tr>
           <tr><td><code>crates/rv-xls-sim/</code></td><td>適配器（argv + JSON、JSON 子集、scratch、USim）</td></tr>
           <tr><td><code>crates/rv-xls-sim/tests/contract.rs</code></td><td>11 項契約測試（oracle byte-equal、巨集、include、錯誤分流）</td></tr>
           <tr><td><code>docs/XLS-ADAPTER.md</code></td><td>協定 v1、stream/exit 契約、分歧與非目標</td></tr>
+          <tr><td><code>crates/rv-xls-sim/cpp/</code></td><td>XLS 子類 + BUILD + harness（對真 header 編譯）</td></tr>
+          <tr><td><code>scripts/xls-cpp-gate.sh</code></td><td>下載 pinned XLS header、編譯、跑 harness</td></tr>
+          <tr><td><code>scripts/xls_harvest_manifest.py</code> · <code>xls_adopt.py</code></td><td>artifact manifest（sha256+syntax gate）與兩階段收編</td></tr>
+          <tr><td><code>.github/workflows/xls-harvest.yml</code></td><td>CI 產出可自我驗證 artifact</td></tr>
           <tr><td><code>docs/e2e-report/dsh-xls-bridge-*.png</code></td><td>真 app 截圖三張</td></tr>
         </tbody>
       </table>
@@ -564,10 +612,11 @@ cargo build -p rv-xls-sim
 </section>
 
 <footer>
-  rust-cad-suite · 本頁由 2026-10-26 的 agent session 產生；S1 的每一項都對應真 app 截圖，S2 的每一項都對應
-  <code>cargo test -p rv-xls-sim</code> 或 <code>regress.sh</code> 的一行。
-  下一輪從 S3 開始：上游 <code>rverilator_simulator.cc</code> 子類、harvest workflow 自動收編 + 錄期望，
-  以及分歧登記（stderr 措辭、<code>.sv</code> 範圍、<code>$finish</code> 對映）。
+  rust-cad-suite · 本頁由 2026-10-26 的 agent session 產生；S1 對應真 app 截圖，S2 對應
+  <code>cargo test -p rv-xls-sim</code> 與 <code>regress.sh</code> 的一行，S3 對應
+  <code>scripts/xls-cpp-gate.sh</code> 的下載→編譯→10 項 harness。
+  真正還缺的一件事：在有 Bazel 的 XLS 樹內跑一次上游測試（以及實際觸發 GitHub Actions）；
+  在那之前，本頁不把 in-tree 連結算成已驗。
 </footer>
 
 </div>

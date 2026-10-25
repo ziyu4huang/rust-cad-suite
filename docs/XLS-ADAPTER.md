@@ -109,21 +109,33 @@ skip the contract tests.
 | VCD output | discarded | not part of XLS's `SimulationResult` |
 | file injection | not in v1 (`$readmem` reads the scratch/cwd) | XLS does not pass data files through `Run`; the wasm face has `inject_file` when needed |
 
-## Wiring into XLS (S3 sketch)
+## Upstream subclass (implemented, compiled against the real header)
 
-The upstream-side change stays thin — a subclass next to `iverilog_simulator.cc`:
+The XLS side lives in `crates/rv-xls-sim/cpp/`:
 
-```cpp
-// xls/simulation/simulators/rverilator_simulator.cc (sketch)
-absl::StatusOr<SimulationResult> Run(absl::string_view text, ...) {
-  // 1. argv: write text to <tmp>/top.v, spawn rv-xls-sim with -D/-I flags
-  //    (or 2. JSON: one write to stdin, parse one line of JSON from stdout)
-  // 3. return {stdout, stderr};
-}
+- `xls/simulation/simulators/rverilator_simulator.{h,cc}` — the
+  `VerilogSimulator` subclass. Like `IcarusVerilogSimulator` it creates a temp
+  dir, writes `top.v` and every `VerilogInclude` (text, not a path), passes
+  `-I <tempdir>` plus the always-on `-D SIMULATION -D ASSERT_ON`, invokes
+  `rv-xls-sim`, and maps a non-zero exit to an absl error carrying the
+  diagnostics. `.sv` is refused with `UnimplementedError` before spawning.
+- `xls/simulation/simulators/BUILD` — drop-in Bazel target. Add
+  `//xls/simulation/simulators:rverilator_simulator` to the deps of
+  `//xls/simulation:verilog_simulators` (next to the iverilog target).
+- Registration: `XLS_REGISTER_MODULE_INITIALIZER(... "rverilator" ...)` lives in
+  the same TU and is excluded by `-DRV_XLS_SIM_HARNESS` for the local harness.
+
+Local verification — it downloads the pinned XLS headers, compiles and runs:
+
+```sh
+bash scripts/xls-cpp-gate.sh
 ```
 
-The JSON shape is the easier one to port (no temp-file lifecycle in C++); the
-argv shape is the easier one to debug by hand. Both are tested here.
+The harness compiles against upstream `v0.0.0-10898-g8ddae8bf4` and links a
+local `InvokeSubprocess` double (`cpp/harness/`). It proves the subclass shape,
+in-memory includes, macros, error mapping and add3 byte-equality. It does not
+prove a Bazel in-tree link or XLS's own test suite: this host has no Bazel, and
+the XLS release is linux-x64 only.
 
 ## Try it
 
@@ -137,4 +149,10 @@ cargo test  -p rv-xls-sim
 # the same design through the JSON protocol (syntax only)
 printf '%s' '{"text":"module tb; endmodule","syntax_only":true}' \
   | ./target/debug/rv-xls-sim --json
+
+# XLS-side subclass against the real upstream header (downloads it once)
+bash scripts/xls-cpp-gate.sh
+
+# CI artifact -> snapshot (verify sha256 + normalize + print next steps)
+python3 scripts/xls_adopt.py /tmp/xls-artifact --dry-run
 ```
