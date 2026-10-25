@@ -6,6 +6,9 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+riv-ir = { workspace = true }
+riv-elab = { workspace = true }
+riv-kernel = { workspace = true }
 vl-syntax = { workspace = true }
 vl-values = { workspace = true }
 rcs-diag = { workspace = true }

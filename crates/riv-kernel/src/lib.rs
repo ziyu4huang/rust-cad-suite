@@ -127,8 +127,8 @@ pub struct Kernel {
     now: u64,
     out: String,
     finished: Option<(u32, u32)>,
-    dump_path: Option<String>,
-    dump_open: bool,
+    pub dump_path: Option<String>,
+    pub dump_open: bool,
     plusargs: Vec<String>,
     /// `$monitor` request (None = never armed). `last: None` = armed, not
     /// yet displayed — the t0 arm displays on the first monitor pass.
@@ -182,6 +182,20 @@ pub struct Kernel {
     rng_seed: u32,
     /// rivvp -n: $stop behaves like $finish (rivD2).
     pub stop_as_finish: bool,
+    /// iverilog-shaped finish-banner suppression (ADR-0009 U-1: the
+    /// rverilator face's goldens never carried the line — rivD8's
+    /// drop-contract expressed at the API instead of text filtering).
+    pub emit_finish_line: bool,
+    /// `VCD info: dumpfile …` tool line (rivD8 same contract).
+    pub emit_vcd_info_line: bool,
+    /// $readmem* resolution base (USim drives the case dir; CLI cwd).
+    pub file_base: std::path::PathBuf,
+    /// wasm/browser injected files: name → contents, checked first.
+    pub injected_files: std::collections::HashMap<String, String>,
+    /// Verilator-form profile (ADR-0009): 2-state projection at the
+    /// storage boundary — init x→0, every committed value x/z→0. The
+    /// riverilog face keeps 4-state (false).
+    pub two_state: bool,
     /// -n $stop halted the run: like natural exhaustion — NO finish
     /// banner (measured: iverilog -n prints only the stop-called line).
     stopped_silently: bool,
@@ -304,6 +318,11 @@ impl Kernel {
             gate_due: BTreeMap::new(),
             gate_pending,
             nba_due: BTreeMap::new(),
+            emit_finish_line: true,
+            emit_vcd_info_line: true,
+            two_state: false,
+            file_base: std::path::PathBuf::new(),
+            injected_files: std::collections::HashMap::new(),
             waiters: vec![Vec::new(); d.vars.len()],
             const_rt: {
                 let n = d.threads.len() + d.funcs.len();
@@ -430,6 +449,49 @@ impl Kernel {
     /// Plusargs for `$test$plusargs`/`$value$plusargs` (+N=42 form).
     pub fn set_plusargs(&mut self, args: Vec<String>) {
         self.plusargs = args;
+    }
+
+    /// Verilator-form profile (ADR-0009): project all storage (vars,
+    /// array elements) to 2-state — init x→0 included. Call once after
+    /// construction, before run.
+    pub fn project_two_state(&mut self) -> Result<(), RunError> {
+        self.two_state = true;
+        for v in self.vars.iter_mut() {
+            *v = v.to_2state().map_err(|e| RunError(e.0))?;
+        }
+        for arr in self.arrays.iter_mut() {
+            for el in arr.iter_mut() {
+                *el = el.to_2state().map_err(|e| RunError(e.0))?;
+            }
+        }
+        Ok(())
+    }
+
+    /// Take the accumulated output (backend seam; rivvp prints the same
+    /// buffer via RunOutcome — do not use both paths for one run).
+    pub fn take_output_buf(&mut self) -> String {
+        std::mem::take(&mut self.out)
+    }
+
+    /// Simulation time in precision ticks.
+    pub fn now_ticks(&self) -> u64 {
+        self.now
+    }
+
+    /// `$readmem*` path resolution: injected files (wasm) by exact name
+    /// first, then `file_base`-joined, then bare (cwd).
+    pub fn resolve_readmem(&self, path: &str) -> Option<std::path::PathBuf> {
+        if self.injected_files.contains_key(path) {
+            return Some(std::path::PathBuf::from(path));
+        }
+        let p = std::path::Path::new(path);
+        if p.is_absolute() {
+            return Some(p.to_path_buf());
+        }
+        if !self.file_base.as_os_str().is_empty() {
+            return Some(self.file_base.join(path));
+        }
+        Some(p.to_path_buf())
     }
 
     /// Run to completion; ready threads start in declaration order.
@@ -581,6 +643,13 @@ impl Kernel {
             self.finished = None;
         }
         if let Some((file, line)) = self.finished {
+            if !self.emit_finish_line {
+                self.finished = None;
+                return RunOutcome {
+                    output: std::mem::take(&mut self.out),
+                    exit,
+                };
+            }
             let file = self
                 .d
                 .strs
@@ -1717,6 +1786,11 @@ impl Kernel {
 
     /// Unconditional storage write + change propagation.
     fn store_var_raw(&mut self, var: VarId, newv: Bits, sink: &mut dyn DumpSink) -> Result<(), RunError> {
+        let newv = if self.two_state {
+            newv.to_2state().map_err(|e| RunError(e.0))?
+        } else {
+            newv
+        };
         let old = self.vars[var as usize].clone();
         if old == newv {
             return Ok(());
@@ -1729,8 +1803,11 @@ impl Kernel {
         Ok(())
     }
 
+    /// Flat dump name = the design var's raw path ("a", "dut.q") — the
+    /// legacy VCD shape (top module carries no prefix; ADR-0009 U-1
+    /// byte-compat with corpus expect.vcd).
     fn var_flat_name(&self, var: VarId) -> String {
-        format!("{}.{}", self.d.meta.top, self.d.vars[var as usize].name)
+        self.d.vars[var as usize].name.clone()
     }
 
     /// Wake suspended threads whose wait matches this change (waiter-list
@@ -1826,6 +1903,11 @@ impl Kernel {
             .get_mut(var as usize)
             .and_then(|a| a.get_mut(abs as usize))
             .ok_or_else(|| RunError(format!("element {} out of range for var {}", abs, var)))?;
+        let val = if self.two_state {
+            val.to_2state().map_err(|e| RunError(e.0))?
+        } else {
+            val
+        };
         if *slot == val {
             return Ok(());
         }
@@ -1855,7 +1937,14 @@ impl Kernel {
         if self.d.vars.get(var as usize).map(|v| v.kind) != Some(VarKind::Array) {
             return Err(RunError("readmem target is not a memory".into()));
         }
-        let text = std::fs::read_to_string(path).map_err(|e| RunError(format!("readmem `{path}`: {e}")))?;
+        let text = match self.injected_files.get(path) {
+            Some(c) => c.clone(),
+            None => {
+                let resolved = self.resolve_readmem(path).unwrap_or_else(|| std::path::PathBuf::from(path));
+                std::fs::read_to_string(&resolved)
+                    .map_err(|e| RunError(format!("readmem `{path}`: {e}")))?
+            }
+        };
         let Some(Some((lo, hi))) = self.array_dims.get(var as usize).copied() else {
             return Err(RunError("readmem target is not a memory".into()));
         };
@@ -2338,8 +2427,10 @@ impl Kernel {
             .clone()
             .unwrap_or_else(|| "dump.vcd".to_string());
         sink.opened(&path);
-        self.out
-            .push_str(&format!("VCD info: dumpfile {path} opened for output.\n"));
+        if self.emit_vcd_info_line {
+            self.out
+                .push_str(&format!("VCD info: dumpfile {path} opened for output.\n"));
+        }
         let mut values = BTreeMap::new();
         for (i, _v) in self.d.vars.iter().enumerate() {
             values.insert(self.var_flat_name(i as VarId), self.vars[i].fmt_bin());

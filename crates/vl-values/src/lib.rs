@@ -553,6 +553,27 @@ impl Bits {
     }
 
     /// All-x (used by conservative arithmetic X and unknown shifts).
+    /// 2-state projection (ADR-0009 Verilator-form profile): every bit
+    /// maps to its data when known, 0 when unknown (x/z → 0). Limb-wise
+    /// `data & !mask`; the N arm keeps the byte-identical layout.
+    pub fn to_2state(&self) -> VResult<Bits> {
+        let w = self.width;
+        match &self.repr {
+            Repr::N { data, mask } => Ok(Bits::n(w, data & !mask, 0)),
+            Repr::W { data, mask } => {
+                let n = limbs_for(w);
+                let mut d = vec![0u64; n];
+                for i in 0..n {
+                    d[i] = data[i] & !mask[i];
+                }
+                Ok(Bits {
+                    width: w,
+                    repr: Repr::W { data: d.into_boxed_slice(), mask: vec![0; n].into_boxed_slice() },
+                })
+            }
+        }
+    }
+
     pub fn all_x(width: u32) -> VResult<Bits> {
         chk(width)?;
         if width <= 128 {

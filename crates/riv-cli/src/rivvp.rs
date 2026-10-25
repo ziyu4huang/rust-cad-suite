@@ -131,6 +131,8 @@ impl VcdSink {
         // q). Event vars carry no value and arrays dump per-element at R5 —
         // both stay out of the registry. Collapsed-port dead vars keep
         // their row (constant x); the cross-compare gate intersects.
+        // Raw var paths ("a", "dut.q") — the legacy VCD shape; the top
+        // module carries no prefix (ADR-0009 U-1 byte-compat).
         let var_list: Vec<(String, Vec<String>, u32)> = d
             .vars
             .iter()
@@ -138,11 +140,9 @@ impl VcdSink {
                 v.kind != riv_ir::VarKind::Event && v.kind != riv_ir::VarKind::Array
             })
             .map(|v| {
-                let mut scopes = vec![d.meta.top.clone()];
-                scopes.extend(v.name.split('.').map(|c| c.to_string()));
                 (
-                    format!("{}.{}", d.meta.top, v.name),
-                    scopes,
+                    v.name.clone(),
+                    v.name.split('.').map(|c| c.to_string()).collect(),
                     v.width,
                 )
             })

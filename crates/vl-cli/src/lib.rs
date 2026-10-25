@@ -154,6 +154,13 @@ fn pp_options(o: &Options) -> PpOptions {
     }
 }
 
+thread_local! {
+    /// (path, per-file timescale) collected during preprocess — consumed
+    /// by the unified-engine simulate path (ADR-0009 U-1).
+    static SOURCE_FILES: std::cell::RefCell<Vec<(String, Option<String>)>> =
+        const { std::cell::RefCell::new(Vec::new()) };
+}
+
 fn preprocess_and_parse(
     o: &Options,
     sm: &mut SourceMap,
@@ -162,11 +169,17 @@ fn preprocess_and_parse(
     let opts = pp_options(o);
     let mut modules = Vec::new();
     let mut timescale: Option<String> = None;
+    // (path, per-file timescale) — the unified engine's per-file sticky
+    // timescale derivation needs the list (ADR-0009 U-1).
+    SOURCE_FILES.with(|c| c.borrow_mut().clear());
     for f in &o.files {
         let path = PathBuf::from(f);
         let Some(out) = pp::preprocess_file(&path, sm, diags, &opts) else {
             continue;
         };
+        SOURCE_FILES.with(|c| {
+            c.borrow_mut().push((f.clone(), out.timescale.clone()))
+        });
         if timescale.is_none() {
             timescale = out.timescale.clone();
         }
@@ -296,6 +309,38 @@ fn simulate(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
             }
         },
     };
+    // ADR-0009 U-1: the unified engine (riv-elab → riv-kernel) drives
+    // --binary; the legacy segments interpreter stays reachable via
+    // RVERILATOR_LEGACY=1 until U-5 retires it.
+    let files: Vec<(String, Option<String>)> =
+        SOURCE_FILES.with(|c| c.borrow().clone());
+    let use_legacy = std::env::var("RVERILATOR_LEGACY").is_ok();
+    if !use_legacy {
+        let mut sim = match vl_sim::USim::build(&modules, &top, timescale.as_deref(), sm, &files) {
+            Ok(s) => s,
+            Err(e) => {
+                println!("%Error: {}", e.message);
+                return 1;
+            }
+        };
+        sim.set_file_base(std::env::current_dir().unwrap_or_default());
+        let r = sim.run();
+        print!("{}", sim.take_output());
+        if let Some((path, text)) = sim.take_vcd() {
+            let path = path.unwrap_or_else(|| "dump.vcd".to_string());
+            if let Err(e) = std::fs::write(&path, text) {
+                println!("%Error: cannot write VCD `{path}`: {e}");
+                return 1;
+            }
+        }
+        return match r {
+            Ok(()) => 0,
+            Err(e) => {
+                println!("%Error: {}", e.message);
+                1
+            }
+        };
+    }
     let mut sim = match vl_sim::Sim::build(&modules, &top, timescale.as_deref()) {
         Ok(s) => s,
         Err(e) => {

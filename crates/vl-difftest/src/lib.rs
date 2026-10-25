@@ -88,6 +88,30 @@ pub fn run_ours(dir: &Path) -> Result<SimOut, String> {
         [only] => only.clone(),
         _ => return Err(format!("top auto-detect failed: {cands:?}")),
     };
+    // ADR-0009 U-1: the differential gate drives the unified engine
+    // (the 59 goldens are its zero-drift acceptance). RVERILATOR_LEGACY=1
+    // falls back to the segments interpreter (rollback path).
+    if std::env::var("RVERILATOR_LEGACY").is_err() {
+        let files: Vec<(String, Option<String>)> = files
+            .iter()
+            .map(|f| {
+                let ts = std::fs::read_to_string(f).ok().and_then(|t| {
+                    t.lines().find_map(|l| {
+                        let l = l.trim_start();
+                        l.strip_prefix("`timescale").map(|r| r.trim().trim_end_matches(';').to_string())
+                    })
+                });
+                (f.to_string_lossy().into_owned(), ts)
+            })
+            .collect();
+        let mut sim = vl_sim::USim::build(&modules, &top, timescale.as_deref(), &sm, &files)
+            .map_err(|e| format!("elaborate: {}", e.message))?;
+        sim.set_file_base(dir.to_path_buf());
+        sim.run().map_err(|e| format!("run: {}", e.message))?;
+        let stdout = sim.take_output();
+        let vcd = sim.take_vcd().map(|(_, text)| text);
+        return Ok(SimOut { stdout, vcd });
+    }
     let mut sim = vl_sim::Sim::build(&modules, &top, timescale.as_deref())
         .map_err(|e| format!("elaborate: {}", e.message))?;
     sim.set_file_base(dir.to_path_buf());
