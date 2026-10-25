@@ -794,6 +794,71 @@ impl<'e, 'f> Lower<'e, 'f> {
                 });
                 Ok(Val { slot: dst, w: 64, signed: false, is_time: true })
             }
+            "$fopen" => {
+                let Some(Expr::StrLit { value: path, .. }) = args.first() else {
+                    return Err(self.err(span, "$fopen first argument must be a file name string"));
+                };
+                let mode_code = match args.get(1) {
+                    None => 0u32,
+                    Some(Expr::StrLit { value: m, .. }) if m == "w" => 1,
+                    Some(Expr::StrLit { value: m, .. }) => {
+                        return Err(self.err(span, format!("$fopen mode \"{m}\" is not supported (only \"w\"; see docs/RIVERILOG-PLAN.md §8)")))
+                    }
+                    Some(_) => return Err(self.err(span, "$fopen mode must be a string literal")),
+                };
+                let fidx = self.pool_str(vec![FmtPiece::Text(path.clone())]);
+                let seed_slot = self.slot();
+                let dst = self.slot();
+                self.emit(Op::Const { dst: seed_slot, lit: riv_ir::Literal { width: 32, signed: true, base: riv_ir::Base::Dec, digits: "0".into() } });
+                self.emit(Op::SysCall {
+                    id: SysId::Fopen,
+                    fmt: Some(fidx),
+                    args: vec![riv_ir::Arg { slot: seed_slot, width: mode_code, signed: true, is_time: false }],
+                    dst: Some(dst),
+                    file: 0,
+                    line: 0,
+                    start: 0,
+                });
+                Ok(Val { slot: dst, w: 32, signed: false, is_time: false })
+            }
+            "$random" => {
+                let dst = self.slot();
+                let mut ir_args = Vec::new();
+                let mut seed_lval: Option<Lval> = None;
+                let mut seed_slot: Option<u32> = None;
+                match args.first() {
+                    None => {}
+                    Some(Expr::Ident { name, span: ss }) => match self.lookup(name) {
+                        Some(NameKind::Var(v)) => {
+                            // Seed form: the variable's value rides in a
+                            // slot (in/out — the kernel writes the new
+                            // seed back into it), then it stores into the
+                            // reg.
+                            let a = self.slot();
+                            self.emit(Op::LoadVar { dst: a, var: v });
+                            self.note_read(v);
+                            ir_args.push(riv_ir::Arg { slot: a, width: 32, signed: true, is_time: false });
+                            seed_lval = Some(Lval::Var { var: v });
+                            seed_slot = Some(a);
+                        }
+                        _ => return Err(self.err(*ss, format!("`{name}` is not a variable"))),
+                    },
+                    Some(_) => return Err(self.err(span, "$random seed must be a variable")),
+                }
+                self.emit(Op::SysCall {
+                    id: SysId::Random,
+                    fmt: None,
+                    args: ir_args,
+                    dst: Some(dst),
+                    file: 0,
+                    line: 0,
+                    start: 0,
+                });
+                if let (Some(lv), Some(a)) = (seed_lval, seed_slot) {
+                    self.emit(Op::AssignBlk { lv, src: a });
+                }
+                Ok(Val { slot: dst, w: 32, signed: true, is_time: false })
+            }
             "$realtime" => Err(self.err(
                 span,
                 format!("`{func}` lands with the $time batch (milestone R3)"),
@@ -870,10 +935,10 @@ impl<'e, 'f> Lower<'e, 'f> {
                 self.ops[j as usize] = Op::Jump { to: els_pc };
                 Ok(Val { slot: ret, w: 1, signed: false, is_time: false })
             }
-            "$random" | "$dist_uniform" | "$dist_poisson" | "$dist_normal" | "$dist_exponential"
+            "$dist_uniform" | "$dist_poisson" | "$dist_normal" | "$dist_exponential"
             | "$dist_chi_square" | "$dist_t" | "$dist_erlang" => Err(self.err(
                 span,
-                format!("`{func}` lands with the IO batch (milestone R5)"),
+                format!("`{func}` is not supported (the $dist family is out of the planned surface; see docs/RIVERILOG-PLAN.md §8)"),
             )),
             _ => {
                 // User-defined function (IEEE §10.3): evaluate args, call,
@@ -1774,15 +1839,66 @@ impl<'e, 'f> Lower<'e, 'f> {
                 self.emit(Op::SysCall { id, fmt: Some(fidx), args: ir_args, dst: None, file: file_idx, line, start: 0 });
                 Ok(())
             }
-            "$dumpall" | "$dumpoff" | "$dumpon" | "$dumpflush" | "$dumplimit" => Err(self.err(
+            "$dumpall" | "$dumpoff" | "$dumpon" => {
+                if !args.is_empty() {
+                    return Err(self.err(span, format!("{name} takes no arguments")));
+                }
+                let id = match name {
+                    "$dumpall" => SysId::Dumpall,
+                    "$dumpoff" => SysId::Dumpoff,
+                    _ => SysId::Dumpon,
+                };
+                self.emit(Op::SysCall { id, fmt: None, args: Vec::new(), dst: None, file: file_idx, line, start: 0 });
+                Ok(())
+            }
+            "$dumpflush" | "$dumplimit" => Err(self.err(
                 span,
-                format!("`{name}` lands with the dump batch (milestone R5)"),
+                format!("`{name}` lands with the dump batch (milestone R5 residuals; see docs/RIVERILOG-PLAN.md §8)"),
             )),
-            "$fopen" | "$fwrite" | "$fdisplay" | "$fclose" | "$fmonitor" | "$sdf_annotate" => {
-                Err(self.err(
-                    span,
-                    format!("`{name}` lands with the IO batch (milestone R5)"),
-                ))
+            "$fopen" | "$fmonitor" | "$sdf_annotate" => Err(self.err(
+                span,
+                format!("`{name}` as a statement is not supported ($fopen is an expression; $fmonitor lands later; see docs/RIVERILOG-PLAN.md §8)"),
+            )),
+            "$fwrite" | "$fdisplay" => {
+                // $fwrite(fd, "fmt", args...) — fd first, then the display
+                // format contract (same compile as $display).
+                let Some(fd_expr) = args.first() else {
+                    return Err(self.err(span, format!("{name} needs a descriptor argument")));
+                };
+                let fd = self.lower(fd_expr, 0)?;
+                let (pieces, arg_exprs): (Vec<FmtPiece>, &[Expr]) = match args.get(1) {
+                    Some(Expr::StrLit { value, .. }) => (fmt::compile(value, self.file, line)?, &args[2..]),
+                    _ => return Err(self.err(span, "file format must be a string literal")),
+                };
+                let nspec = pieces.iter().filter(|p| matches!(p, FmtPiece::Spec { .. })).count();
+                if arg_exprs.len() != nspec {
+                    return Err(self.err(span, format!("{name}: format needs {nspec} arguments, got {}", arg_exprs.len())));
+                }
+                let mut ir_args = vec![riv_ir::Arg { slot: fd.slot, width: 32, signed: true, is_time: false }];
+                for a in arg_exprs {
+                    let v = self.lower(a, 0)?;
+                    ir_args.push(riv_ir::Arg { slot: v.slot, width: v.w, signed: v.signed, is_time: v.is_time });
+                }
+                let fmt_idx = self.pool_str(pieces);
+                let id = if name == "$fwrite" { SysId::Fwrite } else { SysId::Fdisplay };
+                self.emit(Op::SysCall { id, fmt: Some(fmt_idx), args: ir_args, dst: None, file: file_idx, line, start: 0 });
+                Ok(())
+            }
+            "$fclose" => {
+                let [fd_expr] = args else {
+                    return Err(self.err(span, "$fclose takes exactly one argument"));
+                };
+                let fd = self.lower(fd_expr, 0)?;
+                self.emit(Op::SysCall {
+                    id: SysId::Fclose,
+                    fmt: None,
+                    args: vec![riv_ir::Arg { slot: fd.slot, width: 32, signed: true, is_time: false }],
+                    dst: None,
+                    file: file_idx,
+                    line,
+                    start: 0,
+                });
+                Ok(())
             }
             "$time" | "$realtime" => Err(self.err(
                 span,

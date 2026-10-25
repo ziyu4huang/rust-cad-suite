@@ -31,6 +31,9 @@ pub struct RunOutcome {
 pub trait DumpSink {
     /// `$dumpvars` opened the dump for `path`.
     fn opened(&mut self, path: &str);
+    /// Dump-control section (`$dumpoff`/`$dumpon`/`$dumpall`, R5): every
+    /// var's value under the current timestamp (x's for dumpoff).
+    fn dump_section(&mut self, _now: u64, _name: &str, _values: &BTreeMap<String, String>) {}
     /// t0 initialization dump (current value of every var, by name).
     fn dump_t0(&mut self, values: &BTreeMap<String, String>);
     /// A committed change (name = `top.var`).
@@ -167,6 +170,16 @@ pub struct Kernel {
     /// Recycled wheel entry vectors (the wheel allocates one Vec per wake
     /// time without this pool).
     wheel_pool: Vec<Vec<usize>>,
+    /// Open files for the $fopen family: descriptor → handle. Descriptors
+    /// are 32-bit: MCD form = single bit (bit 0 = stdout), channel-FD form
+    /// = 0x8000_0000 | (11 + n) — iverilog's measured allocation.
+    files: Vec<(i32, Option<std::fs::File>)>,
+    next_mcd_bit: u32,
+    next_fd_n: u32,
+    /// Dump enabled (between $dumpoff and $dumpon changes are not recorded).
+    dump_on: bool,
+    /// $random state (sequence divergence = rivD11).
+    rng_seed: u32,
     /// rivvp -n: $stop behaves like $finish (rivD2).
     pub stop_as_finish: bool,
     /// -n $stop halted the run: like natural exhaustion — NO finish
@@ -333,6 +346,11 @@ impl Kernel {
                 rt
             },
             wheel_pool: Vec::new(),
+            files: Vec::new(),
+            next_mcd_bit: 1,
+            next_fd_n: 0,
+            dump_on: true,
+            rng_seed: 1,
             gate_watchers: {
                 let mut w: Vec<Vec<usize>> = vec![Vec::new(); d.vars.len()];
                 for (gi, g) in d.gates.iter().enumerate() {
@@ -996,7 +1014,151 @@ impl Kernel {
                                 bounds.push(Some(v.to_u128_lossy() as u64));
                             }
                         }
-                        self.run_readmem(id == SysId::ReadmemH, &path, var, bounds, sink)?;
+                        let hex = id == SysId::ReadmemH;
+                        let task = if hex { "$readmemh" } else { "$readmemb" };
+                        self.run_readmem(hex, &path, var, bounds, sink, task, file, line)?;
+                    }
+                    SysId::Dumpall => {
+                        if self.dump_open {
+                            let values = self.dump_values(true);
+                            sink.dump_section(self.now, "dumpall", &values);
+                        }
+                    }
+                    SysId::Dumpoff => {
+                        self.dump_on = false;
+                        if self.dump_open {
+                            let values = self.dump_values_x();
+                            sink.dump_section(self.now, "dumpoff", &values);
+                        }
+                    }
+                    SysId::Dumpon => {
+                        self.dump_on = true;
+                        if self.dump_open {
+                            let values = self.dump_values(true);
+                            sink.dump_section(self.now, "dumpon", &values);
+                        }
+                    }
+                    SysId::Fopen => {
+                        let Some(d) = dst else {
+                            return Err(RunError("$fopen without destination".into()));
+                        };
+                        let path = fmt
+                            .and_then(|f| self.d.strs.get(f as usize))
+                            .and_then(|p| p.first())
+                            .map(|p| match p {
+                                FmtPiece::Text(t) => t.clone(),
+                                _ => String::new(),
+                            })
+                            .unwrap_or_default();
+                        let mode_w = args.first().map(|a| a.width == 1).unwrap_or(false);
+                        let key: i32 = if mode_w {
+                            // iverilog channel-FD form (measured): first
+                            // "w" file = 0x8000_000B, incrementing.
+                            let k = (0x8000_0000u32 | (11 + self.next_fd_n)) as i32;
+                            self.next_fd_n += 1;
+                            k
+                        } else {
+                            let k = 1i32 << self.next_mcd_bit;
+                            self.next_mcd_bit += 1;
+                            if self.next_mcd_bit >= 31 {
+                                return Err(RunError("too many open files (MCD bits exhausted)".into()));
+                            }
+                            k
+                        };
+                        let f = std::fs::File::create(&path)
+                            .map_err(|e| RunError(format!("$fopen `{path}`: {e}")))?;
+                        self.files.push((key, Some(f)));
+                        let v = Bits::from_u64(32, key as u32 as u64).unwrap();
+                        self.set_slot(ti, d, v);
+                    }
+                    SysId::Fclose => {
+                        let fd = self
+                            .slot(ti, args.first().map(|a| a.slot).unwrap_or(0))?
+                            .clone();
+                        if fd.has_unknown() {
+                            return Err(RunError("$fclose descriptor is unknown".into()));
+                        }
+                        let key = fd.to_u128_lossy() as u32 as i32;
+                        for (k, f) in self.files.iter_mut() {
+                            if *k == key {
+                                *f = None; // dropped here
+                            }
+                        }
+                        self.files.retain(|(k, f)| *k != key && f.is_some());
+                    }
+                    SysId::Fwrite | SysId::Fdisplay => {
+                        let text = self.render(
+                            fmt,
+                            &args[1.min(args.len())..],
+                            ti,
+                        )?;
+                        let fd = self.slot(ti, args.first().map(|a| a.slot).unwrap_or(0))?.clone();
+                        if fd.has_unknown() {
+                            return Err(RunError("file descriptor is unknown".into()));
+                        }
+                        let key = fd.to_u128_lossy() as u32;
+                        // Channel-FD form (high bit set, iverilog measured):
+                        // writes ONLY the file behind the FD — the stdout
+                        // bit does not apply (`fd | 1` stays file-only).
+                        // MCD form: every set bit writes, bit 0 = stdout.
+                        let fd_form = key & 0x8000_0000 != 0;
+                        let write_file = |f: &mut Option<std::fs::File>, text: &str| -> Result<(), RunError> {
+                            use std::io::Write;
+                            if let Some(f) = f.as_mut() {
+                                let mut buf = text.to_string();
+                                if id == SysId::Fdisplay {
+                                    buf.push('\n');
+                                }
+                                f.write_all(buf.as_bytes())
+                                    .map_err(|e| RunError(format!("$fwrite: {e}")))?;
+                            }
+                            Ok(())
+                        };
+                        if fd_form {
+                            for (k, f) in self.files.iter_mut() {
+                                if *k as u32 == key {
+                                    write_file(f, &text)?;
+                                }
+                            }
+                        } else {
+                            if key & 1 == 1 {
+                                self.out.push_str(&text);
+                                if id == SysId::Fdisplay {
+                                    self.out.push('\n');
+                                }
+                            }
+                            for (k, f) in self.files.iter_mut() {
+                                if *k != 1 && key & *k as u32 != 0 {
+                                    write_file(f, &text)?;
+                                }
+                            }
+                        }
+                    }
+                    SysId::Random => {
+                        let Some(d) = dst else {
+                            return Err(RunError("$random without destination".into()));
+                        };
+                        let mut x = self.rng_seed;
+                        if let Some(a) = args.first() {
+                            if a.width > 0 {
+                                let sv = self.slot(ti, a.slot)?.clone();
+                                x = if sv.has_unknown() {
+                                    1
+                                } else {
+                                    sv.to_u128_lossy() as u32
+                                };
+                            }
+                        }
+                        x = x.wrapping_mul(1103515245).wrapping_add(12345);
+                        self.rng_seed = x;
+                        if let Some(a) = args.first() {
+                            if a.width > 0 {
+                                self.set_slot(ti, a.slot, Bits::from_u64(32, x as u64).unwrap());
+                            }
+                        }
+                        let v = Bits::from_u64(32, x as u64).unwrap();
+                        // 32-bit signed rendering ($random returns signed).
+                        self.set_slot(ti, d, v);
                     }
                     SysId::Trigger => {
                         let ev = args.first().map(|a| a.slot as VarId).ok_or_else(|| {
@@ -1560,7 +1722,7 @@ impl Kernel {
             return Ok(());
         }
         self.vars[var as usize] = newv.clone();
-        if self.dump_open {
+        if self.dump_open && self.dump_on {
             sink.change(&self.var_flat_name(var), &newv.fmt_bin());
         }
         self.wake(var, &old, &newv);
@@ -1686,6 +1848,9 @@ impl Kernel {
         var: VarId,
         bounds: Vec<Option<u64>>,
         sink: &mut dyn DumpSink,
+        task: &str,
+        file: u32,
+        line: u32,
     ) -> Result<(), RunError> {
         if self.d.vars.get(var as usize).map(|v| v.kind) != Some(VarKind::Array) {
             return Err(RunError("readmem target is not a memory".into()));
@@ -1725,6 +1890,21 @@ impl Kernel {
                 continue;
             }
             if addr > finish {
+                // iverilog byte shape (stdout): over-range words warn once
+                // and the rest is ignored.
+                let file_name = self
+                    .d
+                    .strs
+                    .get(file as usize)
+                    .and_then(|p| p.first())
+                    .map(|p| match p {
+                        FmtPiece::Text(t) => t.clone(),
+                        _ => String::new(),
+                    })
+                    .unwrap_or_default();
+                self.out.push_str(&format!(
+                    "WARNING: {file_name}:{line}: {task}({path}): Too many words in the file for the requested range [{start}:{finish}].\n"
+                ));
                 break;
             }
             let bits = from_numlit_parts(Some(w), false, if hex { VB::Hex } else { VB::Bin }, &tok.to_ascii_lowercase())
@@ -2125,6 +2305,31 @@ impl Kernel {
             }
         }
         Ok(out)
+    }
+
+    /// All dumpable vars' current values (arrays/events excluded — per-
+    /// element dump is R5+).
+    fn dump_values(&self, _current: bool) -> BTreeMap<String, String> {
+        let mut values = BTreeMap::new();
+        for (i, v) in self.d.vars.iter().enumerate() {
+            if v.kind == VarKind::Event || v.kind == VarKind::Array {
+                continue;
+            }
+            values.insert(self.var_flat_name(i as VarId), self.vars[i].fmt_bin());
+        }
+        values
+    }
+
+    fn dump_values_x(&self) -> BTreeMap<String, String> {
+        let mut values = BTreeMap::new();
+        for (i, v) in self.d.vars.iter().enumerate() {
+            if v.kind == VarKind::Event || v.kind == VarKind::Array {
+                continue;
+            }
+            let x = "x".repeat(v.width as usize);
+            values.insert(self.var_flat_name(i as VarId), x);
+        }
+        values
     }
 
     fn open_dump(&mut self, sink: &mut dyn DumpSink) -> Result<(), RunError> {

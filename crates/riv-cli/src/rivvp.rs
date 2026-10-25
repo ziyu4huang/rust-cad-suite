@@ -38,6 +38,14 @@ fn main() -> ExitCode {
                 return ExitCode::from(0);
             }
             "-n" => stop_as_finish = true,
+            "-vcd" => {
+                // VCD is the only dumper (ADR-0005); the flag is accepted
+                // as the default selection.
+            }
+            "-fst" => {
+                eprintln!("rivvp: FST dumper is not planned (VCD only; see docs/RIVERILOG-PLAN.md §5)");
+                return ExitCode::from(1);
+            }
             "-N" | "-i" | "-q" => {}
             "-l" | "-M" | "-m" => i += 1,
             _ if a.starts_with('+') => plusargs.push(a),
@@ -51,6 +59,14 @@ fn main() -> ExitCode {
             }
         }
         i += 1;
+    }
+
+    // IVERILOG_DUMPER env (R5): vcd is the only supported dumper.
+    if let Ok(dumper) = std::env::var("IVERILOG_DUMPER") {
+        if !dumper.eq_ignore_ascii_case("vcd") && !dumper.is_empty() {
+            eprintln!("rivvp: IVERILOG_DUMPER={dumper} is not supported (VCD only; see docs/RIVERILOG-PLAN.md §5)");
+            return ExitCode::from(1);
+        }
     }
 
     let Some(design) = design else {
@@ -143,6 +159,12 @@ impl VcdSink {
 impl DumpSink for VcdSink {
     fn opened(&mut self, path: &str) {
         self.path = Some(path.to_string());
+    }
+
+    fn dump_section(&mut self, now: u64, name: &str, values: &BTreeMap<String, String>) {
+        if let Some(w) = self.writer.as_mut() {
+            w.dump_section(now, name, values);
+        }
     }
 
     fn dump_t0(&mut self, values: &BTreeMap<String, String>) {

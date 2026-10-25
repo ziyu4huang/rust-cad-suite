@@ -166,6 +166,35 @@ impl VcdWriter {
         self.pending.clear();
     }
 
+    /// Dump-control section (iverilog shape, R5): `$dumpoff`/`$dumpon`/
+    /// `$dumpall` as a time-stamped section listing every var's value —
+    /// pending changes flush into the body first, then the section lands
+    /// under the current timestamp.
+    pub fn dump_section(&mut self, now: u64, name: &str, values: &BTreeMap<String, String>) {
+        if !self.started || !self.header_done {
+            return;
+        }
+        // iverilog ordering: the section lands FIRST; same-timestamp value
+        // changes buffered from earlier in the slot flush AFTER it (22's
+        // #5000: $dumpoff x's, then the pending a=1 change — the change
+        // survives the section).
+        if self.now_emitted != Some(now) {
+            self.body.push_str(&format!("#{now}\n"));
+            self.now_emitted = Some(now);
+        }
+        self.body.push_str(&format!("${name}\n"));
+        let names: Vec<String> = self.vars.iter().map(|v| v.0.clone()).collect();
+        for name in names {
+            if let Some(value) = values.get(&name) {
+                if let Some(line) = self.value_line(&name, value) {
+                    self.body.push_str(&line);
+                }
+                self.last.insert(name, value.clone());
+            }
+        }
+        self.body.push_str("$end\n");
+    }
+
     /// Flush changes accumulated while processing time `now`.
     pub fn flush_at(&mut self, now: u64) {
         if !self.started || !self.header_done {

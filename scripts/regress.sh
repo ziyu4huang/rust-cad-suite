@@ -59,7 +59,7 @@ if [ -f crates/riv-cli/Cargo.toml ]; then
     [ -n "$e2e_sum" ] || { echo "GATE FAIL: riv e2e SUMMARY missing"; fail=1; }
     [ -n "$iv_sum" ] || { echo "GATE FAIL: riv iv SUMMARY missing"; fail=1; }
     echo "$e2e_sum" | grep -q "SUMMARY e2e=58/59 iv=0/0" || { echo "GATE FAIL: riv e2e baseline (want exact 58/59): $e2e_sum"; fail=1; }
-    echo "$iv_sum" | grep -q "SUMMARY e2e=0/0 iv=19/20" || { echo "GATE FAIL: riv iv baseline (want exact 19/20): $iv_sum"; fail=1; }
+    echo "$iv_sum" | grep -q "SUMMARY e2e=0/0 iv=21/22" || { echo "GATE FAIL: riv iv baseline (want exact 21/22): $iv_sum"; fail=1; }
     riv_all="$e2e_out
 $iv_out"
     riv_unledgered=$(echo "$riv_all" | grep -c "UNLEDGERED" || true)
@@ -78,29 +78,34 @@ $iv_out"
     echo "$tri_sum"
     echo "$e2e_sum"
     echo "$iv_sum"
-    # riverilog VCD cross-compare (RIVERILOG-PLAN §8.1 hygiene ①/rivD9):
-    # 51's dump vs the iverilog-recorded reference through the single VCD
-    # core (ADR-0004) — sample-point compare, name intersection, header
-    # families normalized away by the reader.
-    vcd_tmp=$(mktemp -d)
+    # riverilog VCD cross-compare (RIVERILOG-PLAN §8.1/rivD9 + R5 22):
+    # every case with an iverilog-recorded oracle-ref.iv.vcd (51 base,
+    # 22 dump controls) — sample-point compare through the single VCD core.
     repo_root=$(pwd)
-    cp corpus/e2e/51_vcd_counter/tb.v "$vcd_tmp/"
-    (cd "$vcd_tmp" && "$repo_root/target/debug/riverilog" -o out.riv tb.v >/dev/null 2>&1 && "$repo_root/target/debug/rivvp" out.riv >/dev/null 2>&1)
-    if [ -f "$vcd_tmp/dump.vcd" ]; then
-        vcd_rep=$(cargo run -q -p vl-difftest -- --vcd-xcheck "$vcd_tmp/dump.vcd" corpus/e2e/51_vcd_counter/oracle-ref.iv.vcd 2>&1)
-        vcd_rc=$?
-        if [ "$vcd_rc" -ne 0 ]; then
-            echo "GATE FAIL: riv VCD crosscheck (51 vs iverilog ref)"
-            echo "$vcd_rep"
-            fail=1
+    for vcase in corpus/e2e/51_vcd_counter corpus/iv-e2e/22_dump_control; do
+        [ -f "$vcase/oracle-ref.iv.vcd" ] || continue
+        vcd_tmp=$(mktemp -d)
+        gflag=""
+        case "$vcase" in
+            corpus/iv-e2e/*) gflag="-g2005" ;;
+        esac
+        cp "$vcase"/tb.v "$vcd_tmp/"
+        (cd "$vcd_tmp" && "$repo_root/target/debug/riverilog" $gflag -o out.riv tb.v >/dev/null 2>&1 && "$repo_root/target/debug/rivvp" out.riv >/dev/null 2>&1)
+        if [ -f "$vcd_tmp/dump.vcd" ]; then
+            vcd_rep=$(cargo run -q -p vl-difftest -- --vcd-xcheck "$vcd_tmp/dump.vcd" "$vcase/oracle-ref.iv.vcd" 2>&1)
+            if [ $? -ne 0 ]; then
+                echo "GATE FAIL: riv VCD crosscheck ($vcase vs iverilog ref)"
+                echo "$vcd_rep"
+                fail=1
+            else
+                echo "$vcd_rep" | tail -1
+            fi
         else
-            echo "$vcd_rep" | tail -1
+            echo "GATE FAIL: riv VCD crosscheck — $vcase produced no dump.vcd"
+            fail=1
         fi
-    else
-        echo "GATE FAIL: riv VCD crosscheck — 51 produced no dump.vcd"
-        fail=1
-    fi
-    rm -rf "$vcd_tmp"
+        rm -rf "$vcd_tmp"
+    done
 fi
 
 # WASM differential gate: the wasm engine must reproduce the same oracle

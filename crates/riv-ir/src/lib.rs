@@ -537,6 +537,23 @@ pub enum SysId {
     ReadmemB,
     /// `-> ev` — trigger the named event var.
     Trigger,
+    /// `$fopen("file"[, "w"])` — dst receives the descriptor. Mode rides in
+    /// args[0].width (0 = one-arg MCD form, 1 = "w" channel-FD form).
+    Fopen,
+    /// `$fclose(fd)` — fd in args[0].slot.
+    Fclose,
+    /// `$fwrite(fd, fmt, args...)` — fd in args[0].slot, format in `fmt`,
+    /// remaining args render through it.
+    Fwrite,
+    /// `$fdisplay` — same as Fwrite plus a newline.
+    Fdisplay,
+    /// `$dumpall` / `$dumpoff` / `$dumpon` — dump-control sections.
+    Dumpall,
+    Dumpoff,
+    Dumpon,
+    /// `$random[(seed)]` — 32-bit LCG; seed form updates args[0].slot.
+    /// Sequence values are implementation-specific (rivD11).
+    Random,
 }
 
 impl SysId {
@@ -559,6 +576,14 @@ impl SysId {
             SysId::ReadmemH => "readmemh",
             SysId::ReadmemB => "readmemb",
             SysId::Trigger => "trigger",
+            SysId::Fopen => "fopen",
+            SysId::Fclose => "fclose",
+            SysId::Fwrite => "fwrite",
+            SysId::Fdisplay => "fdisplay",
+            SysId::Dumpall => "dumpall",
+            SysId::Dumpoff => "dumpoff",
+            SysId::Dumpon => "dumpon",
+            SysId::Random => "random",
         }
     }
     pub fn from_tag(s: &str) -> Option<SysId> {
@@ -580,6 +605,14 @@ impl SysId {
             "readmemh" => SysId::ReadmemH,
             "readmemb" => SysId::ReadmemB,
             "trigger" => SysId::Trigger,
+            "fopen" => SysId::Fopen,
+            "fclose" => SysId::Fclose,
+            "fwrite" => SysId::Fwrite,
+            "fdisplay" => SysId::Fdisplay,
+            "dumpall" => SysId::Dumpall,
+            "dumpoff" => SysId::Dumpoff,
+            "dumpon" => SysId::Dumpon,
+            "random" => SysId::Random,
             _ => return None,
         })
     }
@@ -1653,6 +1686,11 @@ mod tests {
                         Op::SysCall { id: SysId::Trigger, fmt: None, args: vec![], dst: None, file: 0, line: 7, start: 0 },
                         Op::SysCall { id: SysId::Stop, fmt: None, args: vec![], dst: None, file: 0, line: 8, start: 0 },
                         Op::SysCall { id: SysId::ReadmemH, fmt: Some(1), args: vec![Arg { slot: 0, width: 32, signed: false, is_time: false }, Arg { slot: 1, width: 0, signed: false, is_time: false }], dst: None, file: 0, line: 9, start: 0 },
+                        Op::SysCall { id: SysId::Fopen, fmt: Some(1), args: vec![Arg { slot: 0, width: 1, signed: false, is_time: false }], dst: Some(1), file: 0, line: 10, start: 0 },
+                        Op::SysCall { id: SysId::Fwrite, fmt: Some(0), args: vec![Arg { slot: 1, width: 32, signed: true, is_time: false }], dst: None, file: 0, line: 11, start: 0 },
+                        Op::SysCall { id: SysId::Fclose, fmt: None, args: vec![Arg { slot: 1, width: 32, signed: true, is_time: false }], dst: None, file: 0, line: 12, start: 0 },
+                        Op::SysCall { id: SysId::Dumpall, fmt: None, args: vec![], dst: None, file: 0, line: 13, start: 0 },
+                        Op::SysCall { id: SysId::Random, fmt: None, args: vec![Arg { slot: 2, width: 32, signed: true, is_time: false }], dst: Some(3), file: 0, line: 14, start: 0 },
                         Op::AssignBlk { lv: Lval::Part { var: 0, hi: 7, lo: 4 }, src: 3 },
                         Op::AssignNba { lv: Lval::PartDyn { var: 0, hi: 1, lo: 0 }, src: 3 },
                         Op::AssignBlk {

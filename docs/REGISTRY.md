@@ -92,6 +92,7 @@
 | rivD7 | 48_frac_delay 延遲捨入(**預登記撤回**) | 設計期預測 iverilog 按 precision 捨入(1500/1750) | 同 | **2026-10-25 live probe 反證**:iverilog 13.0 數據行 `t=2000/t=2000` 與 verilator 金樣逐字一致,僅 finish 橫幅時刻(1750)剩差且屬 rivD8 丟行;48 現狀 pass、無需 ledger;編號留墓碑,32_proc_order 未來分歧=rivD9 | 本 session 探針(vvp -n 輸出 vs expected.stdout diff 僅 1 行);RIVERILOG-PLAN §6 |
 | rivD8 | riv e2e 臂 stdout 正規化:丟 riv 自家工具行 | e2e 金樣(verilator 錄製)無 iverilog 形工具行 | rivvp 印 iverilog 形 $finish 橫幅/`VCD info: ` 行 | 丟行白名單=vl-difftest 四前綴 ∪ 兩工具行形,禁內容改寫;敵意 fixture(`-7div2=-3`、`tb.v:6: ` 設計行)單測釘死;iv 臂不丟(工具行=金樣) | riv-difftest/src/main.rs:241-285,669-714;riv-r2-design §9-3/§10 注 1 |
 | rivD9 | ✅ 2026-10-25 兌現:e2e oracle-ref.vcd=verilator 2-state 錄製,與 riv(iverilog 形 4-state)不同側——t0 值域(q=0 vs x)與參數傾印(D3 家族);交叉閘以 iverilog 腿另錄金樣(oracle-ref.iv.vcd 入庫),樣本點交叉=vcd_gate 形+rivD1 正規化 | 51_vcd_counter 雙腿實證 | regress vcd-xcheck 閘(6/6 var 50 樣本點 0 失配) | RIVERILOG-PLAN §6/§8.1 |
+| rivD11 | $random 序列分歧:iverilog 13.0 首二值 303379748/-1064739199,riv=LCG 1103515245/12345;IEEE 明文序列為 implementation-specific | r5probe.v 探針 | 行為面(可重現+種子 inout)實作;含原值案例不入語料 | RIVERILOG-PLAN §6 |
 | rivD10 | 未寫入記憶體元素:iverilog 讀 x vs verilator 金樣 2-state 讀 0;riv 匹配 iverilog,53_readmem ledger 化 | 53_readmem expected.iv.stdout L2(xxxx vs 0000) | riv-pending.txt ledger(登記分歧不入紅燈);後續記憶體案例須全初始化或預期此分歧 | RIVERILOG-PLAN §6 |
 
 ## Incident register(工具鏈開發事故;五欄制)
