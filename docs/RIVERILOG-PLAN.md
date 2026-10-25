@@ -1,6 +1,6 @@
 # riverilog — Icarus Verilog 等價模擬器企劃書(正典)
 
-> Suite 路線圖 **P3**(PLAN.md §1)。2026-10-24 立案:planner 出案 → 對抗審 →
+> Suite 路線圖 **P3**(PLAN.md §1)。**2026-10-25 ADR-0009:引擎合流為單一核(riv-kernel 升格),本計畫的 CLI 契約(§5/§6)與里程碑語料閘全部不變,架構節(§3)由 ADR 修訂**。2026-10-24 立案:planner 出案 → 對抗審 →
 > 合成正典;oracle=本機 Icarus Verilog 13.0(stable,/opt/homebrew/bin,僅測試)。
 > 本文檔本身即本階段交付物;實作按 §8 里程碑排序,動工前先過 §12 open decisions。
 > 命名:**riverilog**(專案)/`riverilog`(編譯器二進制)/`rivvp`(執行期二進制)。
@@ -205,6 +205,8 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
   確定性 byte 輸出)作為兩進制的流通物:流程相容上游生態,格式主權在自己手裡。
 
 ### 選項 C:擴展 vl-sim 到 4-state/delays(誠實的失敗分析)
+
+> ⚠ **2026-10-25 ADR-0009 翻案**:本節裁決被推翻——方向反轉為「以 riv-kernel 為統一核心、vl-sim 降為方言 profile」;本節分析保留作歷史依據(其對 vl-sim 原地改造成本的判斷仍真,但解法改為引擎合流而非雙引擎並行)。見 docs/adr/0009-unified-engine-cli-compliance.md。
 表面誘人(vl-sim 已是 4-state 值+事件喚醒),但**三層結構性失敗**:
 1. **語義契約對撞**:rverilator 的 spec=「match Verilator」(AGENTS §1+D1-D11
    分歧簿全體),riverilog 的 spec=「match iverilog」。同一輸入兩個正確答案的
@@ -496,7 +498,7 @@ golden model 對 riverilog 鎖步=意圖驗證的 4-state 腿。
 | # | 問題 | 建議 | 備選 |
 |---|---|---|---|
 | OD1 | .vvp 檔案格式相容 | **不相容**;自有 `out.riv`,流程相容 | 位元組相容(RK7 一週 spike 後再議) |
-| OD2 | 單一 vs 兩個二進制 | **兩個**(riverilog+rivvp):生態契約是兩段式;riv 物件是介面凍結點 | 單一 `riverilog` 子命令式(較晚再拆) |
+| OD2 | 單一 vs 兩個二進制 | **兩個**(riverilog+rivvp):生態契約是兩段式;riv 物件是介面凍結點 | 單一 `riverilog` 子命令式(較晚再拆) | **翻案(ADR-0009 2026-10-25)**:二進制保留但只是 CLI 面;引擎單一(riv-kernel 統一核);out.riv 降為 riverilog CLI 內部細節非介面凍結點 |
 | OD3 | SV 雄心水準 | -g2012 子集階梯到 R8 為止;classes/interfaces/constraints/DPI 不進本計畫 | interfaces 隨 M10(rverilator)聯動決策 |
 | OD4 | cocotb 優先序 | R10 後評估;先 Rust-native `-m` VPI 模組面 | 提前開 C-ABI 橋(RK8 條款) |
 | OD5 | riverilog 是否吃 rverilator tier-B lowering | 不預綁;M9 ADR-0002 後以「§9.8-1 執行緒可序列化」為門評估 | 早期綁定(不建議) |
