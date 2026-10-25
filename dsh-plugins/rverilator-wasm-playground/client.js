@@ -9,6 +9,9 @@
  *     (rverilator → WasmSim | riverilog → riv_build + riv_run), stdout, and the
  *     VCD rendered by the SAME Rust SVG renderer the CLI uses (no canvas).
  *   - corpus cards: run the oracle-recorded e2e cases and byte-diff stdout.
+ *   - XLS bridge cards: the provenance chain (DSLX → XLS IR → normalized
+ *     Verilog → race-safe TB) for XLS-generated designs, scanned by the Host
+ *     from corpus-external/xls, then run and byte-diffed in wasm.
  *   - spec card: RTL ↔ golden-model lockstep with named protocol violations.
  *
  * No iframe and no Host-rendered HTML page: the panel is a slot component so it
@@ -45,8 +48,9 @@ module tb;
 endmodule
 `;
 
-    // The three cases the Host route allowlists. `forceDump` is the facade
-    // capability for XLS TBs that carry no `$dumpvars` (not a TB edit).
+    // The generic verification slice the Host allowlists. The two XLS cases
+    // live in the XLS bridge section instead (they carry a provenance chain);
+    // keeping one copy of each run keeps the two sections honest.
     const CASES = [
       {
         dir: '51_vcd_counter',
@@ -56,23 +60,14 @@ endmodule
         top: 'tb',
         forceDump: false,
       },
-      {
-        dir: '57_xls_add3',
-        titleKey: 'caseAdd3Title',
-        descKey: 'caseAdd3Desc',
-        files: ['add3.v', 'tb.v'],
-        top: 'tb',
-        forceDump: false,
-      },
-      {
-        dir: '58_xls_acc_pipe',
-        titleKey: 'caseAccTitle',
-        descKey: 'caseAccDesc',
-        files: ['acc_pipe.v', 'tb.v'],
-        top: 'tb',
-        forceDump: true,
-      },
     ];
+
+    // Locale keys per harvested XLS id; an unknown id falls back to its stem,
+    // so the Host manifest stays the single source of which cases exist.
+    const XLS_KEYS = {
+      add3: { title: 'caseAdd3Title', desc: 'caseAdd3Desc' },
+      acc_pipe: { title: 'caseAccTitle', desc: 'caseAccDesc' },
+    };
 
     const VARIANTS = ['variantCorrect', 'variantBitOrder', 'variantNoAck'];
 
@@ -125,6 +120,23 @@ endmodule
       caseAdd3Desc: 'Three-stage pipelined adder emitted by the XLS toolchain, harvested by the repo pipeline.',
       caseAccTitle: 'XLS acc_pipe (stateful pipeline)',
       caseAccDesc: 'Accumulator pipeline from XLS codegen; the TB has no $dumpvars, so the page asks the facade to force the dump.',
+      xlsHeading: 'XLS bridge: DSLX → IR → Verilog, run here',
+      xlsIntro: 'The same wasm engine that runs the playground also runs Verilog emitted by Google XLS. Each card shows the provenance chain — DSLX source, XLS IR, normalized Verilog, and the race-safe testbench — then byte-diffs stdout against the Verilator-recorded expectation. The Host scans the snapshot, so adding an XLS case is data, not client code.',
+      xlsLoading: 'scanning the XLS snapshot…',
+      xlsEmpty: 'no complete XLS case in the snapshot (needs dslx/, generated/, and an e2e case)',
+      xlsFailed: 'XLS manifest failed: ',
+      xlsChainDslx: 'DSLX',
+      xlsChainIr: 'XLS IR',
+      xlsChainVerilog: 'Verilog',
+      xlsChainTb: 'TB + expectation',
+      xlsChainSim: 'wasm simulate',
+      xlsRun: 'Run + verify',
+      xlsPaneDslx: 'DSLX source',
+      xlsPaneIr: 'XLS IR (lowered dataflow)',
+      xlsPaneVerilog: 'XLS codegen Verilog (normalized)',
+      xlsPaneTb: 'testbench (race-safe)',
+      xlsDocsFailed: 'could not load the provenance files: ',
+      xlsProvenance: 'Harvested by the repo xls-harvest workflow (DSLX → IR → codegen_main). The pipeline normalizes two things: always_ff → always and an injected timescale (REGISTRY D16). Apache-2.0 snapshot; the expectation is recorded from the Verilator oracle, and the TB carries no $dumpvars — the facade forces the dump instead of editing the testbench.',
     };
 
     const ZH_TW = {
@@ -176,6 +188,23 @@ endmodule
       caseAdd3Desc: 'XLS 工具鏈產出的三級管線加法器,經 repo 收割管線收編。',
       caseAccTitle: 'XLS acc_pipe(有狀態管線)',
       caseAccDesc: 'XLS codegen 的累加器管線;TB 沒有 $dumpvars,由頁面要求 facade 強制 dump。',
+      xlsHeading: 'XLS 橋接:DSLX → IR → Verilog,在這裡跑',
+      xlsIntro: '跑 playground 的同一個 wasm 引擎,也跑 Google XLS 產出的 Verilog。每張卡攤開完整出處鏈——DSLX 源、XLS IR、正規化後的 Verilog、race-safe 測試台——再把 stdout 對 Verilator 錄下的期望值逐位元組比對。清單由 Host 掃描快照產生:新增 XLS 案例是資料,不是改前端。',
+      xlsLoading: '掃描 XLS 快照…',
+      xlsEmpty: '快照裡沒有完整的 XLS 案例(需要 dslx/、generated/ 與對應 e2e 案例)',
+      xlsFailed: 'XLS 清單載入失敗:',
+      xlsChainDslx: 'DSLX',
+      xlsChainIr: 'XLS IR',
+      xlsChainVerilog: 'Verilog',
+      xlsChainTb: 'TB + 期望值',
+      xlsChainSim: 'wasm 模擬',
+      xlsRun: '執行 + 驗證',
+      xlsPaneDslx: 'DSLX 源',
+      xlsPaneIr: 'XLS IR(降階後的資料流)',
+      xlsPaneVerilog: 'XLS codegen Verilog(已正規化)',
+      xlsPaneTb: '測試台(race-safe)',
+      xlsDocsFailed: '出處檔案載入失敗:',
+      xlsProvenance: '由 repo 的 xls-harvest workflow 收割(DSLX → IR → codegen_main)。管線內正規化兩點:always_ff → always、注入 timescale(REGISTRY D16)。Apache-2.0 快照;期望值由 Verilator oracle 錄製,TB 不帶 $dumpvars——由 facade 強制 dump,不改測試台。',
     };
 
     // Simplified Chinese dictionary: the shipped Harness UI runs zh-CN by default,
@@ -229,6 +258,23 @@ endmodule
       caseAdd3Desc: 'XLS 工具链产出的三级流水加法器,经 repo 收割流水线收录。',
       caseAccTitle: 'XLS acc_pipe(有状态流水线)',
       caseAccDesc: 'XLS codegen 的累加器流水线;TB 没有 $dumpvars,由页面要求 facade 强制 dump。',
+      xlsHeading: 'XLS 桥接:DSLX → IR → Verilog,在这里跑',
+      xlsIntro: '跑 playground 的同一个 wasm 引擎,也跑 Google XLS 产出的 Verilog。每张卡摊开完整出处链——DSLX 源、XLS IR、规范化后的 Verilog、race-safe 测试台——再把 stdout 对 Verilator 录下的期望值逐字节比对。清单由 Host 扫描快照生成:新增 XLS 案例是数据,不是改前端。',
+      xlsLoading: '扫描 XLS 快照…',
+      xlsEmpty: '快照里没有完整的 XLS 案例(需要 dslx/、generated/ 与对应 e2e 案例)',
+      xlsFailed: 'XLS 清单载入失败:',
+      xlsChainDslx: 'DSLX',
+      xlsChainIr: 'XLS IR',
+      xlsChainVerilog: 'Verilog',
+      xlsChainTb: 'TB + 期望值',
+      xlsChainSim: 'wasm 模拟',
+      xlsRun: '运行 + 验证',
+      xlsPaneDslx: 'DSLX 源',
+      xlsPaneIr: 'XLS IR(降阶后的数据流)',
+      xlsPaneVerilog: 'XLS codegen Verilog(已规范化)',
+      xlsPaneTb: '测试台(race-safe)',
+      xlsDocsFailed: '出处文件载入失败:',
+      xlsProvenance: '由 repo 的 xls-harvest workflow 收割(DSLX → IR → codegen_main)。流水线内规范化两点:always_ff → always、注入 timescale(REGISTRY D16)。Apache-2.0 快照;期望值由 Verilator oracle 录制,TB 不带 $dumpvars——由 facade 强制 dump,不改测试台。',
     };
 
     const CSS = `
@@ -285,6 +331,14 @@ endmodule
 .rvw-details .rvw-pre { max-height: 18rem; }
 .rvw-variants { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12px; margin-bottom: 8px; }
 .rvw-variants label { cursor: pointer; color: var(--dsw-alias-label-primary); }
+.rvw-chain { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 9px 0 2px; font-size: 11.5px; }
+.rvw-chip { border: 1px solid var(--dsw-alias-border-l1); border-radius: 999px; padding: 1px 9px;
+  background: var(--dsw-alias-bg-layer-2); color: var(--dsw-alias-label-primary); }
+.rvw-arrow { color: var(--dsw-alias-label-secondary); }
+.rvw-xls-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 4px 14px; }
+@media (max-width: 980px) { .rvw-xls-grid { grid-template-columns: minmax(0, 1fr); } }
+.rvw-pre.pane { max-height: 12.5rem; min-height: 3.5rem; margin-top: 2px; }
+.rvw-prov { color: var(--dsw-alias-label-secondary); font-size: 11px; margin: 8px 0 0; }
 `;
 
     // ---------------------------------------------------------------- engine
@@ -329,22 +383,30 @@ endmodule
       return { stdout: sim.take_output(), vcdText: sim.take_vcd() || '', rivBytes: 0 };
     }
 
+    /** Fetch one Host-route text asset, failing with the path a human can grep. */
+    async function fetchText(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(path.replace(BASE, '') + ': HTTP ' + res.status);
+      return res.text();
+    }
+
+    /** Simulate a fixed source list (both faces share this). */
+    function runSources(mod, sources, options) {
+      const sim = new mod.WasmSim(options.top, sources, [], []);
+      if (options.forceDump) sim.force_dump();
+      sim.run();
+      return { stdout: sim.take_output(), vcdText: sim.take_vcd() || '' };
+    }
+
     /** Byte-diff one corpus case: sources come from the Host allowlisted route. */
     async function runCorpusCase(mod, target) {
       const sources = [];
       for (const file of target.files) {
-        const res = await fetch(BASE + 'corpus/e2e/' + target.dir + '/' + file);
-        if (!res.ok) throw new Error(file + ': HTTP ' + res.status);
-        sources.push(await res.text());
+        sources.push(await fetchText(BASE + 'corpus/e2e/' + target.dir + '/' + file));
       }
-      const expRes = await fetch(BASE + 'corpus/e2e/' + target.dir + '/expected.stdout');
-      if (!expRes.ok) throw new Error('expected.stdout: HTTP ' + expRes.status);
-      const expected = await expRes.text();
-      const sim = new mod.WasmSim(target.top, sources, [], []);
-      if (target.forceDump) sim.force_dump();
-      sim.run();
-      const got = sim.take_output();
-      return { stdout: got, match: got === expected, vcdText: sim.take_vcd() || '' };
+      const expected = await fetchText(BASE + 'corpus/e2e/' + target.dir + '/expected.stdout');
+      const result = runSources(mod, sources, { top: target.top, forceDump: target.forceDump });
+      return { stdout: result.stdout, match: result.stdout === expected, vcdText: result.vcdText };
     }
 
     function signalNames(vcd) {
@@ -560,6 +622,127 @@ endmodule
       );
     }
 
+    /**
+     * One harvested XLS case: the full provenance chain as read-only panes plus
+     * the same wasm byte-diff the corpus cards do. Panes come from the Host
+     * manifest, so the component knows nothing about specific XLS samples.
+     */
+    function XlsCard({ t, mod, entry }) {
+      const keys = XLS_KEYS[entry.id] || {};
+      const [docs, setDocs] = React.useState(null);
+      const [docsError, setDocsError] = React.useState('');
+      const [busy, setBusy] = React.useState(false);
+      const [stage, setStage] = React.useState('idle');
+      const [stdout, setStdout] = React.useState('');
+      const [match, setMatch] = React.useState(null);
+      const [vcdText, setVcdText] = React.useState('');
+
+      React.useEffect(() => {
+        let alive = true;
+        Promise.all([
+          fetchText(BASE + 'xls/' + entry.dslx),
+          fetchText(BASE + 'xls/' + entry.ir),
+          fetchText(BASE + 'xls/' + entry.verilog),
+          fetchText(BASE + 'corpus/e2e/' + entry.e2e.dir + '/' + entry.e2e.tb),
+        ])
+          .then(([dslx, ir, verilog, tb]) => {
+            if (alive) setDocs({ dslx, ir, verilog, tb });
+          })
+          .catch((error) => {
+            if (alive) setDocsError(String(error));
+          });
+        return () => {
+          alive = false;
+        };
+      }, [entry]);
+
+      const run = async () => {
+        if (!mod || !docs) return;
+        setBusy(true);
+        setStage('running');
+        setMatch(null);
+        try {
+          const expected = await fetchText(
+            BASE + 'corpus/e2e/' + entry.e2e.dir + '/' + entry.e2e.expected,
+          );
+          const result = runSources(mod, [docs.verilog, docs.tb], {
+            top: entry.top,
+            forceDump: entry.forceDump,
+          });
+          setStdout(result.stdout);
+          setVcdText(result.vcdText);
+          setMatch(result.stdout === expected);
+          setStage('done');
+        } catch (error) {
+          setStdout(String(error));
+          setStage('error');
+        }
+        setBusy(false);
+      };
+
+      let badge = '';
+      let badgeClass = 'rvw-badge';
+      if (stage === 'running') {
+        badge = t('running');
+        badgeClass += ' busy';
+      } else if (stage === 'error') {
+        badge = t('error');
+        badgeClass += ' bad';
+      } else if (stage === 'done') {
+        badge = match ? t('matchBadge') : t('diffBadge');
+        badgeClass += match ? ' ok' : ' bad';
+      }
+
+      const pane = (labelKey, path, text) =>
+        h(
+          'div',
+          null,
+          h('label', { className: 'rvw-label' }, t(labelKey) + ' · ' + path),
+          h('pre', { className: 'rvw-pre pane' }, text === null ? '…' : text),
+        );
+
+      const chain = ['xlsChainDslx', 'xlsChainIr', 'xlsChainVerilog', 'xlsChainTb', 'xlsChainSim'];
+
+      return h(
+        'div',
+        { className: 'rvw-card rvw-xls-card' },
+        h('h3', null, keys.title ? t(keys.title) : entry.id),
+        keys.desc ? h('div', { className: 'rvw-desc' }, t(keys.desc)) : null,
+        h(
+          'div',
+          { className: 'rvw-chain' },
+          chain.map((labelKey, index) =>
+            h(
+              React.Fragment,
+              { key: labelKey },
+              index ? h('span', { className: 'rvw-arrow' }, '→') : null,
+              h('span', { className: 'rvw-chip' }, t(labelKey)),
+            ),
+          ),
+        ),
+        h(
+          'div',
+          { className: 'rvw-xls-grid' },
+          pane('xlsPaneDslx', entry.dslx, docs ? docs.dslx : null),
+          pane('xlsPaneIr', entry.ir, docs ? docs.ir : null),
+          pane('xlsPaneVerilog', entry.verilog, docs ? docs.verilog : null),
+          pane('xlsPaneTb', entry.e2e.dir + '/' + entry.e2e.tb, docs ? docs.tb : null),
+        ),
+        h('p', { className: 'rvw-prov' }, t('xlsProvenance')),
+        docsError
+          ? h('pre', { className: 'rvw-pre err' }, t('xlsDocsFailed') + ' ' + docsError)
+          : null,
+        h(
+          'div',
+          { className: 'rvw-row' },
+          h('button', { className: 'rvw-btn', onClick: run, disabled: busy || !mod || !docs }, t('xlsRun')),
+          badge ? h('span', { className: badgeClass }, badge) : null,
+        ),
+        h('pre', { className: 'rvw-pre' }, stdout || t('noRun')),
+        h(Wave, { t, mod, vcdText }),
+      );
+    }
+
     function SpecCard({ t, mod }) {
       const [variant, setVariant] = React.useState(0);
       const [busy, setBusy] = React.useState(false);
@@ -677,6 +860,8 @@ endmodule
       const t = useTranslate(ctx);
       const [mod, setMod] = React.useState(null);
       const [modError, setModError] = React.useState('');
+      const [xlsCases, setXlsCases] = React.useState(null);
+      const [xlsError, setXlsError] = React.useState('');
 
       React.useEffect(() => {
         let alive = true;
@@ -686,6 +871,26 @@ endmodule
           })
           .catch((error) => {
             if (alive) setModError(String(error));
+          });
+        return () => {
+          alive = false;
+        };
+      }, []);
+
+      // The XLS provenance chain is scanned by the Host: this component never
+      // hard-codes which samples were harvested.
+      React.useEffect(() => {
+        let alive = true;
+        fetch(BASE + 'xls/manifest.json')
+          .then((res) => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+          })
+          .then((body) => {
+            if (alive) setXlsCases(Array.isArray(body.cases) ? body.cases : []);
+          })
+          .catch((error) => {
+            if (alive) setXlsError(String(error));
           });
         return () => {
           alive = false;
@@ -704,6 +909,15 @@ endmodule
           ),
           h('p', { className: 'rvw-sub' }, t('panelSubtitle')),
           h(Playground, { t, mod, modError }),
+          h('h2', { className: 'rvw-h2' }, t('xlsHeading')),
+          h('p', { className: 'rvw-sub' }, t('xlsIntro')),
+          xlsError
+            ? h('pre', { className: 'rvw-pre err' }, t('xlsFailed') + ' ' + xlsError)
+            : xlsCases === null
+              ? h('div', { className: 'rvw-status' }, t('xlsLoading'))
+              : xlsCases.length === 0
+                ? h('div', { className: 'rvw-status' }, t('xlsEmpty'))
+                : xlsCases.map((entry) => h(XlsCard, { key: entry.id, t, mod, entry })),
           h('h2', { className: 'rvw-h2' }, t('verifyHeading')),
           h('p', { className: 'rvw-sub' }, t('verifyIntro')),
           CASES.map((target) => h(VerifyCard, { key: target.dir, t, mod, target })),

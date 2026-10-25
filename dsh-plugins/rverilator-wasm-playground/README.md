@@ -16,8 +16,13 @@ switching, locale, and layout instead of living in a separate document.
 | Playground | Verilog source, optional `top`, `$readmem` files (JSON), engine selector, stdout, VCD waveform |
 | Engines | `rverilator` → `WasmSim` (vl-sim) · `riverilog` → `riv_build` + `riv_run` (riv-elab + riv-kernel), the same two-step CLI contract, RIV-1 byte count shown |
 | Waveforms | `vcd_parse` → `to_svg` from the shared Rust `vl-vcd` renderer (ADR-0005: no canvas), signal toggles, deterministic SVG |
-| Verification cards | `51_vcd_counter`, `57_xls_add3`, `58_xls_acc_pipe` run in wasm and byte-diffed against the Verilator-recorded `expected.stdout` |
+| XLS bridge | Per harvested XLS sample: the provenance chain (DSLX source → XLS IR → normalized Verilog → race-safe TB) in four panes, then run in wasm and byte-diff stdout against the Verilator-recorded expectation. `force_dump` supplies the waveform because XLS TBs carry no `$dumpvars` |
+| Verification card | `51_vcd_counter` (reference case) runs in wasm and byte-diffs against the recorded expectation |
 | Spec card | `i2c_spec_check` lockstep: pick a surgically broken RTL variant and read the named protocol violations |
+
+The XLS bridge is the first slice of the "share one core with XLS" plan:
+`docs/plan/xls-shared-core.html` (why XLS needs no Verilator, the interface
+contract, S1 done / S2 adapter / S3 upstream subclass).
 
 ## How the two halves fit
 
@@ -25,7 +30,13 @@ switching, locale, and layout instead of living in a separate document.
   - `/rverilator-wasm/pkg/*` → `crates/vl-wasm/pkg` (the wasm-bindgen artifact,
     rebuilt by `scripts/regress.sh` via `wasm-pack build crates/vl-wasm --target web`)
   - `/rverilator-wasm/corpus/e2e/<case>/<file>` → an **allowlisted** slice of
-    `corpus/e2e` (the three cases above only)
+    `corpus/e2e` (counter + the two XLS e2e cases only)
+  - `/rverilator-wasm/xls/manifest.json` → scanned live from
+    `corpus-external/xls` + the matching e2e case (design stem → case dir);
+    adding a harvested sample is data, not client code
+  - `/rverilator-wasm/xls/dslx/<id>.x`, `/rverilator-wasm/xls/generated/<id>.{v,ir}`
+    → the XLS snapshot (extension-checked, traversal-refused), plus the
+    Apache-2.0 licence/notice files
   - `Cache-Control: no-store` everywhere (repo rule: local preview servers must
     not let a heuristic cache serve a stale wasm bundle), single-segment
     filenames only, no traversal, `GET`/`HEAD` only.
@@ -63,32 +74,38 @@ NODE_PATH=/tmp/plugintest/node_modules node test/smoke.mjs
 ```
 
 `test/smoke.mjs` covers: asset MIME/bytes/no-store, the corpus allowlist and
-traversal refusal, method refusal, the carrier's prefix-match rule (no trailing
-slash — the bug this bundle first shipped with), the `main`/`panellist`
-registrations, both locale dictionaries, SSR markup, and then — in jsdom, with
-the **real** wasm artifact — Run (`q=8`), the riverilog face
-(`$finish called at 76000`), a byte-exact corpus card, and a named spec
-violation.
+traversal refusal, the XLS manifest scan (DSLX/IR/Verilog joined to the e2e case,
+`forceDump`), the XLS asset allowlist (extension + traversal), method refusal,
+the carrier's prefix-match rule (no trailing slash — the bug this bundle first
+shipped with), the `main`/`panellist` registrations, the locale dictionaries, SSR
+markup, and then — in jsdom, with the **real** wasm artifact — Run (`q=8`), the
+riverilog face (`$finish called at 76000`), both XLS provenance panes and an XLS
+byte-exact run (`add3=6`, forced-dump SVG), a byte-exact corpus card, and a named
+spec violation.
 
 ## Verified vs not verified
 
-Verified in the running Desktop app (2026-10-25, screenshots in
-`docs/e2e-report/dsh-playground-*.png`), by real HID clicks:
+Verified in the running Desktop app (2026-10-26, screenshots in
+`docs/e2e-report/dsh-xls-bridge-*.png`), by real HID clicks through the Host
+route:
 
 | Step | Result |
 |---|---|
 | sidebar row → panel | opens as the `main` panel, no crash, host theme applied |
 | Run (rverilator face) | stdout `q=8`, status `done`, SVG waveform with `clk` + `q`, signal toggles |
 | engine → riverilog | `RIV-1 bytes: 1094`, stdout carries the iverilog-face banner `$finish called at 76000 (1ps)` + `VCD info:` line |
+| XLS add3 card | four provenance panes loaded; `✓` byte-exact; stdout `add3=6` / `add3=355`; waveform from the forced dump |
+| XLS acc_pipe card | `✓` byte-exact; stdout `pipe=24` / `pipe=780`; pipeline waveform with time axis |
 | verification card | `✓ byte-exact against the recorded expectation` (corpus fetched through the Host route) |
 
-Mechanically: `test/smoke.mjs` — 42 checks, ALL PASS (asset MIME/bytes/no-store,
-corpus allowlist, traversal, method, the carrier prefix-match rule,
-`main`/`panellist` registrations, three dictionaries, SSR markup, and in jsdom
-with the real wasm artifact: Run `q=8`, riv face banner, byte-exact badge,
-named spec violation). Live probes: `Slots` shows both occupants active, and the
-asset route answers `200 text/javascript`, `200 application/wasm` (the 1.2 MB
-artifact), `200` allowlisted corpus, `403` non-allowlisted/traversal.
+Mechanically: `test/smoke.mjs` — 65 checks, ALL PASS (asset MIME/bytes/no-store,
+corpus allowlist, traversal, method, the carrier prefix-match rule, XLS manifest
+and asset surface, `main`/`panellist` registrations, four locale registrations,
+SSR markup, and in jsdom with the real wasm artifact: Run `q=8`, riv face banner,
+XLS four-pane card + byte-exact, byte-exact corpus badge, named spec violation).
+Live probes: the asset route answers `200 text/javascript`,
+`200 application/wasm` (the 1.2 MB artifact), `200` allowlisted corpus,
+`200` XLS manifest/DSLX/IR, `403` non-allowlisted/traversal/extension.
 
 Locale note (one real trap): `@deepseek-ai/dsh-client-locale` ships exactly two
 built-in ids, `en` and `zh`. Registering only `zh-CN`/`zh-TW` compiles, runs, and

@@ -126,6 +126,35 @@ check('pkg traversal → 403', escapePkg.status === 403, String(escapePkg.status
 const post = await callRoute('/rverilator-wasm/pkg/vl_wasm.js', 'POST')
 check('POST → 405', post.status === 405, String(post.status))
 
+// The XLS provenance surface: manifest + the three source forms + licence.
+const manifestRes = await callRoute('/rverilator-wasm/xls/manifest.json')
+const manifestBody = JSON.parse(manifestRes.body.toString('utf8'))
+check('xls manifest → 200 JSON', manifestRes.status === 200 && /application\/json/.test(manifestRes.headers['Content-Type'] ?? ''), manifestRes.headers['Content-Type'])
+check('xls manifest is no-store', manifestRes.headers['Cache-Control'] === 'no-store', manifestRes.headers['Cache-Control'])
+check('xls manifest lists the harvested cases', manifestBody.cases?.map((c) => c.id).join(',') === 'acc_pipe,add3', JSON.stringify(manifestBody.cases?.map((c) => c.id)))
+const add3Entry = manifestBody.cases?.find((c) => c.id === 'add3')
+check('manifest joins DSLX/IR/Verilog to the e2e case', add3Entry?.dslx === 'dslx/add3.x' && add3Entry?.ir === 'generated/add3.ir' && add3Entry?.verilog === 'generated/add3.v' && add3Entry?.e2e?.dir === '57_xls_add3', JSON.stringify(add3Entry))
+check('manifest marks the facade forced dump', add3Entry?.forceDump === true && add3Entry?.e2e?.expected === 'expected.stdout', JSON.stringify(add3Entry && { forceDump: add3Entry.forceDump, expected: add3Entry.e2e?.expected }))
+
+const dslxAsset = await callRoute('/rverilator-wasm/xls/dslx/add3.x')
+check('xls dslx → 200 text', dslxAsset.status === 200 && /text\/plain/.test(dslxAsset.headers['Content-Type'] ?? ''), dslxAsset.headers['Content-Type'])
+check('xls dslx body is the real source', dslxAsset.body.toString('utf8').includes('fn add3'))
+
+const irAsset = await callRoute('/rverilator-wasm/xls/generated/add3.ir')
+check('xls IR → 200 with the lowered ops', irAsset.status === 200 && irAsset.body.toString('utf8').includes('zero_ext'), String(irAsset.status))
+
+const xlsVerilog = await callRoute('/rverilator-wasm/xls/generated/add3.v')
+check('xls generated Verilog → 200', xlsVerilog.status === 200 && xlsVerilog.body.toString('utf8').includes('__add3__add3'), String(xlsVerilog.status))
+
+const xlsLicense = await callRoute('/rverilator-wasm/xls/XLS-LICENSE.txt')
+check('XLS licence travels with the snapshot', xlsLicense.status === 200 && xlsLicense.body.toString('utf8').includes('Apache License'), String(xlsLicense.status))
+
+const xlsTraversal = await callRoute('/rverilator-wasm/xls/dslx/..%2f..%2fCargo.toml')
+check('xls traversal → 403', xlsTraversal.status === 403, String(xlsTraversal.status))
+
+const xlsWrongExt = await callRoute('/rverilator-wasm/xls/generated/top.sh')
+check('xls unexpected extension → 403', xlsWrongExt.status === 403, String(xlsWrongExt.status))
+
 // --------------------------------------------------------- 2. registration
 
 console.log('\nClient registration')
@@ -229,6 +258,7 @@ check('SSR renders the panel title', markup.includes('Verilog Playground'), mark
 check('SSR renders the source editor', markup.includes('<textarea') && markup.includes('rvw-ta src'))
 check('SSR renders the Run button', markup.includes('Run</button>'))
 check('SSR renders the engine selector', markup.includes('riverilog'))
+check('SSR renders the XLS bridge heading', markup.includes('XLS bridge: DSLX'))
 
 // jsdom pass: the wasm engine is genuinely exercised through the component.
 const dom = new JSDOM('<!doctype html><html><body><div id="root"></div></body></html>', {
@@ -241,17 +271,17 @@ globalThis.document = domWindow.document
 Object.defineProperty(globalThis, 'navigator', { value: domWindow.navigator, configurable: true })
 globalThis.HTMLElement = domWindow.HTMLElement
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
-const corpusFetch = async (url) => {
-  const rel = String(url)
-  const prefix = '/rverilator-wasm/corpus/e2e/'
-  const at = rel.indexOf(prefix)
-  if (at === -1) throw new Error('unexpected fetch: ' + rel)
-  const path = resolve(repoRoot, 'corpus/e2e', rel.slice(at + prefix.length))
-  try {
-    const text = await readFile(path, 'utf8')
-    return { ok: true, status: 200, text: async () => text }
-  } catch {
-    return { ok: false, status: 404, text: async () => '' }
+// Route-backed fetch: the DOM pass goes through the real Host handler, so both
+// the XLS manifest scan and the corpus/XLS file allowlists are exercised.
+const routeFetch = async (url) => {
+  const pathname = new URL(String(url), 'http://localhost').pathname
+  const out = await callRoute(pathname)
+  const text = out.body.toString('utf8')
+  return {
+    ok: out.status === 200,
+    status: out.status,
+    text: async () => text,
+    json: async () => JSON.parse(text),
   }
 }
 
@@ -265,7 +295,7 @@ domWindow.__rverilatorWasmModule = wasmMod
 new Function('window', 'location', 'fetch', 'URL', clientCode)(
   domWindow,
   new URL('http://localhost/'),
-  corpusFetch,
+  routeFetch,
   URL,
 )
 const domPlugin = domCaptured.factory((id) => {
@@ -318,8 +348,31 @@ const stdoutRiv = byClass('rvw-pre')[0]?.textContent ?? ''
 check('riverilog face prints the iverilog $finish banner', /\$finish called at 76000/.test(stdoutRiv), JSON.stringify(stdoutRiv))
 check('riverilog face reports RIV-1 bytes', container.textContent.includes('RIV-1 bytes'), container.textContent.slice(0, 200))
 
-const verifyButtons = [...container.querySelectorAll('button')].filter((button) => button.textContent === 'Run + verify')
-check('three verification cards mounted', verifyButtons.length === 3, String(verifyButtons.length))
+// The XLS bridge: the Host scans the snapshot, the client fetches the
+// provenance panes through the same route, then byte-diffs in wasm.
+await settle(120)
+const xlsCards = [...container.querySelectorAll('.rvw-xls-card')]
+check('XLS bridge mounted both harvested cases', xlsCards.length === 2, String(xlsCards.length))
+const add3Card = xlsCards.find((card) => card.textContent.includes('fn add3'))
+check('XLS card loaded its DSLX source', Boolean(add3Card), xlsCards.map((card) => card.textContent.slice(0, 60)).join(' | '))
+if (add3Card) {
+  const panes = [...add3Card.querySelectorAll('.rvw-pre.pane')].map((node) => node.textContent)
+  check('XLS card shows the DSLX source', panes[0]?.includes('fn add3'), JSON.stringify(panes[0]?.slice(0, 80)))
+  check('XLS card shows the lowered XLS IR', panes[1]?.includes('zero_ext'), JSON.stringify(panes[1]?.slice(0, 80)))
+  check('XLS card shows the generated Verilog', panes[2]?.includes('__add3__add3'), JSON.stringify(panes[2]?.slice(0, 80)))
+  check('XLS card shows the race-safe testbench', panes[3]?.includes('__add3__add3 dut'), JSON.stringify(panes[3]?.slice(0, 80)))
+  const xlsRun = [...add3Card.querySelectorAll('button')].find((button) => button.textContent === 'Run + verify')
+  await React.act(async () => {
+    xlsRun.dispatchEvent(new domWindow.MouseEvent('click', { bubbles: true }))
+  })
+  await settle(200)
+  check('XLS add3 run is byte-exact against the recorded expectation', add3Card.textContent.includes('byte-exact against the recorded expectation'), add3Card.textContent.match(/✓[^\n]{0,80}/)?.[0] ?? '(no badge)')
+  check('XLS add3 stdout is the oracle expectation', /add3=6[\s\S]*add3=355/.test(add3Card.querySelector('.rvw-pre:not(.pane)')?.textContent ?? ''), JSON.stringify(add3Card.querySelector('.rvw-pre:not(.pane)')?.textContent))
+  check('XLS add3 waveform came from the forced dump', add3Card.querySelector('.rvw-wave')?.innerHTML.includes('<svg') && add3Card.querySelectorAll('.rvw-sig').length > 0, String(add3Card.querySelectorAll('.rvw-sig').length))
+}
+
+const verifyButtons = [...container.querySelectorAll('.rvw-card:not(.rvw-xls-card) button')].filter((button) => button.textContent === 'Run + verify')
+check('counter verification card mounted', verifyButtons.length === 1, String(verifyButtons.length))
 await React.act(async () => {
   verifyButtons[0].dispatchEvent(new domWindow.MouseEvent('click', { bubbles: true }))
 })
