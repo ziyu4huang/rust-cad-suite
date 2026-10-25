@@ -211,10 +211,20 @@ if [ -x target/debug/rverilator ] && [ -x target/debug/riverilog ]; then
         || { echo "GATE FAIL: rv-sim smoke"; toolbox=1; }
     bash scripts/rv-diff.sh corpus/e2e/01_arith_widths/tb.v 2>/dev/null | tail -1 | grep -q "== MATCH ==" \
         || { echo "GATE FAIL: rv-diff smoke"; toolbox=1; }
+    # 51_vcd_counter carries $dumpvars: the oracle (run without --trace)
+    # emits a -Info line — exactly the false-DIFF shape the normalizer
+    # must swallow (regression for the -Info prefix fix).
+    bash scripts/rv-diff.sh corpus/e2e/51_vcd_counter/tb.v 2>/dev/null | tail -1 | grep -q "== MATCH ==" \
+        || { echo "GATE FAIL: rv-diff dumpvars smoke"; toolbox=1; }
     wsvg=/tmp/rv-wave-smoke.svg
     bash scripts/rv-wave.sh -o "$wsvg" corpus/e2e/51_vcd_counter/tb.v >/dev/null 2>&1 \
         && grep -q "<svg" "$wsvg" \
         || { echo "GATE FAIL: rv-wave smoke"; toolbox=1; }
+    # Cross-cwd + absolute-path call (regression for the $PWD double-prefix fix).
+    REPO="$PWD"
+    (cd /tmp && bash "$REPO/scripts/rv-wave.sh" -o /tmp/rv-wave-smoke2.svg "$REPO/corpus/e2e/51_vcd_counter/tb.v") >/dev/null 2>&1 \
+        && grep -q "<svg" /tmp/rv-wave-smoke2.svg \
+        || { echo "GATE FAIL: rv-wave abs-path smoke"; toolbox=1; }
     (cd corpus/iv-e2e/01_hello && diff <(bash "$OLDPWD/scripts/riv-run.sh" -n tb.v) expected.stdout) >/dev/null 2>&1 \
         || { echo "GATE FAIL: riv-run smoke"; toolbox=1; }
     [ "$toolbox" -eq 0 ] && echo "agent toolbox smoke: rv-sim/rv-diff/rv-wave/riv-run 4/4"

@@ -42,7 +42,7 @@ cat "$tmp/oracle.out"
 # Normalize exactly like the difftest (AGENTS §10.5): the oracle's tool
 # lines (`- Verilator: …`, `-Info/`, `-Warning/`) are report blocks, not
 # design output — stripped from BOTH sides before comparing.
-norm() { grep -v '^- ' "$1" || true; }
+norm() { grep -v -e '^- ' -e '^-Info' -e '^-Warning' -e '^-Error' "$1" || true; }
 
 if diff -q <(norm "$tmp/ours.out") <(norm "$tmp/oracle.out") >/dev/null 2>&1 && [ "$ours_rc" -eq "$oracle_rc" ]; then
   echo "== MATCH =="

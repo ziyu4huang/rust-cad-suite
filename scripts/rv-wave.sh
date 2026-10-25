@@ -34,7 +34,13 @@ trap 'rm -rf "$tmp"' EXIT
 # argument that names an existing file must be absolutized first.
 args=()
 for a in "$@"; do
-  if [ -e "$a" ]; then args+=("$PWD/$a"); else args+=("$a"); fi
+  if [ ! -e "$a" ]; then
+    args+=("$a")
+  elif [[ "$a" == /* ]]; then
+    args+=("$a")
+  else
+    args+=("$PWD/$a")
+  fi
 done
 
 (cd "$tmp" && "$sim" --binary --trace "${args[@]}" >/dev/null)
