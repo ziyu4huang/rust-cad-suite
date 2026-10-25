@@ -44,13 +44,30 @@ pub trait DumpSink {
 enum Status {
     /// In the active FIFO or a wheel entry.
     Ready,
-    /// Suspended on an edge/level wait list.
-    Wait(Vec<SensItem>),
+    /// Suspended on an edge/level wait list. `Thread` borrows the design's
+    /// static thread sensitivity (the hot always-@ path: zero allocation);
+    /// `Own` covers dynamic in-body WaitEdge lists.
+    Wait(WaitList),
     /// Suspended at a fork...join — resumed when the group counter hits 0.
     /// The group id lives in `join_groups` (waiter pairing); the payload is
     /// not needed on the status itself.
     Join,
     Done,
+}
+
+#[derive(Clone)]
+enum WaitList {
+    Thread(u32),
+    Own(Vec<SensItem>),
+}
+
+impl WaitList {
+    fn items<'a>(&'a self, d: &'a Design) -> &'a [SensItem] {
+        match self {
+            WaitList::Thread(base) => &d.threads[*base as usize].sens,
+            WaitList::Own(v) => v,
+        }
+    }
 }
 
 /// Body reference: usize::MAX = the thread's own body; else the func idx.
@@ -97,7 +114,7 @@ enum Resume {
 }
 
 pub struct Kernel {
-    d: Design,
+    d: std::rc::Rc<Design>,
     vars: Vec<Bits>,
     threads: Vec<ThreadState>,
     active: VecDeque<usize>,
@@ -137,6 +154,19 @@ pub struct Kernel {
     gate_pending: Vec<Option<(u64, Bits)>>,
     /// Delayed NBA commits (`q <= #10 d`): time → (lvalue, sampled value).
     nba_due: BTreeMap<u64, Vec<(Lval, Bits)>>,
+    /// Reverse index (RK5 optimization round): var → threads currently in
+    /// Status::Wait with that var in their sensitivity list. Wakes scan
+    /// only the candidates instead of every thread.
+    waiters: Vec<Vec<usize>>,
+    /// var → gates watching it (input or output side).
+    gate_watchers: Vec<Vec<usize>>,
+    /// Pre-parsed Const literals (RK5 hot loop): per body (threads then
+    /// funcs), per pc — a Const executes once per pass and must not
+    /// re-parse its digit string every time.
+    const_rt: Vec<Vec<Option<Bits>>>,
+    /// Recycled wheel entry vectors (the wheel allocates one Vec per wake
+    /// time without this pool).
+    wheel_pool: Vec<Vec<usize>>,
     /// rivvp -n: $stop behaves like $finish (rivD2).
     pub stop_as_finish: bool,
     /// -n $stop halted the run: like natural exhaustion — NO finish
@@ -185,7 +215,8 @@ struct StrobeReq {
 }
 
 impl Kernel {
-    pub fn new(d: Design) -> Result<Kernel, RunError> {
+    pub fn new(design: Design) -> Result<Kernel, RunError> {
+        let d = std::rc::Rc::new(design);
         let mut vars = Vec::with_capacity(d.vars.len());
         for v in &d.vars {
             let b = match &v.init {
@@ -244,12 +275,13 @@ impl Kernel {
                 status: if t.sens.is_empty() {
                     Status::Ready
                 } else {
-                    // Edge-triggered always: armed before first execution.
-                    Status::Wait(t.sens.clone())
+                    // Edge-triggered always: armed before first execution
+                    // (static sensitivity — the zero-allocation form).
+                    Status::Wait(WaitList::Thread(threads.len() as u32))
                 },
             });
         }
-        Ok(Kernel {
+        let mut k = Kernel {
             threads,
             shared_frames,
             forces,
@@ -259,6 +291,58 @@ impl Kernel {
             gate_due: BTreeMap::new(),
             gate_pending,
             nba_due: BTreeMap::new(),
+            waiters: vec![Vec::new(); d.vars.len()],
+            const_rt: {
+                let n = d.threads.len() + d.funcs.len();
+                let mut rt: Vec<Vec<Option<Bits>>> = vec![Vec::new(); n];
+                let parse = |lit: &riv_ir::Literal| -> Option<Bits> {
+                    from_numlit_parts(
+                        Some(lit.width),
+                        lit.signed,
+                        match lit.base {
+                            Base::Dec => VB::Dec,
+                            Base::Bin => VB::Bin,
+                            Base::Oct => VB::Oct,
+                            Base::Hex => VB::Hex,
+                        },
+                        &lit.digits,
+                    )
+                    .ok()
+                };
+                for (i, t) in d.threads.iter().enumerate() {
+                    rt[i] = t
+                        .body
+                        .iter()
+                        .map(|op| match op {
+                            Op::Const { lit, .. } => parse(lit),
+                            _ => None,
+                        })
+                        .collect();
+                }
+                let nt = d.threads.len();
+                for (i, f) in d.funcs.iter().enumerate() {
+                    rt[nt + i] = f
+                        .body
+                        .iter()
+                        .map(|op| match op {
+                            Op::Const { lit, .. } => parse(lit),
+                            _ => None,
+                        })
+                        .collect();
+                }
+                rt
+            },
+            wheel_pool: Vec::new(),
+            gate_watchers: {
+                let mut w: Vec<Vec<usize>> = vec![Vec::new(); d.vars.len()];
+                for (gi, g) in d.gates.iter().enumerate() {
+                    w[g.out as usize].push(gi);
+                    for i in &g.inputs {
+                        w[*i as usize].push(gi);
+                    }
+                }
+                w
+            },
             stop_as_finish: false,
             stopped_silently: false,
             vars,
@@ -276,7 +360,53 @@ impl Kernel {
             monitor_enabled: true,
             strobes: Vec::new(),
             d,
-        })
+        };
+        // Register the edge-triggered always threads' initial waits.
+        let d0 = std::rc::Rc::clone(&k.d);
+        for ti in 0..k.threads.len() {
+            if let Status::Wait(wl) = &k.threads[ti].status {
+                for it in wl.items(&d0) {
+                    k.waiters[it.var as usize].push(ti);
+                }
+            }
+        }
+        Ok(k)
+    }
+
+    /// Arm a wait: park the thread and register it in the per-var waiter
+    /// lists. A list equal to the thread's static sensitivity parks in the
+    /// zero-allocation `Thread` form (the always-@ hot path).
+    fn arm_wait(&mut self, ti: usize, items: &[SensItem]) {
+        let base = self.threads[ti].base as u32;
+        let static_form = self.d.threads[self.threads[ti].base].sens.as_slice() == items;
+        let wl = if static_form {
+            WaitList::Thread(base)
+        } else {
+            WaitList::Own(items.to_vec())
+        };
+        for it in items {
+            if let Some(list) = self.waiters.get_mut(it.var as usize) {
+                list.push(ti);
+            }
+        }
+        self.threads[ti].status = Status::Wait(wl);
+    }
+
+    /// Remove a thread from every waiter list (it is leaving Wait). The
+    /// status slot is replaced with Ready by the caller right after — here
+    /// it is transiently replaced to release the borrow.
+    fn disarm_wait(&mut self, ti: usize) {
+        let d = std::rc::Rc::clone(&self.d);
+        let wl = std::mem::replace(&mut self.threads[ti].status, Status::Ready);
+        if let Status::Wait(wl) = &wl {
+            for it in wl.items(&d) {
+                if let Some(list) = self.waiters.get_mut(it.var as usize) {
+                    list.retain(|&x| x != ti);
+                }
+            }
+        }
+        // Restore whatever the caller sets next; callers set Ready anyway.
+        let _ = std::mem::replace(&mut self.threads[ti].status, wl);
     }
 
     /// Plusargs for `$test$plusargs`/`$value$plusargs` (+N=42 form).
@@ -303,7 +433,13 @@ impl Kernel {
                 while let Some(ti) = self.active.pop_front() {
                     match self.step_thread(ti, sink) {
                         Ok(Resume::Inactive) => self.inactive.push_back(ti),
-                        Ok(Resume::Wheel(at)) => self.wheel.entry(at).or_default().push(ti),
+                        Ok(Resume::Wheel(at)) => {
+                            let v = self
+                                .wheel
+                                .entry(at)
+                                .or_insert_with(|| self.wheel_pool.pop().unwrap_or_default());
+                            v.push(ti);
+                        }
                         Ok(Resume::None) => {}
                         Err(e) => return self.finish_out(sink, Some(e)),
                     }
@@ -316,7 +452,13 @@ impl Kernel {
                     self.threads[ti].status = Status::Ready;
                     match self.step_thread(ti, sink) {
                         Ok(Resume::Inactive) => self.inactive.push_back(ti),
-                        Ok(Resume::Wheel(at)) => self.wheel.entry(at).or_default().push(ti),
+                        Ok(Resume::Wheel(at)) => {
+                            let v = self
+                                .wheel
+                                .entry(at)
+                                .or_insert_with(|| self.wheel_pool.pop().unwrap_or_default());
+                            v.push(ti);
+                        }
                         Ok(Resume::None) => {}
                         Err(e) => return self.finish_out(sink, Some(e)),
                     }
@@ -395,10 +537,13 @@ impl Kernel {
                 }
             }
             if next_thread == Some(at) {
-                let (_, wake) = self.wheel.pop_first().unwrap();
-                for ti in wake {
+                let (_, mut wake) = self.wheel.pop_first().unwrap();
+                for ti in wake.drain(..) {
                     self.threads[ti].status = Status::Ready;
                     self.active.push_back(ti);
+                }
+                if self.wheel_pool.len() < 64 {
+                    self.wheel_pool.push(wake);
                 }
             }
         }
@@ -444,30 +589,48 @@ impl Kernel {
     // ------------------------------------------------------------------
 
     fn step_thread(&mut self, ti: usize, sink: &mut dyn DumpSink) -> Result<Resume, RunError> {
+        // The design is immutable at run time; a local Rc handle lets the
+        // op be borrowed (no per-step clone — the RK5 hot loop) while the
+        // thread state mutates.
+        let d = std::rc::Rc::clone(&self.d);
         loop {
             // Re-read per iteration: Call/Ret switch the body ref.
-            let body_len = self.body_len(ti);
+            let body_len = match self.threads[ti].body {
+                BODY_OWN => d.threads[self.threads[ti].base].body.len() as u32,
+                f => d.funcs[f].body.len() as u32,
+            };
             let pc = self.threads[ti].pc;
             if pc >= body_len {
                 self.finish_pass(ti);
                 return Ok(Resume::None);
             }
-            let op = self.body_op(ti, pc);
+            let op: &Op = match self.threads[ti].body {
+                BODY_OWN => &d.threads[self.threads[ti].base].body[pc as usize],
+                f => &d.funcs[f].body[pc as usize],
+            };
             self.threads[ti].pc = pc + 1;
-            match op {
-                Op::Const { dst, lit } => {
-                    let b = from_numlit_parts(
-                        Some(lit.width),
-                        lit.signed,
-                        match lit.base {
-                            Base::Dec => VB::Dec,
-                            Base::Bin => VB::Bin,
-                            Base::Oct => VB::Oct,
-                            Base::Hex => VB::Hex,
-                        },
-                        &lit.digits,
-                    )
-                    .map_err(|e| RunError(format!("const: {}", e.0)))?;
+            match *op {
+                Op::Const { dst, ref lit } => {
+                    // Pre-parsed at load (the digit string never changes).
+                    let bk = match self.threads[ti].body {
+                        BODY_OWN => self.threads[ti].base,
+                        f => d.threads.len() + f,
+                    };
+                    let b = match &self.const_rt[bk][pc as usize] {
+                        Some(b) => b.clone(),
+                        None => from_numlit_parts(
+                            Some(lit.width),
+                            lit.signed,
+                            match lit.base {
+                                Base::Dec => VB::Dec,
+                                Base::Bin => VB::Bin,
+                                Base::Oct => VB::Oct,
+                                Base::Hex => VB::Hex,
+                            },
+                            &lit.digits,
+                        )
+                        .map_err(|e| RunError(format!("const: {}", e.0)))?,
+                    };
                     self.set_slot(ti, dst, b);
                 }
                 Op::Mov { dst, src } => {
@@ -615,7 +778,7 @@ impl Kernel {
                     };
                     self.set_slot(ti, dst, r);
                 }
-                Op::Concat { dst, parts } => {
+                Op::Concat { dst, ref parts } => {
                     let vals: Vec<Bits> = parts
                         .iter()
                         .map(|p| self.slot(ti, *p).cloned())
@@ -655,19 +818,19 @@ impl Kernel {
                     let r = self.load_elem(var, &iv)?;
                     self.set_slot(ti, dst, r);
                 }
-                Op::AssignBlk { lv, src } => {
+                Op::AssignBlk { ref lv, src } => {
                     let val = self.slot(ti, src)?.clone();
-                    let resolved = self.resolve_lvalue(ti, &lv)?;
+                    let resolved = self.resolve_lvalue(ti, lv)?;
                     self.commit(&resolved, val, sink)?;
                 }
-                Op::AssignNba { lv, src } => {
+                Op::AssignNba { ref lv, src } => {
                     let val = self.slot(ti, src)?.clone();
-                    let resolved = self.resolve_lvalue(ti, &lv)?;
+                    let resolved = self.resolve_lvalue(ti, lv)?;
                     self.nba.push((resolved, val));
                 }
-                Op::AssignNbaDelay { lv, src, amount } => {
+                Op::AssignNbaDelay { ref lv, src, amount } => {
                     let val = self.slot(ti, src)?.clone();
-                    let resolved = self.resolve_lvalue(ti, &lv.clone())?;
+                    let resolved = self.resolve_lvalue(ti, lv)?;
                     let av = self.slot(ti, amount)?.clone();
                     if av.has_unknown() {
                         return Err(RunError("delayed NBA amount is unknown (x)".into()));
@@ -712,11 +875,11 @@ impl Kernel {
                         Bits::from_u128(64, scaled.min(u128::from(u64::MAX))).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
-                Op::WaitEdge { items } => {
-                    self.threads[ti].status = Status::Wait(items);
+                Op::WaitEdge { ref items } => {
+                    self.arm_wait(ti, items);
                     return Ok(Resume::None);
                 }
-                Op::SysCall { id, fmt, args, dst, file, line, start } => match id {
+                Op::SysCall { id, fmt, ref args, dst, file, line, start } => match id {
                     SysId::Display | SysId::Write => {
                         let text = self.render(fmt, &args, ti)?;
                         self.out.push_str(&text);
@@ -772,7 +935,7 @@ impl Kernel {
                         self.monitor = Some(MonitorReq {
                             thread: ti,
                             fmt: fmt.ok_or_else(|| RunError("monitor without format".into()))?,
-                            args,
+                            args: args.clone(),
                             start,
                             end: pc,
                             last: None,
@@ -847,7 +1010,7 @@ impl Kernel {
                         self.strobes.push(StrobeReq {
                             thread: ti,
                             fmt: fmt.ok_or_else(|| RunError("strobe without format".into()))?,
-                            args,
+                            args: args.clone(),
                             start,
                             end: pc,
                         });
@@ -901,7 +1064,7 @@ impl Kernel {
                         }
                     }
                 },
-                Op::Call { func, ins, outs, dst } => {
+                Op::Call { func, ref ins, ref outs, dst } => {
                     let fi = func as usize;
                     let flen = self.d.funcs[fi].frame_len;
                     let automatic = self.d.funcs[fi].automatic;
@@ -973,13 +1136,13 @@ impl Kernel {
                         self.commit(&lv, val, sink)?;
                     }
                 }
-                Op::AssignForce { lv, src } => {
+                Op::AssignForce { ref lv, src } => {
                     let val = self.slot(ti, src)?.clone();
                     let var = match lv {
                         Lval::Var { var }
                         | Lval::Bit { var, .. }
                         | Lval::Part { var, .. }
-                        | Lval::PartDyn { var, .. } => var,
+                        | Lval::PartDyn { var, .. } => *var,
                         Lval::Elem { .. } => {
                             return Err(RunError("force on array elements is not supported".into()))
                         }
@@ -987,7 +1150,7 @@ impl Kernel {
                             return Err(RunError("force on a concatenation is not supported".into()))
                         }
                     };
-                    let vi = self.d.vars[var as usize].clone();
+                    let vi = d.vars[var as usize].clone();
                     let forced = if val.width == vi.width {
                         val
                     } else if val.width > vi.width {
@@ -1004,6 +1167,7 @@ impl Kernel {
                             (m.clone(), forced)
                         }
                         Lval::Part { hi, lo, .. } => {
+                            let (hi, lo) = (*hi, *lo);
                             let w = hi.abs_diff(lo) + 1;
                             let cur = self.var(var)?.clone();
                             let m = mask_of(vi.width, hi, lo)?;
@@ -1012,7 +1176,7 @@ impl Kernel {
                             (m, patched)
                         }
                         Lval::Bit { idx, .. } => {
-                            let iv = self.slot(ti, idx)?.clone();
+                            let iv = self.slot(ti, *idx)?.clone();
                             match self.abs_index(var, &iv)? {
                                 Some(abs) => {
                                     let cur = self.var(var)?.clone();
@@ -1028,8 +1192,8 @@ impl Kernel {
                             }
                         }
                         Lval::PartDyn { hi, lo, .. } => {
-                            let hv = self.slot(ti, hi)?.clone();
-                            let lv2 = self.slot(ti, lo)?.clone();
+                            let hv = self.slot(ti, *hi)?.clone();
+                            let lv2 = self.slot(ti, *lo)?.clone();
                             if hv.has_unknown() || lv2.has_unknown() {
                                 let m = Bits::zeros(vi.width).map_err(|e| RunError(e.0))?;
                                 (m, self.var(var)?.clone())
@@ -1049,12 +1213,12 @@ impl Kernel {
                     self.store_var_raw(var, patched, sink)?;
                     self.forces[var as usize] = Some(mask);
                 }
-                Op::Release { lv } => {
+                Op::Release { ref lv } => {
                     let var = match lv {
                         Lval::Var { var }
                         | Lval::Bit { var, .. }
                         | Lval::Part { var, .. }
-                        | Lval::PartDyn { var, .. } => var,
+                        | Lval::PartDyn { var, .. } => *var,
                         Lval::Elem { .. } => {
                             return Err(RunError("release on array elements is not supported".into()))
                         }
@@ -1062,7 +1226,7 @@ impl Kernel {
                             return Err(RunError("release on a concatenation is not supported".into()))
                         }
                     };
-                    let is_net = self.d.vars[var as usize].kind == VarKind::Net;
+                    let is_net = d.vars[var as usize].kind == VarKind::Net;
                     self.forces[var as usize] = None;
                     if is_net {
                         // Release on a net: the driver re-takes the wire —
@@ -1077,6 +1241,7 @@ impl Kernel {
                             .collect();
                         for t in threads {
                             if matches!(self.threads[t].status, Status::Wait(_)) {
+                                self.disarm_wait(t);
                                 self.threads[t].status = Status::Ready;
                                 self.threads[t].pc = 0; // re-run from the top
                                 self.active.push_back(t);
@@ -1085,7 +1250,7 @@ impl Kernel {
                     }
                     // Regs keep the forced value (04_force golden).
                 }
-                Op::Fork { branches, join } => {
+                Op::Fork { ref branches, join } => {
                     if branches.is_empty() {
                         self.threads[ti].pc = join;
                     } else {
@@ -1152,14 +1317,21 @@ impl Kernel {
     /// done; edge-triggered `always` threads (thread-level sens) re-arm on
     /// their sensitivity list and wait for the next event.
     fn finish_pass(&mut self, ti: usize) {
-        let sens = self.d.threads[self.threads[ti].base].sens.clone();
-        if sens.is_empty() {
+        let sens_empty = self.d.threads[self.threads[ti].base].sens.is_empty();
+        if sens_empty {
             self.threads[ti].status = Status::Done;
         } else {
             // Re-arm from the top of the body: the next event re-executes
-            // the whole always statement.
+            // the whole always statement (static sensitivity → zero-alloc
+            // Thread form).
             self.threads[ti].pc = 0;
-            self.threads[ti].status = Status::Wait(sens);
+            let base = self.threads[ti].base as u32;
+            for it in &self.d.threads[self.threads[ti].base].sens {
+                if let Some(list) = self.waiters.get_mut(it.var as usize) {
+                    list.push(ti);
+                }
+            }
+            self.threads[ti].status = Status::Wait(WaitList::Thread(base));
         }
     }
 
@@ -1195,20 +1367,6 @@ impl Kernel {
                 f.resize(s as usize + 1, Bits::zeros(1).unwrap());
             }
             f[s as usize] = v;
-        }
-    }
-
-    fn body_len(&self, ti: usize) -> u32 {
-        match self.threads[ti].body {
-            BODY_OWN => self.d.threads[self.threads[ti].base].body.len() as u32,
-            f => self.d.funcs[f].body.len() as u32,
-        }
-    }
-
-    fn body_op(&self, ti: usize, pc: u32) -> Op {
-        match self.threads[ti].body {
-            BODY_OWN => self.d.threads[self.threads[ti].base].body[pc as usize].clone(),
-            f => self.d.funcs[f].body[pc as usize].clone(),
         }
     }
 
@@ -1413,37 +1571,36 @@ impl Kernel {
         format!("{}.{}", self.d.meta.top, self.d.vars[var as usize].name)
     }
 
-    /// Wake suspended threads whose wait matches this change (thread-index
-    /// order = declaration order, ADR-0001), then re-evaluate gates that
-    /// watch this var (inertial scheduling).
+    /// Wake suspended threads whose wait matches this change (waiter-list
+    /// order follows registration = declaration order, ADR-0001), then
+    /// re-evaluate gates that watch this var (inertial scheduling).
     fn wake(&mut self, var: VarId, old: &Bits, new: &Bits) {
-        for ti in 0..self.threads.len() {
-            let items = match &self.threads[ti].status {
-                Status::Wait(items) => items.clone(),
-                _ => continue,
-            };
-            for item in &items {
-                if item.var != var {
-                    continue;
-                }
-                let fire = match item.edge {
+        // Take the waiter list (capacity is kept — the hot path stays
+        // allocation-free after warmup).
+        let mut candidates = std::mem::take(&mut self.waiters[var as usize]);
+        let d = std::rc::Rc::clone(&self.d);
+        for ti in candidates.iter().copied() {
+            let fire = match &self.threads[ti].status {
+                Status::Wait(wl) => wl.items(&d).iter().any(|item| item.var == var && match item.edge {
                     EdgeKind::Any => true,
                     EdgeKind::Pos => edge_fire(old, new, true),
                     EdgeKind::Neg => edge_fire(old, new, false),
-                };
-                if fire {
-                    self.threads[ti].status = Status::Ready;
-                    self.active.push_back(ti);
-                    break;
-                }
+                }),
+                _ => false, // stale entry — dropped on restore below
+            };
+            if fire {
+                self.disarm_wait(ti);
+                self.threads[ti].status = Status::Ready;
+                self.active.push_back(ti);
             }
         }
-        for gi in 0..self.d.gates.len() {
-            let g = &self.d.gates[gi];
-            if g.out == var || g.inputs.iter().any(|i| *i == var) {
-                self.eval_gate(gi);
-            }
+        candidates.retain(|&ti| matches!(self.threads[ti].status, Status::Wait(_)));
+        self.waiters[var as usize] = candidates;
+        let watchers = std::mem::take(&mut self.gate_watchers[var as usize]);
+        for gi in watchers.iter().copied() {
+            self.eval_gate(gi);
         }
+        self.gate_watchers[var as usize] = watchers;
     }
 
     // ------------------------------------------------------------------
@@ -1456,16 +1613,21 @@ impl Kernel {
         if self.d.vars.get(ev as usize).map(|v| v.kind) != Some(VarKind::Event) {
             return Err(RunError(format!("`->` target var {} is not an event", ev)));
         }
-        for ti in 0..self.threads.len() {
-            let items = match &self.threads[ti].status {
-                Status::Wait(items) => items.clone(),
-                _ => continue,
+        let mut candidates = std::mem::take(&mut self.waiters[ev as usize]);
+        let d = std::rc::Rc::clone(&self.d);
+        for ti in candidates.iter().copied() {
+            let hit = match &self.threads[ti].status {
+                Status::Wait(wl) => wl.items(&d).iter().any(|i| i.var == ev && i.edge == EdgeKind::Any),
+                _ => false,
             };
-            if items.iter().any(|i| i.var == ev && i.edge == EdgeKind::Any) {
+            if hit {
+                self.disarm_wait(ti);
                 self.threads[ti].status = Status::Ready;
                 self.active.push_back(ti);
             }
         }
+        candidates.retain(|&ti| matches!(self.threads[ti].status, Status::Wait(_)));
+        self.waiters[ev as usize] = candidates;
         Ok(())
     }
 
@@ -1645,7 +1807,7 @@ impl Kernel {
                 return Err(RunError(format!("monitor arg range pc {pc} out of body")));
             };
             match op {
-                Op::Const { dst, lit } => {
+                Op::Const { dst, ref lit } => {
                     let b = from_numlit_parts(
                         Some(lit.width),
                         lit.signed,
@@ -1794,7 +1956,7 @@ impl Kernel {
                     };
                     self.set_slot(ti, *dst, r);
                 }
-                Op::Concat { dst, parts } => {
+                Op::Concat { dst, ref parts } => {
                     let vals: Vec<Bits> = parts
                         .iter()
                         .map(|p| self.slot(ti, *p).cloned())
