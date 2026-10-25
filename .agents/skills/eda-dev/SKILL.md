@@ -51,6 +51,7 @@ description: rust-cad-suite 开发正典——AI agent 做 EDA/IC 工具(模拟�
     構造(`vec![1u64; n]`=[1,1,1,1] 不是 1)。機檢=value.rs 的 N-vs-W
     property 測試(全運算×寬度掃描),新 limb 代碼必過(REFLECTION §17.3)。
 15. **CLI/語料契約實測枚舉**:行為類只認實跑輸出(exit codes/錯誤文案逐字),
+16. **帳務手術須 assert 命中**:以 python/腳本改 PLAN/OKR/REGISTRY 等帳務文檔時,replace 前必須 assert 錨點在檔中,靜默失敗=帳務宣稱與實際不符(commit message 說了但檔沒改)。實錄:2026-10-25 五輪 PLAN.md 帳務積欠皆此因。
     清單類只認上游文檔,兩者皆無=釘「未知=硬錯」不發明清單;expected.* 禁
     機器相關字串,錄製 cwd=案例目錄(契約寫進 harness);能力未到的期望先錄
     =chase-ledger(pending 錨「里程碑硬錯」契約,翻 enforced=同輪 commit,
