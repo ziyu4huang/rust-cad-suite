@@ -116,7 +116,7 @@ impl<'e, 'f> Lower<'e, 'f> {
                 break Some(i as VarId);
             }
             match pfx.rfind('.') {
-                Some(i) if i > 0 => pfx.truncate(i + 1),
+                Some(i) if i > 0 && i + 1 < pfx.len() => pfx.truncate(i + 1),
                 _ => break None,
             }
         }
@@ -362,10 +362,19 @@ impl<'e, 'f> Lower<'e, 'f> {
                 "$clog2" | "$bits" => 32,
                 "$time" | "$realtime" => 64,
                 _ => {
-                    return Err(self.err(
-                        *span,
-                        format!("function call `{func}` needs tasks/functions (milestone R3)"),
-                    ))
+                    // User function: its declared return width (const-eval
+                    // sites like `parameter P = f(1)` need this).
+                    match self.scope_func(func) {
+                        Some((fi, _)) => self
+                            .e
+                            .ret_types
+                            .get(&fi)
+                            .map(|(w, _)| *w)
+                            .ok_or_else(|| self.err(*span, format!("`{func}` is a task (tasks return nothing)")))?,
+                        None => {
+                            return Err(self.err(*span, format!("function call `{func}` needs tasks/functions (milestone R3)")))
+                        }
+                    }
                 }
             },
         })
@@ -539,10 +548,25 @@ impl<'e, 'f> Lower<'e, 'f> {
                     )),
                 }
             }
-            Expr::IndexedPart { span, .. } => Err(self.err(
-                *span,
-                "indexed part-selects (`+:`/`-:`) are not supported yet (see docs/RIVERILOG-PLAN.md §8)",
-            )),
+            Expr::IndexedPart { span: _, base, plus, offset, width } => {
+                let (var, _vw, _vs, _desc) = self.base_var(base)?;
+                let w = self.const_u32_of(width)?;
+                let off = self.lower(offset, 0)?;
+                let hi_s = self.slot();
+                let lo_s = self.slot();
+                if *plus {
+                    let wm1 = self.const_u64((w as u64).saturating_sub(1), 64);
+                    self.emit(Op::Bin { kind: riv_ir::BinKind::Add, dst: hi_s, a: off.slot, b: wm1, w: 64, signed: false });
+                    self.emit(Op::Mov { dst: lo_s, src: off.slot });
+                } else {
+                    self.emit(Op::Mov { dst: hi_s, src: off.slot });
+                    let wm1 = self.const_u64((w as u64).saturating_sub(1), 64);
+                    self.emit(Op::Bin { kind: riv_ir::BinKind::Sub, dst: lo_s, a: off.slot, b: wm1, w: 64, signed: false });
+                }
+                let dst2 = self.slot();
+                self.emit(Op::LoadPartDyn { dst: dst2, var, hi: hi_s, lo: lo_s });
+                Ok(Val { slot: dst2, w, signed: false, is_time: false })
+            }
             Expr::HierIdent { parts, span } => {
                 let v = self.hier_var(parts.join(".").as_str(), *span)?;
                 self.note_read(v);
@@ -566,6 +590,7 @@ impl<'e, 'f> Lower<'e, 'f> {
     }
 
     fn lower_unary(&mut self, span: rcs_diag::Span, op: UnOp, expr: &Expr, ctx: u32) -> ElabResult<Val> {
+        let _ = span;
         Ok(match op {
             UnOp::Plus => self.lower(expr, ctx)?,
             UnOp::Minus => {
@@ -601,13 +626,13 @@ impl<'e, 'f> Lower<'e, 'f> {
                 };
                 let dst = self.slot();
                 self.emit(Op::Reduce { kind, dst, a: a.slot });
-                let _ = span;
                 Val { slot: dst, w: 1, signed: false, is_time: false }
             }
         })
     }
 
     fn lower_binary(&mut self, span: rcs_diag::Span, op: BinOp, lhs: &Expr, rhs: &Expr, ctx: u32) -> ElabResult<Val> {
+        let _ = span;
         Ok(match op {
             BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div | BinOp::Mod | BinOp::Pow => {
                 let w = ctx.max(self.natural_w(lhs)?).max(self.natural_w(rhs)?);
@@ -624,7 +649,6 @@ impl<'e, 'f> Lower<'e, 'f> {
                 };
                 let dst = self.slot();
                 self.emit(Op::Bin { kind, dst, a: a.slot, b: b.slot, w, signed });
-                let _ = span;
                 Val { slot: dst, w, signed, is_time: false }
             }
             BinOp::BitAnd | BinOp::BitOr | BinOp::BitXor => {
@@ -1627,10 +1651,23 @@ impl<'e, 'f> Lower<'e, 'f> {
                 }
                 Ok(Lval::Concat { parts: flat })
             }
-            Expr::IndexedPart { span, .. } => Err(self.err(
-                *span,
-                "indexed part-selects (`+:`/`-:`) are not supported yet (see docs/RIVERILOG-PLAN.md §8)",
-            )),
+            Expr::IndexedPart { span: _, base, plus, offset, width } => {
+                let (var, _vw, _vs, _desc) = self.base_var(base)?;
+                let w = self.const_u32_of(width)?;
+                let off = self.lower(offset, 0)?;
+                let hi_s = self.slot();
+                let lo_s = self.slot();
+                if *plus {
+                    let wm1 = self.const_u64((w as u64).saturating_sub(1), 64);
+                    self.emit(Op::Bin { kind: riv_ir::BinKind::Add, dst: hi_s, a: off.slot, b: wm1, w: 64, signed: false });
+                    self.emit(Op::Mov { dst: lo_s, src: off.slot });
+                } else {
+                    self.emit(Op::Mov { dst: hi_s, src: off.slot });
+                    let wm1 = self.const_u64((w as u64).saturating_sub(1), 64);
+                    self.emit(Op::Bin { kind: riv_ir::BinKind::Sub, dst: lo_s, a: off.slot, b: wm1, w: 64, signed: false });
+                }
+                Ok(Lval::PartDyn { var, hi: hi_s, lo: lo_s })
+            }
             Expr::HierIdent { parts, span } => {
                 let v = self.hier_var(parts.join(".").as_str(), *span)?;
                 Ok(Lval::Var { var: v })

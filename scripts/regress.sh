@@ -76,6 +76,17 @@ $iv_out"
     tri_bug=$(echo "$tri_sum" | sed -E 's/.*bug=([0-9]+).*/\1/')
     [ "$tri_bug" = "0" ] || { echo "GATE FAIL: riv tri bug=x$tri_bug (riv differs from both agreeing oracles)"; echo "$tri_out" | grep "tri-bug"; fail=1; }
     echo "$tri_sum"
+    # yosys-simple compile-parity leg (R4 deferred, RIVERILOG-PLAN §8):
+    # iverilog -t null vs riverilog per file; registered divergences
+    # excluded (counted), any OTHER mismatch fails. Skips without iverilog.
+    simple_out=$(cargo run -q -p riv-difftest -- --simple 2>&1)
+    simple_sum=$(echo "$simple_out" | grep -E "^SIMPLE" || true)
+    if echo "$simple_out" | grep -qE "^simple"; then
+        echo "GATE FAIL: riv simple parity (unregistered iverilog/riverilog mismatch)"
+        echo "$simple_out" | grep -E "^simple"
+        fail=1
+    fi
+    echo "${simple_sum:-SIMPLE skipped (no iverilog)}"
     echo "$e2e_sum"
     echo "$iv_sum"
     # riverilog VCD cross-compare (RIVERILOG-PLAN §8.1/rivD9 + R5 22):

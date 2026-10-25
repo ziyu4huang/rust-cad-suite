@@ -524,6 +524,108 @@ fn run_iv(corpus: &Path, riverilog: &Path, rivvp: &Path) -> Vec<CaseLine> {
     lines
 }
 
+// ---------------------------------------------------------------------------
+// yosys-simple compile-parity leg (R4 deferred / RIVERILOG-PLAN §8.1):
+// for every .v file, iverilog -t null vs riverilog -s <first module> must
+// agree accept/reject. Registered-divergence files are excluded (counted,
+// not hidden); any OTHER mismatch fails the gate.
+// ---------------------------------------------------------------------------
+
+/// Registered divergences (see RIVERILOG-PLAN §8 progress note):
+///  - hier-order: forward hierarchical references into later sibling
+///    generate blocks (module items are order-free in Verilog; the var
+///    arena is built in walk order) — deferred two-pass resolution.
+///  - const-func / recursion / cross-module function calls (R8 surface).
+///  - real literals (out of planned surface, §8).
+///  - wand/wor (strength batch, R9).
+///  - func_block: block-local bit-select.
+const SIMPLE_EXCLUDE: &[&str] = &[
+    "carryadd.v", "genblk_collide.v", "genblk_dive.v", "genblk_order.v",
+    "genblk_port_shadow.v", "hierdefparam.v", "loop_prefix_case.v",
+    "loop_var_shadow.v", "module_scope.v", "module_scope_case.v",
+    "const_fold_func.v", "const_func_shadow.v", "func_recurse.v",
+    "func_width_scope.v", "module_scope_func.v", "rotate.v",
+    "realexpr.v", "wandwor.v", "func_block.v",
+];
+
+fn first_module_name(path: &Path) -> Option<String> {
+    let text = std::fs::read_to_string(path).ok()?;
+    for l in text.lines() {
+        let t = l.trim_start();
+        if let Some(rest) = t.strip_prefix("module") {
+            if rest.starts_with(' ') || rest.starts_with('\t') {
+                let name: String = rest
+                    .trim_start()
+                    .chars()
+                    .take_while(|c| c.is_ascii_alphanumeric() || *c == '_' || *c == '$')
+                    .collect();
+                if !name.is_empty() {
+                    return Some(name);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn simple_parity(dir: &Path, riverilog: &Path) {
+    let timeout = watchdog_timeout();
+    let mut files: Vec<PathBuf> = std::fs::read_dir(dir)
+        .expect("simple dir")
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.extension().map(|x| x == "v").unwrap_or(false))
+        .collect();
+    files.sort();
+    let (mut ok, mut excl, mut bad) = (0usize, 0usize, Vec::new());
+    for f in &files {
+        let fname = f.file_name().unwrap().to_string_lossy().into_owned();
+        if SIMPLE_EXCLUDE.contains(&fname.as_str()) {
+            excl += 1;
+            continue;
+        }
+        let Some(top) = first_module_name(f) else {
+            bad.push(format!("{fname}: no module"));
+            continue;
+        };
+        let iv = run_with_watchdog(
+            {
+                let mut c = Command::new("iverilog");
+                c.arg("-t").arg("null").arg("-g2005").arg("-s").arg(&top).arg(f);
+                c
+            },
+            timeout,
+        );
+        let rv = run_with_watchdog(
+            {
+                let mut c = Command::new(riverilog);
+                c.arg("-s").arg(&top).arg("-o").arg("/tmp/riv-simple.riv").arg(f);
+                c
+            },
+            timeout,
+        );
+        let iv_ok = !iv.watchdog && iv.code == Some(0);
+        let rv_ok = !rv.watchdog && rv.code == Some(0);
+        if iv_ok != rv_ok {
+            bad.push(format!(
+                "{fname}: iverilog={} riverilog={} ({})",
+                iv_ok,
+                rv_ok,
+                one_line(&rv.stderr)
+            ));
+        } else {
+            ok += 1;
+        }
+    }
+    for b in &bad {
+        println!("simple\t{b}");
+    }
+    println!("SIMPLE parity={ok}/{}/{} excl={excl}", ok + bad.len(), excl);
+    if !bad.is_empty() {
+        eprintln!("riv-difftest: simple parity mismatches (see simple lines)");
+    }
+}
+
 fn locate_bin(name: &str) -> PathBuf {
     let env_key = format!("{}_BIN", name.to_uppercase());
     if let Ok(p) = std::env::var(&env_key) {
@@ -818,6 +920,7 @@ fn main() -> std::process::ExitCode {
     let mut do_e2e = false;
     let mut do_iv_leg = false;
     let mut do_tri = false;
+    let mut do_simple = false;
     let mut corpus: Option<PathBuf> = None;
     let mut i = 0usize;
     while i < argv.len() {
@@ -826,13 +929,14 @@ fn main() -> std::process::ExitCode {
             "--e2e" => do_e2e = true,
             "--record-iv-leg" => do_iv_leg = true,
             "--tri" => do_tri = true,
+            "--simple" => do_simple = true,
             "--corpus" => {
                 corpus = Some(PathBuf::from(&argv[i + 1]));
                 i += 1;
             }
             other => {
                 eprintln!(
-                    "unknown arg `{other}` (usage: riv-difftest [--record] [--record-iv-leg] [--tri] [--e2e] [--corpus DIR])"
+                    "unknown arg `{other}` (usage: riv-difftest [--record] [--record-iv-leg] [--tri] [--simple] [--e2e] [--corpus DIR])"
                 );
                 return std::process::ExitCode::from(2);
             }
@@ -842,6 +946,18 @@ fn main() -> std::process::ExitCode {
     if do_iv_leg {
         let corpus = corpus.unwrap_or_else(default_e2e_corpus);
         record_iv_leg(&corpus);
+        return std::process::ExitCode::from(0);
+    }
+    if do_simple {
+        let dir = corpus.unwrap_or_else(|| {
+            PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/../../corpus-external/yosys-simple"))
+        });
+        if !Command::new("iverilog").arg("-V").output().map(|o| o.status.success()).unwrap_or(false) {
+            eprintln!("riv-difftest: iverilog absent — simple parity leg skipped");
+            return std::process::ExitCode::from(0);
+        }
+        let riverilog = locate_bin("riverilog");
+        simple_parity(&dir, &riverilog);
         return std::process::ExitCode::from(0);
     }
     if do_tri {

@@ -211,8 +211,9 @@ pub fn elaborate(input: ElabInput) -> Result<riv_ir::Design, ElabError> {
 
     // Per-file timescales, sticky across the compilation unit until a new
     // directive (the preprocessor captures the directive seen in each
-    // file). A unit with NO directive anywhere is the unmeasured default —
-    // hard-error per design §4 (禁猜, PLAN §0.2 conflict unresolved).
+    // file). A unit with NO directive anywhere runs at 1s/1s — measured on
+    // iverilog 13.0 (nots.v probe: `#5` = 5 unit ticks, the $finish banner
+    // prints "(1s)"); the R2-era unmeasured hard-error is lifted by it.
     let mut last_ts: Option<String> = None;
     let mut per_file: HashMap<String, String> = HashMap::new();
     for f in files {
@@ -224,13 +225,7 @@ pub fn elaborate(input: ElabInput) -> Result<riv_ir::Design, ElabError> {
                 per_file.insert(f.path.clone(), ts.clone());
             }
             None => {
-                return Err(ElabError {
-                    message: format!(
-                        "riverilog: {0}: no `timescale directive and the no-timescale default is unmeasured on this oracle (see docs/riv-r2-design.md §4) (milestone R2)",
-                        f.path
-                    ),
-                    exit: 2,
-                })
+                per_file.insert(f.path.clone(), "1s/1s".to_string());
             }
         }
     }
@@ -450,11 +445,15 @@ impl<'a> Walker<'a> {
         }
 
         // Non-ANSI ports with no body declaration: implicit 1-bit wire
-        // (IEEE default_nettype wire; corpus does not change it).
+        // (IEEE default_nettype wire; corpus does not change it). Ports
+        // declared in the body (input/output decls) already registered in
+        // the pre-pass — skip those.
         if !m.ansi {
             let names: Vec<String> = port_names.keys().cloned().collect();
             for name in names {
-                self.declare_var(&name, 1, false, VarKind::Net, file, m.span, 0, 0, Vec::new())?;
+                if !self.e.cur().names.contains_key(&name) && !self.e.cur().params.contains_key(&name) {
+                    self.declare_var(&name, 1, false, VarKind::Net, file, m.span, 0, 0, Vec::new())?;
+                }
             }
         }
         Ok(())
@@ -720,9 +719,20 @@ impl<'a> Walker<'a> {
                 (None, e) => positional_exprs.push(e.as_ref()),
             }
         }
+        let all_param_names: Vec<String> = sub
+            .params
+            .iter()
+            .map(|p| p.name.clone())
+            .chain(sub.items.iter().flat_map(|it| match it {
+                ModuleItem::Decl(d) if d.kind == DeclKind::Parameter => {
+                    d.entries.iter().map(|e| e.name.clone()).collect()
+                }
+                _ => Vec::new(),
+            }))
+            .collect();
         for (idx, e) in positional_exprs.iter().enumerate() {
             let Some(e) = e else { continue };
-            let Some(pe) = sub.params.get(idx) else {
+            let Some(pname) = all_param_names.get(idx) else {
                 return Err(err_at(
                     file,
                     self.line_of(i.span),
@@ -730,7 +740,7 @@ impl<'a> Walker<'a> {
                 ));
             };
             let (b, signed) = self.const_eval_at(e, file)?;
-            overrides.push((pe.name.clone(), b, signed));
+            overrides.push((pname.clone(), b, signed));
         }
         for unit in &i.insts {
             // Instance arrays unroll into per-element scopes.
@@ -769,8 +779,20 @@ impl<'a> Walker<'a> {
         // Header params are declared by walk_module; overrides (evaluated
         // in the PARENT scope) ride in the scope and replace each default
         // at declaration, re-typed at the declared width/sign (15_params).
+        // Override targets include body-declared parameters too
+        // (`module m(a); parameter W = 4;` — paramods pins it).
+        let has_param = |m: &Module, name: &str| {
+            m.params.iter().any(|p| p.name == name)
+                || m.items.iter().any(|it| match it {
+                    ModuleItem::Decl(d) => {
+                        d.kind == DeclKind::Parameter
+                            && d.entries.iter().any(|e| e.name == name)
+                    }
+                    _ => false,
+                })
+        };
         for (name, val, _) in overrides {
-            if !sub.params.iter().any(|p| &p.name == name) {
+            if !has_param(sub, name) {
                 return Err(err_at(file, line, format!("module `{}` has no parameter `{name}`", sub.name)));
             }
             self.e
@@ -1038,7 +1060,10 @@ impl<'a> Walker<'a> {
             },
             Some(None) => (0, 0, 0),
         };
-        // Terminals: output first, then inputs.
+        // Terminals: output first, then inputs. buf/not may drive several
+        // outputs (o1, o2, ..., in) — unrolled into one gate per output.
+        let multi_out = matches!(kind, riv_ir::GateKind::Buf | riv_ir::GateKind::Not)
+            && unit.conns.len() > 2;
         let mut terms = Vec::new();
         for c in &unit.conns {
             let Some(e) = &c.expr else {
@@ -1056,19 +1081,21 @@ impl<'a> Walker<'a> {
             };
             terms.push(var);
         }
-        let nin_expected = match kind {
-            riv_ir::GateKind::Buf | riv_ir::GateKind::Not => 2,
-            _ => 3,
+        // buf/not: (o1...oN, in) — multi-OUTPUT. Logic family:
+        // (out, in1...inN) — multi-INPUT. bufif/notif: exactly 3.
+        let (nin_min, nin_max) = match kind {
+            riv_ir::GateKind::Buf | riv_ir::GateKind::Not => (2, usize::MAX),
+            riv_ir::GateKind::Bufif0 | riv_ir::GateKind::Bufif1
+            | riv_ir::GateKind::Notif0 | riv_ir::GateKind::Notif1 => (3, 3),
+            _ => (3, usize::MAX),
         };
-        if terms.len() != nin_expected {
+        if terms.len() < nin_min || terms.len() > nin_max {
             return Err(err_at(
                 file,
                 line,
-                format!("gate `{}` takes {nin_expected} terminals, got {}", i.mod_name, terms.len()),
+                format!("gate `{}` takes {nin_min}+ terminals, got {}", i.mod_name, terms.len()),
             ));
         }
-        let out = terms[0];
-        let inputs = terms[1..].to_vec();
         for &t in terms.iter() {
             if self.e.vars[t as usize].width != 1 {
                 return Err(err_at(
@@ -1078,6 +1105,24 @@ impl<'a> Walker<'a> {
                 ));
             }
         }
+        if multi_out {
+            // (o1 ... oN, in): one gate per output, shared input.
+            let input = *terms.last().unwrap();
+            for &out in &terms[..terms.len() - 1] {
+                self.net_driver_check(out, file, unit.span, true)?;
+                self.design.gates.push(riv_ir::Gate {
+                    kind,
+                    out,
+                    inputs: vec![input],
+                    rise,
+                    fall,
+                    turnoff,
+                });
+            }
+            return Ok(());
+        }
+        let out = terms[0];
+        let inputs = terms[1..].to_vec();
         self.net_driver_check(out, file, unit.span, true)?;
         self.design.gates.push(riv_ir::Gate { kind, out, inputs, rise, fall, turnoff });
         Ok(())
@@ -1252,6 +1297,18 @@ impl<'a> Walker<'a> {
                     None => (w_default, w_default - 1, 0),
                 };
                 for entry in &d.entries {
+                    // `output [3:0] q; reg [3:0] q;` — the follow-up reg
+                    // declaration PROMOTES the port net to a reg (Verilog
+                    // port-completion rule; always01 pins it).
+                    if d.kind == DeclKind::Reg {
+                        if let Some(&id) = self.e.cur().names.get(&entry.name) {
+                            if self.e.vars[id as usize].kind == VarKind::Net {
+                                self.e.vars[id as usize].kind = VarKind::Reg;
+                                self.design.vars[id as usize].kind = VarKind::Reg;
+                                continue;
+                            }
+                        }
+                    }
                     if self.e.cur().names.contains_key(&entry.name)
                         || self.e.cur().params.contains_key(&entry.name)
                     {

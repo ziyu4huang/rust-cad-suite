@@ -383,6 +383,11 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
 
 → 目標基線:**e2e 59/59、iv 9/10(採礦後 19/20)**;UDP 為唯一具名殘項。
 
+**進度註(2026-10-25 R5/效能/yosys 腿追加輪;全部數字=本輪實跑)**:
+- **RK5 效能輪 ✅**:1M 週期 release 3.25s→1.74s=**308k→575k cycles/s(+87%,vvp 差距 4.6×→2.2×)**;樣本驅動三發=Rc<Design> 去 op clone/wake 反向索引+WaitList 零分配敏感表/Const 預解析快取 const_rt+時間輪條目池;殘餘熱點(arm_wait Own to_vec+Bits::part)留 R10。
+- **R5 IO 批次 ✅**:$fopen 家族(MCD/通道 FD 雙形,iverilog 實測分配逐字)+dump 控制(off/on/all 段形+段先落變更後 flush 時序)+$readmemh/b 超界 WARNING 逐字+$random(rivD11=序列分歧預登記);rivvp -vcd/-fst/IVERILOG_DUMPER;iv 採礦 21/22 enforced byte-exact,VCD 閘迴圈化(51+22 雙 OK);基線 **iv 21/22**。
+- **yosys-simple 同位腿 ✅(R4 順延項收口)**:87 檔 iverilog -t null vs riverilog 逐檔同位=**68/68 同位+19 登記排除**(層次前向引用 10=兩遍解析留後/函數 const+遞迴+跨模組 6=R8 面/real 1+wand 1=範圍外/區塊局部位選 1);附帶真修復=無 timescale 預設 1s/1s(nots.v 探針解除 R2 禁猜硬錯)+resolve_hier 前綴剝離無限循環(截斷不動即 break;四檔掛死根因)+非 ANSI 埠尾段重複宣告+output 後置 reg 升級+body-declared parameter 例化覆寫+**indexed part-select `+:`/`-:` 全實作**(值+左值形)+多輸出 buf/not+多輸入邏輯族閘;閘=riv-difftest --simple(排除表在碼內常數,新分歧先登記);picorv32 點火=下弧(來源待取)。
+
 **進度註(2026-10-25 R4 弧收網;全部數字=本輪實跑)**:
 - **步驟 0 ✅**:iv 錄製腿(57/59 例錄成,40/59 iverilog 自身拒編)+tri_gate 機械三分入 regress(bug>0 斷鏈);基線 TRI agree=41 bug=0 div=0 → 收網時 agree=56 bug=0 div=1 skip=2。
 - **R4-a/b/c/d/e ✅ 一弧收網**:riv-ir v4(Elem/gates 段/Event/$stop/readmem/Trigger/AssignNbaDelay)+riv-elab Scope 堆疊(例化三型埠綁定=塌縮/驅動/追隨者;generate 透明作用域;前置宣告 pre-pass=Verilog 模組項次序無關)+riv-kernel(陣列/閘惰性排程/事件/延遲 NBA/事件序=同時戳更新先於程序喚醒)。
