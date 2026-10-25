@@ -7,4 +7,5 @@ authors.workspace = true
 
 [dependencies]
 riv-ir.workspace = true
+vl-ops.workspace = true
 vl-values.workspace = true

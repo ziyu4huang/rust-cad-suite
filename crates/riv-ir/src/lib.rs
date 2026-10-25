@@ -660,11 +660,11 @@ pub enum Op {
     Const { dst: Slot, lit: Literal },
     Mov { dst: Slot, src: Slot },
     Bin { kind: BinKind, dst: Slot, a: Slot, b: Slot, w: u32, signed: bool },
-    Bit { kind: BitKind, dst: Slot, a: Slot, b: Slot, w: u32 },
+    Bit { kind: BitKind, dst: Slot, a: Slot, b: Slot, w: u32, signed: bool },
     /// Binary xnor (`a ~^ b`), kept separate from Bit/Xor so the kernel
     /// does not need a negate fixup.
     BitXnor { dst: Slot, a: Slot, b: Slot, w: u32 },
-    BitNot { dst: Slot, a: Slot, w: u32 },
+    BitNot { dst: Slot, a: Slot, w: u32, signed: bool },
     Reduce { kind: RedKind, dst: Slot, a: Slot },
     LogicAnd { dst: Slot, a: Slot, b: Slot },
     LogicOr { dst: Slot, a: Slot, b: Slot },
@@ -940,9 +940,9 @@ fn op_encode(op: &Op) -> String {
         Op::Bin { kind, dst, a, b: bb, w, signed } => {
             format!("bin {} {dst} {a} {bb} {w} {}", kind.tag(), flag(*signed))
         }
-        Op::Bit { kind, dst, a, b, w } => format!("bit {} {dst} {a} {b} {w}", kind.tag()),
+        Op::Bit { kind, dst, a, b, w, signed } => format!("bit {} {dst} {a} {b} {w} {}", kind.tag(), *signed as u8),
         Op::BitXnor { dst, a, b, w } => format!("bitxnor {dst} {a} {b} {w}"),
-        Op::BitNot { dst, a, w } => format!("bitnot {dst} {a} {w}"),
+        Op::BitNot { dst, a, w, signed } => format!("bitnot {dst} {a} {w} {}", *signed as u8),
         Op::Reduce { kind, dst, a } => format!("reduce {} {dst} {a}", kind.tag()),
         Op::LogicAnd { dst, a, b } => format!("logicand {dst} {a} {b}"),
         Op::LogicOr { dst, a, b } => format!("logicor {dst} {a} {b}"),
@@ -1414,9 +1414,10 @@ fn op_decode(t: &[&str], n: usize) -> Result<Op, ReadError> {
             a: pu(t, 3, n)?,
             b: pu(t, 4, n)?,
             w: pu(t, 5, n)?,
+            signed: b(p(t, 6, n)?),
         }),
         "bitxnor" => Ok(Op::BitXnor { dst: pu(t, 1, n)?, a: pu(t, 2, n)?, b: pu(t, 3, n)?, w: pu(t, 4, n)? }),
-        "bitnot" => Ok(Op::BitNot { dst: pu(t, 1, n)?, a: pu(t, 2, n)?, w: pu(t, 3, n)? }),
+        "bitnot" => Ok(Op::BitNot { dst: pu(t, 1, n)?, a: pu(t, 2, n)?, w: pu(t, 3, n)?, signed: b(p(t, 4, n)?) }),
         "reduce" => Ok(Op::Reduce {
             kind: RedKind::from_tag(p(t, 1, n)?).ok_or_else(|| e("bad reduce kind"))?,
             dst: pu(t, 2, n)?,
@@ -1657,9 +1658,9 @@ mod tests {
                         Op::Mov { dst: 1, src: 0 },
                         Op::Bin { kind: BinKind::Add, dst: 2, a: 0, b: 1, w: 9, signed: false },
                         Op::Bin { kind: BinKind::Pow, dst: 2, a: 0, b: 1, w: 9, signed: true },
-                        Op::Bit { kind: BitKind::Xor, dst: 2, a: 0, b: 1, w: 9 },
+Op::Bit { kind: BitKind::Xor, dst: 2, a: 0, b: 1, w: 9, signed: false },
                         Op::BitXnor { dst: 2, a: 0, b: 1, w: 9 },
-                        Op::BitNot { dst: 2, a: 0, w: 9 },
+Op::BitNot { dst: 2, a: 0, w: 9, signed: false },
                         Op::Reduce { kind: RedKind::Xnor, dst: 2, a: 0 },
                         Op::Reduce { kind: RedKind::Nand, dst: 2, a: 0 },
                         Op::LogicAnd { dst: 2, a: 0, b: 1 },

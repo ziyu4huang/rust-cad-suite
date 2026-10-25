@@ -705,18 +705,8 @@ impl Kernel {
                     };
                     let b = match &self.const_rt[bk][pc as usize] {
                         Some(b) => b.clone(),
-                        None => from_numlit_parts(
-                            Some(lit.width),
-                            lit.signed,
-                            match lit.base {
-                                Base::Dec => VB::Dec,
-                                Base::Bin => VB::Bin,
-                                Base::Oct => VB::Oct,
-                                Base::Hex => VB::Hex,
-                            },
-                            &lit.digits,
-                        )
-                        .map_err(|e| RunError(format!("const: {}", e.0)))?,
+                        None => vl_ops::parse_const(lit)
+                            .map_err(|e| RunError(format!("const: {}", e.0)))?,
                     };
                     self.set_slot(ti, dst, b);
                 }
@@ -725,144 +715,76 @@ impl Kernel {
                     self.set_slot(ti, dst, v);
                 }
                 Op::Bin { kind, dst, a, b, w, signed } => {
-                    let av = self.adjusted(ti, a, w, signed)?;
-                    let bv = self.adjusted(ti, b, w, signed)?;
-                    let r = match kind {
-                        riv_ir::BinKind::Add => av.add(&bv),
-                        riv_ir::BinKind::Sub => av.sub(&bv),
-                        riv_ir::BinKind::Mul => av.mul(&bv),
-                        riv_ir::BinKind::Div => {
-                            if signed {
-                                av.sdiv(&bv)
-                            } else {
-                                av.div(&bv)
-                            }
-                        }
-                        riv_ir::BinKind::Rem => {
-                            if signed {
-                                av.srem(&bv)
-                            } else {
-                                av.rem(&bv)
-                            }
-                        }
-                        riv_ir::BinKind::Pow => {
-                            if signed {
-                                av.spow(&bv)
-                            } else {
-                                av.pow(&bv)
-                            }
-                        }
-                    }
-                    .map_err(|e| RunError(e.0))?;
+                    let av = self.slot(ti, a)?.clone();
+                    let bv = self.slot(ti, b)?.clone();
+                    let r = vl_ops::apply_bin(kind, &av, &bv, w, signed)
+                        .map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
-                Op::Bit { kind, dst, a, b, w } => {
-                    let av = self.adjusted(ti, a, w, false)?;
-                    let bv = self.adjusted(ti, b, w, false)?;
-                    let r = match kind {
-                        riv_ir::BitKind::And => av.bit_and(&bv),
-                        riv_ir::BitKind::Or => av.bit_or(&bv),
-                        riv_ir::BitKind::Xor => av.bit_xor(&bv),
-                    }
-                    .map_err(|e| RunError(e.0))?;
+                Op::Bit { kind, dst, a, b, w, signed } => {
+                    let av = self.slot(ti, a)?.clone();
+                    let bv = self.slot(ti, b)?.clone();
+                    let r = vl_ops::apply_bit(kind, &av, &bv, w, signed)
+                        .map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
                 Op::BitXnor { dst, a, b, w } => {
-                    let av = self.adjusted(ti, a, w, false)?;
-                    let bv = self.adjusted(ti, b, w, false)?;
-                    let r = av.bit_xor(&bv).map_err(|e| RunError(e.0))?.bit_not();
+                    let av = self.slot(ti, a)?.clone();
+                    let bv = self.slot(ti, b)?.clone();
+                    let r = vl_ops::apply_bit_xnor(&av, &bv, w).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
-                Op::BitNot { dst, a, w } => {
-                    let av = self.adjusted(ti, a, w, false)?;
-                    self.set_slot(ti, dst, av.bit_not());
+                Op::BitNot { dst, a, w, signed } => {
+                    let av = self.slot(ti, a)?.clone();
+                    let r = vl_ops::apply_bit_not(&av, w, signed).map_err(|e| RunError(e.0))?;
+                    self.set_slot(ti, dst, r);
                 }
                 Op::Reduce { kind, dst, a } => {
-                    let av = self.slot(ti, a)?;
-                    let r = match kind {
-                        riv_ir::RedKind::And => av.reduce_and(),
-                        riv_ir::RedKind::Or => av.reduce_or(),
-                        riv_ir::RedKind::Xor => av.reduce_xor(),
-                        riv_ir::RedKind::Nand => {
-                            Ok(av.reduce_and().map_err(|e: vl_values::ValueError| RunError(e.0))?.bit_not())
-                        }
-                        riv_ir::RedKind::Nor => {
-                            Ok(av.reduce_or().map_err(|e: vl_values::ValueError| RunError(e.0))?.bit_not())
-                        }
-                        riv_ir::RedKind::Xnor => {
-                            Ok(av.reduce_xor().map_err(|e: vl_values::ValueError| RunError(e.0))?.bit_not())
-                        }
-                    }
-                    .map_err(|e: vl_values::ValueError| RunError(e.0))?;
+                    let av = self.slot(ti, a)?.clone();
+                    let r = vl_ops::apply_reduce(kind, &av).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
                 Op::LogicAnd { dst, a, b } => {
-                    let av = truthy(self.slot(ti, a)?)?;
-                    let bv = truthy(self.slot(ti, b)?)?;
-                    self.set_slot(ti, dst, Bits::from_u64(1, (av && bv) as u64).unwrap());
+                    let av = self.slot(ti, a)?.clone();
+                    let bv = self.slot(ti, b)?.clone();
+                    let r = vl_ops::apply_logic_and(&av, &bv).map_err(|e| RunError(e.0))?;
+                    self.set_slot(ti, dst, r);
                 }
                 Op::LogicOr { dst, a, b } => {
-                    let av = truthy(self.slot(ti, a)?)?;
-                    let bv = truthy(self.slot(ti, b)?)?;
-                    self.set_slot(ti, dst, Bits::from_u64(1, (av || bv) as u64).unwrap());
+                    let av = self.slot(ti, a)?.clone();
+                    let bv = self.slot(ti, b)?.clone();
+                    let r = vl_ops::apply_logic_or(&av, &bv).map_err(|e| RunError(e.0))?;
+                    self.set_slot(ti, dst, r);
                 }
                 Op::LogicNot { dst, a } => {
-                    let av = truthy(self.slot(ti, a)?)?;
-                    self.set_slot(ti, dst, Bits::from_u64(1, !av as u64).unwrap());
+                    let av = self.slot(ti, a)?.clone();
+                    let r = vl_ops::apply_logic_not(&av).map_err(|e| RunError(e.0))?;
+                    self.set_slot(ti, dst, r);
                 }
                 Op::Cmp { kind, dst, a, b, signed } => {
-                    let (av, bv) = self.cmp_pair(ti, a, b, signed)?;
-                    let ord = if signed {
-                        av.cmp_signed(&bv)
-                    } else {
-                        av.cmp_unsigned(&bv)
-                    };
-                    let r = match (kind, ord) {
-                        (_, None) => Bits::all_x(1).unwrap(),
-                        (riv_ir::CmpKind::Lt, Some(o)) => Bits::from_u64(1, o.is_lt() as u64).unwrap(),
-                        (riv_ir::CmpKind::Le, Some(o)) => Bits::from_u64(1, o.is_le() as u64).unwrap(),
-                        (riv_ir::CmpKind::Gt, Some(o)) => Bits::from_u64(1, o.is_gt() as u64).unwrap(),
-                        (riv_ir::CmpKind::Ge, Some(o)) => Bits::from_u64(1, o.is_ge() as u64).unwrap(),
-                        (riv_ir::CmpKind::Eq, Some(o)) => Bits::from_u64(1, o.is_eq() as u64).unwrap(),
-                        (riv_ir::CmpKind::Ne, Some(o)) => Bits::from_u64(1, o.is_ne() as u64).unwrap(),
-                    };
+                    let av = self.slot(ti, a)?.clone();
+                    let bv = self.slot(ti, b)?.clone();
+                    let r = vl_ops::apply_cmp(kind, &av, &bv, signed).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
                 Op::CaseCmp { kind, dst, a, b } => {
                     let av = self.slot(ti, a)?.clone();
                     let bv = self.slot(ti, b)?.clone();
-                    let r = match kind {
-                        riv_ir::CaseCmpKind::ExactEq => av.case_eq(&bv),
-                        riv_ir::CaseCmpKind::ExactNe => av.case_ne(&bv),
-                        // Case-statement item matching: non-match is 0,
-                        // never x (IEEE 9.5 — the item simply does not fire).
-                        riv_ir::CaseCmpKind::WildZ => Ok(Bits::from_u64(1, av.casez_match(&bv) as u64).unwrap()),
-                        riv_ir::CaseCmpKind::WildX => Ok(Bits::from_u64(1, av.casex_match(&bv) as u64).unwrap()),
-                    }
-                    .map_err(|e| RunError(e.0))?;
+                    let r = vl_ops::apply_case_cmp(kind, &av, &bv).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
                 Op::Shift { kind, dst, a, b, w, signed } => {
-                    let av = self.adjusted(ti, a, w, signed)?;
+                    let av = self.slot(ti, a)?.clone();
                     let bv = self.slot(ti, b)?.clone();
-                    let r = match kind {
-                        riv_ir::ShiftKind::Shl => av.shl(&bv),
-                        riv_ir::ShiftKind::Shr => av.shr(&bv),
-                        riv_ir::ShiftKind::Ashr => av.ashr(&bv, signed),
-                    }
-                    .map_err(|e| RunError(e.0))?;
+                    let r = vl_ops::apply_shift(kind, &av, &bv, w, signed)
+                        .map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
                 Op::Sel { dst, cond, a, b } => {
                     let cv = self.slot(ti, cond)?.clone();
-                    let r = match cv.truthy().map_err(|e| RunError(e.0))? {
-                        Some(true) => self.slot(ti, a)?.clone(),
-                        Some(false) => self.slot(ti, b)?.clone(),
-                        None => self
-                            .slot(ti, a)?
-                            .merge(self.slot(ti, b)?)
-                            .map_err(|e| RunError(e.0))?,
-                    };
+                    let av = self.slot(ti, a)?.clone();
+                    let bv = self.slot(ti, b)?.clone();
+                    let r = vl_ops::apply_sel(&cv, &av, &bv).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
                 Op::Concat { dst, ref parts } => {
@@ -870,13 +792,12 @@ impl Kernel {
                         .iter()
                         .map(|p| self.slot(ti, *p).cloned())
                         .collect::<Result<_, _>>()?;
-                    let r = Bits::concat(&vals).map_err(|e| RunError(e.0))?;
+                    let r = vl_ops::apply_concat(&vals).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
                 Op::Replicate { dst, src, times } => {
                     let base = self.slot(ti, src)?.clone();
-                    let vals: Vec<Bits> = (0..times).map(|_| base.clone()).collect();
-                    let r = Bits::concat(&vals).map_err(|e| RunError(e.0))?;
+                    let r = vl_ops::apply_replicate(&base, times).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, dst, r);
                 }
                 Op::LoadVar { dst, var } => {
@@ -1614,31 +1535,6 @@ impl Kernel {
         self.var(v)
     }
 
-    fn adjusted(&self, ti: usize, s: u32, w: u32, signed: bool) -> Result<Bits, RunError> {
-        let v = self.slot(ti, s)?;
-        if signed {
-            v.sadjust(w)
-        } else {
-            v.uadjust(w)
-        }
-        .map_err(|e| RunError(e.0))
-    }
-
-    fn cmp_pair(&self, ti: usize, a: u32, b: u32, signed: bool) -> Result<(Bits, Bits), RunError> {
-        let av = self.slot(ti, a)?;
-        let bv = self.slot(ti, b)?;
-        let w = av.width.max(bv.width);
-        let adj = |v: &Bits| -> Result<Bits, RunError> {
-            if signed {
-                v.sadjust(w)
-            } else {
-                v.uadjust(w)
-            }
-            .map_err(|e| RunError(e.0))
-        };
-        Ok((adj(av)?, adj(bv)?))
-    }
-
     fn load_bit(&self, var: VarId, idx: &Bits) -> Result<Bits, RunError> {
         let v = self.read_var(var)?;
         let Some(abs) = self.abs_index(var, idx)? else {
@@ -2077,18 +1973,8 @@ impl Kernel {
             };
             match op {
                 Op::Const { dst, ref lit } => {
-                    let b = from_numlit_parts(
-                        Some(lit.width),
-                        lit.signed,
-                        match lit.base {
-                            Base::Dec => VB::Dec,
-                            Base::Bin => VB::Bin,
-                            Base::Oct => VB::Oct,
-                            Base::Hex => VB::Hex,
-                        },
-                        &lit.digits,
-                    )
-                    .map_err(|e| RunError(format!("const: {}", e.0)))?;
+                    let b = vl_ops::parse_const(lit)
+                        .map_err(|e| RunError(format!("const: {}", e.0)))?;
                     self.set_slot(ti, *dst, b);
                 }
                 Op::Mov { dst, src } => {
@@ -2096,133 +1982,76 @@ impl Kernel {
                     self.set_slot(ti, *dst, v);
                 }
                 Op::Bin { kind, dst, a, b, w, signed } => {
-                    let av = self.adjusted(ti, *a, *w, *signed)?;
-                    let bv = self.adjusted(ti, *b, *w, *signed)?;
-                    let r = match kind {
-                        riv_ir::BinKind::Add => av.add(&bv),
-                        riv_ir::BinKind::Sub => av.sub(&bv),
-                        riv_ir::BinKind::Mul => av.mul(&bv),
-                        riv_ir::BinKind::Div => {
-                            if *signed { av.sdiv(&bv) } else { av.div(&bv) }
-                        }
-                        riv_ir::BinKind::Rem => {
-                            if *signed { av.srem(&bv) } else { av.rem(&bv) }
-                        }
-                        riv_ir::BinKind::Pow => {
-                            if *signed { av.spow(&bv) } else { av.pow(&bv) }
-                        }
-                    }
-                    .map_err(|e| RunError(e.0))?;
+                    let av = self.slot(ti, *a)?.clone();
+                    let bv = self.slot(ti, *b)?.clone();
+                    let r = vl_ops::apply_bin(*kind, &av, &bv, *w, *signed)
+                        .map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
-                Op::Bit { kind, dst, a, b, w } => {
-                    let av = self.adjusted(ti, *a, *w, false)?;
-                    let bv = self.adjusted(ti, *b, *w, false)?;
-                    let r = match kind {
-                        riv_ir::BitKind::And => av.bit_and(&bv),
-                        riv_ir::BitKind::Or => av.bit_or(&bv),
-                        riv_ir::BitKind::Xor => av.bit_xor(&bv),
-                    }
-                    .map_err(|e| RunError(e.0))?;
+                Op::Bit { kind, dst, a, b, w, signed } => {
+                    let av = self.slot(ti, *a)?.clone();
+                    let bv = self.slot(ti, *b)?.clone();
+                    let r = vl_ops::apply_bit(*kind, &av, &bv, *w, *signed)
+                        .map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
                 Op::BitXnor { dst, a, b, w } => {
-                    let av = self.adjusted(ti, *a, *w, false)?;
-                    let bv = self.adjusted(ti, *b, *w, false)?;
-                    let r = av.bit_xor(&bv).map_err(|e| RunError(e.0))?.bit_not();
+                    let av = self.slot(ti, *a)?.clone();
+                    let bv = self.slot(ti, *b)?.clone();
+                    let r = vl_ops::apply_bit_xnor(&av, &bv, *w).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
-                Op::BitNot { dst, a, w } => {
-                    let av = self.adjusted(ti, *a, *w, false)?;
-                    self.set_slot(ti, *dst, av.bit_not());
+                Op::BitNot { dst, a, w, signed } => {
+                    let av = self.slot(ti, *a)?.clone();
+                    let r = vl_ops::apply_bit_not(&av, *w, *signed).map_err(|e| RunError(e.0))?;
+                    self.set_slot(ti, *dst, r);
                 }
                 Op::Reduce { kind, dst, a } => {
-                    let av = self.slot(ti, *a)?;
-                    let r = match kind {
-                        riv_ir::RedKind::And => av.reduce_and(),
-                        riv_ir::RedKind::Or => av.reduce_or(),
-                        riv_ir::RedKind::Xor => av.reduce_xor(),
-                        riv_ir::RedKind::Nand => Ok(av
-                            .reduce_and()
-                            .map_err(|e: vl_values::ValueError| RunError(e.0))?
-                            .bit_not()),
-                        riv_ir::RedKind::Nor => Ok(av
-                            .reduce_or()
-                            .map_err(|e: vl_values::ValueError| RunError(e.0))?
-                            .bit_not()),
-                        riv_ir::RedKind::Xnor => Ok(av
-                            .reduce_xor()
-                            .map_err(|e: vl_values::ValueError| RunError(e.0))?
-                            .bit_not()),
-                    }
-                    .map_err(|e: vl_values::ValueError| RunError(e.0))?;
+                    let av = self.slot(ti, *a)?.clone();
+                    let r = vl_ops::apply_reduce(*kind, &av).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
                 Op::LogicAnd { dst, a, b } => {
-                    let av = truthy(self.slot(ti, *a)?)?;
-                    let bv = truthy(self.slot(ti, *b)?)?;
-                    self.set_slot(ti, *dst, Bits::from_u64(1, (av && bv) as u64).unwrap());
+                    let av = self.slot(ti, *a)?.clone();
+                    let bv = self.slot(ti, *b)?.clone();
+                    let r = vl_ops::apply_logic_and(&av, &bv).map_err(|e| RunError(e.0))?;
+                    self.set_slot(ti, *dst, r);
                 }
                 Op::LogicOr { dst, a, b } => {
-                    let av = truthy(self.slot(ti, *a)?)?;
-                    let bv = truthy(self.slot(ti, *b)?)?;
-                    self.set_slot(ti, *dst, Bits::from_u64(1, (av || bv) as u64).unwrap());
+                    let av = self.slot(ti, *a)?.clone();
+                    let bv = self.slot(ti, *b)?.clone();
+                    let r = vl_ops::apply_logic_or(&av, &bv).map_err(|e| RunError(e.0))?;
+                    self.set_slot(ti, *dst, r);
                 }
                 Op::LogicNot { dst, a } => {
-                    let av = truthy(self.slot(ti, *a)?)?;
-                    self.set_slot(ti, *dst, Bits::from_u64(1, !av as u64).unwrap());
+                    let av = self.slot(ti, *a)?.clone();
+                    let r = vl_ops::apply_logic_not(&av).map_err(|e| RunError(e.0))?;
+                    self.set_slot(ti, *dst, r);
                 }
                 Op::Cmp { kind, dst, a, b, signed } => {
-                    let (av, bv) = self.cmp_pair(ti, *a, *b, *signed)?;
-                    let ord = if *signed {
-                        av.cmp_signed(&bv)
-                    } else {
-                        av.cmp_unsigned(&bv)
-                    };
-                    let r = match (kind, ord) {
-                        (_, None) => Bits::all_x(1).unwrap(),
-                        (riv_ir::CmpKind::Lt, Some(o)) => Bits::from_u64(1, o.is_lt() as u64).unwrap(),
-                        (riv_ir::CmpKind::Le, Some(o)) => Bits::from_u64(1, o.is_le() as u64).unwrap(),
-                        (riv_ir::CmpKind::Gt, Some(o)) => Bits::from_u64(1, o.is_gt() as u64).unwrap(),
-                        (riv_ir::CmpKind::Ge, Some(o)) => Bits::from_u64(1, o.is_ge() as u64).unwrap(),
-                        (riv_ir::CmpKind::Eq, Some(o)) => Bits::from_u64(1, o.is_eq() as u64).unwrap(),
-                        (riv_ir::CmpKind::Ne, Some(o)) => Bits::from_u64(1, o.is_ne() as u64).unwrap(),
-                    };
+                    let av = self.slot(ti, *a)?.clone();
+                    let bv = self.slot(ti, *b)?.clone();
+                    let r = vl_ops::apply_cmp(*kind, &av, &bv, *signed).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
                 Op::CaseCmp { kind, dst, a, b } => {
                     let av = self.slot(ti, *a)?.clone();
                     let bv = self.slot(ti, *b)?.clone();
-                    let r = match kind {
-                        riv_ir::CaseCmpKind::ExactEq => av.case_eq(&bv),
-                        riv_ir::CaseCmpKind::ExactNe => av.case_ne(&bv),
-                        riv_ir::CaseCmpKind::WildZ => Ok(Bits::from_u64(1, av.casez_match(&bv) as u64).unwrap()),
-                        riv_ir::CaseCmpKind::WildX => Ok(Bits::from_u64(1, av.casex_match(&bv) as u64).unwrap()),
-                    }
-                    .map_err(|e| RunError(e.0))?;
+                    let r = vl_ops::apply_case_cmp(*kind, &av, &bv).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
                 Op::Shift { kind, dst, a, b, w, signed } => {
-                    let av = self.adjusted(ti, *a, *w, *signed)?;
+                    let av = self.slot(ti, *a)?.clone();
                     let bv = self.slot(ti, *b)?.clone();
-                    let r = match kind {
-                        riv_ir::ShiftKind::Shl => av.shl(&bv),
-                        riv_ir::ShiftKind::Shr => av.shr(&bv),
-                        riv_ir::ShiftKind::Ashr => av.ashr(&bv, *signed),
-                    }
-                    .map_err(|e| RunError(e.0))?;
+                    let r = vl_ops::apply_shift(*kind, &av, &bv, *w, *signed)
+                        .map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
                 Op::Sel { dst, cond, a, b } => {
                     let cv = self.slot(ti, *cond)?.clone();
-                    let r = match cv.truthy().map_err(|e| RunError(e.0))? {
-                        Some(true) => self.slot(ti, *a)?.clone(),
-                        Some(false) => self.slot(ti, *b)?.clone(),
-                        None => self
-                            .slot(ti, *a)?
-                            .merge(self.slot(ti, *b)?)
-                            .map_err(|e| RunError(e.0))?,
-                    };
+                    let av = self.slot(ti, *a)?.clone();
+                    let bv = self.slot(ti, *b)?.clone();
+                    let r = vl_ops::apply_sel(&cv, &av, &bv).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
                 Op::Concat { dst, ref parts } => {
@@ -2230,13 +2059,12 @@ impl Kernel {
                         .iter()
                         .map(|p| self.slot(ti, *p).cloned())
                         .collect::<Result<_, _>>()?;
-                    let r = Bits::concat(&vals).map_err(|e| RunError(e.0))?;
+                    let r = vl_ops::apply_concat(&vals).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
                 Op::Replicate { dst, src, times } => {
                     let base = self.slot(ti, *src)?.clone();
-                    let vals: Vec<Bits> = (0..*times).map(|_| base.clone()).collect();
-                    let r = Bits::concat(&vals).map_err(|e| RunError(e.0))?;
+                    let r = vl_ops::apply_replicate(&base, *times).map_err(|e| RunError(e.0))?;
                     self.set_slot(ti, *dst, r);
                 }
                 Op::LoadVar { dst, var } => {
@@ -2486,12 +2314,6 @@ fn op_tag(op: &Op) -> &'static str {
         Op::JoinPoint => "joinpoint",
         Op::EndThread => "endthread",
     }
-}
-
-fn truthy(b: &Bits) -> Result<bool, RunError> {
-    b.truthy()
-        .map_err(|e| RunError(e.0))?
-        .ok_or_else(|| RunError("condition is unknown".into()))
 }
 
 /// IEEE 1364-2005 §9.7.2 edge tables on the LSB.
@@ -3068,7 +2890,7 @@ mod tests {
                 Op::Const { dst: 0, lit: lit_dec(64, 5000) },
                 Op::Delay { amount: 0 },
                 Op::LoadVar { dst: 0, var: 0 },
-                Op::BitNot { dst: 1, a: 0, w: 1 },
+                Op::BitNot { dst: 1, a: 0, w: 1, signed: false },
                 Op::AssignBlk { lv: Lval::Var { var: 0 }, src: 1 },
                 Op::Jump { to: 0 },
             ],
@@ -3361,7 +3183,6 @@ mod tests {
             funcs: vec![],
             strs: vec![],
         };
-        let f = file_pool(&mut d);
         // static task t(input [7:0] v, output [7:0] o): o = v (frame: ret 0,
         // formal v=1, formal o=2, local tmp=3).
         d.funcs.push(riv_ir::Func {

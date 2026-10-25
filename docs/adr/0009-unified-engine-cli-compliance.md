@@ -55,7 +55,7 @@ OUT 硬錯清單),riverilog 面按 iverilog 的接受域收;引擎的完整能�
 | 步 | 內容 | 驗收 |
 |---|---|---|
 | U-1 | **vl-sim 降為 rverilator 面的方言 profile 適配層**:riv-kernel 升為 `vl-engine`(或 riv-kernel 更名),rverilator --binary 改驅動統一引擎 + Verilator 形 profile(2-state 投影:驅動值 x/z→0、settle 收斂序=宣告序) | corpus/e2e 59/59 byte-exact 零漂移(現有金樣即驗收);counter8/fulladd sim_gate 綠 |
-| U-2 | **求值面合流**:vl-sim eval(IEEE §5 表單測軌)與 riv-elab/interp 的 lowered-ops 單一語義源整合——const 求值與運行時共用一份 | vl-difftest 全綠+value.rs 單測軌不動 |
+| U-2 | **求值面合流**:vl-sim eval(IEEE §5 表單測軌)與 riv-elab/interp 的 lowered-ops 單一語義源整合——const 求值與運行時共用一份。**✅ 2026-10-25**:新 `vl-ops` crate(adjusted/apply_* 單源),kernel 兩執行點+elab const interp+vl-sim eval_w 四份手寫臂全數收編;riv-ir Op::Bit/BitNot 補 signed 域;副產品=雙 oracle 七探針抓三語義分歧(~ 自決定修復翻案/riv signed-bitwise/riv logic-x abort)全修,REGISTRY incident 10-24 | vl-difftest 全綠+value.rs 單測軌不動(實績:e2e 59/59+regress 全閘 PASS+vl-ops 10 測) |
 | U-3 | **CLI 面收編**:rverilator 現有旗標逐字保持(legacy 行為測試釘死);riverilog/rivvp 旗標面照 RIVERILOG-PLAN §5;兩面共用 -E/-I/-D 前端 | cli_gate+riv_cli goldens 不漂移 |
 | U-4 | **rVPI 收編**:vl-sim::vpi(ADR-0003)掛到統一引擎鉤子;riv 側 VPI(R7 面)同註冊面 | vpi_gate 綠 |
 | U-5 | **退役 vl-sim segments 解釋器**(interp/eval 中不再被 CLI 面引用的部分),wasm/FFI 改掛統一引擎 | wasm 8/8+ffi 三閘綠 |

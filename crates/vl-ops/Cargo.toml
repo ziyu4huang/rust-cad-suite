@@ -1,0 +1,11 @@
+[package]
+name = "vl-ops"
+description = "Lowered-op application semantics (IEEE 1364-2005 §5): the single source shared by the riv-kernel runtime, the riv-elab const interpreter and the vl-sim AST evaluator (ADR-0009 U-2)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+riv-ir.workspace = true
+vl-values.workspace = true

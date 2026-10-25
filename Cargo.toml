@@ -9,6 +9,7 @@ members = [
     "crates/rcs-diag",
     "crates/vl-syntax",
     "crates/vl-values",
+    "crates/vl-ops",
     "crates/vl-sim",
     "crates/vl-vcd",
     "crates/vl-spec",
@@ -29,6 +30,7 @@ authors = ["rust-cad-suite contributors"]
 rcs-diag = { path = "crates/rcs-diag" }
 vl-syntax = { path = "crates/vl-syntax" }
 vl-values = { path = "crates/vl-values" }
+vl-ops = { path = "crates/vl-ops" }
 riv-ir = { path = "crates/riv-ir" }
 riv-elab = { path = "crates/riv-elab" }
 riv-kernel = { path = "crates/riv-kernel" }

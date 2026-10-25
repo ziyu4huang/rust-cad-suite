@@ -105,6 +105,7 @@ version = "0.1.0"
 dependencies = [
  "rcs-diag",
  "riv-ir",
+ "vl-ops",
  "vl-syntax",
  "vl-values",
 ]
@@ -118,6 +119,7 @@ name = "riv-kernel"
 version = "0.1.0"
 dependencies = [
  "riv-ir",
+ "vl-ops",
  "vl-values",
 ]
 
@@ -189,10 +191,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "vl-ops"
+version = "0.1.0"
+dependencies = [
+ "riv-ir",
+ "vl-values",
+]
+
+[[package]]
 name = "vl-sim"
 version = "0.1.0"
 dependencies = [
  "rcs-diag",
+ "riv-elab",
+ "riv-ir",
+ "riv-kernel",
+ "vl-ops",
  "vl-syntax",
  "vl-values",
  "vl-vcd",

@@ -631,7 +631,7 @@ impl<'e, 'f> Lower<'e, 'f> {
                 let a = self.lower(expr, ctx)?;
                 let w = ctx.max(a.w);
                 let dst = self.slot();
-                self.emit(Op::BitNot { dst, a: a.slot, w });
+                self.emit(Op::BitNot { dst, a: a.slot, w, signed: a.signed });
                 Val { slot: dst, w, signed: a.signed, is_time: false }
             }
             UnOp::Not => {
@@ -687,8 +687,12 @@ impl<'e, 'f> Lower<'e, 'f> {
                     _ => BitKind::Xor,
                 };
                 let dst = self.slot();
-                self.emit(Op::Bit { kind, dst, a: a.slot, b: b.slot, w });
-                Val { slot: dst, w, signed: a.signed && b.signed, is_time: false }
+                // Coercion sign follows the EXPRESSION type (dual-oracle
+                // evidence, REGISTRY incident register 2026-10-24): $signed(p) & $signed(q)
+                // sign-extends both sides; the unsigned form zero-extends.
+                let signed = a.signed && b.signed;
+                self.emit(Op::Bit { kind, dst, a: a.slot, b: b.slot, w, signed });
+                Val { slot: dst, w, signed, is_time: false }
             }
             BinOp::Shl | BinOp::AShl | BinOp::Shr | BinOp::AShr => {
                 let w = ctx.max(self.natural_w(lhs)?);

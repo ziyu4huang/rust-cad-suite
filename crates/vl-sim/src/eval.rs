@@ -8,6 +8,13 @@ use crate::value::{self, Bits, ValueError};
 use rcs_diag::Span;
 use vl_syntax::ast::{BinOp, Expr, UnOp};
 
+// Operator application (the per-op IEEE §5 semantics: coercion + truth
+// tables) is delegated to vl-ops — the single source shared with the
+// unified engine's runtime and const interpreter (ADR-0009 U-2). This
+// file keeps only AST-level walking: width/sign propagation, name
+// resolution, short-circuit evaluation order.
+use vl_ops as vops;
+
 #[derive(Clone, Debug)]
 pub enum Val {
     Bits { bits: Bits, signed: bool },
@@ -303,94 +310,80 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
         Expr::Unary { span, op, expr } => match op {
             UnOp::Not => {
                 let (b, _) = eval(expr, ctx)?.to_bits(*span)?;
-                let r = match b.truthy()? {
-                    Some(v) => Bits::from_u64(1, (!v) as u64)?,
-                    None => Bits::all_x(1)?,
-                };
-                ext(r, false, w)
+                ext(vops::apply_logic_not(&b)?, false, w)
             }
             UnOp::BitNot => {
-                // IEEE 1364-2005 Table 5-22: the ~ operand is
-                // self-determined — it is evaluated at its own width and the
-                // RESULT (operand width) is what the context extends.
-                // Context-widening the operand first inverts zero-padding
-                // (e.g. ~a[7] in an 8-bit context turned 1 into 8'hfe).
-                let (b, _) = eval(expr, ctx)?.to_bits(*span)?;
-                ext(b.bit_not(), false, w)
+                // Context-determined (dual-oracle evidence, 2026-10-24
+                // probe — see REGISTRY incident register 2026-10-24): the operand is
+                // EVALUATED
+                // at the expression width (nested ops see the context, e.g.
+                // ~(4-bit + 4-bit) keeps the carry), coerced per the
+                // expression signedness, THEN inverted. The 2026-10-23
+                // "self-determined per Table 5-22" fix diverged from BOTH
+                // oracles (unsigned shape) and is reverted here.
+                let b = eval_w(expr, ctx, w, signed)?;
+                Ok(vops::apply_bit_not(&b, w, signed)?)
             }
             UnOp::Plus => eval_w(expr, ctx, w, signed),
             UnOp::Minus => {
                 let b = eval_w(expr, ctx, w, signed)?;
-                Ok(Bits::zeros(w)?.sub(&b)?)
+                let zero = Bits::zeros(w)?;
+                Ok(vops::apply_bin(riv_ir::BinKind::Sub, &zero, &b, w, signed)?)
             }
             UnOp::And | UnOp::Nand | UnOp::Or | UnOp::Nor | UnOp::Xor | UnOp::Xnor => {
                 let (b, _) = eval(expr, ctx)?.to_bits(*span)?;
-                let r = match op {
-                    UnOp::And => b.reduce_and()?,
-                    UnOp::Nand => b.reduce_and()?.bit_not(),
-                    UnOp::Or => b.reduce_or()?,
-                    UnOp::Nor => b.reduce_or()?.bit_not(),
-                    UnOp::Xor => b.reduce_xor()?,
-                    _ => b.reduce_xor()?.bit_not(),
+                let kind = match op {
+                    UnOp::And => riv_ir::RedKind::And,
+                    UnOp::Nand => riv_ir::RedKind::Nand,
+                    UnOp::Or => riv_ir::RedKind::Or,
+                    UnOp::Nor => riv_ir::RedKind::Nor,
+                    UnOp::Xor => riv_ir::RedKind::Xor,
+                    _ => riv_ir::RedKind::Xnor,
                 };
-                ext(r, false, w)
+                ext(vops::apply_reduce(kind, &b)?, false, w)
             }
         },
         Expr::Binary { span, op, lhs, rhs } => match op {
             BinOp::Add | BinOp::Sub | BinOp::Mul | BinOp::Div | BinOp::Mod | BinOp::Pow => {
-                let a = eval_w(lhs, ctx, w, signed)?;
-                let b = if *op == BinOp::Pow {
-                    // Exponent is self-determined.
-                    let (bb, bs) = eval(rhs, ctx)?.to_bits(*span)?;
-                    let _ = bs;
-                    bb
-                } else {
-                    eval_w(rhs, ctx, w, signed)?
+                let kind = match op {
+                    BinOp::Add => riv_ir::BinKind::Add,
+                    BinOp::Sub => riv_ir::BinKind::Sub,
+                    BinOp::Mul => riv_ir::BinKind::Mul,
+                    BinOp::Div => riv_ir::BinKind::Div,
+                    BinOp::Mod => riv_ir::BinKind::Rem,
+                    _ => riv_ir::BinKind::Pow,
                 };
-                Ok(match op {
-                    BinOp::Add => a.add(&b)?,
-                    BinOp::Sub => a.sub(&b)?,
-                    BinOp::Mul => a.mul(&b)?,
-                    BinOp::Div => {
-                        if signed {
-                            a.sdiv(&b)?
-                        } else {
-                            a.div(&b)?
-                        }
-                    }
-                    BinOp::Mod => {
-                        if signed {
-                            a.srem(&b)?
-                        } else {
-                            a.rem(&b)?
-                        }
-                    }
-                    _ => {
-                        if signed {
-                            a.spow(&b)?
-                        } else {
-                            a.pow(&b)?
-                        }
-                    }
-                })
+                if *op == BinOp::Pow {
+                    // Exponent is self-determined (Table 5-22); apply_bin's
+                    // value-preserving coercion to `w` cannot change it.
+                    let (b, _) = eval(rhs, ctx)?.to_bits(*span)?;
+                    let a = eval_w(lhs, ctx, w, signed)?;
+                    Ok(vops::apply_bin(kind, &a, &b, w, signed)?)
+                } else {
+                    let a = eval_w(lhs, ctx, w, signed)?;
+                    let b = eval_w(rhs, ctx, w, signed)?;
+                    Ok(vops::apply_bin(kind, &a, &b, w, signed)?)
+                }
             }
             BinOp::BitAnd | BinOp::BitOr | BinOp::BitXor => {
+                let kind = match op {
+                    BinOp::BitAnd => riv_ir::BitKind::And,
+                    BinOp::BitOr => riv_ir::BitKind::Or,
+                    _ => riv_ir::BitKind::Xor,
+                };
                 let a = eval_w(lhs, ctx, w, signed)?;
                 let b = eval_w(rhs, ctx, w, signed)?;
-                Ok(match op {
-                    BinOp::BitAnd => a.bit_and(&b)?,
-                    BinOp::BitOr => a.bit_or(&b)?,
-                    _ => a.bit_xor(&b)?,
-                })
+                Ok(vops::apply_bit(kind, &a, &b, w, signed)?)
             }
             BinOp::Shl | BinOp::AShl | BinOp::Shr | BinOp::AShr => {
+                let kind = match op {
+                    BinOp::Shl | BinOp::AShl => riv_ir::ShiftKind::Shl,
+                    BinOp::Shr => riv_ir::ShiftKind::Shr,
+                    _ => riv_ir::ShiftKind::Ashr,
+                };
                 let a = eval_w(lhs, ctx, w, signed)?;
                 let (amt, _) = eval(rhs, ctx)?.to_bits(*span)?;
-                Ok(match op {
-                    BinOp::Shl | BinOp::AShl => a.shl(&amt)?,
-                    BinOp::Shr => a.shr(&amt)?,
-                    _ => a.ashr(&amt, signed)?,
-                })
+                Ok(vops::apply_shift(kind, &a, &amt, w, signed)?)
             }
             BinOp::Eq | BinOp::Ne | BinOp::EqCase | BinOp::NeCase | BinOp::Lt | BinOp::Le
             | BinOp::Gt | BinOp::Ge => {
@@ -400,50 +393,42 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                 let a = eval_w(lhs, ctx, cw, cs)?;
                 let b = eval_w(rhs, ctx, cw, cs)?;
                 let r = match op {
-                    BinOp::Eq => a.logic_eq(&b)?,
-                    BinOp::Ne => a.logic_eq(&b)?.bit_not(),
-                    BinOp::EqCase => a.case_eq(&b)?,
-                    BinOp::NeCase => a.case_eq(&b)?.bit_not(),
+                    BinOp::Eq => vops::apply_cmp(riv_ir::CmpKind::Eq, &a, &b, cs)?,
+                    BinOp::Ne => vops::apply_cmp(riv_ir::CmpKind::Ne, &a, &b, cs)?,
+                    BinOp::EqCase => vops::apply_case_cmp(riv_ir::CaseCmpKind::ExactEq, &a, &b)?,
+                    BinOp::NeCase => vops::apply_case_cmp(riv_ir::CaseCmpKind::ExactNe, &a, &b)?,
                     _ => {
-                        let ord = if cs {
-                            a.cmp_signed(&b)
-                        } else {
-                            a.cmp_unsigned(&b)
-                        };
                         // Limb-aware compare — the pre-M8 paths truncated
                         // through i64 and diverged from the oracle at
                         // 65..=128 bits (live bug, pinned in value.rs tests).
-                        let res = match ord {
-                            None => return ext(Bits::all_x(1)?, false, w),
-                            Some(o) => match op {
-                                BinOp::Lt => o.is_lt(),
-                                BinOp::Le => o.is_le(),
-                                BinOp::Gt => o.is_gt(),
-                                _ => o.is_ge(),
-                            },
+                        let kind = match op {
+                            BinOp::Lt => riv_ir::CmpKind::Lt,
+                            BinOp::Le => riv_ir::CmpKind::Le,
+                            BinOp::Gt => riv_ir::CmpKind::Gt,
+                            _ => riv_ir::CmpKind::Ge,
                         };
-                        Bits::from_u64(1, res as u64)?
+                        vops::apply_cmp(kind, &a, &b, cs)?
                     }
                 };
                 ext(r, false, w)
             }
             BinOp::LogAnd | BinOp::LogOr => {
+                // Short-circuit EVALUATION stays here (the rhs is not even
+                // evaluated when the lhs decides); the value table —
+                // including the x rows — is vl-ops'.
                 let (a, _) = eval(lhs, ctx)?.to_bits(*span)?;
                 let ta = a.truthy()?;
-                let r = if *op == BinOp::LogAnd && ta == Some(false) {
-                    Bits::from_u64(1, 0)?
-                } else if *op == BinOp::LogOr && ta == Some(true) {
-                    Bits::from_u64(1, 1)?
+                if *op == BinOp::LogAnd && ta == Some(false) {
+                    return ext(Bits::from_u64(1, 0)?, false, w);
+                }
+                if *op == BinOp::LogOr && ta == Some(true) {
+                    return ext(Bits::from_u64(1, 1)?, false, w);
+                }
+                let (b, _) = eval(rhs, ctx)?.to_bits(*span)?;
+                let r = if *op == BinOp::LogAnd {
+                    vops::apply_logic_and(&a, &b)?
                 } else {
-                    let (b, _) = eval(rhs, ctx)?.to_bits(*span)?;
-                    let tb = b.truthy()?;
-                    match (op, ta, tb) {
-                        (BinOp::LogAnd, Some(true), Some(v)) => Bits::from_u64(1, v as u64)?,
-                        (BinOp::LogAnd, _, Some(false)) => Bits::from_u64(1, 0)?,
-                        (BinOp::LogOr, Some(false), Some(v)) => Bits::from_u64(1, v as u64)?,
-                        (BinOp::LogOr, _, Some(true)) => Bits::from_u64(1, 1)?,
-                        _ => Bits::all_x(1)?,
-                    }
+                    vops::apply_logic_or(&a, &b)?
                 };
                 ext(r, false, w)
             }
@@ -461,7 +446,7 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                 None => {
                     let t = eval_w(then, ctx, w, signed)?;
                     let e2 = eval_w(els, ctx, w, signed)?;
-                    Ok(t.merge(&e2)?)
+                    Ok(vops::apply_sel(&c, &t, &e2)?)
                 }
             }
         }
@@ -470,12 +455,12 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
             for p in parts {
                 bs.push(eval(p, ctx)?.to_bits(*span)?.0);
             }
-            ext(Bits::concat(&bs)?, false, w)
+            ext(vops::apply_concat(&bs)?, false, w)
         }
         Expr::Repeat { span, count, value: v } => {
             let c = const_u64(count, ctx, *span)?;
             let (b, _) = eval(v, ctx)?.to_bits(*span)?;
-            ext(b.replicate(c)?, false, w)
+            ext(vops::apply_replicate(&b, c)?, false, w)
         }
         Expr::HierDot { span, .. } => Err(SimError::at(
             "hierarchical reference reached evaluation unresolved",

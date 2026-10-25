@@ -9,4 +9,5 @@ authors.workspace = true
 vl-syntax.workspace = true
 rcs-diag.workspace = true
 riv-ir.workspace = true
+vl-ops.workspace = true
 vl-values.workspace = true

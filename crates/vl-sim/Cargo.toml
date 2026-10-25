@@ -11,5 +11,6 @@ riv-elab = { workspace = true }
 riv-kernel = { workspace = true }
 vl-syntax = { workspace = true }
 vl-values = { workspace = true }
+vl-ops = { workspace = true }
 rcs-diag = { workspace = true }
 vl-vcd = { workspace = true }
