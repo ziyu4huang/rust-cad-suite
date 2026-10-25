@@ -743,9 +743,13 @@ endmodule
       inject: ['slots', 'locale'],
       apply(pluginCtx) {
         ctx = pluginCtx;
+        // The shipped built-in locale ids are `en` and `zh` (dsh-client-locale
+        // README: "register(ns, { zh, en })"). Registering only zh-CN/zh-TW
+        // silently falls back to English while the UI is visibly Chinese.
         pluginCtx.effect(() => pluginCtx.locale.register(NS, 'en', EN), 'rverilator-wasm: en dictionary');
-        pluginCtx.effect(() => pluginCtx.locale.register(NS, 'zh-TW', ZH_TW), 'rverilator-wasm: zh-TW dictionary');
+        pluginCtx.effect(() => pluginCtx.locale.register(NS, 'zh', ZH_CN), 'rverilator-wasm: zh dictionary');
         pluginCtx.effect(() => pluginCtx.locale.register(NS, 'zh-CN', ZH_CN), 'rverilator-wasm: zh-CN dictionary');
+        pluginCtx.effect(() => pluginCtx.locale.register(NS, 'zh-TW', ZH_TW), 'rverilator-wasm: zh-TW dictionary');
 
         const t = pluginCtx.locale.bind(NS);
         pluginCtx.slots.inject('sidebar.panellist', () =>

@@ -32,8 +32,9 @@ switching, locale, and layout instead of living in a separate document.
 - **Client** (`client.js`) loads the artifact lazily
   (`import('/rverilator-wasm/pkg/vl_wasm.js')`), renders the panel, and
   registers the `main` key + the `sidebar.panellist` id that addresses it. All
-  visible text goes through the Harness locale service (`rverilatorWasm` ns, EN
-  and zh-TW).
+  visible text goes through the Harness locale service (`rverilatorWasm` ns,
+  registered as `en` + `zh` — the shipped built-in ids — plus `zh-CN`/`zh-TW`
+  aliases for language packs).
 
 The panel reads no repo files directly; the Host route is the only bridge, and
 it cannot become a repo-wide file reader.
@@ -89,7 +90,11 @@ named spec violation). Live probes: `Slots` shows both occupants active, and the
 asset route answers `200 text/javascript`, `200 application/wasm` (the 1.2 MB
 artifact), `200` allowlisted corpus, `403` non-allowlisted/traversal.
 
-Known cosmetic gap: the zh-CN dictionary shipped after the first bundle
-publication, and a client bundle's combined body is cached per revision, so the
-panel still renders its English strings until the app restarts (or the HMR
-rebuild pipeline republishes the entry). Functionality is unaffected.
+Locale note (one real trap): `@deepseek-ai/dsh-client-locale` ships exactly two
+built-in ids, `en` and `zh`. Registering only `zh-CN`/`zh-TW` compiles, runs, and
+silently falls back to English while the UI around it is visibly Chinese — the
+first version of this plugin did exactly that. Register under `zh`. A client
+bundle edit then reaches the page on the next reload (revision is derived from
+the file's mtime/size): no app restart is needed for the Client half, unlike the
+Host half (`index.js`), whose module is cached per generation until the row is
+toggled or the app restarts.
