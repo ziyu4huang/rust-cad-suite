@@ -335,7 +335,7 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
 | **R5** | IO/傾印系統任務:$dumpfile/$dumpvars/$dumpall/$dumpoff/$dumpon、IVERILOG_DUMPER/-vcd、$readmemh/b(@addr/OOB)、$fopen/$fwrite MCD、plusargs、$random/$time/$realtime 族 | `riv_vcd`(vl-vcd reader 交叉) | oracle VCD 交叉對拍零失配(rivD1 正規化後);dump 語料 8 例 | ~1k |
 | **R6** | 序列化+兩進制流:`out.riv`(自有格式:versioned 文字、確定性輸出、含 delay_selection/time_precision 元資料;**格式帶版本+遷移政策,R8/R9 為已知改版點**——對抗審 P1:R6 排在兩大 IR 擴張面之前,凍結必然回改);`rivvp` 完整旗標面(+plusargs/-n/-N/-q/-l/-M/-m/-i)。**R10/XLS 無 out.riv 硬依賴**(XLS 只執行不解析 .vvp,單進程 fallback 可行——out.riv 的依據是 OD2 介面凍結點,不是 R10 的功能閘) | `riv_flow` | 兩次編譯 byte-同;artifact 回放 stdout 與同進程跑 byte-同;XLS 形狀(compile→run)demo | ~1k |
 | **R7** | **VPI 一等公民**(§7) | `riv_vpi`(vpi_gate 同款+雙路徑一真相) | ivltests/vpi 挑例語料化 8-12 例;內建系統任務=vpi 註冊面實作的自證 | ~1.5k |
-| **R8** | SV 階梯:-g2005-sv(join_any/none/disable、`always @(*)` SV 形)→ -g2009(logic/typedef/always_ff-comb-latch/void 函數)→ -g2012(package/import/enum(+.name())/packed struct/int-byte/常量選擇 sorry 同位) | `riv_sv`(階梯語料;sv-tests chapter-5..9 重錄 iverilog 腿) | §0.1 sv2012/fork 探針 byte-exact;-g 拒收面(2005 拒 join_any exit 4)對拍 | ~2.5k |
+| **R8** | SV 階梯(2026-10-25 起併入 SV-UNIFY 聯合弧,正典=docs/SV-ELAB-STUDY.md:語料=sv-elab tests[ISC]入 git+逐簇同位閘;與 rverilator M8-M9 的 SV 候補合流):-g2005-sv(join_any/none/disable、`always @(*)` SV 形)→ -g2009(logic/typedef/always_ff-comb-latch/void 函數)→ -g2012(package/import/enum(+.name())/packed struct/int-byte/常量選擇 sorry 同位) | `riv_sv`(階梯語料;sv-tests chapter-5..9 重錄 iverilog 腿) | §0.1 sv2012/fork 探針 byte-exact;-g 拒收面(2005 拒 join_any exit 4)對拍 | ~2.5k |
 | **R9** | 深水區(**誠實標 stretch**):UDP(組合/時序表求值)、specify path delays(-gspecify/-gno-specify 雙態)、`$sdf_annotate`+SDF 注釋器(-sdf-warn/info)、-T min/typ/max、完整強度 | `riv_deep` | UDP/specify 探針語料化;SDF=最後收口,砍線不改前置里程碑 | ~2k+ |
 | **R10** | 生態與整合:XLS `VerilogSimulator` 同形包裝(照 iverilog_simulator.cc 形狀);**yosys 閘級網表模擬**(語料=yosys write_verilog 於 picorv32/serv,ISC);wasm 面(ADR-0005 憲法);雙引擎 lockstep 產品面(§9.2);perf gate | `riv_eco`/`riv_wasm`/`cosim_lockstep`;perf=counter8 類 TB ≥1M cycles/s(§0.1 基準的 1/5) | XLS 語料重錄 iverilog/riv 雙腿;wasm 同 goldens;**SV 檔型上游直接 UnimplementedError(study L43),照抄/擴展待裁** | ~1.5k |
 
@@ -434,7 +434,7 @@ VCD/trace → riverilog 重放斷言現場(4-state 語義比 2-state 更接近�
 synth 輸出(全 ISC,PLAN §7.5 已列 M7 標的)。這讓 riverilog 成為 P4 FPGA 線的
 內建驗證腿——**P3 與 P4 互為需求**。
 
-### 9.5 SV 成長路徑與 slang
+### 9.5 SV 成長路徑與 slang(2026-10-25 增補:sv-elab[ISC]=slang 下游已內建 Yosys v0.67/OSS CAD Suite——研究對象具體化,見 docs/SV-ELAB-STUDY.md;其測試語料 ISC 可入 git)
 slang(MIT)授權乾淨=**架構研究**合法(層次化 elaboration/AST 設計可學,零代碼
 依賴——它是 C++,本 repo Rust-only)。決策點:若 R8 後 SV 需求(classes/
 interfaces/DPI)超出 vl-syntax 共享前端可承載,**新前端 vs 共享擴展**另立 ADR;

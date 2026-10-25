@@ -12,6 +12,7 @@
   跟 oracle)。LRM 只用来解释行为,不用来覆盖行为。
 - 期望输出一律 `cargo run -p vl-difftest -- --record` 从 oracle **录制**,
   禁手写期望值。手写只允许错误路径形态(exit code / 里程碑指错信息)。
+- 外部 ISC 语料(2026-10-25 增补):povik/sv-elab 的 tests/{various,unit} SV 档可入 git(corpus-external/sv-elab,ISC LICENSE 随附);采用正典=docs/SV-ELAB-STUDY.md(SV-UNIFY 弧)。
 - 外部 GPLv3 语料(2026-10-25 增补):ZipCPU 以 `vendor-reference/zipcpu`
   (gitignore)唯读使用——**GPL 原文永不入 git**,闸=对 oracle 的即时期望
   对拍(--ext-parity/ZIPLINT,入 regress),分歧只登记数字与原因。
