@@ -230,6 +230,25 @@ if [ -x target/debug/rverilator ] && [ -x target/debug/riverilog ]; then
     [ "$toolbox" -eq 0 ] && echo "agent toolbox smoke: rv-sim/rv-diff/rv-wave/riv-run 4/4"
 fi
 
+# S2 XLS adapter: the VerilogSimulator-shaped face (argv + JSON). The harvested
+# XLS sample must reproduce its oracle stdout byte-exactly, and the error shapes
+# (syntax check, .sv refusal) must keep the streams and exit codes explicit.
+if [ -x target/debug/rv-xls-sim ]; then
+    xlsbad=0
+    ./target/debug/rv-xls-sim corpus/e2e/57_xls_add3/add3.v corpus/e2e/57_xls_add3/tb.v 2>/dev/null \
+        | diff - corpus/e2e/57_xls_add3/expected.stdout >/dev/null 2>&1 \
+        || { echo "GATE FAIL: xls adapter add3"; xlsbad=1; }
+    ./target/debug/rv-xls-sim --syntax-check corpus/e2e/58_xls_acc_pipe/acc_pipe.v corpus/e2e/58_xls_acc_pipe/tb.v >/dev/null 2>&1 \
+        || { echo "GATE FAIL: xls adapter syntax-check"; xlsbad=1; }
+    json_out=$(printf '%s' '{"text":"module tb; initial begin $display(\"q=%0d\", 8); $finish; end endmodule\n"}' | ./target/debug/rv-xls-sim --json)
+    printf '%s' "$json_out" | grep -q '"status":"ok"' && printf '%s' "$json_out" | grep -q 'q=8' \
+        || { echo "GATE FAIL: xls adapter json"; xlsbad=1; }
+    printf '%s' '{"text":"module tb; endmodule","file_type":".sv"}' | ./target/debug/rv-xls-sim --json 2>/dev/null \
+        | grep -q 'SystemVerilog' \
+        || { echo "GATE FAIL: xls adapter .sv refusal"; xlsbad=1; }
+    [ "$xlsbad" -eq 0 ] && echo "xls adapter: add3 byte-exact + syntax + json + sv-refusal"
+fi
+
 if [ "${1:-}" = "--with-record" ]; then
     echo "== extra: re-record from oracle (requires verilator; review diff!) =="
     ./target/debug/vl-difftest --record 2>&1 | tail -1

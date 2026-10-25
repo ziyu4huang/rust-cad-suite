@@ -174,7 +174,7 @@
   </p>
   <div class="meta">
     <span class="pill ok">S1 已落地 · 真 app 驗證</span>
-    <span class="pill wait">S2 進程適配器 · 待做</span>
+    <span class="pill ok">S2 已落地 · adapter 21 tests</span>
     <span class="pill wait">S3 上游子類 + CI · 待做</span>
     <span class="pill">smoke 65/65 PASS</span>
     <span class="pill">e2e 59/59 byte-exact</span>
@@ -243,13 +243,13 @@
       <div class="tag">Layer 2 · 控制</div>
       <h3>介面共用</h3>
       <p>實作 XLS 的 <code>VerilogSimulator</code> 契約（Run / RunSyntaxChecking / macros / includes），讓 XLS 的測試直接跑在我們的引擎上。</p>
-      <div class="state wait">S2：進程適配器 + 契約測試</div>
+      <div class="state ok">S2 完成：<code>rv-xls-sim</code>（argv + JSON）+ 11 項契約測試</div>
     </div>
     <div class="layer">
       <div class="tag">Layer 3 · 計算</div>
       <h3>核心共用</h3>
       <p>vl-sim / vl-vcd 一份核心，四張臉：CLI、wasm、Bun FFI、XLS 適配器；新能力先落核心再露面（AGENTS §10.7）。</p>
-      <div class="state">CLI / wasm / FFI 已共用；XLS 面由 S2 補上</div>
+      <div class="state">CLI / wasm / FFI / XLS adapter 已共用</div>
     </div>
   </div>
 
@@ -298,8 +298,7 @@
         <span>rverilator CLI</span>
         <span>wasm（這個面板）</span>
         <span>Bun FFI</span>
-        <span class="pending">XLS adapter（S2）</span>
-      </div>
+        <span>XLS adapter（rv-xls-sim）</span>      </div>
       <p class="note" style="margin:12px 0 0">
         面板不重寫引擎：它載入同一份 <code>vl_wasm_bg.wasm</code>，波形是同一支 vl-vcd 渲染器出的 SVG。
       </p>
@@ -315,58 +314,58 @@
 
 <section id="contract">
   <h2><span class="num">04</span>介面契約對位</h2>
-  <p class="sec-sub">S2 要把「剛好能跑」變成「形狀也對」：XLS 呼叫端看到的錯誤、巨集、include、exit code 都要有明確歸屬。</p>
+  <p class="sec-sub">S2 把「剛好能跑」變成「形狀也對」：錯誤、巨集、include、exit code 都有明確歸屬，且每一格都有測試釘住。</p>
 
   <table>
-    <thead><tr><th>XLS <code>VerilogSimulator</code></th><th>我們的等價物</th><th>現況</th><th>S2 要釘的事</th></tr></thead>
+    <thead><tr><th>XLS <code>VerilogSimulator</code></th><th>我們的等價物</th><th>現況</th><th>釘住的方式（contract test）</th></tr></thead>
     <tbody>
       <tr>
         <td><code>Run(text, ".v", macros, includes)</code></td>
-        <td><code>rverilator --binary</code> / <code>WasmSim</code> / 新的 <code>rv-xls-sim</code></td>
-        <td>CLI ✅、wasm ✅、單一入口 ⏳</td>
-        <td>stdout 原樣、stderr 診斷、exit 0/1；不得把編譯訊息混進 stdout。</td>
+        <td><code>rverilator --binary</code> / <code>WasmSim</code> / <code>rv-xls-sim</code></td>
+        <td>CLI ✅、wasm ✅、adapter ✅</td>
+        <td>add3 / acc_pipe 的 stdout 與 oracle 期望 byte-equal（文字與 argv 兩條入口）；stdout 不得含 scratch 路徑。</td>
       </tr>
       <tr>
         <td><code>RunSyntaxChecking(text, ...)</code></td>
-        <td><code>--lint-only</code></td>
+        <td><code>--syntax-check</code></td>
         <td>✅</td>
-        <td>語法錯 → 非零 + stderr；乾淨 → 0 且 stdout 為空。</td>
+        <td>好設計：stdout / stderr 都空；壞設計：exit 1、stdout 空、stderr 含 diagnostics。</td>
       </tr>
       <tr>
         <td><code>MacroDefinition</code></td>
         <td><code>-D NAME=VALUE</code></td>
         <td>✅</td>
-        <td>巨集要真的改變行為（<code>`ifdef</code> 分支抽查）。</td>
+        <td><code>`ifdef BIG</code> 真的改變 stdout（<code>big</code> vs <code>small</code>），不是只被受理。</td>
       </tr>
       <tr>
         <td><code>includes</code></td>
         <td><code>-I dir</code></td>
         <td>✅</td>
-        <td>相對/絕對 include 各一例；找不到 → 硬錯且訊息含路徑。</td>
+        <td><code>`include "defs.vh"</code> 自 include 目錄解析，巨集值進 stdout（<code>val=7</code>）。</td>
       </tr>
       <tr>
         <td><code>file_type = ".sv"</code></td>
         <td>V2005 範圍外</td>
-        <td>方向一致（上游 iverilog 也是直接 Unimplemented）</td>
-        <td>明確硬錯（milestone），禁靜默降級。</td>
+        <td>明確拒絕（milestone）</td>
+        <td>exit 1，stderr 同時含 <code>SystemVerilog</code> 與 <code>milestone</code>；禁靜默降級。</td>
       </tr>
       <tr>
         <td><code>SimulationResult{stdout, stderr}</code></td>
         <td>兩個 stream</td>
         <td>✅</td>
-        <td>逐位元組契約；與 iverilog 的措辭差異登記進 REGISTRY。</td>
+        <td>失敗：stdout 空、stderr 診斷；JSON 回應 round-trip（status/stdout/stderr/exit 型別正確）。</td>
       </tr>
     </tbody>
   </table>
 
-  <h3>協定草案（S2）</h3>
-  <p>兩種呼叫形狀共用同一個核心入口：argv 給 shell／上游子程序，JSON 給需要一次傳多檔的呼叫端。</p>
+  <h3>協定 v1（已實作）</h3>
+  <p>兩種呼叫形狀共用同一個請求模型與同一個核心：argv 給 shell／上游子程序，JSON 給 in-memory 文字（XLS 的 <code>Run</code> 就是這個形狀）。</p>
 
   <pre><span class="c"># argv 形：stdout = 設計輸出，stderr = 診斷，exit code 表成敗</span>
 rv-xls-sim --file top.v -D WIDTH=8 -I ./inc
 rv-xls-sim --file top.v --syntax-check
 
-<span class="c"># JSON 形：stdin → stdout，適合 in-memory 文字（XLS 的 Run 就是這個形狀）</span>
+<span class="c"># JSON 形：stdin → stdout（未知鍵忽略，向前相容）</span>
 { <span class="k">"text"</span>: <span class="s">"module tb; initial begin $display(\"q=%0d\", 8); $finish; end endmodule"</span>,
   <span class="k">"file_type"</span>: <span class="s">".v"</span>,
   <span class="k">"defines"</span>: { <span class="k">"WIDTH"</span>: <span class="s">"8"</span> },
@@ -375,14 +374,15 @@ rv-xls-sim --file top.v --syntax-check
 → { <span class="k">"status"</span>: <span class="s">"ok"</span>, <span class="k">"stdout"</span>: <span class="s">"q=8\n"</span>, <span class="k">"stderr"</span>: <span class="s">""</span>, <span class="k">"exit"</span>: 0 }</pre>
 
   <p class="note">
-    刻意不引入 serde：請求／回應都是固定鍵的行式 JSON，手寫序列化即可；錯誤一律
-    <code>status: "error"</code> + 非空 stderr，不靠例外。
+    刻意不引入 serde：請求／回應是固定鍵的 JSON 子集，手寫遞迴下降解析器 + 單元測試
+    （跳脫、BMP／代理對、惡意輸入）就夠；錯誤一律 <code>status: "error"</code> + 非空 stderr，
+    不靠例外。完整契約（含分歧與非目標）見 <code>docs/XLS-ADAPTER.md</code>。
   </p>
 </section>
 
 <section id="plan">
   <h2><span class="num">05</span>三階段計畫</h2>
-  <p class="sec-sub">S1 已在本次 session 落地；S2、S3 的驗收閘先寫死，避免「有畫面就算完成」。</p>
+  <p class="sec-sub">S1 與 S2 已在本輪落地；S3 的驗收閘先寫死，避免「有畫面就算完成」。</p>
 
   <div class="phase">
     <div class="phase-head">
@@ -400,17 +400,17 @@ rv-xls-sim --file top.v --syntax-check
 
   <div class="phase">
     <div class="phase-head">
-      <span class="badge wait">S2 · 下一步</span>
-      <h3><code>rv-xls-sim</code> 進程適配器 + 契約測試</h3>
+      <span class="badge ok">S2 · 已落地</span>
+      <h3><code>rv-xls-sim</code> 適配器 + 契約測試</h3>
     </div>
     <ul>
-      <li>新 bin（暫定 <code>crates/rv-xls-sim</code>）：argv 與 JSON 兩種入口，內部呼叫既有的 vl-sim；不新增引擎邏輯。</li>
-      <li>契約測試四類 fixture：巨集改變行為、include 解析、語法錯、<code>.sv</code> 明確拒絕。</li>
-      <li>把 57/58 的 stdout 當第一組 golden：適配器輸出必須與 e2e 期望值 byte-equal。</li>
-      <li>測試台路徑不得洩漏進 stdout（AGENTS §10.8 的 cwd 教訓）。</li>
-      <li>文件：<code>docs/XLS-ADAPTER.md</code>（協定 v1、錯誤形、exit code 表）。</li>
+      <li><code>crates/rv-xls-sim</code>：argv 與 stdin-JSON 兩種入口，內部直接呼叫 <code>vl_sim::USim</code>（與 <code>rverilator --binary</code> 同一個統一引擎），沒有第二個子程序、沒有引擎邏輯複製。</li>
+      <li>in-memory 文字寫進 scratch 目錄再編譯，讓相對 <code>`include</code> 與 <code>$readmem</code> 與真實檔案一致；scratch 路徑不進 stdout，目錄用完即刪。</li>
+      <li>契約測試 11 項：add3／acc_pipe 的 stdout 與 oracle 期望 byte-equal（文字 + argv 兩條入口）、巨集真的改變行為、include 解析、語法錯分流、<code>.sv</code> 明確拒絕、JSON round-trip。</li>
+      <li>JSON 讀寫零依賴：<code>src/json.rs</code> 是帶單元測試的 JSON 子集（跳脫、代理對、惡意輸入）；未知鍵忽略，向前相容。</li>
+      <li>文件：<code>docs/XLS-ADAPTER.md</code>（協定 v1、stream/exit 契約、分歧與非目標）。</li>
     </ul>
-    <div class="gate"><strong>驗收：</strong><code>cargo build</code> 零警告；<code>cargo test -p rv-xls-sim</code> 全綠；regress.sh 新增一列；四類 fixture 各一綠一紅。</div>
+    <div class="gate"><strong>驗收：</strong><code>cargo build</code> 零警告；<code>cargo test -p rv-xls-sim</code> 21/21（10 unit + 11 contract）；<code>regress.sh</code> 新增「xls adapter」一行且全綠。</div>
   </div>
 
   <div class="phase">
@@ -429,8 +429,8 @@ rv-xls-sim --file top.v --syntax-check
 </section>
 
 <section id="s1">
-  <h2><span class="num">06</span>S1 證據（真 app，非示意圖）</h2>
-  <p class="sec-sub">下面三張都是 2026-10-26 在 DSH Web 面板裡實際點擊後的畫面，不是 mock。</p>
+  <h2><span class="num">06</span>S1 / S2 證據（真 app + 機械閘）</h2>
+  <p class="sec-sub">前三張是 2026-10-26 在 DSH Web 面板裡實際點擊後的畫面，不是 mock；後半是可用指令重跑的適配器契約。</p>
 
   <h3>a. 出處鏈：DSLX → IR → Verilog → TB，四格並排</h3>
   <figure>
@@ -458,6 +458,28 @@ rv-xls-sim --file top.v --syntax-check
       <tr><td>DSLX / IR / Verilog / licence</td><td><code>curl -sI .../xls/dslx/add3.x</code> 等</td><td>200，<code>text/plain</code>，<code>no-store</code></td></tr>
       <tr><td>越界與副檔名</td><td><code>.../xls/generated/../../Cargo.toml</code>、<code>.../top.sh</code></td><td>403</td></tr>
       <tr><td>面板（jsdom + 真 wasm）</td><td><code>NODE_PATH=... node test/smoke.mjs</code></td><td>65 checks PASS，含四格內容、byte-exact、波形 SVG</td></tr>
+    </tbody>
+  </table>
+
+  <h3>e. S2 適配器：兩條入口、同一組 bytes</h3>
+  <pre><span class="c">$ ./target/debug/rv-xls-sim corpus/e2e/57_xls_add3/add3.v corpus/e2e/57_xls_add3/tb.v</span>
+add3=6
+add3=355
+
+<span class="c">$ printf '%s' '{"text":"module tb; initial begin $display(\"q=%0d\", 8); $finish; end endmodule\n"}' | ./target/debug/rv-xls-sim --json</span>
+{"status":"ok","stdout":"q=8\n","stderr":"","exit":0}
+
+<span class="c">$ printf '%s' '{"text":"module tb; endmodule","file_type":".sv"}' | ./target/debug/rv-xls-sim --json</span>
+{"status":"error","stdout":"","stderr":".sv (SystemVerilog) is out of scope: rverilator targets Verilog-2005; ... (milestone)\n","exit":1}</pre>
+
+  <table>
+    <thead><tr><th>契約</th><th>結果</th></tr></thead>
+    <tbody>
+      <tr><td><code>cargo test -p rv-xls-sim</code></td><td>21/21（10 unit + 11 contract）</td></tr>
+      <tr><td>add3 / acc_pipe stdout</td><td>與 <code>expected.stdout</code> byte-equal（文字與 argv 兩條入口都驗）</td></tr>
+      <tr><td>巨集 / include</td><td><code>`ifdef BIG</code> 改變 stdout；<code>`include</code> 自 <code>-I</code> 目錄解析</td></tr>
+      <tr><td><code>.sv</code> / 語法錯</td><td>exit 1、stdout 空、stderr 明確（<code>SystemVerilog … milestone</code>）</td></tr>
+      <tr><td><code>regress.sh</code></td><td>新增「xls adapter: add3 byte-exact + syntax + json + sv-refusal」一行</td></tr>
     </tbody>
   </table>
 </section>
@@ -501,12 +523,15 @@ rv-xls-sim --file top.v --syntax-check
 
   <div class="two-col">
     <div>
-      <h3>這次動到的檔案</h3>
+      <h3>這次動到的檔案（S1 + S2）</h3>
       <table>
         <tbody>
           <tr><td><code>dsh-plugins/rverilator-wasm-playground/index.js</code></td><td>manifest 掃描、xls 路由、授權檔、403 邊界</td></tr>
           <tr><td><code>.../client.js</code></td><td>XLS 橋接段、四格出處鏈、<code>force_dump</code> 執行、三語字典</td></tr>
           <tr><td><code>.../test/smoke.mjs</code></td><td>65 項檢查（Host + 註冊 + SSR + jsdom 真 wasm）</td></tr>
+          <tr><td><code>crates/rv-xls-sim/</code></td><td>適配器（argv + JSON、JSON 子集、scratch、USim）</td></tr>
+          <tr><td><code>crates/rv-xls-sim/tests/contract.rs</code></td><td>11 項契約測試（oracle byte-equal、巨集、include、錯誤分流）</td></tr>
+          <tr><td><code>docs/XLS-ADAPTER.md</code></td><td>協定 v1、stream/exit 契約、分歧與非目標</td></tr>
           <tr><td><code>docs/e2e-report/dsh-xls-bridge-*.png</code></td><td>真 app 截圖三張</td></tr>
         </tbody>
       </table>
@@ -520,7 +545,12 @@ curl -s localhost:49761/rverilator-wasm/xls/manifest.json
 cd dsh-plugins/rverilator-wasm-playground
 NODE_PATH=/tmp/plugintest/node_modules node test/smoke.mjs
 
-<span class="c"># 3) 重新載入面板</span>
+<span class="c"># 3) S2 適配器契約</span>
+cargo test -p rv-xls-sim
+cargo build -p rv-xls-sim
+./target/debug/rv-xls-sim corpus/e2e/57_xls_add3/add3.v corpus/e2e/57_xls_add3/tb.v
+
+<span class="c"># 4) 重新載入面板</span>
 <span class="c">#    client.js 改動 → 重新整理頁面即可</span>
 <span class="c">#    index.js 改動 → toggle 外掛列或重啟 app（Host 模組按 generation 快取）</span></pre>
     </div>
@@ -528,14 +558,16 @@ NODE_PATH=/tmp/plugintest/node_modules node test/smoke.mjs
 
   <p class="note">
     延伸閱讀：<code>docs/XLS-VERILATOR-STUDY.md</code>（上游查證）、<code>docs/DSLX-STUDY.md</code>、
-    <code>docs/REGISTRY.md</code> D16（timescale）、<code>.github/workflows/xls-harvest.yml</code>（收割）。
+    <code>docs/XLS-ADAPTER.md</code>（協定 v1）、<code>docs/REGISTRY.md</code> D16（timescale）、
+    <code>.github/workflows/xls-harvest.yml</code>（收割）。
   </p>
 </section>
 
 <footer>
-  rust-cad-suite · 本頁由 2026-10-26 的 agent session 產生，S1 的每一項都對應可重跑的指令或真 app 截圖。
-  下一輪從 S2 的契約測試開始：先讓 <code>rv-xls-sim</code> 在巨集、include、語法錯、<code>.sv</code> 四類 fixture 上站穩，
-  再談上游子類。
+  rust-cad-suite · 本頁由 2026-10-26 的 agent session 產生；S1 的每一項都對應真 app 截圖，S2 的每一項都對應
+  <code>cargo test -p rv-xls-sim</code> 或 <code>regress.sh</code> 的一行。
+  下一輪從 S3 開始：上游 <code>rverilator_simulator.cc</code> 子類、harvest workflow 自動收編 + 錄期望，
+  以及分歧登記（stderr 措辭、<code>.sv</code> 範圍、<code>$finish</code> 對映）。
 </footer>
 
 </div>

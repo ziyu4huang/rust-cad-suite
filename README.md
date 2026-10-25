@@ -44,6 +44,7 @@ cargo test
 - `crates/vl-syntax` — preprocessor, lexer, recursive-descent parser, AST.
 - `crates/vl-sim` — 4-state values, evaluator, interpreter (event scheduler) and the rVPI interface (`src/vpi.rs`).
 - `crates/vl-cli` — the `rverilator` binary.
+- `crates/rv-xls-sim` — XLS `VerilogSimulator`-shaped process adapter (argv + stdin JSON) over the unified engine; contract tests pin `.sv` refusal, macro/include behaviour, and byte-exact replay of the harvested XLS samples ([docs/XLS-ADAPTER.md](docs/XLS-ADAPTER.md)).
 - `crates/vl-values` + `crates/riv-*` (`riv-ir`, `riv-elab`, `riv-kernel`, `riv-cli`, `riv-difftest`) — the riverilog (iverilog-analog) line: `riverilog`/`rivvp` binaries over flat elaboration → RIV-1 (own versioned text IR) → event-driven kernel; see [docs/RIVERILOG-PLAN.md](docs/RIVERILOG-PLAN.md).
 - `dsh-plugins/rverilator-wasm-playground/` — the wasm playground packaged as a DeepSeek Harness bundle (a Verilog panel in the Harness Web UI; Host route serves the `pkg` artifact, an allowlisted corpus slice, and the scanned XLS provenance manifest, Client half is the React panel). See its [README](dsh-plugins/rverilator-wasm-playground/README.md) and the [XLS shared-core plan](docs/plan/xls-shared-core.html).
 - `crates/vl-wasm` — WebAssembly facade over `vl-sim` (`wasm-pack build crates/vl-wasm --target web`, ~500KB; differential-gated from Bun).

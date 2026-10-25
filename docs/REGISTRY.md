@@ -11,6 +11,7 @@
 | `vl-syntax` | pp+lexer+parser+AST(V2005) | rcs-diag | VPreproc/V3Parser | lexer 12 + frontend 17 測試;E2E 全語料過解析閘 |
 | `vl-sim` | 4-state 值/求值/展開/事件調度器(值域已提取=`vl-values`,src/value.rs 為 shim re-export;wait/fork/force 族硬錯自 parse 級遷 build 級,M7/M8 文字逐臂保留 interp.rs:1767-1785) | vl-syntax, rcs-diag, vl-values | VCSD/eval/scheduling | value 8 測試;sim_gate 2(counter8+fulladd byte-diff);e2e 59/59 零漂移 |
 | `vl-cli` | bin `rverilator`(--version/-E/--lint-only/--dump-ast/--binary/--top-module) | 上全部 | verilator driver | 未知旗標=錯 exit1(對抗審 #8) |
+| `rv-xls-sim` | XLS `VerilogSimulator` 形進程適配器:argv 與 stdin-JSON 兩入口共用 `vl_sim::USim`;stdout=設計輸出/stderr=診斷(CLI 的 Verilator 全-stdout 慣例不變);`.sv` 明確拒收;in-memory 文字落 scratch 目錄(相對 include/readmem 同真檔);JSON 子集零 serde | vl-syntax, vl-sim, vl-cli, rcs-diag | XLS `VerilogSimulator`(`iverilog_simulator.cc` 的同位插槽) | `cargo test -p rv-xls-sim`(10 unit+11 contract:add3/acc_pipe byte-equal×2、巨集、include、語法錯分流、`.sv`、JSON round-trip);regress「xls adapter」行;正典=docs/XLS-ADAPTER.md |
 | `vl-difftest` | oracle 錄製/差分閘/HTML 報告(dev-only, publish=false) | vl-syntax, vl-sim, rcs-diag | —(自建) | regression_gate ≥80% 斷言 |
 | `vl-wasm` | WASM facade(cdylib)雙面(ADR-0009):rverilator 面=`run_verilog(_stdout)`/`WasmSim`;riverilog 面=`riv_build`(→RIV-1 文本)+`riv_run`(rivvp 同核,iverilog 形橫幅);復用 CLI 頂層偵測;wasm-pack --target web,~1.2MB | `wasm-test/run.mjs`+`riv_run.mjs` 差分閘(oracle/iverilog goldens byte-exact)入 regress.sh(pkg 過期自動重建) | ADR-0003 facade 慣例+ADR-0009 §1 |
 | `vl-ffi` | C-ABI host facade(cdylib):`rcs_run(manifest)/rcs_version/rcs_free`,行式 manifest(file/inject);Bun bun:ffi 兩式(FFI 進程內/spawn subprocess) | bun-example 差分閘同 goldens 入 regress(dylib 缺=略過提示) | ADR-0003 facade 慣例 |
@@ -59,6 +60,7 @@
 | `bun crates/vl-wasm/wasm-test/vcd_parse.mjs` | regress.sh | 三面共用 reader:wasm 版 BigInt 時序/單調/終值/VL-E101 錯誤路徑 |
 | `bun crates/vl-ffi/bun-example/vcd_read.mjs` | regress.sh | agent 讀波形:FFI run→`vcd <path>` 強制 dump→rcs_vcd_parse→q 終值斷言 |
 | agent toolbox smoke(`scripts/rv-sim/rv-diff/rv-wave/riv-run.sh`)| regress.sh | 四支 agent 腳本各對一個入庫 golden 實跑:rv-sim=byte-exact、rv-diff=正規化 MATCH、rv-wave=SVG 帶 `<svg`、riv-run=iv 金樣 byte-exact;正典=`.agents/skills/rv-lab/SKILL.md`(agent→skill→script→CLI 層) |
+| `cargo test -p rv-xls-sim` + regress「xls adapter」 | 每次提交/交付 | 21 測(10 unit+11 contract);argv add3 byte-exact、syntax check 靜默、JSON ok、`.sv` 拒收;正典=docs/XLS-ADAPTER.md |
 | difftest `--min-pass 100`(regress.sh) | 每次交付 | e2e 精確數閘(80% 門檻曾讓 55/57 藏身綠燈,1023 教訓) |
 | lint parity 基線 83(regress.sh) | 每次交付 | M8 五輪基線(ADR-0008);閘曾攔下 78 誤算(ADR-0006 備忘) |
 | riv-cli/riv-difftest(riverilog R0→R3) | riverilog/rivvp 契約面 goldens byte-exact(cli_gate 23 測=R0 契約 8+01_hello/03_nba 真流程+U-3 前半契約面;vl-cli cli_gate 5 測=--version/--help/-E pp golden/-I-D smoke/-V=VL-E030 錯誤路徑)+ riv-difftest 7 單測(正規化敵意 fixture/看門狗/DECL 兩形/臂選擇=corpus 尾段) | RIVERILOG-PLAN.md §5/§8;rivD1-6 預載+rivD7 撤回+rivD8 於 §6/本簿 |
@@ -90,6 +92,8 @@
 | D14 | rVPI finish/stop | vpiFinish/vpiStop 有別 | 合流(同 $stop 既有行為) | 與 TB 系統任務行為一致 | interp syscall |
 | D15 | rVPI Transport/Inertial put | 脈衝消除有別 | 切片 2:兩模式同義(事件模型無脈衝消除) | 註冊分歧,切片 2 落地 | ADR-0003 D4 |
 | D16 | 混合 timescale 檔序 | TIMESCALEMOD 警告預設致命(檔序相關) | 不報(通過) | 語料面已修(XLS 生成檔注入 timescale);引擎面對齊候補 | corpus-external/xls;REGISTRY 1023 |
+| D18 | XLS 適配器 `.sv` | XLS 預設 iverilog 以 `-g2012` 受理部分 SystemVerilog | 明確拒收(exit 1) | 範圍外=硬錯,milestone;XLS 測試若要 SV 先擴引擎,不在適配器靜默改寫 | rv-xls-sim contract `systemverilog_is_refused_explicitly` |
+| D19 | XLS 適配器診斷流 | XLS 介面把 iverilog 錯誤放 stderr | CLI 維持 Verilator 全-stdout;適配器把診斷導到 stderr、設計輸出留 stdout | 只有適配器這張臉分流;CLI 契約不動(regress e2e 仍 byte-exact) | docs/XLS-ADAPTER.md;contract `parse_error_goes_to_stderr` |
 | rivD1-6 | riverilog 預載分歧(VCD header/$stop 互動/效能/`-o -`/sorry 文案/目標插件) | iverilog 13.0 | 政策見預載表 | SSOT=RIVERILOG-PLAN.md §6(2026-10-24 預載);落地時逐條回填本簿;rivD4 ✅ 2026-10-25 兌現=編譯目標 `-o -` 硬錯 exit 1(`-E -o -`=stdout 正當;oracle 實況=真的建出檔名 `-` 的檔,政策性分歧 cli_gate 釘死) | RIVERILOG-PLAN §6 |
 | rivD7 | 48_frac_delay 延遲捨入(**預登記撤回**) | 設計期預測 iverilog 按 precision 捨入(1500/1750) | 同 | **2026-10-25 live probe 反證**:iverilog 13.0 數據行 `t=2000/t=2000` 與 verilator 金樣逐字一致,僅 finish 橫幅時刻(1750)剩差且屬 rivD8 丟行;48 現狀 pass、無需 ledger;編號留墓碑,32_proc_order 未來分歧=rivD9 | 本 session 探針(vvp -n 輸出 vs expected.stdout diff 僅 1 行);RIVERILOG-PLAN §6 |
 | rivD8 | riv e2e 臂 stdout 正規化:丟 riv 自家工具行 | e2e 金樣(verilator 錄製)無 iverilog 形工具行 | rivvp 印 iverilog 形 $finish 橫幅/`VCD info: ` 行 | 丟行白名單=vl-difftest 四前綴 ∪ 兩工具行形,禁內容改寫;敵意 fixture(`-7div2=-3`、`tb.v:6: ` 設計行)單測釘死;iv 臂不丟(工具行=金樣) | riv-difftest/src/main.rs:241-285,669-714;riv-r2-design §9-3/§10 注 1 |
@@ -119,5 +123,6 @@
 | 10-23 | `3'h0` 被拒(位數檢查) | 檢查「數字位寬」而非「值域顯著位」 | 值域檢查(3'h0 合法,3'h9 拒) | value.rs |
 | 10-25 | riv-difftest `--e2e --corpus corpus/iv-e2e` 把 8 個 enforced iv 案例全誤報 UNLEDGERED diff(修前 `SUMMARY e2e=0/10`;手跑 riverilog+rivvp 八例全 byte-exact 才定位) | 臂選擇誤看 `--e2e` 旗標而非 corpus 路徑尾段:iv 案例被推入 e2e 臂→正規化丟掉身為金樣的 iverilog 工具行+跳過 -g/plusargs/case.json | 臂選擇=corpus 尾段(`arm_label`,main.rs:658-663)+單測釘死(`arm_label_comes_from_corpus_tail`,main.rs:779-785);修後 `SUMMARY e2e=0/0 iv=8/10` | regress 兩臂精確數基線逐字 grep(錯臂即錯數)+UNLEDGERED/DRIFT==0;riv-difftest 7 單測 |
 | 10-24 | 2026-10-23 的 `~`(bitnot)「IEEE Table 5-22 自決定」修復實為 **oracle 分歧**:legacy 面 `~4'b1000` 於 8-bit unsigned ctx 出 `00000111`,兩 oracle(verilator 5.050+iverilog 13.0)皆 `11110111`;U-2 求值合流時雙引擎並排七探針揭發 | 修復證據=自家 lockstep golden(I2C demo)而非 oracle,違 AGENTS §1(oracle 贏 LRM)未察覺;語料無 `~` 案例,金樣無從仲裁 | U-2 單一語義源(vl-ops)統一裁定:~ 與 bitwise 皆 context-determined(運算元按整體表達式符號延展後運算,嵌套吃 ctx 進位保留);legacy 翻案回歸;riv 同輪補 IR signed 域(Op::Bit/BitNot +signed),附帶抓兩真 bug=riv bitwise 恆零延展(雙 signed 探針 z2)+riv logic-op 遇 x 直接 abort(oracle=x) | AGENTS §1「修對了還是修偏了必須對 oracle 讀」;vl-ops 10 單測釘死四形;vl-sim eval.rs 註解翻案記錄;七探針 /tmp 可重現(w/t/u/ws/z2/m/lx) |
+| 10-26 | regress 的 cargo test 間歇 FAIL(`parse_error_goes_to_stderr`;單跑 3 次才重現 1 次) | Scratch 目錄名僅 pid+nanos,並行 contract 測試同 tick 撞名→共用同一份 `top.v`,一測的 Drop 還刪掉另一測的目錄(可能解析到別人的合法設計) | scratch 名加 process-local AtomicU64 序號+`create_dir`(撞名即錯);新增 `scratch_directories_are_unique` 單測;contract 40 連跑零失敗 | rv-xls-sim 契約測試 + regress |
 | `vl-difftest --html` | 報告需求 | 生成 docs/e2e-report/index.html |
 | `vl-difftest --record` | 語義變更後 | 重錄 oracle 期望(人工讀 diff) |

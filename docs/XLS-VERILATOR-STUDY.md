@@ -41,6 +41,9 @@ Verilator 只出現在文件範例與一處發射端遷就註解。rverilator �
 - 若要正式插進上游 C++ 介面:實作一個 `VerilogSimulator` 子類包 rverilator 子流程
   (照 `iverilog_simulator.cc` 的形狀)即可;上游還要求 SystemVerilog 時 iverilog 直接
   `UnimplementedError`,我方 V2005 範圍同樣明確報錯(方向一致)。
+- **2026-10-26 進度**:子類要先有的進程契約已落地=`crates/rv-xls-sim`(argv + stdin JSON、
+  共用 `vl_sim::USim`、stream 分離、`.sv` 硬錯);契約與測試見 `docs/XLS-ADAPTER.md`。
+  上游 `.cc` 子類與 CI 收編仍待做(計畫 S3)。
 
 ## 授權/引用
 

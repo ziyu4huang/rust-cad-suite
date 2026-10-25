@@ -15,6 +15,7 @@ members = [
     "crates/vl-spec",
     "crates/spec-i2c",
     "crates/vl-cli",
+    "crates/rv-xls-sim",
     "crates/vl-difftest",
     "crates/vl-wasm",
     "crates/vl-ffi",
