@@ -71,11 +71,25 @@ violation.
 
 ## Verified vs not verified
 
-- Verified mechanically: everything above (`node test/smoke.mjs` → ALL CHECKS
-  PASS), plus live `curl` against the running carrier (200 `text/javascript`,
-  200 `application/wasm` for the 1.2 MB artifact, 200 allowlisted corpus file,
-  403 non-allowlisted/traversal), plus the live client registration
-  (`Slots` shows `main` occupant `rverilator-wasm` active).
-- Not verified here: pixels in the real browser (no browser control in this
-  session) — the sidebar icon target, dark/light rendering, and the visual
-  waveform are only proven by the DOM-level React test, not by a screenshot.
+Verified in the running Desktop app (2026-10-25, screenshots in
+`docs/e2e-report/dsh-playground-*.png`), by real HID clicks:
+
+| Step | Result |
+|---|---|
+| sidebar row → panel | opens as the `main` panel, no crash, host theme applied |
+| Run (rverilator face) | stdout `q=8`, status `done`, SVG waveform with `clk` + `q`, signal toggles |
+| engine → riverilog | `RIV-1 bytes: 1094`, stdout carries the iverilog-face banner `$finish called at 76000 (1ps)` + `VCD info:` line |
+| verification card | `✓ byte-exact against the recorded expectation` (corpus fetched through the Host route) |
+
+Mechanically: `test/smoke.mjs` — 42 checks, ALL PASS (asset MIME/bytes/no-store,
+corpus allowlist, traversal, method, the carrier prefix-match rule,
+`main`/`panellist` registrations, three dictionaries, SSR markup, and in jsdom
+with the real wasm artifact: Run `q=8`, riv face banner, byte-exact badge,
+named spec violation). Live probes: `Slots` shows both occupants active, and the
+asset route answers `200 text/javascript`, `200 application/wasm` (the 1.2 MB
+artifact), `200` allowlisted corpus, `403` non-allowlisted/traversal.
+
+Known cosmetic gap: the zh-CN dictionary shipped after the first bundle
+publication, and a client bundle's combined body is cached per revision, so the
+panel still renders its English strings until the app restarts (or the HMR
+rebuild pipeline republishes the entry). Functionality is unaffected.
