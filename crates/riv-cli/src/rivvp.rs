@@ -24,7 +24,16 @@ fn main() -> ExitCode {
     let mut plusargs: Vec<String> = Vec::new();
     // -n: $stop ≡ $finish (rivD2; measured: the stop line prints, then
     // the run ends). Default = banner + continue (EOF semantics).
+    // -N: same halt but the process exits 1 (measured on vvp 13.0).
     let mut stop_as_finish = false;
+    let mut stop_exit = 0i32;
+    // -q: stdout fully silent (tool lines AND design $display — measured);
+    // dump.vcd still written. outcome.output is always collected so -l
+    // keeps mirroring under -q.
+    let mut quiet = false;
+    // -l <file>: mirror everything that would reach stdout into the file
+    // (measured: log == direct stdout, byte-equal).
+    let mut log_file: Option<String> = None;
     let mut i = 0usize;
     while i < argv.len() {
         let a = argv[i].clone();
@@ -46,8 +55,40 @@ fn main() -> ExitCode {
                 eprintln!("rivvp: FST dumper is not planned (VCD only; see docs/RIVERILOG-PLAN.md §5)");
                 return ExitCode::from(1);
             }
-            "-N" | "-i" | "-q" => {}
-            "-l" | "-M" | "-m" => i += 1,
+            "-N" => {
+                stop_as_finish = true;
+                stop_exit = 1;
+            }
+            // -i: interactive (line-buffered) mode — accepted no-op; the
+            // buffering difference is unobservable in batch corpus runs
+            // (noted in REGISTRY riv-cli row).
+            "-i" => {}
+            "-q" => quiet = true,
+            "-l" => match argv.get(i + 1) {
+                // Measured oracle shape (vvp 13.0): `-l -` writes the full
+                // copy to BOTH stdout and stderr with no `-` file created —
+                // a contract we have not pinned (rivD14); hard-error until
+                // the U-3b probe settles it.
+                Some(f) if f == "-" => {
+                    eprintln!("rivvp: -l - (log to streams) is not supported yet (oracle contract unsettled; see docs/REGISTRY.md rivD14)");
+                    return ExitCode::from(1);
+                }
+                Some(f) => {
+                    log_file = Some(f.clone());
+                    i += 1;
+                }
+                None => {
+                    eprintln!("rivvp: option -l requires an argument");
+                    return ExitCode::from(1);
+                }
+            },
+            // VPI module face (-M/-m): R7 scope (docs/RIVERILOG-PLAN.md §8)
+            // — hard error with the pointer instead of the old silent
+            // arg-swallow (AGENTS §3).
+            "-M" | "-m" => {
+                eprintln!("rivvp: VPI module loading (-M/-m) lands at R7 (docs/RIVERILOG-PLAN.md §8)");
+                return ExitCode::from(1);
+            }
             _ if a.starts_with('+') => plusargs.push(a),
             _ if a.starts_with('-') => {
                 eprintln!("rivvp: illegal option -- {}", &a[1..]);
@@ -105,9 +146,18 @@ fn main() -> ExitCode {
     // the rivD2 $stop semantics.
     kernel.set_plusargs(plusargs);
     kernel.stop_as_finish = stop_as_finish;
+    kernel.stop_exit = stop_exit;
     let mut sink = VcdSink::new(&d);
     let outcome = kernel.run(&mut sink);
-    print!("{}", outcome.output);
+    if let Some(lf) = &log_file {
+        if let Err(e) = std::fs::write(lf, &outcome.output) {
+            eprintln!("rivvp: cannot write log {lf}: {e}");
+            return ExitCode::from(1);
+        }
+    }
+    if !quiet {
+        print!("{}", outcome.output);
+    }
     ExitCode::from(u8::try_from(outcome.exit.max(0)).unwrap_or(1))
 }
 

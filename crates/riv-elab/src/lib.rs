@@ -694,7 +694,7 @@ impl<'a> Walker<'a> {
             return Err(err_at(
                 file,
                 self.line_of(i.span),
-                format!("module `{}` is not defined (searched the given sources; -y library dirs apply at the CLI driver)", i.mod_name),
+                format!("module `{}` is not defined (searched the given sources and -y library dirs)", i.mod_name),
             ));
         };
         if self.chain.iter().any(|m| m == &sub.name) {

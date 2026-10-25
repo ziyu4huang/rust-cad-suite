@@ -182,6 +182,9 @@ pub struct Kernel {
     rng_seed: u32,
     /// rivvp -n: $stop behaves like $finish (rivD2).
     pub stop_as_finish: bool,
+    /// Exit code when that -n/-N stop halts the run (rivvp -N = stop with
+    /// exit 1, measured on vvp 13.0; default 0 keeps -n byte-compatible).
+    pub stop_exit: i32,
     /// iverilog-shaped finish-banner suppression (ADR-0009 U-1: the
     /// rverilator face's goldens never carried the line — rivD8's
     /// drop-contract expressed at the API instead of text filtering).
@@ -381,6 +384,7 @@ impl Kernel {
                 w
             },
             stop_as_finish: false,
+            stop_exit: 0,
             stopped_silently: false,
             vars,
             active: VecDeque::new(),
@@ -633,6 +637,8 @@ impl Kernel {
     fn finish_out(&mut self, sink: &mut dyn DumpSink, err: Option<RunError>) -> RunOutcome {
         sink.finish();
         let exit = match err {
+            // -n/-N stop: the host picks the exit (rivvp -N exits 1).
+            None if self.stopped_silently => self.stop_exit,
             None => 0,
             Some(e) => {
                 self.out.push_str(&format!("rivvp: runtime error: {}\n", e.0));

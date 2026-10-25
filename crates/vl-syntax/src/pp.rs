@@ -9,7 +9,7 @@
 //! `<macro:NAME>`, so diagnostics inside bodies show the body text.
 
 use crate::lexer::{self, LexOptions};
-use crate::token::{DirKind, Tok, Token};
+use crate::token::{DirKind, Punct, Tok, Token};
 use rcs_diag::{DiagSink, FileId, SourceMap, Span};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -751,4 +751,76 @@ fn parse_macro_params(s: &str) -> Option<(Vec<String>, &str)> {
         }
     }
     None
+}
+
+// ── Shared `-E` frontend (ADR-0009 U-3): lives here because it renders
+// vl-syntax tokens; both CLI faces (rverilator stdout contract and
+// riverilog's -E a.out/-o/stdout routing) consume this single renderer.
+
+/// `-E` output: token reconstruction (formatting is approximate in v0 —
+/// byte-exact `-E` parity against `verilator -E` is an M1 acceptance item).
+pub fn render_preprocessed(toks: &[Token]) -> String {
+    let mut s = String::new();
+    let mut need_space = false;
+    for t in toks {
+        if t.kind == Tok::Eof {
+            break;
+        }
+        let text = match t.kind {
+            Tok::Ident | Tok::SysIdent | Tok::IntLit | Tok::RealLit | Tok::BasedLit
+            | Tok::StrLit => t.text.clone(),
+            Tok::Keyword(k) => k.as_str().to_string(),
+            Tok::Punct(p) => p.as_str().to_string(),
+            Tok::Directive(d) => {
+                let name = directive_name(d);
+                if t.text.is_empty() {
+                    format!("`{name}\n")
+                } else {
+                    format!("`{name} {}\n", t.text)
+                }
+            }
+            _ => continue,
+        };
+        let no_space = matches!(
+            t.kind,
+            Tok::Punct(Punct::LParen)
+                | Tok::Punct(Punct::LBracket)
+                | Tok::Punct(Punct::Semi)
+                | Tok::Punct(Punct::Comma)
+        ) || s.ends_with('(')
+            || s.ends_with('[');
+        if need_space && !no_space {
+            s.push(' ');
+        }
+        s.push_str(&text);
+        need_space = !matches!(
+            t.kind,
+            Tok::Punct(Punct::LParen) | Tok::Punct(Punct::LBracket)
+        );
+    }
+    s
+}
+
+pub fn directive_name(d: DirKind) -> &'static str {
+    match d {
+        DirKind::Define => "define",
+        DirKind::Undef => "undef",
+        DirKind::Ifdef => "ifdef",
+        DirKind::Ifndef => "ifndef",
+        DirKind::Elsif => "elsif",
+        DirKind::Else => "else",
+        DirKind::Endif => "endif",
+        DirKind::Include => "include",
+        DirKind::Timescale => "timescale",
+        DirKind::Resetall => "resetall",
+        DirKind::DefaultNettype => "default_nettype",
+        DirKind::Line => "line",
+        DirKind::Celldefine => "celldefine",
+        DirKind::Endcelldefine => "endcelldefine",
+        DirKind::UnconnectedDrive => "unconnected_drive",
+        DirKind::NounconnectedDrive => "nounconnected_drive",
+        DirKind::Pragma => "pragma",
+        DirKind::BeginKeywords => "begin_keywords",
+        DirKind::EndKeywords => "end_keywords",
+    }
 }

@@ -9,8 +9,7 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 use vl_syntax::ast::ModuleItem;
 use vl_syntax::parser;
-use vl_syntax::pp::{self, PpOptions};
-use vl_syntax::token::{DirKind, Punct, Tok};
+use vl_syntax::pp::{self, render_preprocessed, PpOptions};
 
 pub const VERSION_LINE: &str =
     "rverilator 0.1.0 (rust-cad-suite); upstream-parity target: Verilator 5.x";
@@ -366,70 +365,3 @@ fn simulate(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink) -> i32 {
     }
 }
 
-/// `-E` output: token reconstruction (formatting is approximate in v0 —
-/// byte-exact `-E` parity against `verilator -E` is an M1 acceptance item).
-fn render_preprocessed(toks: &[vl_syntax::token::Token]) -> String {
-    let mut s = String::new();
-    let mut need_space = false;
-    for t in toks {
-        if t.kind == Tok::Eof {
-            break;
-        }
-        let text = match t.kind {
-            Tok::Ident | Tok::SysIdent | Tok::IntLit | Tok::RealLit | Tok::BasedLit
-            | Tok::StrLit => t.text.clone(),
-            Tok::Keyword(k) => k.as_str().to_string(),
-            Tok::Punct(p) => p.as_str().to_string(),
-            Tok::Directive(d) => {
-                let name = directive_name(d);
-                if t.text.is_empty() {
-                    format!("`{name}\n")
-                } else {
-                    format!("`{name} {}\n", t.text)
-                }
-            }
-            _ => continue,
-        };
-        let no_space = matches!(
-            t.kind,
-            Tok::Punct(Punct::LParen)
-                | Tok::Punct(Punct::LBracket)
-                | Tok::Punct(Punct::Semi)
-                | Tok::Punct(Punct::Comma)
-        ) || s.ends_with('(')
-            || s.ends_with('[');
-        if need_space && !no_space {
-            s.push(' ');
-        }
-        s.push_str(&text);
-        need_space = !matches!(
-            t.kind,
-            Tok::Punct(Punct::LParen) | Tok::Punct(Punct::LBracket)
-        );
-    }
-    s
-}
-
-fn directive_name(d: DirKind) -> &'static str {
-    match d {
-        DirKind::Define => "define",
-        DirKind::Undef => "undef",
-        DirKind::Ifdef => "ifdef",
-        DirKind::Ifndef => "ifndef",
-        DirKind::Elsif => "elsif",
-        DirKind::Else => "else",
-        DirKind::Endif => "endif",
-        DirKind::Include => "include",
-        DirKind::Timescale => "timescale",
-        DirKind::Resetall => "resetall",
-        DirKind::DefaultNettype => "default_nettype",
-        DirKind::Line => "line",
-        DirKind::Celldefine => "celldefine",
-        DirKind::Endcelldefine => "endcelldefine",
-        DirKind::UnconnectedDrive => "unconnected_drive",
-        DirKind::NounconnectedDrive => "nounconnected_drive",
-        DirKind::Pragma => "pragma",
-        DirKind::BeginKeywords => "begin_keywords",
-        DirKind::EndKeywords => "end_keywords",
-    }
-}

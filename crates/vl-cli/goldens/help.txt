@@ -1,0 +1,21 @@
+rverilator — Verilog simulator toolchain (rust-cad-suite Phase 1)
+
+Usage: rverilator [options] <file.v>...
+
+Options:
+  --version            Print version and exit
+  --lint-only          Parse + lint only, do not simulate
+  -E                   Preprocess only, print result
+  --binary             Simulate now (v0 slice: combinational + initial blocks;
+                       always/#delay scheduling lands at M5)
+  --dump-ast           Print the parsed AST
+  -I <dir>, -I<dir>    Add include search directory
+  -D <NAME[=VAL]>      Predefine a preprocessor macro (default 1)
+  --top-module <mod>   Top module (default: auto-detect the un-instantiated one)
+  --timing, --no-timing, --trace, --Mdir <dir>, -o <name>,
+  --build-jobs <n>, -Wall, -Wno-<CODE>
+                       Accepted for compatibility; no-op in v0
+  -h, --help           This help
+
+Companion: `vcd2svg <file.vcd>` renders a dump to SVG (crates/vl-vcd).
+Exit codes: 0 = no errors, 1 = diagnostics or usage error.

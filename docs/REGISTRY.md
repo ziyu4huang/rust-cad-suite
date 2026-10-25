@@ -22,7 +22,7 @@
 | `riv-ir` | RIV-1:自有 versioned 文字 IR(var/thread/func 槽定址+每啟用幀;字面量 (width,signed,base,digits) 載入期才變 Bits)+手寫 writer/reader(零 serde) | **0**(純 std) | vvp 的 .vvp 角色(格式主權自有,OD1;out.riv 前拉 R6→R2=riv-r2-design §9-1) | writer→reader→writer 往返 byte-equal 單測;riverilog `-o` ↔ rivvp 載入貫通 |
 | `riv-elab` | AST→設計裝配:平層 Phase A(top 偵測/decl/常量/寬度符號 lowering 烘焙/display fmt 編譯);結構層(例化/generate/array/閘)=R4,未支援構造=帶 `milestone R<x>` 硬錯(err.rs 分類) | vl-syntax, rcs-diag, riv-ir, vl-values | ivl 的 Parser/Elaborator(平層部分) | riv e2e 臂 42/59;17 個 pending 全帶 R4 指針(即本 crate 的硬錯面) |
 | `riv-kernel` | 事件內核:分層隊列(active/inactive/NBA/monitor)+時間輪+顯式 PC 執行緒+force-overlay 層+每啟用幀呼叫+DumpSink(VCD 經 vl-vcd) | riv-ir, vl-values(**零 vl-sim 依賴**,PLAN 9.8-2) | vvp 直譯器(分層隊列=iverilog 契約) | riv iv 臂 8/10 byte-exact(含 03_nba 層次序/04_force 殘值);riv-difftest 7 單測 |
-| `riv-cli` | bin `riverilog`(pp→parse→riv-elab→RIV-1 write)+bin `rivvp`(載入 RIV-1 直譯;iverilog 形 $finish 橫幅/VCD info 行) | riv-elab, riv-kernel, riv-ir, vl-syntax, rcs-diag, vl-vcd | iverilog+vvp 兩進制(流程相容,檔案自有) | cli_gate 9 goldens(R0 契約 8+01_hello/03_nba 真流程 byte-exact) |
+| `riv-cli` | bin `riverilog`(pp→parse→-y fixpoint→riv-elab→RIV-1 write;-t null=免寫;`-E`=共享 vl-syntax::pp 渲染器路由 a.out/-o/stdout;pp 錯=exit 1/parse=exit 2 分類;`-D` attached+separate;rivD4 `-o -` 編譯目標硬錯)+bin `rivvp`(載入 RIV-1 直譯;iverilog 形 $finish 橫幅/VCD info 行;-N=stop exit 1;-q=stdout 全靜 VCD 照寫;-l=stdout 全量鏡像;-M/-m=R7 指針硬錯;-i=受理 no-op,緩衝語義 batch 不可觀測) | riv-elab, riv-kernel, riv-ir, vl-syntax, rcs-diag, vl-vcd | iverilog+vvp 兩進制(流程相容,檔案自有) | cli_gate 23 測(R0 契約 8+01_hello/03_nba 真流程+U-3 前半:-t null 真行為/-E 路由/-D 兩形/-y transitive+-Y/-t null 免寫/pp=1 parse=2/缺模組 exit 2/-o- 硬錯/-i 指針/rivvp -N -q -l -l- -M-m) |
 | `riv-difftest` | riv 差分 harness(dev-only):`--e2e --corpus`(正規化+看門狗+ledger 判定)與 iv 臂(case.json enforced/pending)**按 corpus 路徑尾段選臂**;UNLEDGERED/DRIFT 文字訊號,執法在 regress grep | 無 lib(子程序驅動兩 bin) | —(自建) | 7 單測(正規化敵意 fixture/看門狗/DECL 兩形/臂選擇);regress 兩臂精確數基線 |
 
 ## 語言能力 ↔ 里程碑 ↔ 證據 case
@@ -60,8 +60,8 @@
 | `bun crates/vl-ffi/bun-example/vcd_read.mjs` | regress.sh | agent 讀波形:FFI run→`vcd <path>` 強制 dump→rcs_vcd_parse→q 終值斷言 |
 | difftest `--min-pass 100`(regress.sh) | 每次交付 | e2e 精確數閘(80% 門檻曾讓 55/57 藏身綠燈,1023 教訓) |
 | lint parity 基線 83(regress.sh) | 每次交付 | M8 五輪基線(ADR-0008);閘曾攔下 78 誤算(ADR-0006 備忘) |
-| riv-cli/riv-difftest(riverilog R0→R3) | riverilog/rivvp 契約面 goldens byte-exact(cli_gate 9 測=R0 契約 8+01_hello/03_nba 真流程)+ riv-difftest 7 單測(正規化敵意 fixture/看門狗/DECL 兩形/臂選擇=corpus 尾段) | RIVERILOG-PLAN.md §5/§8;rivD1-6 預載+rivD7 撤回+rivD8 於 §6/本簿 |
-| riv-difftest 兩臂精確數閘(regress.sh) | 每次交付 | `SUMMARY e2e=42/59 iv=0/0` 與 `SUMMARY e2e=0/0 iv=8/10` 逐字 grep(基線隨能力同輪上調,AGENTS 10.9);UNLEDGERED/DRIFT 計數==0;runner exit 恆 0,執法全在 grep |
+| riv-cli/riv-difftest(riverilog R0→R3) | riverilog/rivvp 契約面 goldens byte-exact(cli_gate 23 測=R0 契約 8+01_hello/03_nba 真流程+U-3 前半契約面;vl-cli cli_gate 5 測=--version/--help/-E pp golden/-I-D smoke/-V=VL-E030 錯誤路徑)+ riv-difftest 7 單測(正規化敵意 fixture/看門狗/DECL 兩形/臂選擇=corpus 尾段) | RIVERILOG-PLAN.md §5/§8;rivD1-6 預載+rivD7 撤回+rivD8 於 §6/本簿 |
+| riv-difftest 兩臂精確數閘(regress.sh) | 每次交付 | `SUMMARY e2e=58/59 iv=0/0` 與 `SUMMARY e2e=0/0 iv=21/22` 逐字 grep(基線隨能力同輪上調,AGENTS 10.9);UNLEDGERED/DRIFT 計數==0;runner exit 恆 0,執法全在 grep |
 | `cargo test -q -p vl-spec -p spec-i2c` | regress.sh | spec 驗證層:lockstep/不變量/負向偵測/隨機 |
 | D17 timer 期限推進 | — | rVPI AfterDelay 於自身期限準點觸發(舊=拖到下一 # 事件);vpi_gate 20000→16000 |
 | `bun crates/vl-wasm/wasm-test/vcd_svg.mjs` | regress.sh | 三面同源渲染器:wasm one-shot==golden byte-diff+句柄重渲+u64 窗口+hostile 轉義+錯誤路徑 |
@@ -89,12 +89,15 @@
 | D14 | rVPI finish/stop | vpiFinish/vpiStop 有別 | 合流(同 $stop 既有行為) | 與 TB 系統任務行為一致 | interp syscall |
 | D15 | rVPI Transport/Inertial put | 脈衝消除有別 | 切片 2:兩模式同義(事件模型無脈衝消除) | 註冊分歧,切片 2 落地 | ADR-0003 D4 |
 | D16 | 混合 timescale 檔序 | TIMESCALEMOD 警告預設致命(檔序相關) | 不報(通過) | 語料面已修(XLS 生成檔注入 timescale);引擎面對齊候補 | corpus-external/xls;REGISTRY 1023 |
-| rivD1-6 | riverilog 預載分歧(VCD header/$stop 互動/效能/`-o -`/sorry 文案/目標插件) | iverilog 13.0 | 政策見預載表 | SSOT=RIVERILOG-PLAN.md §6(2026-10-24 預載);落地時逐條回填本簿 | RIVERILOG-PLAN §6 |
+| rivD1-6 | riverilog 預載分歧(VCD header/$stop 互動/效能/`-o -`/sorry 文案/目標插件) | iverilog 13.0 | 政策見預載表 | SSOT=RIVERILOG-PLAN.md §6(2026-10-24 預載);落地時逐條回填本簿;rivD4 ✅ 2026-10-25 兌現=編譯目標 `-o -` 硬錯 exit 1(`-E -o -`=stdout 正當;oracle 實況=真的建出檔名 `-` 的檔,政策性分歧 cli_gate 釘死) | RIVERILOG-PLAN §6 |
 | rivD7 | 48_frac_delay 延遲捨入(**預登記撤回**) | 設計期預測 iverilog 按 precision 捨入(1500/1750) | 同 | **2026-10-25 live probe 反證**:iverilog 13.0 數據行 `t=2000/t=2000` 與 verilator 金樣逐字一致,僅 finish 橫幅時刻(1750)剩差且屬 rivD8 丟行;48 現狀 pass、無需 ledger;編號留墓碑,32_proc_order 未來分歧=rivD9 | 本 session 探針(vvp -n 輸出 vs expected.stdout diff 僅 1 行);RIVERILOG-PLAN §6 |
 | rivD8 | riv e2e 臂 stdout 正規化:丟 riv 自家工具行 | e2e 金樣(verilator 錄製)無 iverilog 形工具行 | rivvp 印 iverilog 形 $finish 橫幅/`VCD info: ` 行 | 丟行白名單=vl-difftest 四前綴 ∪ 兩工具行形,禁內容改寫;敵意 fixture(`-7div2=-3`、`tb.v:6: ` 設計行)單測釘死;iv 臂不丟(工具行=金樣) | riv-difftest/src/main.rs:241-285,669-714;riv-r2-design §9-3/§10 注 1 |
 | rivD9 | ✅ 2026-10-25 兌現:e2e oracle-ref.vcd=verilator 2-state 錄製,與 riv(iverilog 形 4-state)不同側——t0 值域(q=0 vs x)與參數傾印(D3 家族);交叉閘以 iverilog 腿另錄金樣(oracle-ref.iv.vcd 入庫),樣本點交叉=vcd_gate 形+rivD1 正規化 | 51_vcd_counter 雙腿實證 | regress vcd-xcheck 閘(6/6 var 50 樣本點 0 失配) | RIVERILOG-PLAN §6/§8.1 |
 | rivD11 | $random 序列分歧:iverilog 13.0 首二值 303379748/-1064739199,riv=LCG 1103515245/12345;IEEE 明文序列為 implementation-specific | r5probe.v 探針 | 行為面(可重現+種子 inout)實作;含原值案例不入語料 | RIVERILOG-PLAN §6 |
 | rivD10 | 未寫入記憶體元素:iverilog 讀 x vs verilator 金樣 2-state 讀 0;riv 匹配 iverilog,53_readmem ledger 化 | 53_readmem expected.iv.stdout L2(xxxx vs 0000) | riv-pending.txt ledger(登記分歧不入紅燈);後續記憶體案例須全初始化或預期此分歧 | RIVERILOG-PLAN §6 |
+| rivD12 | -E 缺檔:oracle ivlpp segfault(exit 139,印 partial 錯誤後 crash)vs 我方乾淨 pp 類錯 exit 1——oracle bug 不復刻;正常編譯缺檔 U-3 前半 pp 分類修正後兩側皆 exit 1 對齊(訊息文字自由=rivD5),不再列分歧 | 2026-10-25 U-3 探針:iverilog -E missing.v → "missing.v: No such file or directory"+Segmentation fault: 11 | 我方=VL-E010 乾淨 pp 類錯 exit 1(cli_gate pp_class_errors_are_exit_1) | RIVERILOG-PLAN §6/§8 |
+| rivD13 | 寫檔失敗類別:oracle "…/x.vvp: No such file or directory / error: Code generator failure: -1" **exit 255** vs 我方 "riverilog: cannot write …" **exit 2**——本弧登記不對齊,對齊候補留 U-3b | 2026-10-25 P6 探針(iverilog -o /nope_dir/x.vvp vs riverilog 同形) | 維持 exit 2(訊息自由);翻 255 前須再實測 oracle 更多失敗形 | RIVERILOG-PLAN §5 |
+| rivD14 | `vvp -l -` 特形:man page 稱「-=stderr」被實測推翻——oracle stdout 與 stderr **各一份全量互現**、無 `-` 檔建出;契約未釘死前我方=帶指針硬錯 exit 1 | 2026-10-25 P5 對抗審雙側實測(vvp -l - st.vvp) | 硬錯+指針(cli_gate rivvp_dash_l_dash_is_hard_error);U-3b 補 vvp -q -l - 與多流交錯探針後再議 | RIVERILOG-PLAN §6 |
 
 ## Incident register(工具鏈開發事故;五欄制)
 
