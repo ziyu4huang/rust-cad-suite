@@ -12,6 +12,9 @@
   跟 oracle)。LRM 只用来解释行为,不用来覆盖行为。
 - 期望输出一律 `cargo run -p vl-difftest -- --record` 从 oracle **录制**,
   禁手写期望值。手写只允许错误路径形态(exit code / 里程碑指错信息)。
+- 外部 GPLv3 语料(2026-10-25 增补):ZipCPU 以 `vendor-reference/zipcpu`
+  (gitignore)唯读使用——**GPL 原文永不入 git**,闸=对 oracle 的即时期望
+  对拍(--ext-parity/ZIPLINT,入 regress),分歧只登记数字与原因。
 - oracle 实例:本机 `/opt/homebrew/bin/verilator`(5.050),仅测试用,永不
   随产品 ship;上游 test_regress 文件(LGPL/Artistic)禁入 git。
 - 改了语义(求值/调度/格式化)后必须重录受影响 case 并读一遍 diff——

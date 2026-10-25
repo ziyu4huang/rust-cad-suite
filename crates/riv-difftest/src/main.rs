@@ -626,6 +626,128 @@ fn simple_parity(dir: &Path, riverilog: &Path) {
     }
 }
 
+// ---------------------------------------------------------------------------
+// External compile-parity leg for arbitrary vendor trees (e.g. ZipCPU in
+// vendor-reference/, GPL — read-only use, never committed; expectations
+// are computed live from the oracle, nothing GPL enters the repo).
+// Dialect-aware: a file rejected under -g2005 is retried under -g2012 on
+// BOTH sides (ZipCPU is SV-flavored .v); accept = either dialect passes.
+// ---------------------------------------------------------------------------
+
+/// Registered divergences (ZipCPU, GPL vendor-reference — live-scan only):
+///  - div.v: SVA sequence syntax (`|=>`, `##1`, `[*0:$]`) — assert-property
+///    surface is out of the planned V2005 dialect (rverilator-side the
+///    same file is excluded from lint parity for the same reason).
+///  - fwb_*.v: immediate `assert(...)` statements — SV surface (open,
+///    tracked with the rverilator lint excludes).
+const EXT_PARITY_EXCLUDE: &[&str] = &["div.v", "fwb_counter.v", "fwb_master.v", "fwb_slave.v", "zipmmu.v"];
+
+fn first_module_loose(path: &Path) -> Option<String> {
+    let text = std::fs::read_to_string(path).ok()?;
+    for l in text.lines() {
+        let t = l.trim_start();
+        if let Some(rest) = t.strip_prefix("module") {
+            if rest.starts_with(' ') || rest.starts_with('\t') {
+                let name: String = rest
+                    .trim_start()
+                    .chars()
+                    .take_while(|c| c.is_ascii_alphanumeric() || *c == '_' || *c == '$')
+                    .collect();
+                if !name.is_empty() {
+                    return Some(name);
+                }
+            }
+        }
+    }
+    None
+}
+
+fn ext_parity(dir: &Path, riverilog: &Path) {
+    let timeout = watchdog_timeout();
+    let mut files: Vec<PathBuf> = std::fs::read_dir(dir)
+        .expect("ext dir")
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.is_dir() || p.extension().map(|x| x == "v").unwrap_or(false))
+        .flat_map(|p| {
+            if p.is_dir() {
+                walk_v_files(&p)
+            } else {
+                vec![p]
+            }
+        })
+        .collect();
+    files.sort();
+    let (mut ok, mut excl, mut bad) = (0usize, 0usize, Vec::new());
+    for f in &files {
+        let fname = f.file_name().unwrap().to_string_lossy().into_owned();
+        if EXT_PARITY_EXCLUDE.contains(&fname.as_str()) {
+            excl += 1;
+            continue;
+        }
+        let Some(top) = first_module_loose(f) else { continue };
+        let accept_iv = |g: &str| -> bool {
+            let r = run_with_watchdog(
+                {
+                    let mut c = Command::new("iverilog");
+                    c.arg("-t").arg("null").arg(g).arg("-s").arg(&top).arg(f);
+                    c
+                },
+                timeout,
+            );
+            !r.watchdog && r.code == Some(0)
+        };
+        let accept_rv = |g: &str| -> bool {
+            let r = run_with_watchdog(
+                {
+                    let mut c = Command::new(riverilog);
+                    c.arg(g).arg("-s").arg(&top).arg("-o").arg("/tmp/riv-ext.riv").arg(f);
+                    c
+                },
+                timeout,
+            );
+            !r.watchdog && r.code == Some(0)
+        };
+        let iv = accept_iv("-g2005") || accept_iv("-g2012");
+        let rv = accept_rv("-g2005") || accept_rv("-g2012");
+        if iv != rv {
+            let rvdetail = run_with_watchdog(
+                {
+                    let mut c = Command::new(riverilog);
+                    c.arg("-g2005").arg("-s").arg(&top).arg("-o").arg("/tmp/riv-ext.riv").arg(f);
+                    c
+                },
+                timeout,
+            );
+            bad.push(format!("{fname}: iverilog={iv} riverilog={rv} ({})", one_line(&rvdetail.stderr)));
+        } else {
+            ok += 1;
+        }
+    }
+    for b in &bad {
+        println!("ext\t{b}");
+    }
+    println!("EXT parity={ok}/{} excl={excl}", ok + bad.len());
+    if !bad.is_empty() {
+        eprintln!("riv-difftest: ext parity mismatches (see ext lines)");
+    }
+}
+
+fn walk_v_files(dir: &Path) -> Vec<PathBuf> {
+    let mut out = Vec::new();
+    if let Ok(rd) = std::fs::read_dir(dir) {
+        for e in rd.flatten() {
+            let p = e.path();
+            if p.is_dir() {
+                out.extend(walk_v_files(&p));
+            } else if p.extension().map(|x| x == "v").unwrap_or(false) {
+                out.push(p);
+            }
+        }
+    }
+    out
+}
+
 fn locate_bin(name: &str) -> PathBuf {
     let env_key = format!("{}_BIN", name.to_uppercase());
     if let Ok(p) = std::env::var(&env_key) {
@@ -921,6 +1043,7 @@ fn main() -> std::process::ExitCode {
     let mut do_iv_leg = false;
     let mut do_tri = false;
     let mut do_simple = false;
+    let mut do_ext = false;
     let mut corpus: Option<PathBuf> = None;
     let mut i = 0usize;
     while i < argv.len() {
@@ -930,13 +1053,14 @@ fn main() -> std::process::ExitCode {
             "--record-iv-leg" => do_iv_leg = true,
             "--tri" => do_tri = true,
             "--simple" => do_simple = true,
+            "--ext-parity" => do_ext = true,
             "--corpus" => {
                 corpus = Some(PathBuf::from(&argv[i + 1]));
                 i += 1;
             }
             other => {
                 eprintln!(
-                    "unknown arg `{other}` (usage: riv-difftest [--record] [--record-iv-leg] [--tri] [--simple] [--e2e] [--corpus DIR])"
+                    "unknown arg `{other}` (usage: riv-difftest [--record] [--record-iv-leg] [--tri] [--simple] [--ext-parity] [--e2e] [--corpus DIR])"
                 );
                 return std::process::ExitCode::from(2);
             }
@@ -946,6 +1070,22 @@ fn main() -> std::process::ExitCode {
     if do_iv_leg {
         let corpus = corpus.unwrap_or_else(default_e2e_corpus);
         record_iv_leg(&corpus);
+        return std::process::ExitCode::from(0);
+    }
+    if do_ext {
+        let dir = corpus.unwrap_or_else(|| {
+            PathBuf::from(concat!(env!("CARGO_MANIFEST_DIR"), "/../../vendor-reference/zipcpu/rtl"))
+        });
+        if !dir.is_dir() {
+            eprintln!("riv-difftest: ext dir absent — ext parity leg skipped ({})", dir.display());
+            return std::process::ExitCode::from(0);
+        }
+        if !Command::new("iverilog").arg("-V").output().map(|o| o.status.success()).unwrap_or(false) {
+            eprintln!("riv-difftest: iverilog absent — ext parity leg skipped");
+            return std::process::ExitCode::from(0);
+        }
+        let riverilog = locate_bin("riverilog");
+        ext_parity(&dir, &riverilog);
         return std::process::ExitCode::from(0);
     }
     if do_simple {

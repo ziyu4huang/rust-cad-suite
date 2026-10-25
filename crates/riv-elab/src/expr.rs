@@ -499,6 +499,9 @@ impl<'e, 'f> Lower<'e, 'f> {
                 let mut w = 0u32;
                 for p in parts {
                     let v = self.lower(p, 0)?;
+                    if v.w == 0 {
+                        continue; // empty replication contributes nothing
+                    }
                     w += v.w;
                     slots.push(v.slot);
                 }
@@ -506,10 +509,17 @@ impl<'e, 'f> Lower<'e, 'f> {
                 self.emit(Op::Concat { dst, parts: slots });
                 Ok(Val { slot: dst, w: w.max(1), signed: false, is_time: false })
             }
-            Expr::Repeat { span, count, value } => {
+            Expr::Repeat { span: _, count, value } => {
                 let (cb, _) = self.const_eval(count)?;
-                if cb.has_unknown() || cb.to_u128_lossy() == 0 {
-                    return Err(self.err(*span, "replication count must be a non-zero constant"));
+                if cb.has_unknown() {
+                    return Err(self.err(count.span(), "replication count must be a constant"));
+                }
+                if cb.to_u128_lossy() == 0 {
+                    // `{(0){x}}` is a legal EMPTY replication (memops:
+                    // BUS_WIDTH-32 == 0) — a zero-width value the enclosing
+                    // concat skips.
+                    let dst = self.slot();
+                    return Ok(Val { slot: dst, w: 0, signed: false, is_time: false });
                 }
                 let times = cb.to_u128_lossy();
                 let v = self.lower(value, 0)?;
@@ -530,6 +540,22 @@ impl<'e, 'f> Lower<'e, 'f> {
                 }
             }
             Expr::PartSelect { base, msb, lsb, span } => {
+                // Parameter base (`RESET_ADDRESS[(AW+1):2]`, pipefetch):
+                // fold the parameter value, then slice it — a plain
+                // Bits::part (const_eval of the WHOLE select would
+                // recurse straight back here).
+                if let Expr::Ident { name, .. } = base.as_ref() {
+                    if self.lookup(name).is_none() && self.scope_param(name).is_some() {
+                        let (b, signed) = self.const_eval(base)?;
+                        let m = self.const_u32_of(msb)?;
+                        let l = self.const_u32_of(lsb)?;
+                        let (hi, lo) = if m >= l { (m, l) } else { (l, m) };
+                        let part = Bits::part(&b, hi, lo)
+                            .map_err(|e| self.err(*span, e.0))?;
+                        let slot = self.const_bits(&part, signed);
+                        return Ok(Val { slot, w: part.width, signed, is_time: false });
+                    }
+                }
                 let (var, _, _, desc) = self.base_var(base)?;
                 let m = self.const_u32_of(msb);
                 let l = self.const_u32_of(lsb);
@@ -991,6 +1017,15 @@ impl<'e, 'f> Lower<'e, 'f> {
                 "bit/part-select base must be a plain identifier (hierarchical selects land with the strength batch)",
             ));
         };
+        // A PARAMETER base (`RESET_ADDRESS[(AW+1):2]`, pipefetch pins it)
+        // is a constant — there is no var to select; callers that can
+        // const-fold route through `part_or_param` instead.
+        if self.lookup(name).is_none() && self.scope_param(name).is_some() {
+            return Err(self.err(
+                e.span(),
+                "part-select of a parameter is constant — routed via const folding (internal)",
+            ));
+        }
         match self.lookup(name) {
             Some(NameKind::Var(v)) => {
                 self.note_read(v);

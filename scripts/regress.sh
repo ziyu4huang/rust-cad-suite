@@ -87,6 +87,38 @@ $iv_out"
         fail=1
     fi
     echo "${simple_sum:-SIMPLE skipped (no iverilog)}"
+    # ZipCPU external parity (GPL vendor-reference, read-only; live oracle
+    # compare — nothing from the tree enters the repo). riverilog side:
+    # dialect-aware accept parity vs iverilog; rverilator side: lint parity
+    # vs verilator. Both skip when the vendor tree or oracles are absent.
+    if [ -d vendor-reference/zipcpu/rtl ] && command -v iverilog >/dev/null; then
+        ext_out=$(cargo run -q -p riv-difftest -- --ext-parity 2>&1)
+        if echo "$ext_out" | grep -qE "^ext"; then
+            echo "GATE FAIL: riv ext parity (zipcpu unregistered mismatch)"
+            echo "$ext_out" | grep -E "^ext"
+            fail=1
+        else
+            echo "$ext_out" | grep -E "^EXT"
+        fi
+        zip_ma=0; zip_bad=0
+        for f in $(find vendor-reference/zipcpu/rtl -name "*.v" | sort); do
+            b=$(basename "$f")
+            case "$b" in div.v|fwb_counter.v|fwb_master.v|fwb_slave.v|wbarbiter.v) continue ;; esac
+            target/debug/rverilator --lint-only "$f" >/dev/null 2>&1; orc=$?
+            verilator --lint-only -Wno-fatal "$f" >/dev/null 2>&1; vrc=$?
+            if [ "$orc" -eq 0 ] && [ "$vrc" -eq 0 ]; then zip_ma=$((zip_ma+1));
+            elif [ "$orc" -ne 0 ] && [ "$vrc" -ne 0 ]; then zip_ma=$((zip_ma+1));
+            else zip_bad=$((zip_bad+1)); echo "  zipcpu-lint mismatch: $b (ours=$orc verilator=$vrc)"; fi
+        done
+        if [ "$zip_bad" -ne 0 ]; then
+            echo "GATE FAIL: rverilator zipcpu lint parity ($zip_bad mismatches)"
+            fail=1
+        else
+            echo "ZIPLINT parity=$zip_ma/$zip_ma excl=5"
+        fi
+    else
+        echo "EXT/ZIPLINT skipped (vendor-reference/zipcpu absent)"
+    fi
     echo "$e2e_sum"
     echo "$iv_sum"
     # riverilog VCD cross-compare (RIVERILOG-PLAN §8.1/rivD9 + R5 22):

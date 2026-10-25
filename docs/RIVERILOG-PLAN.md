@@ -383,6 +383,10 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
 
 → 目標基線:**e2e 59/59、iv 9/10(採礦後 19/20)**;UDP 為唯一具名殘項。
 
+**進度註(2026-10-25 ZipCPU 外部語料輪;全部數字=本輪實跑)**:
+- **ZipCPU(GPLv3)收編為唯讀外部語料**(vendor-reference/zipcpu,gitignore;家法 §2/RK3:GPL 原文永不入 git,閘=即時 oracle 對拍,期望零入庫):**riverilog --ext-parity 46/46 同位+5 登記排除**(方言感知=2005 拒則兩側同試 2012;排除=div SVA 序列語法/fwb×3 即時 assert(SV 面,open)/zipmmu 陣列元素 part-select(open,R5+));**rverilator ZIPLINT 46/46+5 排除**(同 SVA 群+wbarbiter >8 字元字串=M8-M9 候補既列)。雙閘入 regress(vendor 樹/ogra 缺席即跳過)。
+- 附帶真修復:①參數基準 part-select(RESET_ADDRESS[(AW+1):2],pipefetch 實證)——常量折疊直切 Bits::part(const_eval 全選取式會自遞迴=stack overflow 首犯,改折參數再切);②零寬重複複製 {(0){1'b0}}(memops:BUS_WIDTH-32==0;iverilog 收)——零寬 Val+Concat 跳過零寬部分;③module 宣告 tab 分隔偵測(掃描器)。
+
 **進度註(2026-10-25 R5/效能/yosys 腿追加輪;全部數字=本輪實跑)**:
 - **RK5 效能輪 ✅**:1M 週期 release 3.25s→1.74s=**308k→575k cycles/s(+87%,vvp 差距 4.6×→2.2×)**;樣本驅動三發=Rc<Design> 去 op clone/wake 反向索引+WaitList 零分配敏感表/Const 預解析快取 const_rt+時間輪條目池;殘餘熱點(arm_wait Own to_vec+Bits::part)留 R10。
 - **R5 IO 批次 ✅**:$fopen 家族(MCD/通道 FD 雙形,iverilog 實測分配逐字)+dump 控制(off/on/all 段形+段先落變更後 flush 時序)+$readmemh/b 超界 WARNING 逐字+$random(rivD11=序列分歧預登記);rivvp -vcd/-fst/IVERILOG_DUMPER;iv 採礦 21/22 enforced byte-exact,VCD 閘迴圈化(51+22 雙 OK);基線 **iv 21/22**。
