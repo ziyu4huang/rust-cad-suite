@@ -242,6 +242,9 @@ version = "0.1.0"
 dependencies = [
  "js-sys",
  "rcs-diag",
+ "riv-elab",
+ "riv-ir",
+ "riv-kernel",
  "spec-i2c",
  "vl-cli",
  "vl-sim",

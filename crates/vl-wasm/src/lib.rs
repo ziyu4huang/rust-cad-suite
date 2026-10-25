@@ -559,3 +559,144 @@ impl SpecCheckJs {
         self.inner.vcd.clone()
     }
 }
+
+// ---------------------------------------------------------------------------
+// riverilog/rivvp face (ADR-0009: one engine, two CLI faces — the browser
+// gets both, exactly like the native CLIs).
+// ---------------------------------------------------------------------------
+
+/// riverilog face, compile step: sources -> RIV-1 text. The same pipeline
+/// as the `riverilog` CLI minus the filesystem surface (shared pp+parse ->
+/// flat elaboration -> design write; no -y/-E in the browser). `top` may be
+/// empty for auto-detection.
+#[wasm_bindgen]
+pub fn riv_build(top: &str, sources: Vec<String>) -> Result<String, JsValue> {
+    let mut sm = rcs_diag::SourceMap::new();
+    let mut diags = rcs_diag::DiagSink::new();
+    let opts = PpOptions::default();
+    let mut modules = Vec::new();
+    let mut files = Vec::new();
+    for (i, src) in sources.iter().enumerate() {
+        let name = format!("source_{i}.v");
+        let out = pp::preprocess_source(&name, src, &mut sm, &mut diags, &opts);
+        files.push(riv_elab::FileTs {
+            path: name,
+            timescale: out.timescale.clone(),
+        });
+        let parsed = parser::parse_source_file(out.tokens, &mut diags);
+        modules.extend(parsed.modules);
+    }
+    if diags.has_errors() {
+        let mut text = String::new();
+        rcs_diag::render_diags(&mut text, &sm, &diags.diags);
+        return Err(JsValue::from_str(&format!("errors:\n{text}")));
+    }
+    let top = resolve_top(&modules, top)?;
+    let design = riv_elab::elaborate(riv_elab::ElabInput {
+        modules: &modules,
+        sm: &sm,
+        top: Some(&top),
+        files: &files,
+    })
+    .map_err(|e| JsValue::from_str(&e.message))?;
+    Ok(design.write())
+}
+
+/// rivvp face, run step: a RIV-1 design text plus plusargs -> stdout + VCD.
+/// The same kernel the `rivvp` CLI drives, with its defaults ($stop pauses
+/// and the run returns the output produced so far; the finish banner is the
+/// iverilog-face form).
+#[wasm_bindgen]
+pub fn riv_run(riv: String, plusargs: Vec<String>) -> Result<RunResult, JsValue> {
+    let d = riv_ir::read(&riv)
+        .map_err(|e| JsValue::from_str(&format!("not a riv design ({e})")))?;
+    let mut kernel = riv_kernel::Kernel::new(d.clone())
+        .map_err(|e| JsValue::from_str(&format!("design load: {}", e.0)))?;
+    kernel.set_plusargs(plusargs);
+    let mut sink = RivVcdSink::new(&d);
+    let outcome = kernel.run(&mut sink);
+    Ok(RunResult {
+        stdout: outcome.output,
+        vcd: sink.text,
+    })
+}
+
+/// DumpSink over the vl-vcd writer capturing the VCD text in memory (the
+/// browser has no filesystem for rivvp's file write). Var registry mirrors
+/// the rivvp sink: non-event/non-array vars under raw dotted paths split
+/// into real VCD scopes (ADR-0009 U-1 byte-compat shape).
+struct RivVcdSink {
+    timescale: String,
+    path: Option<String>,
+    writer: Option<vl_vcd::VcdWriter>,
+    var_list: Vec<(String, Vec<String>, u32)>,
+    text: Option<String>,
+}
+
+impl RivVcdSink {
+    fn new(d: &riv_ir::Design) -> RivVcdSink {
+        let var_list: Vec<(String, Vec<String>, u32)> = d
+            .vars
+            .iter()
+            .filter(|v| {
+                v.kind != riv_ir::VarKind::Event && v.kind != riv_ir::VarKind::Array
+            })
+            .map(|v| {
+                (
+                    v.name.clone(),
+                    v.name.split('.').map(|c| c.to_string()).collect(),
+                    v.width,
+                )
+            })
+            .collect();
+        RivVcdSink {
+            timescale: d.meta.precision.clone(),
+            path: None,
+            writer: None,
+            var_list,
+            text: None,
+        }
+    }
+}
+
+impl riv_kernel::DumpSink for RivVcdSink {
+    fn opened(&mut self, path: &str) {
+        self.path = Some(path.to_string());
+    }
+
+    fn dump_section(&mut self, now: u64, name: &str, values: &std::collections::BTreeMap<String, String>) {
+        if let Some(w) = self.writer.as_mut() {
+            w.dump_section(now, name, values);
+        }
+    }
+
+    fn dump_t0(&mut self, values: &std::collections::BTreeMap<String, String>) {
+        let vars = self.var_list.clone();
+        let mut w = vl_vcd::VcdWriter::new_named(
+            vars,
+            "rivvp (riverilog runtime, rust-cad-suite wasm)",
+            &self.timescale,
+        );
+        w.start();
+        w.dump_t0(values);
+        self.writer = Some(w);
+    }
+
+    fn change(&mut self, name: &str, value: &str) {
+        if let Some(w) = &mut self.writer {
+            w.record_change(name, value);
+        }
+    }
+
+    fn flush_slot(&mut self, now: u64) {
+        if let Some(w) = &mut self.writer {
+            w.flush_at(now);
+        }
+    }
+
+    fn finish(&mut self) {
+        if let Some(w) = self.writer.take() {
+            self.text = Some(w.finish());
+        }
+    }
+}

@@ -27,7 +27,7 @@
 </head>
 <body>
 <h1>rverilator.wasm — Verilog-2005 simulation in your browser</h1>
-<p class="small">Same core as the native CLI (vl-sim compiled to WebAssembly, ~500KB).
+<p class="small">One engine, two CLI faces (ADR-0009): rverilator (vl-sim) and riverilog→rivvp (riv-elab + riv-kernel), both compiled to WebAssembly (~1.2MB).
 Expectations in <code>corpus/</code> were recorded from real Verilator 5.050 — the engine
 running here reproduces them byte-exactly. Waveforms are parsed by the same shared
 <code>vl-vcd</code> reader the CLI and Bun use — one parser behind every tier.</p>
@@ -38,7 +38,12 @@ running here reproduces them byte-exactly. Waveforms are parsed by the same shar
     <label>top module (optional) · $readmem files (JSON: name → content)</label>
     <input id="top" placeholder="tb" style="width:8rem;background:#0a0e12;color:#cde;border:1px solid #345">
     <textarea id="files" spellcheck="false" placeholder='{"data.hex": "11\n22"}'></textarea>
-    <p><button id="run">▶ Run</button> <span id="status" class="small"></span></p>
+    <p><select id="engine" style="background:#0a0e12;color:#cde;border:1px solid #345;font:inherit">
+         <option value="vl">engine: rverilator</option>
+         <option value="riv">engine: riverilog → rivvp</option>
+       </select>
+       <button id="run">▶ Run</button> <span id="status" class="small"></span></p>
+    <p class="small" id="rivnote" style="display:none">riverilog face: sources compile to the RIV-1 design (<span id="rivsize">0</span> bytes, the <code>-o out.riv</code> artifact), then rivvp interprets it — the same two-step contract as the native CLIs. The $finish banner is the iverilog-face form.</p>
     <label>stdout</label>
     <pre id="out">(no run yet)</pre>
   </div>
@@ -77,7 +82,7 @@ named. The waveform is the run's VCD rendered as SVG (ADR-0005).</p>
 </div>
 
 <script type="module">
-import init, { WasmSim, vcd_parse, i2c_spec_check, i2c_rtl } from "./pkg/vl_wasm.js";
+import init, { WasmSim, vcd_parse, i2c_spec_check, i2c_rtl, riv_build, riv_run } from "./pkg/vl_wasm.js";
 const SVG_FLAGS = { t0: 1, t1: 2, height: 4 };
 
 const DEFAULT_SRC = `\`timescale 1ns/1ps
@@ -99,6 +104,10 @@ document.getElementById("src").value = DEFAULT_SRC;
 
 const $ = (id) => document.getElementById(id);
 
+$("engine").onchange = () => {
+  $("rivnote").style.display = $("engine").value === "riv" ? "" : "none";
+};
+
 $("run").onclick = async () => {
   $("run").disabled = true;
   $("status").textContent = "running…";
@@ -110,11 +119,23 @@ $("run").onclick = async () => {
       const map = JSON.parse(filesText);
       files = [Object.keys(map), Object.values(map)];
     }
-    const sim = new WasmSim($("top").value.trim(), [$("src").value], files[0] ?? [], files[1] ?? []);
-    sim.run();
-    $("out").textContent = sim.take_output() || "(no output)";
+    const top = $("top").value.trim();
+    let stdout, vcd;
+    if ($("engine").value === "riv") {
+      // Two-step face contract: compile to RIV-1, then interpret it.
+      const riv = riv_build(top, [$("src").value]);
+      $("rivsize").textContent = String(riv.length);
+      const r = riv_run(riv, files[0] ?? []);
+      stdout = r.stdout;
+      vcd = r.vcd;
+    } else {
+      const sim = new WasmSim(top, [$("src").value], files[0] ?? [], files[1] ?? []);
+      sim.run();
+      stdout = sim.take_output();
+      vcd = sim.take_vcd();
+    }
+    $("out").textContent = stdout || "(no output)";
     $("out").className = "";
-    const vcd = sim.take_vcd();
     const n = vcd ? drawFrom(vcd, $("siglist"), $("wave")) : 0;
     $("status").textContent = `done · ${n ? n + " signals" : "no dump"}`;
   } catch (e) {

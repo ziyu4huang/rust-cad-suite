@@ -161,7 +161,7 @@ if command -v wasm-pack >/dev/null && command -v bun >/dev/null; then
             || { echo "GATE FAIL: wasm-pack build"; fail=1; }
     fi
     if [ -f crates/vl-wasm/pkg/vl_wasm_bg.wasm ]; then
-        for t in run features vcd_parse vcd_svg spec; do
+        for t in run features vcd_parse vcd_svg spec riv_run; do
             bun crates/vl-wasm/wasm-test/$t.mjs >/tmp/wasm-gate-$t.out 2>&1 \
                 || { echo "GATE FAIL: wasm $t"; cat /tmp/wasm-gate-$t.out; fail=1; }
             tail -1 /tmp/wasm-gate-$t.out

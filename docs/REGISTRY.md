@@ -12,7 +12,7 @@
 | `vl-sim` | 4-state 值/求值/展開/事件調度器(值域已提取=`vl-values`,src/value.rs 為 shim re-export;wait/fork/force 族硬錯自 parse 級遷 build 級,M7/M8 文字逐臂保留 interp.rs:1767-1785) | vl-syntax, rcs-diag, vl-values | VCSD/eval/scheduling | value 8 測試;sim_gate 2(counter8+fulladd byte-diff);e2e 59/59 零漂移 |
 | `vl-cli` | bin `rverilator`(--version/-E/--lint-only/--dump-ast/--binary/--top-module) | 上全部 | verilator driver | 未知旗標=錯 exit1(對抗審 #8) |
 | `vl-difftest` | oracle 錄製/差分閘/HTML 報告(dev-only, publish=false) | vl-syntax, vl-sim, rcs-diag | —(自建) | regression_gate ≥80% 斷言 |
-| `vl-wasm` | WASM facade(cdylib):`run_verilog(_stdout)`/`WasmSim`,復用 CLI 頂層偵測;wasm-pack --target web,~500KB | `wasm-test/run.mjs` 差分閘(同 oracle goldens,6 例)入 regress.sh(pkg 過期自動重建) | ADR-0003 facade 慣例 |
+| `vl-wasm` | WASM facade(cdylib)雙面(ADR-0009):rverilator 面=`run_verilog(_stdout)`/`WasmSim`;riverilog 面=`riv_build`(→RIV-1 文本)+`riv_run`(rivvp 同核,iverilog 形橫幅);復用 CLI 頂層偵測;wasm-pack --target web,~1.2MB | `wasm-test/run.mjs`+`riv_run.mjs` 差分閘(oracle/iverilog goldens byte-exact)入 regress.sh(pkg 過期自動重建) | ADR-0003 facade 慣例+ADR-0009 §1 |
 | `vl-ffi` | C-ABI host facade(cdylib):`rcs_run(manifest)/rcs_version/rcs_free`,行式 manifest(file/inject);Bun bun:ffi 兩式(FFI 進程內/spawn subprocess) | bun-example 差分閘同 goldens 入 regress(dylib 缺=略過提示) | ADR-0003 facade 慣例 |
 | `vl-spec` | Spec 驗證核心:Signals 句柄/Invariant trait/GoldenModel trait/LockstepSpec harness(put+run_until 成對紀律,ADR-0007) | vl-sim, vl-syntax, rcs-diag | —(自建) | spec_gate 4 測 |
 | `spec-i2c` | 乾淨室 I2C master demo:RTL+golden model+匯流排驅動器+4 協議不變量+負向變種偵測(publish=false) | vl-spec, vl-sim, rcs-diag | OpenCores i2c(GPL,唯讀啟發零拷貝) | scripted/隨機 20 事務乾淨;LSB-first/no-ack-release 負向全被抓 |

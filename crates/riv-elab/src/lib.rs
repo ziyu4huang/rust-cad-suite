@@ -246,7 +246,13 @@ pub fn elaborate(input: ElabInput) -> Result<riv_ir::Design, ElabError> {
             min_precision = Some((info.precision.clone(), rank));
         }
     }
-    let global_precision = min_precision.unwrap().0;
+    // Files is one entry per source (the CLI loader always fills it); an
+    // empty slice is a caller bug — error, not a panic across an FFI edge.
+    let global_precision = min_precision.ok_or_else(|| ElabError {
+        message: "riverilog: no source files reached elaboration".to_string(),
+        exit: 2,
+    })?
+    .0;
 
     let top_mod = modules.iter().find(|m| m.name == top_name).unwrap();
     let top_file = sm.file_name(top_mod.span.file).to_string();
