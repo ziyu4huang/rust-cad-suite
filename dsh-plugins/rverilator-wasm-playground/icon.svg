@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Verilog Playground">
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0f2a33" stroke="#2f7f8f" stroke-width="2"/>
+  <path d="M10 38h10l4-12 5 22 5-16 3 6h17" fill="none" stroke="#4fd1c5" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M10 48h44" stroke="#2f7f8f" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="19" cy="20" r="3" fill="#7ef0e2"/>
+  <circle cx="45" cy="20" r="3" fill="#7ef0e2" opacity="0.6"/>
+  <path d="M22 20h20" stroke="#7ef0e2" stroke-width="1.6" stroke-dasharray="3 3" opacity="0.8"/>
+</svg>

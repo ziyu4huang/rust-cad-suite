@@ -1,0 +1,3 @@
+- insert:
+    - id: rverilator-wasm-playground
+      name: '@local/rverilator-wasm-playground'

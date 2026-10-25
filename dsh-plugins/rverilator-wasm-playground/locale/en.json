@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Verilog Playground",
+    "description": "Run Verilog in the Harness Web UI over the repo's WebAssembly engine: rverilator (vl-sim) and riverilog → rivvp, stdout plus VCD waveforms rendered by the shared Rust SVG renderer, with oracle-recorded corpus verification cards."
+  }
+}

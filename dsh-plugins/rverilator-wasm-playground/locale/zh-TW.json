@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Verilog 模擬台",
+    "description": "在 Harness Web UI 內用 repo 的 WebAssembly 引擎跑 Verilog:rverilator(vl-sim)與 riverilog → rivvp,輸出 stdout 與由共用 Rust SVG 渲染器產生的 VCD 波形,並附 oracle 錄製語料的逐位元組驗證卡。"
+  }
+}
