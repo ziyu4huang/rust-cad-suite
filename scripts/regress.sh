@@ -202,6 +202,24 @@ if command -v bun >/dev/null && [ -f target/release/libvl_ffi.dylib ]; then
     echo "ffi vcd-svg gate: $(grep -m1 PASS /tmp/ffi-svg.out || echo MISSING)"
 fi
 
+# Agent toolbox smoke: the four rv-* scripts are how agents drive the CLIs;
+# each must reproduce a committed golden byte-exactly (exit code included).
+if [ -x target/debug/rverilator ] && [ -x target/debug/riverilog ]; then
+    toolbox=0
+    diff <(bash scripts/rv-sim.sh corpus/e2e/01_arith_widths/tb.v) \
+         corpus/e2e/01_arith_widths/expected.stdout >/dev/null 2>&1 \
+        || { echo "GATE FAIL: rv-sim smoke"; toolbox=1; }
+    bash scripts/rv-diff.sh corpus/e2e/01_arith_widths/tb.v 2>/dev/null | tail -1 | grep -q "== MATCH ==" \
+        || { echo "GATE FAIL: rv-diff smoke"; toolbox=1; }
+    wsvg=/tmp/rv-wave-smoke.svg
+    bash scripts/rv-wave.sh -o "$wsvg" corpus/e2e/51_vcd_counter/tb.v >/dev/null 2>&1 \
+        && grep -q "<svg" "$wsvg" \
+        || { echo "GATE FAIL: rv-wave smoke"; toolbox=1; }
+    (cd corpus/iv-e2e/01_hello && diff <(bash "$OLDPWD/scripts/riv-run.sh" -n tb.v) expected.stdout) >/dev/null 2>&1 \
+        || { echo "GATE FAIL: riv-run smoke"; toolbox=1; }
+    [ "$toolbox" -eq 0 ] && echo "agent toolbox smoke: rv-sim/rv-diff/rv-wave/riv-run 4/4"
+fi
+
 if [ "${1:-}" = "--with-record" ]; then
     echo "== extra: re-record from oracle (requires verilator; review diff!) =="
     ./target/debug/vl-difftest --record 2>&1 | tail -1

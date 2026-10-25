@@ -58,6 +58,7 @@
 | `cargo test --test vcd_gate` | 每次提交 | 有 oracle-ref.vcd 的 case 與 oracle 逐訊號零失配 |
 | `bun crates/vl-wasm/wasm-test/vcd_parse.mjs` | regress.sh | 三面共用 reader:wasm 版 BigInt 時序/單調/終值/VL-E101 錯誤路徑 |
 | `bun crates/vl-ffi/bun-example/vcd_read.mjs` | regress.sh | agent 讀波形:FFI run→`vcd <path>` 強制 dump→rcs_vcd_parse→q 終值斷言 |
+| agent toolbox smoke(`scripts/rv-sim/rv-diff/rv-wave/riv-run.sh`)| regress.sh | 四支 agent 腳本各對一個入庫 golden 實跑:rv-sim=byte-exact、rv-diff=正規化 MATCH、rv-wave=SVG 帶 `<svg`、riv-run=iv 金樣 byte-exact;正典=`.agents/skills/rv-lab/SKILL.md`(agent→skill→script→CLI 層) |
 | difftest `--min-pass 100`(regress.sh) | 每次交付 | e2e 精確數閘(80% 門檻曾讓 55/57 藏身綠燈,1023 教訓) |
 | lint parity 基線 83(regress.sh) | 每次交付 | M8 五輪基線(ADR-0008);閘曾攔下 78 誤算(ADR-0006 備忘) |
 | riv-cli/riv-difftest(riverilog R0→R3) | riverilog/rivvp 契約面 goldens byte-exact(cli_gate 23 測=R0 契約 8+01_hello/03_nba 真流程+U-3 前半契約面;vl-cli cli_gate 5 測=--version/--help/-E pp golden/-I-D smoke/-V=VL-E030 錯誤路徑)+ riv-difftest 7 單測(正規化敵意 fixture/看門狗/DECL 兩形/臂選擇=corpus 尾段) | RIVERILOG-PLAN.md §5/§8;rivD1-6 預載+rivD7 撤回+rivD8 於 §6/本簿 |
