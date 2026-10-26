@@ -8,3 +8,7 @@ corpus-external/*
 !corpus/**/*.vcd
 crates/vl-wasm/pkg/
 obj_dir/
+
+# local agent tooling (never in git)
+.v2c/
+.video_agent/
