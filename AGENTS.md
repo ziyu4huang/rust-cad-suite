@@ -153,6 +153,11 @@
 - 外部工具產物收編(XLS 類):正規化(always_ff→always/timescale 注入)
   在收割管線內做+raw 保留+記在快照 README;上游工具介面衝突以
   `--helpfull`/stderr 為準,禁盲猜(REFLECTION §15.3)。
+- **linux-only 上游工具=CI 當 linux oracle(2026-10-26 立法)**:公開 repo
+  的 standard runner 免費無上限;收割/樹內驗證走 workflow_dispatch 實跑,
+  artifact 帶授權+manifest 由 adopt 腳本本機驗收(sha256+byte-diff),禁手
+  抄期望;本機脫機備援=Apple container(x64 經 Rosetta 配 **glibc** 影像,
+  musl 缺 loader 必敗),配方與花費實錄在 docs/XLS-ADAPTER.md。
 - 互動頁交付:serve smoke(資產 200+no-store)與真瀏覽器目檢
   (點 Run→stdout→canvas)兩者不可互替;截圖入 docs/e2e-report/。
 - VCD 讀寫一律走 `vl-vcd` 單一核心(ADR-0004):CLI/wasm/FFI/difftest 共用

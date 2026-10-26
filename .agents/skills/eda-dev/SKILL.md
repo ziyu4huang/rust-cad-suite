@@ -115,6 +115,7 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
 (`inject_file`/`run_verilog_with_files`),不碰真 FS;js_sys 表面一律
 `#[cfg(target_arch = "wasm32")]`(host 構建用 stub)。
 
+- **linux-only 上游工具的正典路徑(2026-10-26,XLS 弧定調)**:上游二進制只有 linux-x64 時,**CI=linux oracle**——workflow_dispatch 自助觸發 ubuntu runner 實跑(收割/樹內 bazel build),artifact 自帶授權、本機 `scripts/xls_adopt.py` 驗收;機械閘=in-tree job+regress 的 adapter/selftest 行,證據=workflow run + 快照 manifest。本機脫機路徑=Apple `container`(macOS≥26+Apple Silicon;**x64 二進制經 Rosetta 跑 amd64 容器,必須配 glibc 基底影像[ubuntu],alpine/musl 缺 ld-linux 必敗**;暖跑實測 0.83s);OrbStack/colima 為替代,XLS-ADAPTER.md 有配方與花費實錄。
 - 雙 oracle 紀律(2026-10-24,riverilog R0 起):iverilog 13.0/vvp=第二 oracle;期望錄製要帶 `-n`(防互動態);iv-e2e 案例一律自寫 TB+錄製,iverilog 主樹 ivtest/=GPL-2.0 唯讀挖掘永不入 git;iverilog 特有行為(分層隊列/$stop 四行橫幅/sorry 語義)以 corpus 釘死,分歧入 rivD 簿。
 
 ## riv runner 增補(2026-10-24,C4)

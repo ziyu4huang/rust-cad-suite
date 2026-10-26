@@ -140,7 +140,40 @@ overlays the subclass, and `bazel build`s it green (first run 635s / 2171
 actions; artifact measured as `librverilator_simulator.lo`). XLS's own test
 suite and the `verilog_simulators` registration land with the upstream PR.
 This host has no Bazel and the XLS release is linux-x64 only — CI is the
-linux oracle for this arc.
+linux oracle for this arc (canon: AGENTS 10.7 / SKILL「linux-only 上游工具」).
+
+### Local offline path: Apple `container` (measured 2026-10-26)
+
+macOS >= 26 + Apple Silicon; the x64 release runs via Rosetta in an amd64
+container. **The base image MUST be glibc (ubuntu/debian) — alpine/musl
+fails with `rosetta error: failed to open elf at /lib64/ld-linux-x86-64.so.2`.**
+
+```sh
+brew install container                    # 85s
+container system start                    # ~6 min first time (kata kernel download), instant after
+container run --rm --platform linux/amd64 \
+  --volume /tmp/xls-cont:/work --cwd /work --user root \
+  docker.io/library/ubuntu:24.04 sh -c \
+  './xls-*/ir_converter_main --top=add3 add3.x > add3.ir'
+```
+
+Measured spend: install 85s; first start+kernel ~6 min (one-time); first
+amd64 image pull+boot 10-53s (image size dominated); **warm run of
+ir_converter+codegen_main: 0.83s**; output byte-matches the CI snapshot
+modulo the two documented normalizations (timescale inject,
+always_ff->always).
+
+### Alternatives (recorded, not chosen)
+
+- **OrbStack** — mature, lowest idle footprint (~50-200 MB), full Docker
+  CLI/Compose compat, Intel+Silicon, loose OS requirements. Pick this if
+  macOS < 26 or Compose orchestration is needed. Personal use free.
+- **colima** — OSS free, but no advantage over OrbStack in footprint,
+  file IO, or startup (measured by the community; not re-measured here).
+- **CI round-trip** — the chosen default: public-repo standard runners are
+  free and uncapped; one harvest dispatch ~25s, the in-tree bazel gate
+  ~11 min (no cache; `actions/cache` on the bazel disk cache would cut it
+  to minutes if the gate starts running often).
 
 ## Try it
 
