@@ -133,9 +133,14 @@ bash scripts/xls-cpp-gate.sh
 
 The harness compiles against upstream `v0.0.0-10898-g8ddae8bf4` and links a
 local `InvokeSubprocess` double (`cpp/harness/`). It proves the subclass shape,
-in-memory includes, macros, error mapping and add3 byte-equality. It does not
-prove a Bazel in-tree link or XLS's own test suite: this host has no Bazel, and
-the XLS release is linux-x64 only.
+in-memory includes, macros, error mapping and add3 byte-equality. The Bazel
+in-tree link is proven by CI (2026-10-26): the `in-tree` job of
+`.github/workflows/xls-harvest.yml` checks out google/xls at the harvested tag,
+overlays the subclass, and `bazel build`s it green (first run 635s / 2171
+actions; artifact measured as `librverilator_simulator.lo`). XLS's own test
+suite and the `verilog_simulators` registration land with the upstream PR.
+This host has no Bazel and the XLS release is linux-x64 only — CI is the
+linux oracle for this arc.
 
 ## Try it
 

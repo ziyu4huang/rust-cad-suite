@@ -309,7 +309,7 @@
   <p class="note">
     為什麼要「進程邊界」而不是直接把 XLS 原始碼拉進來編？XLS 是 Bazel/C++ 大樹，綁進去等於把
     Apache-2.0 的上游編譯鏈變成我們的建置前提。已用穩定的 JSON/argv 協定對接；上游子類（<code>cpp/xls/...</code>）已對 pinned 真 header 編譯，
-    只剩 XLS 樹內 Bazel 連結未跑。我們的建置與授權邊界保持乾淨。
+    XLS 樹內 Bazel 連結已於 2026-10-26 在 CI 實跑綠(見 §risk)。我們的建置與授權邊界保持乾淨。
   </p>
 </section>
 
@@ -383,7 +383,7 @@ rv-xls-sim --file top.v --syntax-check
 
 <section id="plan">
   <h2><span class="num">05</span>三階段計畫</h2>
-  <p class="sec-sub">S1、S2 已落地；S3 的子類與收割鏈已落地，只剩 XLS 樹內 Bazel 實跑（本機沒有 Bazel，且 XLS release 只有 linux-x64）。</p>
+  <p class="sec-sub">S1、S2、S3 已落地；XLS 樹內 Bazel 實跑已於 2026-10-26 在 xls-harvest workflow 的 in-tree job 綠（checkout google/xls at tag → overlay 子類 → <code>bazel build //xls/simulation/simulators:rverilator_simulator</code>，2171 actions 全綠；本機無 Bazel 不再是殘項——CI 就是 linux oracle）。殘=註冊進 <code>verilog_simulators</code>+live simulator run+上游 PR。</p>
 
   <div class="phase">
     <div class="phase-head">
@@ -512,7 +512,7 @@ adopted 2 case(s) from google/xls v0.0.0-test into /tmp/snapshot</pre>
       <tr><td>harness</td><td>10/10（add3 byte-exact、巨集真的生效、include text 落檔、語法錯→status、<code>.sv</code>→Unimplemented）</td></tr>
       <tr><td>artifact manifest</td><td>sha256 + tag + adapter <code>syntax_check</code>；manifest 寫在 artifact 根</td></tr>
       <tr><td>adopt</td><td>正規化（always_ff→always、timescale 冪等）＋先驗後寫；竄改整批拒絕、dest 不建立</td></tr>
-      <tr><td>未驗</td><td>XLS Bazel 樹內連結與上游測試（本機無 Bazel；release 只有 linux-x64）</td></tr>
+      <tr><td>✅ 2026-10-26</td><td>XLS Bazel 樹內連結：in-tree job 實跑綠（runs 40279782574；首跑 635s/2171 actions build completed successfully，產物實名 librverilator_simulator.lo 已回寫檢查）。上游測試=待上游 PR。</td></tr>
     </tbody>
   </table>
 
@@ -555,7 +555,7 @@ adopted 2 case(s) from google/xls v0.0.0-test into /tmp/snapshot</pre>
       </tr>
       <tr>
         <td>XLS 樹內驗證</td>
-        <td>本機沒有 Bazel；XLS release 只提供 linux-x64，macOS arm64 不能直接執行。</td>
+        <td>本機沒有 Bazel；XLS release 只提供 linux-x64，macOS arm64 不能直接執行。<b>解法已落地=CI 當 linux oracle</b>（workflow_dispatch 自助觸發、artifact 自帶授權、adopt 腳本本機驗收），樹內閘=in-tree job。</td>
         <td>子類對真 header 編譯＋harness 實跑；in-tree <code>bazel test</code> 明標 TODO，不假裝已驗。</td>
       </tr>
     </tbody>
