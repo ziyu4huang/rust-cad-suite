@@ -175,6 +175,20 @@ pub struct VpiState {
 }
 
 impl VpiState {
+    /// U-4 (ADR-0009 unified engine): build a frozen table from plain
+    /// (name, kind) rows — the Kernel/USim bridge constructs the same
+    /// table shape without the legacy union-find machinery. Sorted by
+    /// name, handle ids deterministic (same rule as finish_elab).
+    pub fn build(mut rows: Vec<(String, CellKind)>) -> VpiState {
+        rows.sort_by(|a, b| a.0.cmp(&b.0));
+        rows.dedup_by(|a, b| a.0 == b.0);
+        let mut st = VpiState::default();
+        for (i, (name, kind)) in rows.into_iter().enumerate() {
+            st.index.insert(name.clone(), i as u32);
+            st.table.push(ObjMeta { name, kind });
+        }
+        st
+    }
     fn add_cb(&mut self, reason: CbReason, f: CbFn) -> CbId {
         let id = CbId(self.next_cb);
         self.next_cb += 1;

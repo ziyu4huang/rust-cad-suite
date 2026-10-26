@@ -26,6 +26,8 @@ pub struct RunOutcome {
     pub exit: i32,
 }
 
+pub mod vpi;
+
 /// VCD/dump hook. The kernel notifies; the host (rivvp) owns the actual
 /// vl-vcd writer and file IO.
 pub trait DumpSink {
@@ -129,6 +131,10 @@ pub struct Kernel {
     finished: Option<(u32, u32)>,
     pub dump_path: Option<String>,
     pub dump_open: bool,
+    /// U-4: additive rVPI firing points (empty = zero cost).
+    pub vpi_hooks: vpi::VpiHooks,
+    /// end_of_simulation fired once (finish checkpoints are several).
+    vpi_ended: bool,
     plusargs: Vec<String>,
     /// `$monitor` request (None = never armed). `last: None` = armed, not
     /// yet displayed — the t0 arm displays on the first monitor pass.
@@ -396,6 +402,8 @@ impl Kernel {
             finished: None,
             dump_path: None,
             dump_open: false,
+            vpi_hooks: vpi::VpiHooks::default(),
+            vpi_ended: false,
             plusargs: Vec::new(),
             monitor: None,
             monitor_enabled: true,
@@ -500,6 +508,10 @@ impl Kernel {
 
     /// Run to completion; ready threads start in declaration order.
     pub fn run(&mut self, sink: &mut dyn DumpSink) -> RunOutcome {
+        if let Some(mut f) = self.vpi_hooks.start_of_sim.take() {
+            f(self, 0);
+            self.vpi_hooks.start_of_sim = Some(f);
+        }
         for ti in 0..self.threads.len() {
             if matches!(self.threads[ti].status, Status::Ready) {
                 self.active.push_back(ti);
@@ -606,6 +618,12 @@ impl Kernel {
                 break; // no more events: natural stop (exit 0)
             };
             self.now = at;
+            // U-4: time-wheel advance fires the embedder's AfterDelay
+            // timers (before the slots at this time execute).
+            if let Some(mut f) = self.vpi_hooks.after_delay.take() {
+                f(self, at);
+                self.vpi_hooks.after_delay = Some(f);
+            }
             if let Some(mut gates) = self.gate_due.remove(&at) {
                 while let Some(gi) = gates.pop() {
                     if let Err(e) = self.commit_gate(gi, sink) {
@@ -636,6 +654,13 @@ impl Kernel {
 
     fn finish_out(&mut self, sink: &mut dyn DumpSink, err: Option<RunError>) -> RunOutcome {
         sink.finish();
+        if !self.vpi_ended {
+            self.vpi_ended = true;
+            if let Some(mut f) = self.vpi_hooks.end_of_sim.take() {
+                f(self, 0);
+                self.vpi_hooks.end_of_sim = Some(f);
+            }
+        }
         let exit = match err {
             // -n/-N stop: the host picks the exit (rivvp -N exits 1).
             None if self.stopped_silently => self.stop_exit,
@@ -1702,6 +1727,12 @@ impl Kernel {
             sink.change(&self.var_flat_name(var), &newv.fmt_bin());
         }
         self.wake(var, &old, &newv);
+        // U-4: post-settle value-change firing point (ADR-0003 write-point
+        // parity; single funnel = all writes, VPI puts included).
+        if let Some(mut f) = self.vpi_hooks.value_change.take() {
+            f(self, var as u64);
+            self.vpi_hooks.value_change = Some(f);
+        }
         Ok(())
     }
 
