@@ -59,6 +59,7 @@ pub fn run(argv: &[String]) -> i32 {
         files: Vec::new(),
     };
     let mut want_binary = false;
+    let mut gen_rust: Option<String> = None;
     let mut i = 0;
     while i < argv.len() {
         let a = argv[i].as_str();
@@ -75,6 +76,14 @@ pub fn run(argv: &[String]) -> i32 {
             "-E" => o.preprocess_only = true,
             "--dump-ast" => o.dump_ast = true,
             "--binary" => want_binary = true,
+            "--gen-rust" => {
+                i += 1;
+                if i >= argv.len() {
+                    eprintln!("error[VL-E030]: option `--gen-rust` requires a value");
+                    return 1;
+                }
+                gen_rust = Some(argv[i].clone());
+            }
             "--top-module" => {
                 i += 1;
                 if i >= argv.len() {
@@ -139,6 +148,13 @@ pub fn run(argv: &[String]) -> i32 {
     }
     let mut sm = SourceMap::new();
     let mut diags = DiagSink::new();
+    if let Some(path) = gen_rust.clone() {
+        if want_binary || o.lint_only || o.preprocess_only {
+            eprintln!("error[VL-E030]: --gen-rust is exclusive of --binary/--lint-only/-E");
+            return 1;
+        }
+        return gen_rust_cmd(&o, &mut sm, &mut diags, &path);
+    }
     if want_binary && !o.preprocess_only {
         simulate(&o, &mut sm, &mut diags)
     } else {
@@ -283,6 +299,64 @@ pub fn detect_top(modules: &[vl_syntax::ast::Module]) -> Result<String, Vec<Stri
     match cands.as_slice() {
         [only] => Ok(only.clone()),
         _ => Err(cands),
+    }
+}
+
+/// M9 tier-B (ADR-0002): elaborate like --binary, then emit a standalone
+/// Rust model instead of simulating.
+fn gen_rust_cmd(o: &Options, sm: &mut SourceMap, diags: &mut DiagSink, path: &str) -> i32 {
+    let (modules, _timescale) = preprocess_and_parse(o, sm, diags);
+    if diags.has_errors() {
+        let mut out = String::new();
+        rcs_diag::render_diags(&mut out, sm, &diags.diags);
+        print!("{out}");
+        println!("%Error: cannot generate while parsing has errors");
+        return 1;
+    }
+    let top = match &o.top_module {
+        Some(t) => t.clone(),
+        None => match detect_top(&modules) {
+            Ok(t) => t,
+            Err(cands) => {
+                println!(
+                    "%Error: cannot auto-detect top module (candidates: {}); pass --top-module",
+                    if cands.is_empty() { "none".to_string() } else { cands.join(", ") }
+                );
+                return 1;
+            }
+        },
+    };
+    let files: Vec<(String, Option<String>)> =
+        SOURCE_FILES.with(|c| c.borrow().clone());
+    let file_ts: Vec<riv_elab::FileTs> = files
+        .iter()
+        .map(|(p, ts)| riv_elab::FileTs { path: p.clone(), timescale: ts.clone() })
+        .collect();
+    let design = match riv_elab::elaborate(riv_elab::ElabInput::strict(
+        &modules,
+        sm,
+        Some(&top),
+        &file_ts,
+    )) {
+        Ok(d) => d,
+        Err(e) => {
+            println!("%Error: {}", e.message);
+            return 1;
+        }
+    };
+    let src = match riv_gen::gen(&design) {
+        Ok(s) => s,
+        Err(m) => {
+            println!("%Error: {m}");
+            return 1;
+        }
+    };
+    match std::fs::write(path, src) {
+        Ok(()) => 0,
+        Err(e) => {
+            println!("%Error: cannot write `{path}`: {e}");
+            1
+        }
     }
 }
 

@@ -216,7 +216,7 @@ pub struct Kernel {
 }
 
 /// Unit→precision scale parsed from meta.timescale (unit fs / precision fs).
-fn unit_ratio(ts: &str) -> Option<u128> {
+pub(crate) fn unit_ratio(ts: &str) -> Option<u128> {
     fn half_fems(h: &str) -> Option<u128> {
         let digits: String = h.chars().take_while(|c| c.is_ascii_digit()).collect();
         let rest = &h[digits.len()..];
@@ -2661,11 +2661,42 @@ fn dyn_part(v: &Bits, hv: &Bits, lv: &Bits) -> Result<Bits, RunError> {
     }
 }
 
+/// M9 tier-B display face (ADR-0002): THE one $display/%-formatting
+/// path. `args` is indexed by FmtPiece::Spec.arg — one
+/// (value, signed, is_time) triple per display argument. The interpreter
+/// (`Self::render`) and generated models (`--gen-rust`) both land here;
+/// a second formatting implementation would be a contract fork.
+pub fn render_pieces(
+    pieces: &[riv_ir::FmtPiece],
+    args: &[(Bits, bool, bool)],
+    scale: u64,
+) -> String {
+    let mut out = String::new();
+    for piece in pieces {
+        match piece {
+            riv_ir::FmtPiece::Text(t) => out.push_str(t),
+            riv_ir::FmtPiece::Spec { ch, width, zero_pad, arg } => {
+                let Some((v, signed, is_time)) = args.get(*arg as usize) else {
+                    continue;
+                };
+                out.push_str(&fmt_one(*ch, *width, *zero_pad, v, *signed, *is_time, scale));
+            }
+        }
+    }
+    out
+}
+
+/// Unit→precision scale parsed from a `timescale` string (unit fs /
+/// precision fs) — public for the generated-model runtime (ADR-0002).
+pub fn unit_ratio_pub(ts: &str) -> Option<u128> {
+    unit_ratio(ts)
+}
+
 /// Render one format spec (IEEE §F.4 + the 11/45-display goldens).
 /// `%t` scales is_time args (unit ticks) into precision units by
 /// `scale = unit/precision`; the default field is 20 (AGENTS §5), %0t
 /// minimal. Non-time args render raw.
-fn fmt_one(ch: char, width: u32, zero_pad: bool, v: &Bits, signed: bool, is_time: bool, scale: u64) -> String {
+pub fn fmt_one(ch: char, width: u32, zero_pad: bool, v: &Bits, signed: bool, is_time: bool, scale: u64) -> String {
     fn pad(s: String, width: u32, zero_pad: bool) -> String {
         let w = width as usize;
         if w == 0 || s.len() >= w {

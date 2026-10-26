@@ -1,0 +1,15 @@
+[package]
+name = "riv-gen"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+riv-ir = { workspace = true }
+vl-syntax = { workspace = true }
+rcs-diag = { workspace = true }
+riv-elab = { workspace = true }
+vl-ops = { workspace = true }
+vl-values = { workspace = true }
+
+[package.metadata.notes]
+"adr" = "0002-tier-b-gen-rust"

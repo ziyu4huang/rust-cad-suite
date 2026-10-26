@@ -111,6 +111,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "riv-gen"
+version = "0.1.0"
+dependencies = [
+ "rcs-diag",
+ "riv-elab",
+ "riv-ir",
+ "vl-ops",
+ "vl-syntax",
+ "vl-values",
+]
+
+[[package]]
 name = "riv-ir"
 version = "0.1.0"
 
@@ -176,6 +188,8 @@ name = "vl-cli"
 version = "0.1.0"
 dependencies = [
  "rcs-diag",
+ "riv-elab",
+ "riv-gen",
  "vl-sim",
  "vl-syntax",
 ]

@@ -4,6 +4,7 @@ members = [
     "crates/riv-cli",
     "crates/riv-difftest",
     "crates/riv-ir",
+    "crates/riv-gen",
     "crates/riv-elab",
     "crates/riv-kernel",
     "crates/rcs-diag",
@@ -33,6 +34,7 @@ vl-syntax = { path = "crates/vl-syntax" }
 vl-values = { path = "crates/vl-values" }
 vl-ops = { path = "crates/vl-ops" }
 riv-ir = { path = "crates/riv-ir" }
+riv-gen = { path = "crates/riv-gen" }
 riv-elab = { path = "crates/riv-elab" }
 riv-kernel = { path = "crates/riv-kernel" }
 vl-sim = { path = "crates/vl-sim" }
