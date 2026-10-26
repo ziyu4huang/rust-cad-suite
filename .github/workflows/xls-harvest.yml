@@ -122,8 +122,11 @@ jobs:
 
       - name: Install bazelisk
         run: |
-          curl -L -o /usr/local/bin/bazel             https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64
-          chmod +x /usr/local/bin/bazel
+          mkdir -p "$HOME/.local/bin"
+          curl -fL -o "$HOME/.local/bin/bazel" \
+            https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64
+          chmod +x "$HOME/.local/bin/bazel"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Clone google/xls at the harvested tag
         run: |
