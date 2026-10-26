@@ -102,7 +102,13 @@ fn run(manifest_path: &str) -> Result<String, String> {
         Some(t) if t != "auto" => t,
         _ => vl_detect_top(&modules)?,
     };
-    let mut sim = vl_sim::Sim::build(&modules, &top, timescale.as_deref())
+    // U-5 slice-1 (ADR-0009): the FFI face mounts the unified engine.
+    let ts_files: Vec<(String, Option<String>)> = files
+        .iter()
+        .cloned()
+        .map(|n| (n, timescale.clone()))
+        .collect();
+    let mut sim = vl_sim::USim::build(&modules, &top, timescale.as_deref(), &sm, &ts_files)
         .map_err(|e| format!("elaborate: {}", e.message))?;
     for (n, c) in inject {
         sim.inject_file(&n, &c);

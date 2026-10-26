@@ -490,6 +490,13 @@ impl Kernel {
         self.now
     }
 
+    /// U-5 slice-1: open the VCD dump without a TB `$dumpvars` — the
+    /// injected-`$dumpvars`-at-t0 equivalent (legacy Sim::force_dump
+    /// parity). Facades that always want waveforms call this before run.
+    pub fn force_dump(&mut self, sink: &mut dyn DumpSink) {
+        let _ = self.open_dump(sink);
+    }
+
     /// `$readmem*` path resolution: injected files (wasm) by exact name
     /// first, then `file_base`-joined, then bare (cwd).
     pub fn resolve_readmem(&self, path: &str) -> Option<std::path::PathBuf> {

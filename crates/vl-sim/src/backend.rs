@@ -127,6 +127,9 @@ pub struct USim {
     /// run() as SResult, mirroring the legacy face's Err path.
     vpi_error: Rc<RefCell<Option<String>>>,
     hooks_installed: bool,
+    /// `finish()` before `run()` (wasm hosts finish pre-run); honored at
+    /// run entry via kernel stop_as_finish.
+    finish_requested: bool,
 }
 
 impl USim {
@@ -199,12 +202,13 @@ impl USim {
             vpi_names: Rc::new(vpi_names),
             vpi_error: Rc::new(RefCell::new(None)),
             hooks_installed: false,
+            finish_requested: false,
         })
     }
 
     /// Run to completion (kernel's stratified slot loop).
     pub fn run(&mut self) -> SResult<()> {
-        self.kernel.stop_as_finish = false;
+        self.kernel.stop_as_finish = self.finish_requested;
         self.install_hooks();
         let outcome = self.kernel.run(&mut self.sink);
         self.sink.finish();
@@ -259,6 +263,70 @@ impl USim {
         self.kernel.injected_files.insert(name.to_string(), contents.to_string());
     }
 
+    /// Force the VCD dump without a TB `$dumpvars` (legacy Sim::force_dump
+    /// parity; wasm demo / FFI vcd keyword). Call before `run()`.
+    pub fn force_dump(&mut self) {
+        self.kernel.force_dump(&mut self.sink);
+    }
+
+    /// `vpi_control(vpiFinish)` (Stop conflates; matches `$stop`). Honored
+    /// at run entry or at the next after_delay checkpoint.
+    pub fn finish(&mut self) {
+        self.finish_requested = true;
+    }
+
+    fn var_of_handle(&self, h: vpi::VpiHandle) -> SResult<u32> {
+        self.vpi_vars
+            .get(h.0 as usize)
+            .copied()
+            .ok_or_else(|| err(format!("rVPI: handle {} out of range", h.0)))
+    }
+
+    /// Raw 4-state bits of a table object (value-bearing vars only — the
+    /// USim table excludes Event/Array rows, registered U-4 slice-2 scope).
+    pub fn vpi_bits(&self, h: vpi::VpiHandle) -> SResult<Bits> {
+        let var = self.var_of_handle(h)?;
+        self.kernel
+            .vpi_read_var(var)
+            .ok_or_else(|| err("rVPI: var storage missing"))
+    }
+
+    /// Declared width (legacy vpi_size parity).
+    pub fn vpi_size(&self, h: vpi::VpiHandle) -> u32 {
+        self.var_of_handle(h)
+            .ok()
+            .and_then(|var| self.kernel.vpi_var_width(var))
+            .unwrap_or(0)
+    }
+
+    fn var_signed(&self, var: u32) -> bool {
+        self.design.vars.get(var as usize).is_some_and(|v| v.signed)
+    }
+
+    /// `vpi_get_value` int semantics: x/z refuses; signed vars sign-extend.
+    pub fn vpi_get_int(&self, h: vpi::VpiHandle) -> SResult<i64> {
+        let b = self.vpi_bits(h)?;
+        if b.has_unknown() {
+            return Err(err("int format on a value carrying x/z (use Vector/BinStr)"));
+        }
+        let raw = b.to_u64_lossy();
+        if self.var_signed(self.var_of_handle(h)?)
+            && b.width > 0
+            && b.width < 64
+            && raw & (1 << (b.width - 1)) != 0
+        {
+            Ok((raw | !((1u64 << b.width) - 1)) as i64)
+        } else {
+            Ok(raw as i64)
+        }
+    }
+
+    /// NoDelay write through the kernel's single write funnel.
+    pub fn vpi_put_bits(&mut self, h: vpi::VpiHandle, bits: &Bits) -> SResult<()> {
+        let var = self.var_of_handle(h)?;
+        self.kernel.vpi_write_var(var, bits.clone()).map_err(|e| err(e))
+    }
+
     // ---------- rVPI registration face (U-4 slice-2, ADR-0003) ----------
 
     /// `vpi_register_cb` on the shared registry. Same signature/semantics
@@ -277,12 +345,10 @@ impl USim {
 
     /// `vpi_handle_by_name` (bare cell paths, same canon rule as legacy).
     pub fn vpi_handle_by_name(&self, path: &str) -> Option<vpi::VpiHandle> {
-        self.vpi
-            .borrow()
-            .index
-            .get(path)
-            .copied()
-            .map(vpi::VpiHandle)
+        let p = path
+            .strip_prefix(&format!("{}.", self.design.meta.top))
+            .unwrap_or(path);
+        self.vpi.borrow().index.get(p).copied().map(vpi::VpiHandle)
     }
 
     /// Install the kernel hook closures that route the four unified-engine

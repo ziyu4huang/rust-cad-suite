@@ -7,12 +7,21 @@
 
 #[cfg(target_arch = "wasm32")]
 use vl_sim::vpi::CbReason;
-use vl_sim::vpi::{Format, VpiValue};
 use vl_syntax::parser;
 use vl_syntax::pp::{self, PpOptions};
 use wasm_bindgen::prelude::*;
 
-fn compile_sources(sources: &[String]) -> Result<(Vec<vl_syntax::ast::Module>, Option<String>), JsValue> {
+fn compile_sources(
+    sources: &[String],
+) -> Result<
+    (
+        Vec<vl_syntax::ast::Module>,
+        Option<String>,
+        rcs_diag::SourceMap,
+        Vec<(String, Option<String>)>,
+    ),
+    JsValue,
+> {
     let mut sm = rcs_diag::SourceMap::new();
     let mut diags = rcs_diag::DiagSink::new();
     let opts = PpOptions::default();
@@ -33,7 +42,12 @@ fn compile_sources(sources: &[String]) -> Result<(Vec<vl_syntax::ast::Module>, O
         rcs_diag::render_diags(&mut text, &sm, &diags.diags);
         return Err(JsValue::from_str(&format!("parse errors:\n{text}")));
     }
-    Ok((modules, timescale))
+    // U-5 slice-1: the unified engine derives per-file sticky timescales
+    // from this list; wasm sources are virtual `source_i.v` names.
+    let files = (0..sources.len())
+        .map(|i| (format!("source_{i}.v"), timescale.clone()))
+        .collect();
+    Ok((modules, timescale, sm, files))
 }
 
 fn resolve_top(modules: &[vl_syntax::ast::Module], top: &str) -> Result<String, JsValue> {
@@ -69,9 +83,9 @@ impl RunResult {
 }
 
 fn run_inner(top: &str, sources: Vec<String>) -> Result<RunResult, JsValue> {
-    let (modules, timescale) = compile_sources(&sources)?;
+    let (modules, timescale, sm, files) = compile_sources(&sources)?;
     let top = resolve_top(&modules, top)?;
-    let mut sim = vl_sim::Sim::build(&modules, &top, timescale.as_deref())
+    let mut sim = vl_sim::USim::build(&modules, &top, timescale.as_deref(), &sm, &files)
         .map_err(|e| JsValue::from_str(&format!("elaborate: {}", e.message)))?;
     sim.run()
         .map_err(|e| JsValue::from_str(&format!("run: {}", e.message)))?;
@@ -91,10 +105,13 @@ fn sim_from_parts(
     sources: Vec<String>,
     file_names: Vec<String>,
     file_contents: Vec<String>,
-) -> Result<vl_sim::interp::Sim, JsValue> {
-    let (modules, timescale) = compile_sources(&sources)?;
+) -> Result<vl_sim::USim, JsValue> {
+    let (modules, timescale, sm, files) = compile_sources(&sources)?;
     let top = resolve_top(&modules, top)?;
-    let mut sim = vl_sim::Sim::build(&modules, &top, timescale.as_deref())
+    // U-5 slice-1 (ADR-0009): every wasm face builds the unified engine —
+    // one engine, one platform matrix; the segments interpreter is no
+    // longer referenced from this facade.
+    let mut sim = vl_sim::USim::build(&modules, &top, timescale.as_deref(), &sm, &files)
         .map_err(|e| JsValue::from_str(&format!("elaborate: {}", e.message)))?;
     for (n, c) in file_names.into_iter().zip(file_contents) {
         sim.inject_file(&n, &c);
@@ -132,7 +149,7 @@ pub fn run_verilog_stdout(top: &str, sources: Vec<String>) -> Result<String, JsV
 /// lands here in a later slice).
 #[wasm_bindgen]
 pub struct WasmSim {
-    inner: vl_sim::interp::Sim,
+    inner: vl_sim::USim,
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -222,28 +239,26 @@ impl WasmSim {
             .inner
             .vpi_handle_by_name(path)
             .ok_or_else(|| JsValue::from_str(&format!("no object `{path}`")))?;
-        let f = match fmt {
-            "int" => Format::Int,
-            "bin" => Format::BinStr,
-            "hex" => {
-                let b = self.inner.vpi_bits(h).map_err(js_err)?;
-                return Ok(b.fmt_hex());
-            }
-            "dec" => {
-                let b = self.inner.vpi_bits(h).map_err(js_err)?;
-                return Ok(b.fmt_dec());
-            }
-            _ => return Err(JsValue::from_str("fmt: int|bin|hex|dec")),
-        };
-        match self.inner.vpi_get_as(h, f) {
-            Ok(v) => Ok(match v {
-                VpiValue::Int(i) => i.to_string(),
-                VpiValue::Scalar(s) => format!("{s:?}"),
-                VpiValue::Vector(b) => b.fmt_bin(),
-                VpiValue::BinStr(s) => s,
-                VpiValue::Time(t) => t.to_string(),
-            }),
-            Err(e) => Err(JsValue::from_str(&e.message)),
+        // U-5 slice-1: the unified-engine value face (USim::vpi_bits /
+        // vpi_get_int) — same format contract as the legacy vpi_get_as.
+        match fmt {
+            "int" => match self.inner.vpi_get_int(h) {
+                Ok(v) => Ok(v.to_string()),
+                Err(e) => Err(JsValue::from_str(&e.message)),
+            },
+            "bin" => match self.inner.vpi_bits(h) {
+                Ok(b) => Ok(b.fmt_bin()),
+                Err(e) => Err(JsValue::from_str(&e.message)),
+            },
+            "hex" => match self.inner.vpi_bits(h) {
+                Ok(b) => Ok(b.fmt_hex()),
+                Err(e) => Err(JsValue::from_str(&e.message)),
+            },
+            "dec" => match self.inner.vpi_bits(h) {
+                Ok(b) => Ok(b.fmt_dec()),
+                Err(e) => Err(JsValue::from_str(&e.message)),
+            },
+            _ => Err(JsValue::from_str("fmt: int|bin|hex|dec")),
         }
     }
 
@@ -253,8 +268,12 @@ impl WasmSim {
             .inner
             .vpi_handle_by_name(path)
             .ok_or_else(|| JsValue::from_str(&format!("no object `{path}`")))?;
+        // Legacy put-Int parity: a 64-bit raw lands in kernel storage and
+        // is projected/truncated to the declared width by the funnel.
+        let bits = vl_sim::value::Bits::from_u64(64, value as u64)
+            .map_err(|e| JsValue::from_str(&e.0))?;
         self.inner
-            .vpi_put_value(h, VpiValue::Int(value))
+            .vpi_put_bits(h, &bits)
             .map_err(|e| JsValue::from_str(&e.message))
     }
 
@@ -426,10 +445,6 @@ impl VcdJs {
         vl_vcd::render(&self.inner, &opts)
             .map_err(|d| JsValue::from_str(&format!("{}: {} @ byte {}", d.code, d.message, d.offset)))
     }
-}
-
-fn js_err(e: vl_sim::SimError) -> JsValue {
-    JsValue::from_str(&e.message)
 }
 
 // ---------- spec-verification layer (ADR-0007 browser closed loop) ----------

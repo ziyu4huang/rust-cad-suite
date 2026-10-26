@@ -33,8 +33,12 @@ sim.on_value_change("lfsr", (info) => vcLog.push(`${info.time}:${info.valueHex}`
 let sawTimer = false;
 sim.on_after_delay(76000n, () => { sawTimer = true; });
 sim.run();
-// 8 NBA updates (t=5000..75000); the initializer ran before registration.
-const okCb = vcLog.length === 8 && vcLog[vcLog.length - 1] === "75000:b0";
+// 8 NBA updates (t=5000..75000) + the declaration-init materialization:
+// the unified engine lowers `reg [7:0] lfsr = 8'hAC` to a t0 initial
+// thread (the @* wake semantics 21_always_comb pins), so cbValueChange
+// sees the real x->AC transition at t0 — 9 events, first=0:ac (U-5
+// slice-1; legacy face applied init at build silently, D17).
+const okCb = vcLog.length === 9 && vcLog[0] === "0:ac" && vcLog[vcLog.length - 1] === "75000:b0";
 const sampled = sim.vpi_get("lfsr", "hex");
 console.log(`PASS rVPI-callbacks (vc=${vcLog.length}, last=${vcLog[vcLog.length - 1]}, timer=${sawTimer}, sample=${sampled})`);
 if (!okCb || !sawTimer || sampled !== "b0") process.exit(1);
