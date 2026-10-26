@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "xls": {
+    "repository": "google/xls",
+    "tag": "v0.0.0-10898-g8ddae8bf4"
+  },
+  "pipeline": "xls-harvest v1: ir_converter_main -> codegen_main; always_ff -> always; `timescale 1ns/1ps injected",
+  "cases": [
+    {
+      "id": "acc_pipe",
+      "verilog": "generated/acc_pipe.v",
+      "sha256": {
+        "verilog": "d3437b15e194d7c44fe4df72e070e0ec812e577b4a639af5d8a1a370a8d5da41",
+        "ir": "f9cd3310eafe6173f94e9c5e374b5d7a770edc801344132a9708d3fd04e20a98",
+        "dslx": "6001eb0c4986259e9d35f4b56c07b7047c120b91c4abd17f95c6535fac8a6a4b"
+      },
+      "ir": "generated/acc_pipe.ir",
+      "dslx": "dslx/acc_pipe.x",
+      "syntax_check": {
+        "status": "ok",
+        "adapter": "rv-xls-sim"
+      }
+    },
+    {
+      "id": "add3",
+      "verilog": "generated/add3.v",
+      "sha256": {
+        "verilog": "61a02c233d67af8055fe7bed961e8893b8ba9cc3f71a68172646723c6324fe49",
+        "ir": "ba68f9b523addfffa2adbe013539ea67f80573f313bf8b1d4f6ae9fb318e2ff5",
+        "dslx": "3fd842f023337ad85d34e2bda80f4c4e70fb29907572e4f15010f35be823926b"
+      },
+      "ir": "generated/add3.ir",
+      "dslx": "dslx/add3.x",
+      "syntax_check": {
+        "status": "ok",
+        "adapter": "rv-xls-sim"
+      }
+    }
+  ]
+}

@@ -1,2 +1,2 @@
 https://github.com/google/xls (Apache-2.0)
-Snapshot: generated Verilog via XLS codegen_main (release v0.0.0-20261022)
+Snapshot: generated Verilog via XLS codegen_main (v0.0.0-10898-g8ddae8bf4)
