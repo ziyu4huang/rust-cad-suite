@@ -163,6 +163,15 @@ ir_converter+codegen_main: 0.83s**; output byte-matches the CI snapshot
 modulo the two documented normalizations (timescale inject,
 always_ff->always).
 
+### OrbStack (also measured 2026-10-26)
+
+`brew install --cask orbstack` (170s) + first launch ~15s. Same Rosetta
+amd64 recipe via the docker CLI (`docker run --platform linux/amd64 ...`):
+cold pull+boot+ir_converter **5.3s**, warm codegen **0.33s**, output
+byte-matches the snapshot. Faster than Apple container on both cold and
+warm; RSS measured ~1.5 GB right after a container run (the advertised
+50-200 MB idle reclaim was not measured over time).
+
 ### Alternatives (recorded, not chosen)
 
 - **OrbStack** — mature, lowest idle footprint (~50-200 MB), full Docker
