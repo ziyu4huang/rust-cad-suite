@@ -25,6 +25,18 @@ async-fn 語法糖形態按 PLAN §3)。生成碼依賴 runtime 面等同 verila
   $display 看到 NBA 前值的語義保持);
 - #delay = `rt.advance(ticks)`:時間推進 + NBA 套用。
 
+## 2.5 slice-2(2026-10-26 同日落地)
+
+多進程=嵌入式排程器(ADR-0001 縮影):線程=狀態機(match 段),掛起僅
+Delay(#0→inactive 區,#n→wheel);run_all=active FIFO(宣告序)→inactive
+區→NBA 批次→wheel 推進(新時間的延遲 NBA 先於被喚醒線程提交;kernel
+run-loop 序)。線程函數回 `Result<Susp,_>`(運行錯誤=exit 1 對齊 kernel)。
+**實錄兩刀**:①Delay 被切進下一段開頭→上一段誤回 Done、線程死在第一個 #
+(修=Delay 終結所屬段);②賦值未按宣告寬截斷→1-bit reg 被 64-bit const 蓋寬、
+%b 打出原始寬(修=rt.store/nba 攜寬,Limbs::padded+pack,即 kernel 提交
+同款)。覆蓋 4→16 案例(含 32_proc_order=process 序釘子、49_multi_initial、
+34_cmp_signed_mixed),全部 byte-exact。
+
 ## 3. 子集邊界與硬錯
 
 子集外一律 `error: --gen-rust: <構造> not supported yet (milestone M9)`

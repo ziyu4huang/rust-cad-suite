@@ -24,6 +24,9 @@ const CASES: &[&str] = &[
     "46_signed_shift",
     "47_concat_nest",
     "60_wide_values",
+    "32_proc_order",
+    "49_multi_initial",
+    "34_cmp_signed_mixed",
 ];
 
 fn root() -> PathBuf {
@@ -107,12 +110,30 @@ fn gen_rust_roundtrip_on_subset() {
     // The subset is pinned: slice-1 must cover at least the pure-main
     // cases; widen as slices land (regress-visible counter).
     eprintln!("in-subset cases: {in_subset:?}");
-    // Pinned coverage = the slice-1 subset (single straight-line initial
-    // thread). Widen the list as slices land; regress-visible.
+    // Pinned coverage = the ADR-0002 slice-2 subset (N initial threads,
+    // straight-line segments, Delay suspension, delayed NBAs). Widen as
+    // slices land; regress-visible.
     assert_eq!(
         in_subset,
-        ["02_div_mod_signed", "10_literals", "11_display_formats", "45_display_esc"],
-        "slice-1 subset coverage changed"
+        [
+            "02_div_mod_signed",
+            "03_pow_shifts",
+            "04_bitwise_reduce",
+            "05_logical_cmp",
+            "06_case_identity",
+            "07_ternary",
+            "10_literals",
+            "11_display_formats",
+            "12_signed_ops",
+            "31_wide64",
+            "45_display_esc",
+            "46_signed_shift",
+            "47_concat_nest",
+            "32_proc_order",
+            "49_multi_initial",
+            "34_cmp_signed_mixed",
+        ],
+        "slice-2 subset coverage changed"
     );
     assert!(
         failures.is_empty(),
