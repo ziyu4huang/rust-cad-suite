@@ -96,3 +96,50 @@ jobs:
         with:
           name: xls-generated
           path: artifact/
+
+  # In-tree gate (ADR-0009 XLS arc, the "本機沒有 Bazel" residual): overlay
+  # the rverilator_simulator subclass into a real google/xls checkout at the
+  # harvested tag and BUILD it with Bazel — proves headers, deps, and the
+  # layering_check/parse_headers features against the actual upstream tree,
+  # which the macOS dev box cannot do (XLS release is linux-x64 only; this
+  # gate exists ONLY here). v1 = the library target itself (self-contained
+  # deps); registration into //xls/simulation:verilog_simulators and a live
+  # simulator run land with the upstream PR.
+  in-tree:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Capture XLS release tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG=$(gh release view --repo google/xls --json tagName --jq .tagName)
+          test -n "$TAG"
+          echo "XLS_TAG=$TAG" >> "$GITHUB_ENV"
+
+      - name: Install bazelisk
+        run: |
+          curl -L -o /usr/local/bin/bazel             https://github.com/bazelbuild/bazelisk/releases/latest/download/bazelisk-linux-amd64
+          chmod +x /usr/local/bin/bazel
+
+      - name: Clone google/xls at the harvested tag
+        run: |
+          git clone --depth 1 --branch "$XLS_TAG"             https://github.com/google/xls.git "$HOME/xls"
+          echo "XLS_TREE=$HOME/xls" >> "$GITHUB_ENV"
+
+      - name: Overlay the subclass
+        run: |
+          DST="$XLS_TREE/xls/simulation/simulators"
+          mkdir -p "$DST"
+          cp crates/rv-xls-sim/cpp/xls/simulation/simulators/* "$DST/"
+          ls -la "$DST"
+
+      - name: Bazel build the subclass target
+        working-directory: ${{ env.XLS_TREE }}
+        run: |
+          bazel build //xls/simulation/simulators:rverilator_simulator 2>&1 | tail -30
+          test -f bazel-bin/xls/simulation/simulators/librverilator_simulator.a \
+            || { echo "expected build output missing"; exit 1; }
