@@ -24,6 +24,10 @@ pub struct RunOutcome {
     pub output: String,
     /// 0 = clean stop ($finish or event exhaustion); 1 = runtime error.
     pub exit: i32,
+    /// True when the run reached a finished checkpoint (finish/stop/error/
+    /// event exhaustion); false when a stepwise deadline stopped it early
+    /// (U-5 slice-2: the caller resumes with another run_until).
+    pub finished: bool,
 }
 
 pub mod vpi;
@@ -135,6 +139,7 @@ pub struct Kernel {
     pub vpi_hooks: vpi::VpiHooks,
     /// end_of_simulation fired once (finish checkpoints are several).
     vpi_ended: bool,
+    started: bool,
     plusargs: Vec<String>,
     /// `$monitor` request (None = never armed). `last: None` = armed, not
     /// yet displayed — the t0 arm displays on the first monitor pass.
@@ -392,6 +397,7 @@ impl Kernel {
             stop_as_finish: false,
             stop_exit: 0,
             stopped_silently: false,
+            started: false,
             vars,
             active: VecDeque::new(),
             inactive: VecDeque::new(),
@@ -515,19 +521,52 @@ impl Kernel {
 
     /// Run to completion; ready threads start in declaration order.
     pub fn run(&mut self, sink: &mut dyn DumpSink) -> RunOutcome {
-        if let Some(mut f) = self.vpi_hooks.start_of_sim.take() {
-            f(self, 0);
-            self.vpi_hooks.start_of_sim = Some(f);
+        self.run_steps(sink, None)
+    }
+
+    /// U-5 slice-2 stepwise run (ADR-0007 parity with the legacy face):
+    /// advance to absolute precision tick `t` — the slot AT `t` drains
+    /// fully (legacy run_until contract) and the state stays resumable
+    /// (deadline stop skips finish_out: no end hook, no VCD finish).
+    /// Re-entry composes: the next run_until continues from `now`.
+    pub fn run_until(
+        &mut self,
+        sink: &mut dyn DumpSink,
+        t: u64,
+    ) -> Result<RunOutcome, RunError> {
+        if t <= self.now {
+            return Err(RunError(format!(
+                "run_until deadline {t} <= current time {}",
+                self.now
+            )));
         }
+        Ok(self.run_steps(sink, Some(t)))
+    }
+
+    fn run_steps(&mut self, sink: &mut dyn DumpSink, deadline: Option<u64>) -> RunOutcome {
+        // U-5 slice-2 stepwise: a put between run calls wakes threads to
+        // Ready without a queue to land in — seed Ready threads on EVERY
+        // entry (the slot-settled invariant means the queue was empty at
+        // the previous return, so this can't double-queue a thread).
         for ti in 0..self.threads.len() {
             if matches!(self.threads[ti].status, Status::Ready) {
                 self.active.push_back(ti);
             }
         }
-        // Gates evaluate once at t0 (iverilog semantics): output deltas
-        // schedule through the inertial wheel like any input change.
-        for gi in 0..self.d.gates.len() {
-            self.eval_gate(gi);
+        // The start hook and the t0 gate sweep run exactly once across
+        // resume boundaries (stepwise or not).
+        if !self.started {
+            self.started = true;
+            if let Some(mut f) = self.vpi_hooks.start_of_sim.take() {
+                f(self, 0);
+                self.vpi_hooks.start_of_sim = Some(f);
+            }
+            // Gates evaluate once at t0 (iverilog semantics): output
+            // deltas schedule through the inertial wheel like any input
+            // change.
+            for gi in 0..self.d.gates.len() {
+                self.eval_gate(gi);
+            }
         }
         // Main slot loop (design §4).
         loop {
@@ -622,8 +661,33 @@ impl Kernel {
                 .flatten()
                 .min()
             else {
+                if let Some(t) = deadline {
+                    if t > self.now {
+                        // Stepwise deadline with an externally-driven clock
+                        // (no future events scheduled): the deadline IS the
+                        // schedule point — advance `now` to it and hand the
+                        // state back to the caller (spec layer's lockstep
+                        // halves; legacy sched_loop did the same).
+                        self.now = t;
+                        return RunOutcome {
+                            output: std::mem::take(&mut self.out),
+                            exit: 0,
+                            finished: false,
+                        };
+                    }
+                }
                 break; // no more events: natural stop (exit 0)
             };
+            if deadline.is_some_and(|t| at > t) {
+                // U-5 slice-2: the slot at the deadline drained; stop BEFORE
+                // advancing past it. No finish_out — the stepwise caller
+                // resumes (finished=false, exit=0, output handed over).
+                return RunOutcome {
+                    output: std::mem::take(&mut self.out),
+                    exit: 0,
+                    finished: false,
+                };
+            }
             self.now = at;
             // U-4: time-wheel advance fires the embedder's AfterDelay
             // timers (before the slots at this time execute).
@@ -695,6 +759,7 @@ impl Kernel {
                 return RunOutcome {
                     output: std::mem::take(&mut self.out),
                     exit,
+                    finished: true,
                 };
             }
             let file = self
@@ -715,6 +780,7 @@ impl Kernel {
         RunOutcome {
             output: std::mem::take(&mut self.out),
             exit,
+            finished: true,
         }
     }
 

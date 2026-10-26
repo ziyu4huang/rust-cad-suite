@@ -25,7 +25,7 @@ impl BusDriver {
     /// slave against the bus edges, drive the bus levels and the command
     /// port back into the DUT. Takes (sim, sigs) directly so the harness
     /// driver closure can pass them through.
-    pub fn drive(&mut self, sim: &mut vl_sim::interp::Sim, sigs: &vl_spec::Signals, input: &CmdInput) {
+    pub fn drive(&mut self, sim: &mut vl_sim::USim, sigs: &vl_spec::Signals, input: &CmdInput) {
         let g = |id: SignalId| -> u8 { sigs.u64(sim, id).unwrap_or(0) as u8 };
         let view = MasterView {
             scl_o: g(self.scl_o),
@@ -47,7 +47,7 @@ impl BusDriver {
     /// Recompute the bus levels from the CURRENT DUT outputs without
     /// stepping the slave (used post-half so per-cycle invariants see the
     /// bus as of the real SCL/SDA edges, not one clk stale).
-    pub fn refresh(&mut self, sim: &mut vl_sim::interp::Sim, sigs: &vl_spec::Signals) {
+    pub fn refresh(&mut self, sim: &mut vl_sim::USim, sigs: &vl_spec::Signals) {
         let g = |id: SignalId| -> u8 { sigs.u64(sim, id).unwrap_or(0) as u8 };
         let view = MasterView {
             scl_o: g(self.scl_o),

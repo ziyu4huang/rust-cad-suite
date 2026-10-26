@@ -53,6 +53,14 @@ impl Kernel {
     /// put_value via VPI during a run is a testbench-side force — the
     /// legacy face has the same asymmetry, REGISTRY rivD note pending).
     pub fn vpi_write_var(&mut self, var: u32, v: vl_values::Bits) -> Result<(), String> {
+        // Truncate/pad to the declared width (legacy vpi_write_bits
+        // parity: a put carries the caller's width; storage is the
+        // declared one — a 64-bit put onto a 1-bit reg must land as 1
+        // bit, or the design's `if (we)` sees a width-64 value).
+        let width = self.vpi_var_width(var).unwrap_or(v.width);
+        let v = vl_values::Limbs::padded(&v, width)
+            .pack(width)
+            .map_err(|e| e.0)?;
         let mut sink = NoopDump;
         self.store_var_raw(var, v, &mut sink)
             .map_err(|e| e.0)

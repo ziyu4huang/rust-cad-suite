@@ -118,7 +118,7 @@ fn i2c_rd_shift_minimal_harness() {
 
     let mut t = sim.now_ticks();
     let mut cyc = |sigs: &mut Signals,
-                   sim: &mut vl_sim::interp::Sim,
+                   sim: &mut vl_sim::USim,
                    t: &mut u64,
                    we_v: u8,
                    cmd_v: u8,
@@ -135,7 +135,7 @@ fn i2c_rd_shift_minimal_harness() {
         sim.run_until(*t).expect("negedge");
         if dbg {
             cycle_no += 1;
-            let g = |sigs: &Signals, sim: &vl_sim::interp::Sim, id: &Option<vl_spec::SignalId>| {
+            let g = |sigs: &Signals, sim: &vl_sim::USim, id: &Option<vl_spec::SignalId>| {
                 id.and_then(|i| sigs.u64(sim, i).ok()).unwrap_or(u64::MAX)
             };
             eprintln!(

@@ -25,6 +25,15 @@ fn err(m: impl Into<String>) -> SimError {
     SimError::new(m.into(), None)
 }
 
+/// Stepwise run result (ADR-0007): `Finished` = the simulation reached a
+/// finished checkpoint (further run_until calls are pointless);
+/// `Running` = the deadline stopped the run, state stays resumable.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RunEnd {
+    Finished,
+    Running,
+}
+
 /// VCD capture over the vl-vcd writer (single core, ADR-0004): the scope
 /// tree from the design's dotted var paths (rivvp's sink shape, moved
 /// here so every facade shares one implementation).
@@ -173,9 +182,12 @@ impl USim {
         // registered exclusions — array words are the R7 face's slice).
         // Kernel VarId = declaration order of the full var list; the VCD
         // filter is order-preserving, so indices map back 1:1.
-        let mut rows: Vec<(String, vpi::CellKind)> = Vec::new();
-        let mut vpi_vars: Vec<u32> = Vec::new();
-        let mut handle_of: HashMap<u32, u32> = HashMap::new();
+        // Rows carry their var id; VpiState::build SORTS BY NAME, so the
+        // table index → VarId maps must be derived from the sorted order
+        // (measured: declaration-order mapping landed puts on the wrong
+        // vars — prescale hit cnt, clk hit scl_i — and the spec FSM never
+        // saw an edge).
+        let mut rows: Vec<(String, vpi::CellKind, u32)> = Vec::new();
         for (i, v) in rc.vars.iter().enumerate() {
             if v.kind == riv_ir::VarKind::Event || v.kind == riv_ir::VarKind::Array {
                 continue;
@@ -184,11 +196,19 @@ impl USim {
                 riv_ir::VarKind::Reg => vpi::CellKind::Reg,
                 _ => vpi::CellKind::Net,
             };
-            rows.push((v.name.clone(), kind));
-            handle_of.insert(i as u32, vpi_vars.len() as u32);
-            vpi_vars.push(i as u32);
+            rows.push((v.name.clone(), kind, i as u32));
         }
-        let st = vpi::VpiState::build(rows);
+        // Pre-sort exactly as VpiState::build will (name order, dedup) so
+        // the table index → VarId maps are derived from the frozen order.
+        rows.sort_by(|a, b| a.0.cmp(&b.0));
+        rows.dedup_by(|a, b| a.0 == b.0);
+        let st = vpi::VpiState::build(rows.iter().map(|(n, k, _)| (n.clone(), *k)).collect());
+        let mut vpi_vars: Vec<u32> = Vec::new();
+        let mut handle_of: HashMap<u32, u32> = HashMap::new();
+        for (table_idx, (_, _, var_id)) in rows.iter().enumerate() {
+            vpi_vars.push(*var_id);
+            handle_of.insert(*var_id, table_idx as u32);
+        }
         let vpi_names: Vec<String> = st.table.iter().map(|m| m.name.clone()).collect();
         Ok(USim {
             kernel,
@@ -230,6 +250,29 @@ impl USim {
         Ok(())
     }
 
+    /// U-5 slice-2 stepwise run (ADR-0007 parity): advance to absolute
+    /// precision tick `t` — the slot AT `t` drains fully before returning
+    /// (legacy run_until contract; same-slot display-vs-NBA ambiguity
+    /// excluded by construction). `Running` leaves the state resumable.
+    pub fn run_until(&mut self, t: u64) -> SResult<RunEnd> {
+        self.kernel.stop_as_finish = self.finish_requested;
+        self.install_hooks();
+        let outcome = self
+            .kernel
+            .run_until(&mut self.sink, t)
+            .map_err(|e| err(e.0))?;
+        self.output.push_str(&outcome.output);
+        if outcome.finished {
+            self.sink.finish();
+            if let Some(e) = self.vpi_error.borrow_mut().take() {
+                return Err(err(e));
+            }
+            Ok(RunEnd::Finished)
+        } else {
+            Ok(RunEnd::Running)
+        }
+    }
+
     /// Design stdout (without the iverilog-shaped finish banner — the
     /// kernel's rivD8 line is suppressed for this face; the goldens never
     /// carried it).
@@ -240,7 +283,15 @@ impl USim {
     /// `(dump_path, vcd_text)` when `$dumpvars` opened a dump; `None` when
     /// not or already taken (legacy take semantics).
     pub fn take_vcd(&mut self) -> Option<(Option<String>, String)> {
-        if self.vcd_taken || !self.sink.opened || self.sink.text.is_empty() {
+        if self.vcd_taken || !self.sink.opened {
+            return None;
+        }
+        // U-5 slice-2: on the stepwise path the writer may still be open
+        // (run_until(Running) never reaches sink.finish) — taking the VCD
+        // IS the end-of-dump (legacy take semantics; the scenario pin
+        // calls take_vcd before finish for exactly this).
+        self.sink.finish();
+        if self.sink.text.is_empty() {
             return None;
         }
         self.vcd_taken = true;

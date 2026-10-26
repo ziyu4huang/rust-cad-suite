@@ -21,8 +21,13 @@
 pub mod report;
 
 use std::collections::HashMap;
-use vl_sim::interp::{RunEnd, Sim};
-use vl_sim::vpi::{Format, VpiHandle, VpiValue};
+use vl_sim::backend::RunEnd;
+use vl_sim::USim;
+use vl_sim::vpi::VpiHandle;
+
+/// U-5 slice-2 (ADR-0009): the spec layer mounts the unified engine —
+/// the segments interpreter is no longer referenced from any face.
+pub type Sim = USim;
 
 pub use report::{SpecReport, SpecViolation, ViolationKind};
 
@@ -64,7 +69,21 @@ pub fn build_sim(files: &[(&str, &str)], top: &str) -> Result<Sim, SpecError> {
         rcs_diag::render_diags(&mut text, &sm, &diags.diags);
         return Err(SpecError(format!("parse errors:\n{text}")));
     }
-    vl_sim::Sim::build(&modules, top, timescale.as_deref())
+    // Per-file sticky timescales (the unified engine's file list); spec
+    // sources are in-memory, so each file's `timescale comes from its own
+    // text (the difftest harness rule).
+    let ts_files: Vec<(String, Option<String>)> = files
+        .iter()
+        .map(|(name, src)| {
+            let ts = src.lines().find_map(|l| {
+                let l = l.trim_start();
+                l.strip_prefix("`timescale")
+                    .map(|r| r.trim().trim_end_matches(';').to_string())
+            });
+            (name.to_string(), ts)
+        })
+        .collect();
+    vl_sim::USim::build(&modules, top, timescale.as_deref(), &sm, &ts_files)
         .map_err(|e| SpecError(format!("elaborate: {}", e.message)))
 }
 
@@ -92,18 +111,15 @@ impl Signals {
     }
 
     pub fn u64(&self, sim: &Sim, id: SignalId) -> Result<u64, SpecError> {
-        match sim.vpi_get_as(self.handles[id.0], Format::Int)? {
-            VpiValue::Int(v) => Ok(v as u64),
-            VpiValue::Vector(b) => Ok(b.to_u128_lossy() as u64),
-            other => Err(SpecError(format!("signal `{}`: {other:?} is not integral", self.names[id.0]))),
-        }
+        // Legacy Format::Int parity on the unified value face: x/z
+        // refuses, signed sign-extends (USim::vpi_get_int).
+        let v = sim.vpi_get_int(self.handles[id.0])?;
+        Ok(v as u64)
     }
 
     pub fn bits(&self, sim: &Sim, id: SignalId) -> Result<vl_sim::value::Bits, SpecError> {
-        match sim.vpi_get_as(self.handles[id.0], Format::Vector)? {
-            VpiValue::Vector(b) => Ok(b),
-            other => Err(SpecError(format!("signal `{}`: {other:?} is not a vector", self.names[id.0]))),
-        }
+        sim.vpi_bits(self.handles[id.0])
+            .map_err(SpecError::from)
     }
 
     pub fn name(&self, id: SignalId) -> &str {
@@ -114,7 +130,11 @@ impl Signals {
     /// settles combinational logic immediately but never runs processes —
     /// pair it with a harness cycle/run_until).
     pub fn put_int(&self, sim: &mut Sim, id: SignalId, v: i64) -> Result<(), SpecError> {
-        sim.vpi_put_value(self.handles[id.0], VpiValue::Int(v))
+        // Legacy put-Int parity: a 64-bit raw lands in kernel storage and
+        // is projected/truncated to the declared width by the funnel.
+        let bits = vl_sim::value::Bits::from_u64(64, v as u64)
+            .map_err(|e| SpecError(format!("put {}: {e}", self.names[id.0])))?;
+        sim.vpi_put_bits(self.handles[id.0], &bits)
             .map_err(|e| SpecError(format!("put {}: {}", self.names[id.0], e.message)))
     }
 }
@@ -269,8 +289,10 @@ impl<M: GoldenModel> LockstepSpec<M> {
 
     fn put_clk(&mut self, v: i64) -> Result<(), SpecError> {
         let h = self.sigs.handles[self.clk.0];
+        let bits = vl_sim::value::Bits::from_u64(64, v as u64)
+            .map_err(|e| SpecError(format!("clk put: {e}")))?;
         self.sim
-            .vpi_put_value(h, VpiValue::Int(v))
+            .vpi_put_bits(h, &bits)
             .map_err(|e| SpecError(format!("clk put: {}", e.message)))?;
         Ok(())
     }

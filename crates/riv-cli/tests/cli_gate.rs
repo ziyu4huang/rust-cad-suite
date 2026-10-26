@@ -149,7 +149,7 @@ fn synthesis_target_is_pointer_hard_error() {
 /// (measured: one stderr line, default top, exit follows the compile).
 #[test]
 fn top_selection_p_falls_back_non_fatal() {
-    let work = std::env::temp_dir().join("riv-cli-gate-ptop");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-ptop", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(
@@ -182,7 +182,7 @@ fn top_selection_p_falls_back_non_fatal() {
 /// option-looking lines are a parse failure (measured shapes).
 #[test]
 fn cmd_file_grammar_matches_oracle() {
-    let work = std::env::temp_dir().join("riv-cli-gate-cmdfile");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-cmdfile", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(
@@ -226,9 +226,9 @@ fn cmd_file_grammar_matches_oracle() {
 /// exit 255 (rivD13 flipped to ALIGNED; ENOENT/EACCES/EISDIR measured).
 #[test]
 fn output_write_failure_is_exit_255() {
-    let (_, se, rc) = run("riverilog", &["-o", "/nope_dir/x.vvp", "-t", "null"]);
+    let (_, _se, rc) = run("riverilog", &["-o", "/nope_dir/x.vvp", "-t", "null"]);
     assert_eq!(rc, 1, "-t null writes nothing, so the path is never touched");
-    let work = std::env::temp_dir().join("riv-cli-gate-o255");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-o255", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(
@@ -251,7 +251,7 @@ fn output_write_failure_is_exit_255() {
 /// no diagnostics); without -i the hard error stands.
 #[test]
 fn ignore_missing_instances_is_real() {
-    let work = std::env::temp_dir().join("riv-cli-gate-i");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-i", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(work.join("top.v"), "module top; sub u1(); endmodule\n").unwrap();
@@ -277,7 +277,7 @@ fn ignore_missing_instances_is_real() {
 /// (measured rule, n=3 oracle probes).
 #[test]
 fn depfile_lists_sources_plus_doubled_libs() {
-    let work = std::env::temp_dir().join("riv-cli-gate-mdep");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-mdep", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(work.join("lib")).unwrap();
     std::fs::write(work.join("top.v"), "module top; sub u1(); endmodule\n").unwrap();
@@ -323,7 +323,7 @@ fn pp_class_errors_are_exit_1() {
 /// parse-class errors stay exit 2, independent of the pp class.
 #[test]
 fn parse_class_errors_are_exit_2() {
-    let work = std::env::temp_dir().join("riv-cli-gate-parse");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-parse", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(work.join("bad.v"), "module bad;\nendmodule m typos;)\n").unwrap();
@@ -343,7 +343,7 @@ fn parse_class_errors_are_exit_2() {
 /// (exit 2, same as without -t).
 #[test]
 fn null_target_compiles_without_output() {
-    let work = std::env::temp_dir().join("riv-cli-gate-null");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-null", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(work.join("tb.v"), "module tb; initial $display(\"hi\"); endmodule\n").unwrap();
@@ -375,7 +375,7 @@ fn null_target_compiles_without_output() {
 /// default, `-o file` to that file, `-o -` to stdout.
 #[test]
 fn e_mode_routes_preprocessed_output() {
-    let work = std::env::temp_dir().join("riv-cli-gate-e");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-e", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(work.join("tb.v"), "module tb; initial $display(1); endmodule\n").unwrap();
@@ -425,7 +425,7 @@ fn define_both_shapes_reach_the_design() {
         ("d-attached", vec!["-DW=8"]),
         ("d-separate", vec!["-D", "W=8"]),
     ] {
-        let work = std::env::temp_dir().join(format!("riv-cli-gate-{tag}"));
+        let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-{tag}", std::process::id()));
         let _ = std::fs::remove_dir_all(&work);
         std::fs::create_dir_all(&work).unwrap();
         std::fs::write(
@@ -455,7 +455,7 @@ fn define_both_shapes_reach_the_design() {
 /// is a registered policy divergence, not a parity claim.
 #[test]
 fn output_dash_on_compile_target_is_refused() {
-    let work = std::env::temp_dir().join("riv-cli-gate-odash");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-odash", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(work.join("tb.v"), "module tb; initial $display(1); endmodule\n").unwrap();
@@ -479,7 +479,7 @@ fn output_dash_on_compile_target_is_refused() {
 #[test]
 fn y_search_transitive_byte_matches_oracle() {
     let case = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("goldens/y-flow");
-    let work = std::env::temp_dir().join("riv-cli-gate-yflow");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-yflow", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     for f in ["tb.v", "libdir/mid.v", "libdir/leaf.v"] {
@@ -511,7 +511,7 @@ fn y_search_transitive_byte_matches_oracle() {
 #[test]
 fn y_cap_y_suffix_form_works() {
     let case = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("goldens/y-flow");
-    let work = std::env::temp_dir().join("riv-cli-gate-yflowva");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-yflowva", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::copy(case.join("tb.v"), work.join("tb.v")).unwrap();
@@ -542,7 +542,7 @@ fn y_cap_y_suffix_form_works() {
 #[test]
 fn missing_module_after_y_scan_is_exit_2() {
     let case = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("goldens/y-flow");
-    let work = std::env::temp_dir().join("riv-cli-gate-ymiss");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-ymiss", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     for f in ["tb.v", "libdir/mid.v", "libdir/leaf.v"] {
@@ -645,7 +645,7 @@ fn vvp_contracts() {
 
 /// Compile a source string in a fresh work dir; returns (work, exit).
 fn compile_src(tag: &str, src: &str) -> (std::path::PathBuf, i32) {
-    let work = std::env::temp_dir().join(format!("riv-cli-gate-{tag}"));
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-{tag}", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(work.join("tb.v"), src).unwrap();
@@ -734,14 +734,13 @@ fn rivvp_dash_l_mirrors_stdout() {
 
 /// -l - (rivD14 settled, U-3b): stderr receives a full copy of the stdout
 /// content, no `-` file is created, and the run completes normally.
-#[test]
 /// U-3b `-T` selection semantics, oracle-measured (iverilog 13.0): an
 /// `and #(2:3:4)` gate drives at min/typ/max under -T; the default is typ
 /// WITH one "Choosing typ expression." stderr line; an explicit -Ttyp
 /// (like -Tmin/-Tmax) suppresses it.
 #[test]
 fn timescale_selection_picks_from_min_typ_max() {
-    let work = std::env::temp_dir().join("riv-cli-gate-tsel");
+    let work = std::env::temp_dir().join(format!("riv-cli-gate-{}-tsel", std::process::id()));
     let _ = std::fs::remove_dir_all(&work);
     std::fs::create_dir_all(&work).unwrap();
     std::fs::write(
@@ -797,6 +796,7 @@ fn timescale_selection_picks_from_min_typ_max() {
     assert!(run("3"));
 }
 
+#[test]
 fn rivvp_dash_l_dash_mirrors_streams() {
     let (work, _) = compile_src("vp-ldash", DUMP_TB);
     let (so, se, rc) = vp_run(&work, &["-l", "-", "out.riv"]);
