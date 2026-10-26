@@ -144,5 +144,6 @@ jobs:
         working-directory: ${{ env.XLS_TREE }}
         run: |
           bazel build //xls/simulation/simulators:rverilator_simulator 2>&1 | tail -30
-          test -f bazel-bin/xls/simulation/simulators/librverilator_simulator.a \
-            || { echo "expected build output missing"; exit 1; }
+          # First real in-tree build measured the output name: .lo (pic
+          # object), not .a — accept any librverilator_simulator artifact.
+          ls bazel-bin/xls/simulation/simulators/ | grep librverilator_simulator
