@@ -30,17 +30,27 @@ pub fn gen(d: &Design) -> Result<String, String> {
         return Err(err("gate primitives"));
     }
     for t in &d.threads {
-        if t.kind != ThreadKind::Initial || !t.sens.is_empty() {
+        // Slice-3: edge-triggered always threads join (static sensitivity,
+        // armed before first execution, whole-body re-arm); the body loops
+        // via a trailing Jump to the top (the always semantics) and
+        // suspends on Delay/WaitEdge. Pure-level threads (@* /
+        // ContAssign) stay out — the level-wait arm is a later slice.
+        let edge_sens = !t.sens.is_empty()
+            && t.sens.iter().all(|it| it.edge != riv_ir::EdgeKind::Any);
+        if (t.kind != ThreadKind::Initial && t.kind != ThreadKind::Always)
+            || t.sens.iter().any(|it| it.edge == riv_ir::EdgeKind::Any)
+        {
             return Err(err("non-initial threads"));
         }
-        // Suspension whitelist for the segment scheduler: Delay only.
+        if !t.sens.is_empty() && !edge_sens {
+            return Err(err("level-sensitive threads"));
+        }
+        // Suspension whitelist for the segment scheduler: Delay/WaitEdge.
         for op in &t.body {
-            if let Op::WaitEdge { .. }
-            | Op::Fork { .. }
+            if let Op::Fork { .. }
             | Op::JoinDone
             | Op::JoinPoint
             | Op::Branch { .. }
-            | Op::Jump { .. }
             | Op::Call { .. }
             | Op::LoadElem { .. }
             | Op::LoadPartDyn { .. }
@@ -115,12 +125,58 @@ impl<'a> Gen<'a> {
             ));
         }
         self.out.push_str(&format!(
-            "    let mut rt = Rt::new({:?});\n",
-            d.meta.timescale
+            "    let mut rt = Rt::new({:?}, vec![{}]);\n",
+            d.meta.timescale,
+            d.threads
+                .iter()
+                .map(|t| {
+                    let items = t
+                        .sens
+                        .iter()
+                        .map(|it| {
+                            let e = match it.edge {
+                                riv_ir::EdgeKind::Pos => 0u8,
+                                riv_ir::EdgeKind::Neg => 1u8,
+                                riv_ir::EdgeKind::Any => 2u8,
+                            };
+                            format!("({}, {e})", it.var)
+                        })
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    format!("vec![{items}]")
+                })
+                .collect::<Vec<_>>()
+                .join(", ")
         ));
         self.out.push_str(&format!(
             "    let threads: [ThreadFn; {n}] = [{}];\n",
             (0..n).map(|i| format!("t{i}")).collect::<Vec<_>>().join(", ")
+        ));
+        // Static sensitivity of the edge-triggered always threads: armed
+        // BEFORE first execution (kernel construction rule); items are
+        // (var, edge) with edge 0=pos 1=neg (Any stays out of the subset).
+        self.out.push_str(&format!(
+            "    const SENS: [&[(u32, u8)]; {n}] = [{}];\n",
+            d.threads
+                .iter()
+                .map(|t| {
+                    let items = t
+                        .sens
+                        .iter()
+                        .map(|it| {
+                            let e = match it.edge {
+                                riv_ir::EdgeKind::Pos => 0u8,
+                                riv_ir::EdgeKind::Neg => 1u8,
+                                riv_ir::EdgeKind::Any => 2u8,
+                            };
+                            format!("({}, {e})", it.var)
+                        })
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    format!("&[{items}]")
+                })
+                .collect::<Vec<_>>()
+                .join(", ")
         ));
         self.out.push_str("    rt.run_all(&mut vars, &mut slot_frames, &threads);\n");
         self.out.push_str("    rt.flush(&mut vars);\n    Ok(())\n}\n\n");
@@ -133,16 +189,15 @@ impl<'a> Gen<'a> {
         self.out.push_str(&format!(
             "fn t{ti}(rt: &mut Rt, vars: &mut Vec<Bits>, slots: &mut Vec<Bits>, st: &mut u32) -> Result<Susp, Box<dyn std::error::Error>> {{\n    loop {{\n        match *st {{\n"
         ));
-        // Split the body into segments at Delay ops.
+        // Split the body into segments at Delay AND WaitEdge ops (the
+        // two suspension kinds of the slice-3 subset).
         let mut segments: Vec<Vec<&Op>> = vec![Vec::new()];
         for op in &t.body {
             segments.last_mut().unwrap().push(op);
-            if let Op::Delay { .. } = op {
-                // The Delay TERMINATES its segment: `let d` is emitted as
-                // the segment's last statement, then the state return
-                // routes it (measured: splitting after the delay op left
-                // the delay in the NEXT segment and the previous state
-                // returned Done — the thread died at its first #).
+            if matches!(op, Op::Delay { .. } | Op::WaitEdge { .. }) {
+                // The suspension TERMINATES its segment: measured (M9
+                // slice-2), splitting after the op left it at the START of
+                // the next segment and the previous state returned Done.
                 segments.push(Vec::new());
             }
         }
@@ -153,7 +208,31 @@ impl<'a> Gen<'a> {
         for (si, seg) in segments.iter().enumerate() {
             self.out.push_str(&format!("            {si} => {{\n"));
             let ends_with_delay = matches!(seg.last(), Some(Op::Delay { .. }));
+            let ends_with_wait = matches!(seg.last(), Some(Op::WaitEdge { .. }));
             for op in seg {
+                if let Op::WaitEdge { items } = op {
+                    // The park ADVANCES the state (kernel: a fired WaitEdge
+                    // resumes AFTER the wait — measured: without the state
+                    // bump the thread re-ran the whole body on every fire
+                    // and re-parked at the same `@(posedge)` forever).
+                    let list = items
+                        .iter()
+                        .map(|it| {
+                            let e = match it.edge {
+                                riv_ir::EdgeKind::Pos => 0u8,
+                                riv_ir::EdgeKind::Neg => 1u8,
+                                riv_ir::EdgeKind::Any => 2u8,
+                            };
+                            format!("({}, {e})", it.var)
+                        })
+                        .collect::<Vec<_>>()
+                        .join(", ");
+                    self.out.push_str(&format!(
+                        "                *st = {}; return Ok(Susp::Wait(vec![{list}]));\n",
+                        si + 1
+                    ));
+                    continue;
+                }
                 let finished = matches!(
                     op,
                     Op::SysCall { id: SysId::Finish, .. }
@@ -166,16 +245,23 @@ impl<'a> Gen<'a> {
                     break;
                 }
             }
-            if ends_with_delay {
+            if ends_with_wait {
+                // Already emitted the state-advancing Wait above.
+            } else if ends_with_delay {
                 self.out.push_str(&format!(
                     "                *st = {}; return Ok(Susp::Delay(d));\n",
                     si + 1
                 ));
             } else {
-                self.out.push_str(&format!(
-                    "                *st = {}; return Ok(Susp::Done);\n",
-                    si + 1
-                ));
+                // An edge-triggered always thread re-arms its static
+                // sensitivity when the body completes (kernel: re-arm from
+                // the top, pc=0); initials just finish.
+                let end = if t.kind == ThreadKind::Always {
+                    "Ok(Susp::Rearm)"
+                } else {
+                    "Ok(Susp::Done)"
+                };
+                self.out.push_str(&format!("                *st = {}; return {end};\n", si + 1));
             }
             self.out.push_str("            }\n");
         }
@@ -331,6 +417,12 @@ impl<'a> Gen<'a> {
                 self.out
                     .push_str(&format!("    let d = slots[{amount}].to_u128_lossy() as u64;\n"));
             }
+            Op::Jump { to: 0 } => {
+                // The always loop: re-run the whole body (re-arm happens
+                // when the thread returns Rearm at its last state).
+                self.out.push_str("                *st = 0; continue;\n");
+            }
+            Op::Jump { to } => return Err(err(&format!("jump to {to}"))),
             Op::EndThread => {}
             Op::SysCall { id, fmt, args, .. } => match id {
                 SysId::Display | SysId::Write => {
@@ -378,10 +470,11 @@ fn pieces_lit(pieces: &[FmtPiece]) -> String {
 }
 
 /// The embedded runtime: the ADR-0001 scheduler in miniature — active
-/// FIFO (declaration order) → inactive region (#0) → NBA batch → wheel
-/// advance (delayed NBAs due at the new time commit before the woken
-/// threads run; kernel run-loop order). Single-threaded host, no true
-/// concurrency (PLAN §3).
+/// FIFO (declaration order) -> inactive region (#0) -> NBA batch -> wheel
+/// advance; edge-triggered always threads arm their static sensitivity
+/// before first execution and re-arm when the body completes; commits
+/// wake waiters through the kernel's edge table. Single-threaded host,
+/// no true concurrency (PLAN §3).
 const RUNTIME: &str = r##"type ThreadFn = fn(&mut Rt, &mut Vec<Bits>, &mut Vec<Bits>, &mut u32) -> Result<Susp, Box<dyn std::error::Error>>;
 
 enum Susp {
@@ -390,39 +483,100 @@ enum Susp {
     Delay(u64),
     /// #0 yield: re-queued through the inactive region in the same slot.
     Inactive,
+    /// One-shot park on an edge wait (`@(...)` mid-body); the scheduler
+    /// arms the items and resumes the thread at the next fire.
+    Wait(Vec<(u32, u8)>),
+    /// An always thread completed its body: re-arm the static sensitivity.
+    Rearm,
     Done,
 }
 
 struct Rt {
     timescale: String,
+    /// Static sensitivity per thread (edge-triggered always).
+    sens: Vec<Vec<(u32, u8)>>,
     now: u64,
     nba: Vec<(usize, u32, Bits)>,
     nba_due: std::collections::BTreeMap<u64, Vec<(usize, u32, Bits)>>,
     out: String,
     finished: bool,
+    /// Armed always threads (static sensitivity, whole-body re-arm).
+    armed: Vec<(usize, Vec<(u32, u8)>)>,
+    /// Parked one-shot waits (initial-thread `@(...)` suspensions).
+    parked: Vec<(usize, Vec<(u32, u8)>)>,
+    /// The scheduler queue lives here so commits can wake threads.
+    active: std::collections::VecDeque<usize>,
 }
 
 impl Rt {
-    fn new(timescale: &str) -> Rt {
-        Rt {
+    fn new(timescale: &str, sens: Vec<Vec<(u32, u8)>>) -> Rt {
+        let mut rt = Rt {
             timescale: timescale.to_string(),
+            sens,
             now: 0,
             nba: Vec::new(),
             nba_due: std::collections::BTreeMap::new(),
             out: String::new(),
             finished: false,
+            armed: Vec::new(),
+            parked: Vec::new(),
+            active: std::collections::VecDeque::new(),
+        };
+        // Construction rule: edge-triggered always threads arm their
+        // static sensitivity BEFORE first execution (never run at t0).
+        for (ti, s) in rt.sens.iter().enumerate() {
+            if !s.is_empty() {
+                rt.armed.push((ti, s.clone()));
+            }
         }
+        rt
     }
-    /// Blocking write: truncate to the declared width, then project
-    /// 2-state (the storage boundary contract).
-    fn store(&self, vars: &mut Vec<Bits>, id: usize, v: Bits, width: u32) {
+    /// Arm a thread's static sensitivity (construction rule: armed before
+    /// first execution).
+    fn arm(&mut self, tid: usize) {
+        let items = self.sens[tid].clone();
+        self.armed.push((tid, items));
+    }
+    fn store(&mut self, vars: &mut Vec<Bits>, id: usize, v: Bits, width: u32) {
+        let old = vars[id].clone();
         vars[id] = vl_values::Limbs::padded(&v, width)
             .pack(width)
             .map_err(|e| e.0)
-            .unwrap_or_else(|_| vars[id].clone())
+            .unwrap_or_else(|_| old.clone())
             .to_2state()
             .map_err(|e| e.0)
-            .unwrap_or_else(|_| vars[id].clone());
+            .unwrap_or_else(|_| old.clone());
+        self.wake(id as u32, &old, &vars[id].clone());
+    }
+    /// Kernel parity: every committed change wakes matching waiters
+    /// (edge table = riv_kernel::edge_fire_pub, one source).
+    fn wake(&mut self, id: u32, old: &Bits, new: &Bits) {
+        let mut fire: Vec<usize> = Vec::new();
+        self.armed.retain(|(tid, items)| {
+            let hit = items
+                .iter()
+                .any(|(var, e)| *var == id && edge_match(old, new, *e));
+            if hit {
+                fire.push(*tid);
+            }
+            !hit
+        });
+        for tid in fire {
+            self.active.push_back(tid);
+        }
+        let mut fire: Vec<usize> = Vec::new();
+        self.parked.retain(|(tid, items)| {
+            let hit = items
+                .iter()
+                .any(|(var, e)| *var == id && edge_match(old, new, *e));
+            if hit {
+                fire.push(*tid);
+            }
+            !hit
+        });
+        for tid in fire {
+            self.active.push_back(tid);
+        }
     }
     fn nba(&mut self, id: usize, v: Bits, width: u32) {
         self.nba.push((id, width, v));
@@ -433,7 +587,10 @@ impl Rt {
         if amount == 0 {
             self.nba.push((id, width, v));
         } else {
-            self.nba_due.entry(self.now + amount).or_default().push((id, width, v));
+            self.nba_due
+                .entry(self.now + amount)
+                .or_default()
+                .push((id, width, v));
         }
     }
     fn apply_nba(&mut self, vars: &mut Vec<Bits>) {
@@ -458,12 +615,18 @@ impl Rt {
     fn run_all(&mut self, vars: &mut Vec<Bits>, slot_frames: &mut Vec<Vec<Bits>>, threads: &[ThreadFn]) {
         let n = threads.len();
         let mut states = vec![0u32; n];
-        let mut active: std::collections::VecDeque<usize> = (0..n).collect();
         let mut inactive: std::collections::VecDeque<usize> = std::collections::VecDeque::new();
         let mut wheel: std::collections::BTreeMap<u64, Vec<usize>> = std::collections::BTreeMap::new();
+        // Seed: initial threads start Ready in declaration order;
+        // edge-triggered always threads are armed (never run at t0).
+        for ti in 0..n {
+            if !self.armed.iter().any(|(t, _)| *t == ti) {
+                self.active.push_back(ti);
+            }
+        }
         loop {
             // 1. Active region: FIFO drain in declaration order.
-            while let Some(ti) = active.pop_front() {
+            while let Some(ti) = self.active.pop_front() {
                 let susp = (threads[ti])(self, vars, &mut slot_frames[ti], &mut states[ti])
                     .unwrap_or_else(|e| {
                         eprintln!("runtime error: {e}");
@@ -473,6 +636,14 @@ impl Rt {
                     Susp::Delay(t) if t == 0 => inactive.push_back(ti),
                     Susp::Delay(t) => wheel.entry(self.now + t).or_default().push(ti),
                     Susp::Inactive => inactive.push_back(ti),
+                    Susp::Wait(items) => self.parked.push((ti, items)),
+                    // Re-arm = the kernel's pc=0 reset: the next fire
+                    // re-executes the whole body (st stays if left at a
+                    // Done state would kill the thread — measured in 25).
+                    Susp::Rearm => {
+                        states[ti] = 0;
+                        self.arm(ti);
+                    }
                     Susp::Done => {}
                 }
                 if self.finished {
@@ -490,13 +661,22 @@ impl Rt {
                     Susp::Delay(t) if t == 0 => inactive.push_back(ti),
                     Susp::Delay(t) => wheel.entry(self.now + t).or_default().push(ti),
                     Susp::Inactive => inactive.push_back(ti),
+                    Susp::Wait(items) => self.parked.push((ti, items)),
+                    // Re-arm = the kernel's pc=0 reset: the next fire
+                    // re-executes the whole body (st stays if left at a
+                    // Done state would kill the thread — measured in 25).
+                    Susp::Rearm => {
+                        states[ti] = 0;
+                        self.arm(ti);
+                    }
                     Susp::Done => {}
                 }
                 if self.finished {
                     return;
                 }
             }
-            // 3. NBA batch commit (issue order, same slot).
+            // 3. NBA batch commit (issue order, same slot) — commits wake
+            // edge waiters into the active tail.
             self.apply_nba(vars);
             // 4. Wheel advance: delayed NBAs due at the new time commit
             // first, then the woken threads re-enter the active region.
@@ -510,10 +690,19 @@ impl Rt {
             self.apply_nba(vars);
             if let Some(woken) = wheel.remove(&at) {
                 for ti in woken {
-                    active.push_back(ti);
+                    self.active.push_back(ti);
                 }
             }
         }
+    }
+}
+
+/// The kernel edge table (riv_kernel::edge_fire_pub) for one bit.
+fn edge_match(old: &Bits, new: &Bits, edge: u8) -> bool {
+    match edge {
+        0 => riv_kernel::edge_fire_pub(old, new, true),
+        1 => riv_kernel::edge_fire_pub(old, new, false),
+        _ => true, // Any — out of the slice-3 sens subset, kept total
     }
 }
 "##;

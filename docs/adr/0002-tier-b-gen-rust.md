@@ -37,6 +37,18 @@ run-loop 序)。線程函數回 `Result<Susp,_>`(運行錯誤=exit 1 對齊 kern
 同款)。覆蓋 4→16 案例(含 32_proc_order=process 序釘子、49_multi_initial、
 34_cmp_signed_mixed),全部 byte-exact。
 
+## 2.7 slice-3(2026-10-26 同日落地)
+
+事件驅動:邊沿觸發 always(靜態敏感表,建構即武裝、整體重臂)+ initial 的
+`@(edge)` 掛起;喚醒=riv_kernel::edge_fire_pub 單源(第二張邊沿表=契約分叉)。
+**實錄三刀**:①Rearm 未重置 st——kernel 重臂=pc=0,留 st 會在下次觸發跑空段
+回 Done、線程永久死亡(25_edge_or hits=1 而非 3);②WaitEdge 掛起未推進
+st——每次觸發整段重跑、停在同一 @(posedge) 永久循環(23 掛死);③排程器
+佇列放 Rt 欄位(commit 的喚醒要進 active 尾)。watchdog 進閘:生成模型死循環
+=單例失敗(10s),不再吊死閘線(鐵則 4)。覆蓋 16→18(23_nba_vs_blocking=
+NBA 對 blocking 語義釘子、25_edge_or=雙邊沿 or 敏感)。剩餘阻擋普查:Branch
+(迴圈)×5、$time×2、LoadBit×2、level 線程(21)——slice-4 候選序。
+
 ## 3. 子集邊界與硬錯
 
 子集外一律 `error: --gen-rust: <構造> not supported yet (milestone M9)`

@@ -27,6 +27,18 @@ const CASES: &[&str] = &[
     "32_proc_order",
     "49_multi_initial",
     "34_cmp_signed_mixed",
+    "21_always_comb",
+    "22_counter_nba",
+    "23_nba_vs_blocking",
+    "24_clock_time",
+    "25_edge_or",
+    "26_fsm_casez",
+    "27_shift_reg",
+    "42_nba_handshake",
+    "43_counter_load",
+    "44_lfsr",
+    "48_frac_delay",
+    "50_forever_finish",
 ];
 
 fn root() -> PathBuf {
@@ -96,8 +108,40 @@ fn gen_rust_roundtrip_on_subset() {
             failures.push(format!("== {case}: rustc failed\n{}", String::from_utf8_lossy(&c.stderr)));
             continue;
         }
-        let out = Command::new(&bin).output().expect("run model");
-        let got = String::from_utf8_lossy(&out.stdout).to_string();
+        // Per-case watchdog (iron rule 4): a generated model that loops
+        // forever must fail the case, not hang the gate.
+        let mut child = Command::new(&bin)
+            .stdout(std::process::Stdio::piped())
+            .spawn()
+            .expect("run model");
+        let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
+        let mut hung = false;
+        let mut buf = Vec::new();
+        loop {
+            match child.try_wait().expect("wait") {
+                Some(st) => {
+                    let _ = st;
+                    if let Some(mut p) = child.stdout.take() {
+                        use std::io::Read;
+                        let _ = p.read_to_end(&mut buf);
+                    }
+                    break;
+                }
+                None if std::time::Instant::now() > deadline => {
+                    let _ = child.kill();
+                    let _ = child.wait();
+                    hung = true;
+                    break;
+                }
+                None => std::thread::sleep(std::time::Duration::from_millis(50)),
+            }
+        }
+        if hung {
+            failures.push(format!("== {case}: model hang (10s watchdog)"));
+            let _ = std::fs::remove_dir_all(&dir);
+            continue;
+        }
+        let got = String::from_utf8_lossy(&buf).to_string();
         let want = std::fs::read_to_string(root().join(format!("corpus/e2e/{case}/expected.stdout")))
             .unwrap_or_default();
         if got != want {
@@ -132,8 +176,10 @@ fn gen_rust_roundtrip_on_subset() {
             "32_proc_order",
             "49_multi_initial",
             "34_cmp_signed_mixed",
+            "23_nba_vs_blocking",
+            "25_edge_or",
         ],
-        "slice-2 subset coverage changed"
+        "slice-3 subset coverage changed"
     );
     assert!(
         failures.is_empty(),

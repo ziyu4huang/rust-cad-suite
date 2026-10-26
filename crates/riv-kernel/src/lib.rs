@@ -2445,6 +2445,13 @@ fn op_tag(op: &Op) -> &'static str {
 }
 
 /// IEEE 1364-2005 §9.7.2 edge tables on the LSB.
+/// M9 tier-B (ADR-0002): THE edge-classification table — the generated
+/// models' runtime wakes waiters through this same function; a second
+/// edge table in generated code would be a contract fork.
+pub fn edge_fire_pub(old: &Bits, new: &Bits, pos: bool) -> bool {
+    edge_fire(old, new, pos)
+}
+
 fn edge_fire(old: &Bits, new: &Bits, pos: bool) -> bool {
     let bit = |b: &Bits| -> (bool, bool) {
         if b.width == 0 {
