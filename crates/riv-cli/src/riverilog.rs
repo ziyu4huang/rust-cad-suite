@@ -619,7 +619,15 @@ fn compile(
             eprint!("{}", ld.render_errors());
             return Err(ld.pp_failure());
         }
-        let text = rendered.concat();
+        // Oracle-measured (-E parity gate): ivlpp -E keeps the `timescale
+        // line; our pp captures it into PpOut, so the E route re-emits the
+        // first captured directive as a prefix (sticky-first = source order
+        // for the corpus shape).
+        let mut text = String::new();
+        if let Some(ts) = ld.files.iter().find_map(|f| f.timescale.clone()) {
+            text.push_str(&format!("`timescale {ts}\n"));
+        }
+        text.push_str(&rendered.concat());
         if out_path == Path::new("-") {
             print!("{text}");
         } else if let Err(e) = std::fs::write(out_path, &text) {

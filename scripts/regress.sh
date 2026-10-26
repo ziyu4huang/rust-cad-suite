@@ -50,6 +50,39 @@ fi
 # counts and must land in the same commit as the capability change
 # (AGENTS 10.5 riv ledger row).
 if [ -f crates/riv-cli/Cargo.toml ]; then
+# -E preprocessor parity gate (U-3b, oracle-optional): for every e2e case
+# the oracle compiles, `riverilog -E` must match `iverilog -E` under the
+# measured normalization contract — strip // and /* */ comments, then
+# remove ALL whitespace (formatting is not the contract; the token/char
+# content is; string interiors survive on both sides). Underscores inside
+# based literals and string quoting ARE contract (the 31/60 probes pinned
+# them). Oracle absent = skip with a note.
+if command -v iverilog >/dev/null 2>&1 && [ -x target/debug/riverilog ]; then
+    e_out=$(python3 - <<'PYE'
+import re, subprocess, glob, os, sys
+R=os.getcwd()
+def norm(t):
+    t=re.sub(r'//[^\n]*',' ',t); t=re.sub(r'/\*.*?\*/',' ',t,flags=re.S)
+    return re.sub(r'\s+','',t)
+ok=bad=skip=0
+for tb in sorted(glob.glob(f"{R}/corpus/e2e/*/tb.v")):
+    d=os.path.dirname(tb)
+    iv=subprocess.run(["iverilog","-E","-o","-",tb],capture_output=True,text=True,timeout=30,cwd=d)
+    rv=subprocess.run([f"{R}/target/debug/riverilog","-E","-o","-",os.path.basename(tb)],capture_output=True,text=True,timeout=30,cwd=d)
+    if iv.returncode!=0:
+        skip+=1
+        continue
+    if norm(iv.stdout)!=norm(rv.stdout):
+        bad+=1
+        print("EDIFF", os.path.basename(os.path.dirname(tb)))
+    else:
+        ok+=1
+print(f"e={ok}/{ok+bad} skip={skip}")
+sys.exit(1 if bad else 0)
+PYE
+    ) || fail=1
+    echo "-E preprocessor parity: $e_out"
+fi
     ct=$(cargo test -p riv-cli 2>&1 | grep -E "^test result" | tail -1)
     echo "$ct" | grep -q "test result: ok" || { echo "GATE FAIL: riv-cli goldens: $ct"; fail=1; }
     e2e_out=$(cargo run -q -p riv-difftest -- --e2e --corpus corpus/e2e 2>&1)

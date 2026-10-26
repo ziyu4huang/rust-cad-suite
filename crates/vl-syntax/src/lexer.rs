@@ -452,7 +452,10 @@ impl<'a, 'd> Lexer<'a, 'd> {
         if self.pos == dstart {
             self.err(start, "VL-E005", "no digits in based number literal");
         }
-        text.push_str(&no_underscores(&self.src[dstart..self.pos]));
+        // Keep the source underscores in the token text — the oracle's -E
+        // preserves them (U-3b parity gate); every value parser (vl-values
+        // from_numlit) filters '_' itself, so downstream is insensitive.
+        text.push_str(&self.src[dstart..self.pos]);
         Token::new(Tok::BasedLit, self.span_from(start), text)
     }
 
@@ -677,7 +680,7 @@ mod tests {
             ("8'sh3f", "8'sh3f"),
             ("4'b01x?", "4'b01x?"),
             ("'sd15", "'sd15"),
-            ("12'hDEAD_BEEF", "12'hDEADBEEF"),
+            ("12'hDEAD_BEEF", "12'hDEAD_BEEF"),
             ("'h3x", "'h3x"),
             ("1'b1", "1'b1"),
         ] {

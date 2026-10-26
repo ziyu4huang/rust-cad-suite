@@ -59,6 +59,7 @@
 | `cargo test --test vcd_gate` | 每次提交 | 有 oracle-ref.vcd 的 case 與 oracle 逐訊號零失配 |
 | `bun crates/vl-wasm/wasm-test/vcd_parse.mjs` | regress.sh | 三面共用 reader:wasm 版 BigInt 時序/單調/終值/VL-E101 錯誤路徑 |
 | `bun crates/vl-ffi/bun-example/vcd_read.mjs` | regress.sh | agent 讀波形:FFI run→`vcd <path>` 強制 dump→rcs_vcd_parse→q 終值斷言 |
+| -E preprocessor parity(iverilog -E vs riverilog -E,oracle-optional)| regress.sh | e2e 59 例正規化同位 59/59(剝註解+移除全部空白;字符串引號、based-literal 底線=契約,31/60 探針釘死);正規化收據=RIVERILOG-PLAN §5 U-3b 第三刀 |
 | agent toolbox smoke(`scripts/rv-sim/rv-diff/rv-wave/riv-run.sh`)| regress.sh | 四支 agent 腳本各對一個入庫 golden 實跑:rv-sim=byte-exact、rv-diff=正規化 MATCH、rv-wave=SVG 帶 `<svg`、riv-run=iv 金樣 byte-exact;正典=`.agents/skills/rv-lab/SKILL.md`(agent→skill→script→CLI 層) |
 | `cargo test -p rv-xls-sim` + regress「xls adapter」 | 每次提交/交付 | 21 測(10 unit+11 contract);argv add3 byte-exact、syntax check 靜默、JSON ok、`.sv` 拒收;正典=docs/XLS-ADAPTER.md |
 | `scripts/xls_harvest_selftest.sh`(regress) | 每次交付 | manifest sha256+adapter syntax 閘、adopt 兩階段(byte-identical/idempotent/normalization/竄改全拒);無網路 |

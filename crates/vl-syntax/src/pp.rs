@@ -767,8 +767,19 @@ pub fn render_preprocessed(toks: &[Token]) -> String {
             break;
         }
         let text = match t.kind {
-            Tok::Ident | Tok::SysIdent | Tok::IntLit | Tok::RealLit | Tok::BasedLit
-            | Tok::StrLit => t.text.clone(),
+            Tok::Ident | Tok::SysIdent | Tok::IntLit | Tok::RealLit | Tok::BasedLit => {
+                t.text.clone()
+            }
+            // Strings render re-quoted (the lexer stores the unquoted,
+            // unescaped value); the oracle's -E keeps the source quoting.
+            Tok::StrLit => format!(
+                "\"{}\"",
+                t.text
+                    .replace('\\', "\\\\")
+                    .replace('"', "\\\"")
+                    .replace('\t', "\\t")
+                    .replace('\n', "\\n"),
+            ),
             Tok::Keyword(k) => k.as_str().to_string(),
             Tok::Punct(p) => p.as_str().to_string(),
             Tok::Directive(d) => {
