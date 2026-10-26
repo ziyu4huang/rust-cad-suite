@@ -1469,6 +1469,12 @@ impl Sim {
 
     fn prefix_expr(&mut self, e: &Expr, scope: &Scope) -> SResult<Expr> {
         Ok(match e {
+            Expr::Delay3 { span, .. } => {
+                return Err(SimError::at(
+                    "min:typ:max delay literal is only valid in a gate delay",
+                    *span,
+                ))
+            }
             Expr::Ident { span, name } => Expr::Ident {
                 span: *span,
                 name: self.resolve_name(name, scope).ok_or_else(|| {

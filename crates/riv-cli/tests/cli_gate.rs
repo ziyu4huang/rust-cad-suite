@@ -735,6 +735,68 @@ fn rivvp_dash_l_mirrors_stdout() {
 /// -l - (rivD14 settled, U-3b): stderr receives a full copy of the stdout
 /// content, no `-` file is created, and the run completes normally.
 #[test]
+/// U-3b `-T` selection semantics, oracle-measured (iverilog 13.0): an
+/// `and #(2:3:4)` gate drives at min/typ/max under -T; the default is typ
+/// WITH one "Choosing typ expression." stderr line; an explicit -Ttyp
+/// (like -Tmin/-Tmax) suppresses it.
+#[test]
+fn timescale_selection_picks_from_min_typ_max() {
+    let work = std::env::temp_dir().join("riv-cli-gate-tsel");
+    let _ = std::fs::remove_dir_all(&work);
+    std::fs::create_dir_all(&work).unwrap();
+    std::fs::write(
+        work.join("tb.v"),
+        concat!(
+            "`timescale 1ns/1ns\n",
+            "module tb;\n",
+            "reg a, b; wire o;\n",
+            "and #(2:3:4) g (o, a, b);\n",
+            "initial begin a=0; b=0; #1 a=1; end\n",
+            "initial $monitor(\"%0t o=%b\", $time, o);\n",
+            "initial #6 $finish;\n",
+            "endmodule\n",
+        ),
+    )
+    .unwrap();
+    let compile = |extra: &[&str]| {
+        let _ = std::fs::remove_file(work.join("t.riv"));
+        let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+            .args(extra)
+            .args(["-g2005", "-o", "t.riv", "tb.v"])
+            .current_dir(&work)
+            .output()
+            .unwrap();
+        (out.status.code(), String::from_utf8_lossy(&out.stderr).into_owned())
+    };
+    let run = |delay: &str| {
+        let out = Command::new(env!("CARGO_BIN_EXE_rivvp"))
+            .args(["t.riv"])
+            .current_dir(&work)
+            .output()
+            .unwrap();
+        let so = String::from_utf8_lossy(&out.stdout);
+        let hit = so.lines().any(|l| l.starts_with(&format!("{delay} ")));
+        hit
+    };
+    // Selection (oracle probe: o flips at 2/3/4 for min/typ/max).
+    for (flag, want) in [("-Tmin", "2"), ("-Ttyp", "3"), ("-Tmax", "4")] {
+        let (rc, se) = compile(&[flag]);
+        assert_eq!(rc, Some(0), "{flag} compile");
+        assert!(se.is_empty(), "{flag} suppresses the warning, got {se}");
+        assert!(run(want), "{flag}: o must flip at t={want}");
+    }
+    // Default: typ value + the measured warning line, exactly once.
+    let (rc, se) = compile(&[]);
+    assert_eq!(rc, Some(0));
+    let lines: Vec<&str> = se.lines().collect();
+    assert_eq!(
+        lines,
+        vec!["tb.v:4: warning: Choosing typ expression."],
+        "measured warning shape, one per site"
+    );
+    assert!(run("3"));
+}
+
 fn rivvp_dash_l_dash_mirrors_streams() {
     let (work, _) = compile_src("vp-ldash", DUMP_TB);
     let (so, se, rc) = vp_run(&work, &["-l", "-", "out.riv"]);

@@ -151,6 +151,12 @@ pub fn nat_width(e: &Expr, ctx: &mut dyn Lookup) -> SResult<u32> {
             | BinOp::Gt | BinOp::Ge | BinOp::LogAnd | BinOp::LogOr => 1,
         },
         Expr::Ternary { then, els, .. } => nat_width(then, ctx)?.max(nat_width(els, ctx)?),
+        Expr::Delay3 { span, .. } => {
+            return Err(SimError::at(
+                "min:typ:max delay literal is only valid in a gate delay",
+                *span,
+            ))
+        }
         Expr::Concat { parts, .. } => {
             let mut w = 0;
             for p in parts {
@@ -239,6 +245,7 @@ pub fn is_signed(e: &Expr, ctx: &mut dyn Lookup) -> SResult<bool> {
                 None => false,
             }
         }
+        Expr::Delay3 { .. } => false,
         Expr::Concat { .. } | Expr::Repeat { .. } | Expr::PartSelect { .. }
         | Expr::IndexedPart { .. } => false,
         Expr::Call { func, .. } => match func.as_str() {
@@ -450,6 +457,10 @@ fn eval_w(e: &Expr, ctx: &mut dyn Lookup, w: u32, signed: bool) -> SResult<Bits>
                 }
             }
         }
+        Expr::Delay3 { span, .. } => Err(SimError::at(
+            "min:typ:max delay literal is only valid in a gate delay",
+            *span,
+        )),
         Expr::Concat { span, parts } => {
             let mut bs = Vec::with_capacity(parts.len());
             for p in parts {

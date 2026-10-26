@@ -377,6 +377,12 @@ impl<'e, 'f> Lower<'e, 'f> {
                     }
                 }
             },
+            Expr::Delay3 { span, .. } => {
+                // U-3b: `a:b:c` is a delay literal — valid only in gate
+                // delay position, where lower_gate decodes it before any
+                // expression lowering happens.
+                return Err(self.err(*span, "min:typ:max delay literal is only valid in a gate delay"));
+            }
         })
     }
 
@@ -573,6 +579,10 @@ impl<'e, 'f> Lower<'e, 'f> {
                         "variable part-select bounds are illegal Verilog-2001 (use bit-select or `+:`/`-:`)",
                     )),
                 }
+            }
+            Expr::Delay3 { span, .. } => {
+                // U-3b: see natural_w — decoded in gate delay position only.
+                return Err(self.err(*span, "min:typ:max delay literal is only valid in a gate delay"));
             }
             Expr::IndexedPart { span: _, base, plus, offset, width } => {
                 let (var, _vw, _vs, _desc) = self.base_var(base)?;

@@ -489,6 +489,17 @@ pub enum Expr {
         span: Span,
         parts: Vec<Expr>,
     },
+    /// `a:b:c` min:typ:max delay triple (U-3b, measured on iverilog 13.0:
+    /// `-T` selects one value; the default is typ with a one-line
+    /// "Choosing typ expression." warning, capped at the first ten sites).
+    /// Only meaningful in gate delay position; the elaborator decodes it —
+    /// other positions treat it as a hard error.
+    Delay3 {
+        span: Span,
+        min: Box<Expr>,
+        typ: Box<Expr>,
+        max: Box<Expr>,
+    },
     Repeat {
         span: Span,
         count: Box<Expr>,
@@ -590,6 +601,7 @@ impl Expr {
             | Expr::Binary { span, .. }
             | Expr::Ternary { span, .. }
             | Expr::Concat { span, .. }
+            | Expr::Delay3 { span, .. }
             | Expr::Repeat { span, .. }
             | Expr::Index { span, .. }
             | Expr::PartSelect { span, .. }

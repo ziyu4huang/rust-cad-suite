@@ -538,7 +538,25 @@ impl<'d> Parser<'d> {
                 self.pos += 1;
                 let mut parts: Vec<Expr> = Vec::new();
                 loop {
-                    parts.push(self.expr()?);
+                    let first = self.expr()?;
+                    // `and #(2:3:4) g(...)` — min:typ:max delay triple
+                    // (U-3b): parsed as Delay3, selection happens at
+                    // elaboration (oracle-measured: -T min/typ/max picks
+                    // the value; default = typ + a capped warning).
+                    if self.at_punct(Punct::Colon) {
+                        self.pos += 1;
+                        let typ = self.expr()?;
+                        self.expect_punct(Punct::Colon, "in min:typ:max delay")?;
+                        let max = self.expr()?;
+                        parts.push(Expr::Delay3 {
+                            span: first.span().merge(max.span()),
+                            min: Box::new(first),
+                            typ: Box::new(typ),
+                            max: Box::new(max),
+                        });
+                    } else {
+                        parts.push(first);
+                    }
                     if !self.eat_punct(Punct::Comma) {
                         break;
                     }

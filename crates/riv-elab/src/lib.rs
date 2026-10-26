@@ -50,6 +50,24 @@ pub struct ElabInput<'a> {
     /// silently — oracle-measured (iverilog 13.0): exit 0, no diagnostics.
     /// Other faces keep the hard error via `ElabInput::strict`.
     pub allow_missing_instances: bool,
+    /// `-T` (U-3b, oracle-measured): selection for `a:b:c` delay literals.
+    /// None = the compiler default (typ) WITH the one-line
+    /// "Choosing typ expression." warning per site (first ten, measured);
+    /// an explicit `-T` — typ included — suppresses the warning (man page
+    /// + probe: default run warns, `-Ttyp` run does not).
+    pub delay_selection: Option<DelaySelection>,
+    /// Compile-time warnings sink (the "Choosing typ expression." lines).
+    /// None = warnings discarded (USim/wasm faces have no -T flag).
+    pub warnings: Option<&'a std::cell::RefCell<Vec<String>>>,
+}
+
+/// `-T` selection (U-3b). Measured on iverilog 13.0: `#(2:3:4)` selects
+/// 2/3/4 under min/typ/max; the default picks typ.
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum DelaySelection {
+    Min,
+    Typ,
+    Max,
 }
 
 impl<'a> ElabInput<'a> {
@@ -66,6 +84,8 @@ impl<'a> ElabInput<'a> {
             top,
             files,
             allow_missing_instances: false,
+            delay_selection: None,
+            warnings: None,
         }
     }
 }
@@ -126,6 +146,14 @@ pub struct Elab<'a> {
     /// Name-based (hierarchical) resolution chases these; op rewrites make
     /// them invisible to already-lowered code.
     pub aliases: HashMap<VarId, VarId>,
+    /// `-T` selection for `a:b:c` gate delays (U-3b).
+    pub delay_sel: DelaySelection,
+    /// True = the compiler default (no -T): selecting typ emits the
+    /// measured per-site warning; an explicit -T never warns.
+    pub delay_warn_typ: bool,
+    /// Buffered "Choosing typ expression." warnings (capped at ten,
+    /// oracle-measured cap), flushed by the CLI face.
+    pub warnings: Vec<String>,
 }
 
 impl<'a> Elab<'a> {
@@ -206,7 +234,20 @@ fn parse_timescale(ts: &str) -> Option<TsInfo> {
 }
 
 pub fn elaborate(input: ElabInput) -> Result<riv_ir::Design, ElabError> {
-    let ElabInput { modules, sm, top, files, allow_missing_instances } = input;
+    let ElabInput {
+        modules,
+        sm,
+        top,
+        files,
+        allow_missing_instances,
+        delay_selection,
+        warnings: warnings_sink,
+    } = input;
+    // The typ default warns per site (first ten, measured cap); an explicit
+    // -T — typ included — suppresses it (man page + probe: default run
+    // warns, -Ttyp run does not).
+    let delay_sel = delay_selection.unwrap_or(DelaySelection::Typ);
+    let delay_warn_typ = delay_selection.is_none();
     let top_name = match top {
         Some(t) => {
             if !modules.iter().any(|m| m.name == *t) {
@@ -307,18 +348,27 @@ pub fn elaborate(input: ElabInput) -> Result<riv_ir::Design, ElabError> {
         scopes: vec![Scope { prefix: String::new(), ..Default::default() }],
         ret_types: HashMap::new(),
         aliases: HashMap::new(),
+        delay_sel,
+        delay_warn_typ,
+        warnings: Vec::new(),
     };
-    let mut walker = Walker {
-        e: &mut elab,
-        design: &mut design,
-        per_file: &per_file,
-        top_ts: top_info,
-        modules,
-        chain: Vec::new(),
-        allow_missing: allow_missing_instances,
-    };
-    walker.walk_module(top_mod)?;
-
+    {
+        let mut walker = Walker {
+            e: &mut elab,
+            design: &mut design,
+            per_file: &per_file,
+            top_ts: top_info,
+            modules,
+            chain: Vec::new(),
+            allow_missing: allow_missing_instances,
+        };
+        walker.walk_module(top_mod)?;
+        // Flush inside the walker's borrow (the warnings buffer lives in
+        // Elab, which the walker exclusively holds).
+        if let Some(sink) = warnings_sink {
+            *sink.borrow_mut() = std::mem::take(&mut walker.e.warnings);
+        }
+    }
     Ok(design)
 }
 
@@ -1088,6 +1138,26 @@ impl<'a> Walker<'a> {
                         None => 0,
                     };
                     (r, f, t)
+                }
+                // `a:b:c` min:typ:max (U-3b): -T selects one value for all
+                // three of rise/fall/turn-off. Default = typ, with the
+                // measured one-line warning per site, capped at ten.
+                Expr::Delay3 { min, typ, max, span } => {
+                    let v = match self.e.delay_sel {
+                        DelaySelection::Min => lit_ticks(min)?,
+                        DelaySelection::Typ => {
+                            if self.e.delay_warn_typ && self.e.warnings.len() < 10 {
+                                self.e.warnings.push(format!(
+                                    "{}:{}: warning: Choosing typ expression.",
+                                    file,
+                                    self.line_of(*span),
+                                ));
+                            }
+                            lit_ticks(typ)?
+                        }
+                        DelaySelection::Max => lit_ticks(max)?,
+                    };
+                    (v, v, v)
                 }
                 other => {
                     let v = lit_ticks(other)?;

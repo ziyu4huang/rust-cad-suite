@@ -2160,15 +2160,24 @@ impl Kernel {
                     .iter()
                     .map(|a| self.slot(req.thread, a.slot).cloned())
                     .collect::<Result<_, _>>()?;
+                // Change detection EXCLUDES time arguments — oracle-measured
+                // (iverilog 13.0, U-3b probe): `$monitor("%0t o=%b", $time, o)`
+                // prints only at t0 and when `o` itself changes; $time moving
+                // alone (or unrelated var events) does not re-fire.
+                let watched: Vec<Bits> = vals
+                    .iter()
+                    .zip(req.args.iter())
+                    .map(|(v, a)| if a.is_time { Bits::from_u64(64, 0).unwrap() } else { v.clone() })
+                    .collect();
                 let display = match &req.last {
                     None => true, // t0 arm: first pass displays unconditionally
-                    Some(last) => last != &vals,
+                    Some(last) => last != &watched,
                 };
                 if display {
                     let text = self.render(Some(req.fmt), &req.args, req.thread)?;
                     self.out.push_str(&text);
                     self.out.push('\n');
-                    req.last = Some(vals);
+                    req.last = Some(watched);
                 }
                 self.monitor = Some(req);
             }

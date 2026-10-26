@@ -171,7 +171,7 @@ fn main() -> ExitCode {
     let mut ignore_missing = false; // -i: skip undefined instances (exit 0)
     let mut depfile: Option<String> = None; // -M <file>
     let mut ptop: Option<String> = None; // -P <name>: top hint, non-fatal if absent
-    let mut _timescale_arg: Option<String> = None; // -T min|typ|max (semantics ledgered)
+    let mut timescale_arg: Option<String> = None; // -T min|typ|max
     let mut i = 0usize;
     while i < argv.len() {
         let a = argv[i].clone();
@@ -298,7 +298,7 @@ fn main() -> ExitCode {
                         eprintln!("riverilog: invalid -T{t} argument");
                         return ExitCode::from(1);
                     }
-                    _timescale_arg = Some(t.clone());
+                    timescale_arg = Some(t.clone());
                     i += 1;
                 }
                 None => {
@@ -372,7 +372,7 @@ fn main() -> ExitCode {
                     eprintln!("riverilog: invalid -T{t} argument");
                     return ExitCode::from(1);
                 }
-                _timescale_arg = Some(t.to_string());
+                timescale_arg = Some(t.to_string());
             }
             s if s.starts_with("-M") && s.len() > 2 => {
                 depfile = Some(s[2..].to_string());
@@ -441,6 +441,14 @@ fn main() -> ExitCode {
     } else {
         Mode::Normal
     };
+    // -T selection (U-3b, oracle-measured semantics on `a:b:c` delays);
+    // None = the compiler default (typ) with the per-site warning.
+    let delay_selection = timescale_arg.as_deref().map(|t| match t {
+        "min" => riv_elab::DelaySelection::Min,
+        "max" => riv_elab::DelaySelection::Max,
+        _ => riv_elab::DelaySelection::Typ,
+    });
+    let warnings = std::cell::RefCell::new(Vec::new());
     match compile(
         &sources,
         top.as_deref(),
@@ -452,8 +460,15 @@ fn main() -> ExitCode {
         mode,
         Path::new(&out_path),
         ignore_missing,
+        delay_selection,
+        &warnings,
     ) {
         Ok(resolved) => {
+            // Oracle-measured warning flush (compile-time stderr, after
+            // elaboration, before any -M work).
+            for w in warnings.borrow().iter() {
+                eprintln!("{w}");
+            }
             // -M (U-3b): dependency list after a successful compile.
             // Measured rule: explicit sources once, then each -y-resolved
             // library file exactly twice (n=3 oracle probes all show the
@@ -585,6 +600,8 @@ fn compile(
     mode: Mode,
     out_path: &Path,
     ignore_missing: bool,
+    delay_selection: Option<riv_elab::DelaySelection>,
+    warnings: &std::cell::RefCell<Vec<String>>,
 ) -> Result<Vec<String>, riv_elab::ElabError> {
     let mut ld = Loader::new(include_dirs, predefines);
     let mut rendered: Vec<String> = Vec::new();
@@ -689,6 +706,8 @@ fn compile(
         top,
         files: &ld.files,
         allow_missing_instances: ignore_missing,
+        delay_selection,
+        warnings: Some(warnings),
     })?;
     if mode == Mode::NullTarget {
         // Oracle-measured: -t null writes nothing, even with -o.
