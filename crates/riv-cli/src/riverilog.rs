@@ -58,14 +58,103 @@ fn target_policy(t: &str) -> Result<Option<&'static str>, String> {
     }
 }
 
+/// The `-g` registry, measured verbatim from iverilog 13.0 (U-3b probe:
+/// an unknown generation makes the oracle print its own supported list —
+/// the registry text below is that measurement, not a man-page guess).
+/// Generations gate keyword acceptance (R8 will consume `generation`);
+/// feature toggles are accepted-as-measured, their semantic effects land
+/// with the features themselves (assertions R8, specify R9, ...).
+const GENERATIONS: [(&str, &str); 6] = [
+    ("1995", "IEEE1364-1995"),
+    ("2001", "IEEE1364-2001"),
+    ("2005", "IEEE1364-2005"),
+    ("2005-sv", "IEEE1800-2005"),
+    ("2009", "IEEE1800-2009"),
+    ("2012", "IEEE1800-2012"),
+];
+
+const FEATURE_FLAGS: [&str; 25] = [
+    "assertions",
+    "supported-assertions",
+    "no-assertions",
+    "specify",
+    "no-specify",
+    "interconnect",
+    "no-interconnect",
+    "verilog-ams",
+    "no-verilog-ams",
+    "std-include",
+    "no-std-include",
+    "relative-include",
+    "no-relative-include",
+    "xtypes",
+    "no-xtypes",
+    "icarus-misc",
+    "no-icarus-misc",
+    "io-range-error",
+    "no-io-range-error",
+    "strict-ca-eval",
+    "no-strict-ca-eval",
+    "strict-expr-width",
+    "no-strict-expr-width",
+    "shared-loop-index",
+    "no-shared-loop-index",
+];
+
+/// Ok(generation) for a known generation; Ok("") for a feature toggle
+/// (no generation change); Err(text) = the oracle's exact refusal shape.
+/// Measured exit for the refusal is **255** (not 1 — re-measured U-3b,
+/// supersedes the R0 receipt's single-message class).
 fn std_level(g: &str) -> Result<&'static str, String> {
-    match g {
-        "1995" | "2001" | "2005" | "2005-sv" | "2009" | "2012" => Ok("known (dialect profiles land at R1/R8)"),
-        // Oracle shape (measured): one message for any unknown -g argument,
-        // generation or feature toggle alike.
-        other => Err(format!("riverilog: Unknown/Unsupported Language generation {other}")),
+    if let Some((name, _)) = GENERATIONS.iter().find(|(n, _)| *n == g) {
+        return Ok(name);
     }
+    if FEATURE_FLAGS.contains(&g) {
+        return Ok("");
+    }
+    let mut text = format!("riverilog: Unknown/Unsupported Language generation {g}\n\n");
+    text.push_str("Supported generations are:\n");
+    for (name, desc) in GENERATIONS {
+        text.push_str(&format!("    {name:<8}-- {desc}\n"));
+    }
+    text.push_str("Other generation flags:\n");
+    for group in [
+        "assertions | supported-assertions | no-assertions",
+        "specify | no-specify",
+        "interconnect | no-interconnect",
+        "verilog-ams | no-verilog-ams",
+        "std-include | no-std-include",
+        "relative-include | no-relative-include",
+        "xtypes | no-xtypes",
+        "icarus-misc | no-icarus-misc",
+        "io-range-error | no-io-range-error",
+        "strict-ca-eval | no-strict-ca-eval",
+        "strict-expr-width | no-strict-expr-width",
+        "shared-loop-index | no-shared-loop-index",
+    ] {
+        text.push_str(&format!("    {group}\n"));
+    }
+    Err(text)
 }
+
+/// `-W` classes that the oracle accepts silently (U-3b probe: all, none,
+/// infloop, timescale, portbind, implicit-dimensions, select-range pass
+/// without output; anything else prints "Ignoring unknown warning class"
+/// on stderr and continues with exit 0).
+const WARNING_CLASSES: [&str; 7] = [
+    "all",
+    "none",
+    "infloop",
+    "timescale",
+    "portbind",
+    "implicit-dimensions",
+    "select-range",
+];
+
+/// `-T` selections accepted by the oracle (min/typ/max validated; the
+/// triple-selection *semantics* stay ledgered pending a conclusive oracle
+/// probe — accepted-and-validated at the CLI, no guessed behavior).
+const TIMESCALE_ARGS: [&str; 3] = ["min", "typ", "max"];
 
 fn main() -> ExitCode {
     let argv: Vec<String> = std::env::args().skip(1).collect();
@@ -78,6 +167,11 @@ fn main() -> ExitCode {
     let mut lib_suffixes: Vec<String> = Vec::new();
     let mut predefines: Vec<String> = Vec::new();
     let mut preprocess_only = false;
+    // U-3b additions (all oracle-measured on iverilog 13.0).
+    let mut ignore_missing = false; // -i: skip undefined instances (exit 0)
+    let mut depfile: Option<String> = None; // -M <file>
+    let mut ptop: Option<String> = None; // -P <name>: top hint, non-fatal if absent
+    let mut _timescale_arg: Option<String> = None; // -T min|typ|max (semantics ledgered)
     let mut i = 0usize;
     while i < argv.len() {
         let a = argv[i].clone();
@@ -146,12 +240,91 @@ fn main() -> ExitCode {
                 }
             },
             "-E" => preprocess_only = true,
-            // U-3b scope: real -i = elaboration skips missing instances.
-            // Until then a pointer hard error beats a silent no-op (§3).
-            "-i" => {
-                eprintln!("riverilog: -i (ignore missing modules) is not implemented yet (U-3b library-search completion; docs/RIVERILOG-PLAN.md §8)");
+            // U-3b: real -i (oracle-measured iverilog 13.0: a missing
+            // module is skipped silently, elaboration exits 0).
+            "-i" => ignore_missing = true,
+            // U-3b: -f/-c command file (oracle-measured grammar: each
+            // non-blank line is ONE path token; `#` lines are comments;
+            // option-looking lines are a parse failure, exit 1).
+            "-f" | "-c" => match argv.get(i + 1) {
+                Some(f) => {
+                    if let Err(e) = read_cmd_file(f, &mut sources) {
+                        eprint!("{e}");
+                        return ExitCode::from(1);
+                    }
+                    i += 1;
+                }
+                None => {
+                    eprintln!("riverilog: option requires an argument -- {}", &a[1..]);
+                    return ExitCode::from(1);
+                }
+            },
+            // U-3b: -M <depfile> — dependency list written after a
+            // successful compile (sources once, then each -y-resolved
+            // library file exactly twice; measured rule, n=3 probes).
+            "-M" => match argv.get(i + 1) {
+                Some(f) => {
+                    depfile = Some(f.clone());
+                    i += 1;
+                }
+                None => {
+                    eprintln!("riverilog: option requires an argument -- M");
+                    return ExitCode::from(1);
+                }
+            },
+            // U-3b: -P <name> selects the top like -s, but an absent name
+            // is NON-FATAL (oracle: one stderr line, default top, exit 0).
+            "-P" => match argv.get(i + 1) {
+                Some(n) => {
+                    ptop = Some(n.clone());
+                    i += 1;
+                }
+                None => {
+                    eprintln!("riverilog: option requires an argument -- P");
+                    return ExitCode::from(1);
+                }
+            },
+            // U-3b: -S = synthesis path — unplanned target, hard error with
+            // the pointer (R0 policy; the oracle synthesizes, we do not).
+            "-S" => {
+                eprintln!("riverilog: -S (synthesis) is not supported (R0 policy; docs/RIVERILOG-PLAN.md)");
                 return ExitCode::from(1);
             }
+            // U-3b: -T min|typ|max — validated; triple-selection semantics
+            // ledgered pending a conclusive oracle probe.
+            "-T" => match argv.get(i + 1) {
+                Some(t) => {
+                    if !TIMESCALE_ARGS.contains(&t.as_str()) {
+                        eprintln!("riverilog: invalid -T{t} argument");
+                        return ExitCode::from(1);
+                    }
+                    _timescale_arg = Some(t.clone());
+                    i += 1;
+                }
+                None => {
+                    eprintln!("riverilog: option requires an argument -- T");
+                    return ExitCode::from(1);
+                }
+            },
+            // U-3b: -p NAME=VALUE accepted and ignored (oracle: silent,
+            // exit 0, even without '=').
+            "-p" => {
+                i += 1;
+            }
+            // U-3b: -W <class> — known classes silent; unknown classes get
+            // the oracle's stderr line and compilation continues.
+            "-W" => match argv.get(i + 1) {
+                Some(w) => {
+                    if !WARNING_CLASSES.contains(&w.as_str()) {
+                        eprintln!("Ignoring unknown warning class {w}");
+                    }
+                    i += 1;
+                }
+                None => {
+                    eprintln!("riverilog: option requires an argument -- W");
+                    return ExitCode::from(1);
+                }
+            },
             "-t" => match argv.get(i + 1) {
                 Some(t) => {
                     target = Some(t.clone());
@@ -165,8 +338,10 @@ fn main() -> ExitCode {
             "-g" => match argv.get(i + 1) {
                 Some(g) => {
                     if let Err(e) = std_level(g) {
-                        eprintln!("{e}");
-                        return ExitCode::from(1);
+                        // Measured exit is 255 (U-3b re-probe; the R0
+                        // single-message receipt's exit 1 is superseded).
+                        eprint!("{e}");
+                        return ExitCode::from(255);
                     }
                     i += 1;
                 }
@@ -176,15 +351,33 @@ fn main() -> ExitCode {
                 }
             },
             _ if a.starts_with("-g") => {
-                // Attached form (-g2005 / feature toggles). The oracle answers
-                // any unknown -g argument with the same single message —
-                // mirrored; the real feature registry lands at R1 from the
-                // man page, not from guesses.
+                // Attached form (-g2005 / feature toggles).
                 if let Err(e) = std_level(&a[2..]) {
-                    eprintln!("{e}");
-                    return ExitCode::from(1);
+                    eprint!("{e}");
+                    return ExitCode::from(255);
                 }
             }
+            s if s.starts_with("-W") && s.len() > 2 => {
+                let w = &s[2..];
+                if !WARNING_CLASSES.contains(&w) {
+                    eprintln!("Ignoring unknown warning class {w}");
+                }
+            }
+            s if s.starts_with("-P") && s.len() > 2 => {
+                ptop = Some(s[2..].to_string());
+            }
+            s if s.starts_with("-T") && s.len() > 2 => {
+                let t = &s[2..];
+                if !TIMESCALE_ARGS.contains(&t) {
+                    eprintln!("riverilog: invalid -T{t} argument");
+                    return ExitCode::from(1);
+                }
+                _timescale_arg = Some(t.to_string());
+            }
+            s if s.starts_with("-M") && s.len() > 2 => {
+                depfile = Some(s[2..].to_string());
+            }
+            s if s.starts_with("-p") && s.len() > 2 => {}
             _ if a.starts_with('-') && a.len() > 1 => {
                 let known = [
                     "-R", "-S", "-u", "-v", "-B", "-c", "-f", "-L", "-M", "-m", "-N", "-p", "-s",
@@ -251,14 +444,39 @@ fn main() -> ExitCode {
     match compile(
         &sources,
         top.as_deref(),
+        ptop.as_deref(),
         &include_dirs,
         &predefines,
         &lib_dirs,
         &lib_suffixes,
         mode,
         Path::new(&out_path),
+        ignore_missing,
     ) {
-        Ok(()) => ExitCode::from(0),
+        Ok(resolved) => {
+            // -M (U-3b): dependency list after a successful compile.
+            // Measured rule: explicit sources once, then each -y-resolved
+            // library file exactly twice (n=3 oracle probes all show the
+            // doubled entry).
+            if let Some(df) = &depfile {
+                let mut text = String::new();
+                for s in &sources {
+                    text.push_str(s);
+                    text.push('\n');
+                }
+                for r in &resolved {
+                    text.push_str(r);
+                    text.push('\n');
+                    text.push_str(r);
+                    text.push('\n');
+                }
+                if let Err(e) = std::fs::write(df, text) {
+                    eprintln!("riverilog: cannot write {df}: {e}");
+                    return ExitCode::from(2);
+                }
+            }
+            ExitCode::from(0)
+        }
         Err(e) => {
             eprintln!("{e}");
             ExitCode::from(u32::try_from(e.exit).unwrap_or(2) as u8)
@@ -354,19 +572,23 @@ impl Loader {
 
 /// Compile pipeline: preprocess + parse (shared vl-syntax) → -y library
 /// fixpoint → flat elaboration (riv-elab) → RIV-1 text write (skipped for
-/// NullTarget; routed per -o for E).
+/// NullTarget; routed per -o for E). Returns the -y-resolved library paths
+/// (deduped, sorted) for `-M` (U-3b).
 fn compile(
     sources: &[String],
     top: Option<&str>,
+    ptop: Option<&str>,
     include_dirs: &[PathBuf],
     predefines: &[String],
     lib_dirs: &[PathBuf],
     lib_suffixes: &[String],
     mode: Mode,
     out_path: &Path,
-) -> Result<(), riv_elab::ElabError> {
+    ignore_missing: bool,
+) -> Result<Vec<String>, riv_elab::ElabError> {
     let mut ld = Loader::new(include_dirs, predefines);
     let mut rendered: Vec<String> = Vec::new();
+    let mut resolved: Vec<String> = Vec::new();
     for f in sources {
         if let Some(text) = ld.load_file(f, mode != Mode::E) {
             rendered.push(text);
@@ -384,12 +606,9 @@ fn compile(
         if out_path == Path::new("-") {
             print!("{text}");
         } else if let Err(e) = std::fs::write(out_path, &text) {
-            return Err(riv_elab::ElabError {
-                message: format!("riverilog: cannot write {}: {e}", out_path.display()),
-                exit: 2,
-            });
+            return Err(write_failure(out_path, e));
         }
-        return Ok(());
+        return Ok(resolved);
     }
 
     // -y library search (R1): fixpoint over instantiated-but-undefined
@@ -422,6 +641,7 @@ fn compile(
                         }
                         parsed_paths.insert(p.clone());
                         ld.load_file(&p.to_string_lossy(), true);
+                        resolved.push(p.to_string_lossy().to_string());
                         progress = true;
                         continue 'scan;
                     }
@@ -448,20 +668,81 @@ fn compile(
         });
     }
 
+    // -P (U-3b, oracle-measured): the named top is used only when defined;
+    // an absent name prints the oracle's stderr line and compilation falls
+    // back to auto-detect (exit follows the compile, measured 0).
+    let top = match ptop {
+        Some(p) => {
+            if ld.modules.iter().any(|m| &m.name == p) {
+                Some(p)
+            } else {
+                eprintln!("<command line>: error: invalid value specified for defparam: {p}");
+                None
+            }
+        }
+        None => top,
+    };
+
     let design = riv_elab::elaborate(riv_elab::ElabInput {
         modules: &ld.modules,
         sm: &ld.sm,
         top,
         files: &ld.files,
+        allow_missing_instances: ignore_missing,
     })?;
     if mode == Mode::NullTarget {
         // Oracle-measured: -t null writes nothing, even with -o.
-        return Ok(());
+        return Ok(resolved);
     }
-    std::fs::write(out_path, design.write()).map_err(|e| riv_elab::ElabError {
-        message: format!("riverilog: cannot write {}: {e}", out_path.display()),
-        exit: 2,
+    std::fs::write(out_path, design.write()).map_err(|e| write_failure(out_path, e))?;
+    Ok(resolved)
+}
+
+/// Output-file write failure — rivD13 flipped to ALIGNED (U-3b): the
+/// oracle's shape is `<path>: <errno text>\nerror: Code generator failure: -1`
+/// with **exit 255** (measured: ENOENT / EACCES / EISDIR all identical).
+fn write_failure(path: &Path, e: std::io::Error) -> riv_elab::ElabError {
+    let msg = match e.raw_os_error() {
+        Some(2) => "No such file or directory",
+        Some(13) => "Permission denied",
+        Some(21) => "Is a directory",
+        _ => {
+            return riv_elab::ElabError {
+                message: format!("riverilog: cannot write {}: {e}", path.display()),
+                exit: 2,
+            };
+        }
+    };
+    riv_elab::ElabError {
+        message: format!("{}: {msg}\nerror: Code generator failure: -1", path.display()),
+        exit: 255,
+    }
+}
+
+/// `-f`/`-c` command file (U-3b, oracle-measured grammar): each non-blank
+/// line is ONE path token (no whitespace splitting — "a b" is a single
+/// weird filename); `#`-initial lines are comments; a line that looks like
+/// an option is a parse failure reported at the 1-based non-comment line
+/// number, exit 1.
+fn read_cmd_file(f: &str, sources: &mut Vec<String>) -> Result<(), String> {
+    let text = std::fs::read_to_string(f).map_err(|_| {
+        format!("riverilog: cannot open command file {f} for reading.\n")
     })?;
+    let mut n = 0usize;
+    for line in text.lines() {
+        let t = line.trim();
+        if t.is_empty() || t.starts_with('#') {
+            continue;
+        }
+        n += 1;
+        if t.starts_with('-') {
+            return Err(format!(
+                "Error: unable to parse line {n} in cmd file {f}.\n\
+                 riverilog: parsing failed in base command file {f}.\n"
+            ));
+        }
+        sources.push(t.to_string());
+    }
     Ok(())
 }
 

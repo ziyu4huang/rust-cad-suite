@@ -46,6 +46,28 @@ pub struct ElabInput<'a> {
     /// Explicit `-s` top; None → auto-detect (the un-instantiated module).
     pub top: Option<&'a str>,
     pub files: &'a [FileTs],
+    /// `-i` (riverilog face, U-3b): skip instances of undefined modules
+    /// silently — oracle-measured (iverilog 13.0): exit 0, no diagnostics.
+    /// Other faces keep the hard error via `ElabInput::strict`.
+    pub allow_missing_instances: bool,
+}
+
+impl<'a> ElabInput<'a> {
+    /// Strict form (pre-U-3b behavior): hard error on undefined instances.
+    pub fn strict(
+        modules: &'a [Module],
+        sm: &'a SourceMap,
+        top: Option<&'a str>,
+        files: &'a [FileTs],
+    ) -> ElabInput<'a> {
+        ElabInput {
+            modules,
+            sm,
+            top,
+            files,
+            allow_missing_instances: false,
+        }
+    }
 }
 
 /// Internal var info (superset of what the IR carries).
@@ -184,7 +206,7 @@ fn parse_timescale(ts: &str) -> Option<TsInfo> {
 }
 
 pub fn elaborate(input: ElabInput) -> Result<riv_ir::Design, ElabError> {
-    let ElabInput { modules, sm, top, files } = input;
+    let ElabInput { modules, sm, top, files, allow_missing_instances } = input;
     let top_name = match top {
         Some(t) => {
             if !modules.iter().any(|m| m.name == *t) {
@@ -293,6 +315,7 @@ pub fn elaborate(input: ElabInput) -> Result<riv_ir::Design, ElabError> {
         top_ts: top_info,
         modules,
         chain: Vec::new(),
+        allow_missing: allow_missing_instances,
     };
     walker.walk_module(top_mod)?;
 
@@ -307,6 +330,8 @@ struct Walker<'a> {
     modules: &'a [Module],
     /// Instantiation chain (module names) for recursion detection.
     chain: Vec<String>,
+    /// `-i` (U-3b): undefined module instances are skipped silently.
+    allow_missing: bool,
 }
 
 /// Build a fresh thread lowering session in the CURRENT scope. `Elab` is
@@ -697,6 +722,11 @@ impl<'a> Walker<'a> {
             return Ok(());
         }
         let Some(sub) = self.modules.iter().find(|m| m.name == i.mod_name) else {
+            // -i (U-3b, oracle-measured): a missing module under `-i` is a
+            // silent skip — no diagnostic, elaboration continues, exit 0.
+            if self.allow_missing {
+                return Ok(());
+            }
             return Err(err_at(
                 file,
                 self.line_of(i.span),

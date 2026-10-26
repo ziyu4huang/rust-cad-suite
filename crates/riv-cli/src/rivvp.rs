@@ -34,6 +34,10 @@ fn main() -> ExitCode {
     // -l <file>: mirror everything that would reach stdout into the file
     // (measured: log == direct stdout, byte-equal).
     let mut log_file: Option<String> = None;
+    // -l - (rivD14, contract settled by U-3b probes): no file is created;
+    // stderr receives a full copy of the stdout content. -q silences the
+    // stdout side only — the stderr copy survives (measured vvp 13.0).
+    let mut log_dash = false;
     let mut i = 0usize;
     while i < argv.len() {
         let a = argv[i].clone();
@@ -65,13 +69,11 @@ fn main() -> ExitCode {
             "-i" => {}
             "-q" => quiet = true,
             "-l" => match argv.get(i + 1) {
-                // Measured oracle shape (vvp 13.0): `-l -` writes the full
-                // copy to BOTH stdout and stderr with no `-` file created —
-                // a contract we have not pinned (rivD14); hard-error until
-                // the U-3b probe settles it.
+                // Measured oracle contract (vvp 13.0, U-3b probes): `-l -`
+                // creates no file — the full copy reaches stdout AND stderr.
                 Some(f) if f == "-" => {
-                    eprintln!("rivvp: -l - (log to streams) is not supported yet (oracle contract unsettled; see docs/REGISTRY.md rivD14)");
-                    return ExitCode::from(1);
+                    log_dash = true;
+                    i += 1;
                 }
                 Some(f) => {
                     log_file = Some(f.clone());
@@ -157,6 +159,9 @@ fn main() -> ExitCode {
     }
     if !quiet {
         print!("{}", outcome.output);
+    }
+    if log_dash {
+        eprint!("{}", outcome.output);
     }
     ExitCode::from(u8::try_from(outcome.exit.max(0)).unwrap_or(1))
 }

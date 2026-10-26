@@ -592,12 +592,12 @@ pub fn riv_build(top: &str, sources: Vec<String>) -> Result<String, JsValue> {
         return Err(JsValue::from_str(&format!("errors:\n{text}")));
     }
     let top = resolve_top(&modules, top)?;
-    let design = riv_elab::elaborate(riv_elab::ElabInput {
-        modules: &modules,
-        sm: &sm,
-        top: Some(&top),
-        files: &files,
-    })
+    let design = riv_elab::elaborate(riv_elab::ElabInput::strict(
+        &modules,
+        &sm,
+        Some(&top),
+        &files,
+    ))
     .map_err(|e| JsValue::from_str(&e.message))?;
     Ok(design.write())
 }

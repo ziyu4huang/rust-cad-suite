@@ -227,7 +227,11 @@ if [ -x target/debug/rverilator ] && [ -x target/debug/riverilog ]; then
         || { echo "GATE FAIL: rv-wave abs-path smoke"; toolbox=1; }
     (cd corpus/iv-e2e/01_hello && diff <(bash "$OLDPWD/scripts/riv-run.sh" -n tb.v) expected.stdout) >/dev/null 2>&1 \
         || { echo "GATE FAIL: riv-run smoke"; toolbox=1; }
-    [ "$toolbox" -eq 0 ] && echo "agent toolbox smoke: rv-sim/rv-diff/rv-wave/riv-run 4/4"
+    if [ "$toolbox" -eq 0 ]; then
+        echo "agent toolbox smoke: rv-sim/rv-diff/rv-wave/riv-run 4/4"
+    else
+        echo "GATE FAIL: agent toolbox smoke (see lines above)"; fail=1
+    fi
 fi
 
 # S2 XLS adapter: the VerilogSimulator-shaped face (argv + JSON). The harvested

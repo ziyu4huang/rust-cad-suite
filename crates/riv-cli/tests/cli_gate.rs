@@ -71,12 +71,232 @@ fn illegal_option_matches_oracle_shape() {
 #[test]
 fn unknown_generation_is_hard_error() {
     let (_, se, rc) = run("riverilog", &["-g", "2007", "x.v"]);
-    assert_eq!(rc, 1);
+    // U-3b re-measurement (iverilog 13.0): the unknown-generation refusal
+    // exits **255** (not 1 — the R0 receipt's class is superseded) and the
+    // oracle prints its own supported registry, which we mirror verbatim.
+    assert_eq!(rc, 255);
     assert!(
         se.contains("riverilog: Unknown/Unsupported Language generation 2007"),
         "{se}"
     );
+    assert!(se.contains("Supported generations are:"), "{se}");
+    assert!(se.contains("2005-sv -- IEEE1800-2005"), "{se}");
+    assert!(se.contains("shared-loop-index | no-shared-loop-index"), "{se}");
 }
+
+/// U-3b: the feature toggles the oracle's own registry lists are accepted
+/// (attached and separate form), no generation change.
+#[test]
+fn generation_feature_toggles_are_accepted() {
+    for g in [
+        "assertions",
+        "no-assertions",
+        "supported-assertions",
+        "specify",
+        "no-specify",
+        "xtypes",
+        "no-xtypes",
+        "icarus-misc",
+        "no-icarus-misc",
+        "relative-include",
+    ] {
+        let (_, se, rc) = run("riverilog", &["-g", g, "x.v"]);
+        assert_eq!(rc, 1, "-g{g}: not a usage refusal, got {se}");
+        assert!(
+            !se.contains("Unknown/Unsupported"),
+            "-g{g} must be accepted as a known flag: {se}"
+        );
+    }
+}
+
+/// U-3b: -T validates its argument against min/typ/max (measured refusal
+/// shape + exit 1); bare -T is "option requires an argument".
+#[test]
+fn timescale_arg_is_validated() {
+    let (_, se, rc) = run("riverilog", &["-Tgeo", "x.v"]);
+    assert_eq!(rc, 1);
+    assert!(se.contains("invalid -Tgeo argument"), "{se}");
+    let (_, se, rc) = run("riverilog", &["-T", "max", "x.v"]);
+    assert_eq!(rc, 1, "-T max accepted as flag, fails later on sources");
+    assert!(!se.contains("invalid -T"), "{se}");
+    let (_, se, rc) = run("riverilog", &["-T"]);
+    assert_eq!(rc, 1);
+    assert!(se.contains("option requires an argument -- T"), "{se}");
+}
+
+/// U-3b: unknown -W classes print the oracle's stderr line and continue
+/// (the run then fails on the missing source with the pp class, exit 1);
+/// known classes stay silent.
+#[test]
+fn warning_class_unknown_is_ignored_not_fatal() {
+    let (_, se, rc) = run("riverilog", &["-Wbogus", "x.v"]);
+    assert_eq!(rc, 1);
+    assert!(se.contains("Ignoring unknown warning class bogus"), "{se}");
+    let (_, se, rc) = run("riverilog", &["-Wall", "x.v"]);
+    assert_eq!(rc, 1);
+    assert!(!se.contains("Ignoring"), "{se}");
+}
+
+/// U-3b: -S (synthesis) is an unplanned target — hard error with pointer.
+#[test]
+fn synthesis_target_is_pointer_hard_error() {
+    let (_, se, rc) = run("riverilog", &["-S", "x.v"]);
+    assert_eq!(rc, 1);
+    assert!(se.contains("-S (synthesis) is not supported"), "{se}");
+}
+
+/// U-3b: -P selects the top when defined; an absent name is NON-FATAL
+/// (measured: one stderr line, default top, exit follows the compile).
+#[test]
+fn top_selection_p_falls_back_non_fatal() {
+    let work = std::env::temp_dir().join("riv-cli-gate-ptop");
+    let _ = std::fs::remove_dir_all(&work);
+    std::fs::create_dir_all(&work).unwrap();
+    std::fs::write(
+        work.join("tb.v"),
+        "module tb; initial begin $display(\"hello\"); $finish; end endmodule\n",
+    )
+    .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-Pnosuch", "-o", "p.vvp", "tb.v"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0), "non-fatal fallback");
+    let se = String::from_utf8_lossy(&out.stderr);
+    assert!(
+        se.contains("<command line>: error: invalid value specified for defparam: nosuch"),
+        "{se}"
+    );
+    // Defined top name works like -s.
+    let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-Ptb", "-o", "p2.vvp", "tb.v"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0));
+    assert!(work.join("p2.vvp").is_file());
+}
+
+/// U-3b: -f/-c command files — one path token per line, `#` comments,
+/// option-looking lines are a parse failure (measured shapes).
+#[test]
+fn cmd_file_grammar_matches_oracle() {
+    let work = std::env::temp_dir().join("riv-cli-gate-cmdfile");
+    let _ = std::fs::remove_dir_all(&work);
+    std::fs::create_dir_all(&work).unwrap();
+    std::fs::write(
+        work.join("tb.v"),
+        "module tb; initial begin $display(\"hello\"); $finish; end endmodule\n",
+    )
+    .unwrap();
+    std::fs::write(work.join("c1.txt"), "# comment\ntb.v\n").unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-f", "c1.txt", "-o", "c1.vvp"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0), "cmd file with comment");
+    assert!(work.join("c1.vvp").is_file());
+    // -c is the same face.
+    let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-c", "c1.txt", "-o", "c2.vvp"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0), "-c == -f");
+    // Option-looking line: parse failure naming the non-comment line.
+    std::fs::write(work.join("c3.txt"), "# c\ntb.v\n-Wall\n").unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-f", "c3.txt", "-o", "c3.vvp"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(1));
+    let se = String::from_utf8_lossy(&out.stderr);
+    assert!(se.contains("unable to parse line 2"), "{se}");
+    assert!(se.contains("parsing failed in base command file c3.txt"), "{se}");
+    // Missing cmd file: measured shape + exit 1.
+    let (_, se, rc) = run("riverilog", &["-f", "nosuch.txt", "x.v"]);
+    assert_eq!(rc, 1);
+    assert!(se.contains("cannot open command file nosuch.txt for reading"), "{se}");
+}
+
+/// U-3b: -o to an unwritable path mirrors the oracle's two-line shape with
+/// exit 255 (rivD13 flipped to ALIGNED; ENOENT/EACCES/EISDIR measured).
+#[test]
+fn output_write_failure_is_exit_255() {
+    let (_, se, rc) = run("riverilog", &["-o", "/nope_dir/x.vvp", "-t", "null"]);
+    assert_eq!(rc, 1, "-t null writes nothing, so the path is never touched");
+    let work = std::env::temp_dir().join("riv-cli-gate-o255");
+    let _ = std::fs::remove_dir_all(&work);
+    std::fs::create_dir_all(&work).unwrap();
+    std::fs::write(
+        work.join("tb.v"),
+        "module tb; initial begin $finish; end endmodule\n",
+    )
+    .unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-o", "/nope_dir/x.vvp", "tb.v"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(255), "oracle-measured class");
+    let se = String::from_utf8_lossy(&out.stderr);
+    assert!(se.contains("/nope_dir/x.vvp: No such file or directory"), "{se}");
+    assert!(se.contains("error: Code generator failure: -1"), "{se}");
+}
+
+/// U-3b: -i skips undefined module instances silently (measured: exit 0,
+/// no diagnostics); without -i the hard error stands.
+#[test]
+fn ignore_missing_instances_is_real() {
+    let work = std::env::temp_dir().join("riv-cli-gate-i");
+    let _ = std::fs::remove_dir_all(&work);
+    std::fs::create_dir_all(&work).unwrap();
+    std::fs::write(work.join("top.v"), "module top; sub u1(); endmodule\n").unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-o", "i0.vvp", "top.v"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(2), "without -i: elaboration error");
+    let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-i", "-o", "i1.vvp", "top.v"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0), "-i: silent skip, exit 0");
+    let se = String::from_utf8_lossy(&out.stderr);
+    assert!(se.is_empty(), "no diagnostics under -i: {se}");
+    assert!(work.join("i1.vvp").is_file());
+}
+
+/// U-3b: -M writes the dependency list after a successful compile —
+/// sources once, then each -y-resolved library file exactly twice
+/// (measured rule, n=3 oracle probes).
+#[test]
+fn depfile_lists_sources_plus_doubled_libs() {
+    let work = std::env::temp_dir().join("riv-cli-gate-mdep");
+    let _ = std::fs::remove_dir_all(&work);
+    std::fs::create_dir_all(work.join("lib")).unwrap();
+    std::fs::write(work.join("top.v"), "module top; sub u1(); endmodule\n").unwrap();
+    std::fs::write(work.join("lib/sub.v"), "module sub; endmodule\n").unwrap();
+    let out = Command::new(env!("CARGO_BIN_EXE_riverilog"))
+        .args(["-y", "lib", "-M", "deps.d", "-o", "m.vvp", "top.v"])
+        .current_dir(&work)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0));
+    let deps = std::fs::read_to_string(work.join("deps.d")).unwrap();
+    assert_eq!(
+        deps, "top.v\nlib/sub.v\nlib/sub.v\n",
+        "measured oracle content shape"
+    );
+}
+
+/// U-3b (rivD14 settled): `rivvp -l -` behavior is gated by
+/// rivvp_dash_l_dash_mirrors_streams below (compiled-design flow).
 
 #[test]
 fn unplanned_targets_name_the_line() {
@@ -250,13 +470,8 @@ fn output_dash_on_compile_target_is_refused() {
     assert!(!work.join("-").exists(), "no `-` file created");
 }
 
-/// -i: pointer hard error until U-3b implements missing-instance skips.
-#[test]
-fn ignore_missing_modules_names_the_arc() {
-    let (_, se, rc) = run("riverilog", &["-i", "tb.v"]);
-    assert_eq!(rc, 1);
-    assert!(se.contains("U-3b"), "{se}");
-}
+/// -i is now REAL (U-3b): see ignore_missing_instances_is_real above.
+/// Placeholder removed with the capability flip.
 
 /// -y library search, transitive: tb→mid→leaf with mid+leaf only in the
 /// -y dir. Expected stdout recorded from the oracle (vvp), never
@@ -517,16 +732,16 @@ fn rivvp_dash_l_mirrors_stdout() {
     assert_eq!(logged, direct, "log mirrors stdout byte-equal");
 }
 
-/// -l -: oracle contract unsettled (measured dual-stream full-copy, not
-/// "to stderr" as the man page claims) — hard error with pointer, rivD14.
+/// -l - (rivD14 settled, U-3b): stderr receives a full copy of the stdout
+/// content, no `-` file is created, and the run completes normally.
 #[test]
-fn rivvp_dash_l_dash_is_hard_error() {
+fn rivvp_dash_l_dash_mirrors_streams() {
     let (work, _) = compile_src("vp-ldash", DUMP_TB);
-    let (_, se, rc) = vp_run(&work, &["-l", "-", "out.riv"]);
-    assert_eq!(rc, 1);
-    assert!(se.contains("rivD14"), "{se}");
+    let (so, se, rc) = vp_run(&work, &["-l", "-", "out.riv"]);
+    assert_eq!(rc, 0);
+    assert!(!so.is_empty());
+    assert_eq!(se, so, "stderr copy == stdout content (measured)");
     assert!(!work.join("-").exists(), "no `-` file created");
-    assert!(!work.join("dump.vcd").exists(), "erred before running");
 }
 
 /// -M/-m (VPI module face): R7 pointer hard error, no silent swallow.

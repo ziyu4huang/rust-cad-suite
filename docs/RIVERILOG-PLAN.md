@@ -273,8 +273,10 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
 - exit code(對抗審訂正:實測枚舉,非三分類):**0** 綠;**1** 用法錯(未知旗標、
   -h)、sorry 類(`wire #6` net delay 實測 exit 1)與 pp 錯類(缺 include/缺檔,
   實測 "Preprocessor failed with 1 errors." exit 1);**2** 語法/elab 錯(-g 階梯
-  拒收實測亦歸此類:join_any@2005=exit 2,2026-10-25 P7 修——三類實測=0/1/2,
-  **無任何 exit 4**,早期「exit 4」收據錯);**255** `-t` 未知目標
+  拒收實測亦歸此類:join_any@2005=exit 2,2026-10-25 P7 修——單錯誤 case 三類
+  實測=0/1/2,**無任何 exit 4**,早期「exit 4」收據錯;2026-10-26 U-3b 增補:
+  oracle parse exit=**錯誤計數**(多錯檔實測 2..6),我方首錯即停恆 2=單錯對齊/
+  多錯分歧暫記);**255** `-t` 未知目標+`-g` 未知代際(U-3b 重測翻案,原記 1)+寫檔失敗(rivD13 已對齊)
   ("Code generator failure",實測)與寫檔失敗(我方=exit 2,分歧 rivD13 不對齊)。
   riverilog 逐類對拍復刻;`-t` 未知目標的 exit 碼對位在 §12 增補裁決。
   `rivvp`:$finish=0、-N+($stop)=1、-n+($stop)=0;-h=0(不對稱照抄)。
@@ -349,6 +351,7 @@ iverilog 的世界(X 傳播、延遲、VPI 測試台)verilator 語義上就接�
 - **量尺**:`cargo run -q -p riv-difftest -- --e2e --corpus corpus/e2e` → `SUMMARY e2e=42/59 iv=0/0`(17 個 pending **全部**帶 `milestone R4` 指針:例化 15/16/22/29/37/38/51/54/57/58/59、genvar 28/30/36、unpacked array 52/53/55);`--e2e --corpus corpus/iv-e2e` → `SUMMARY e2e=0/0 iv=8/10`(01-08 enforced 全 byte-exact;09_udp=R9、10_gates=R4 pending)。R4 指針現在**可達且被 17 例實測命中**(riv-elab err.rs 分類面)。
 - **R1 ◐**:`-g1995..2012` 全階梯**受理**(riverilog.rs:57,「dialect profiles land at R1/R8」)、`-t vvp`=RIV-1 writer;**未落**=dialect 關鍵字受理表本體+icarus-misc 開關+-E oracle 正規化差分閘(=U-3b 範圍);`-t null`/`-E`/`-y` fixpoint/`-D` ✅(2026-10-25 U-3 前半,見下);`tri_gate`/`--record-iv-leg` ✅(R4 步驟 0)。
 - **U-3 前半 ✅(2026-10-25,ADR-0009 §3 合流序第三步)**:riverilog 編譯面 `-t null`(pp+parse+elaborate 免寫,oracle 實證)/`-E`(僅 pp,路由 a.out/-o/stdout,語法錯不擋)/`-y` fixpoint 庫搜尋(transitive;`-Y` 後綴=逐字拼接+附加非取代)/`-D` attached+separate(舊版 illegal option+靜默丟值兩 bug 修)/pp 錯=exit 1、parse=exit 2 分類(缺檔兩側對齊,rivD12 注)/`-o -` 編譯目標硬錯(rivD4 兌現)/`-i` 指針硬錯(U-3b);rivvp `-N`(stop exit 1,riv-kernel stop_exit additive)/`-q`(stdout 全靜 VCD 照寫)/`-l`(stdout 全量鏡像;`-l -`=rivD14 硬錯)/-M/-m=R7 指針;共享 -E 前端=render_preprocessed 上移 vl-syntax::pp(vl-cli golden byte-equal=零漂移機械證明)。閘=cli_gate riv-cli 23 測+vl-cli 5 測;兩臂 SUMMARY 逐字零漂移(58/59、21/22)。**U-3b 殘**:dialect 關鍵字×代際逐字受理表(P7:三類 0/1/2 無 exit 4;exit-1 leg=partial ANSI 類,歸因待建表)+icarus-misc 開關+-E oracle 正規化差分閘+`-l -` 契約(vvp -q -l - 多流探針)+-M depfile/-c/-f/-P/-W/-p/-T 長尾+`-i` 真實作(elab 跳缺失例化)+rivvp -i 緩衝語義+寫檔失敗 exit 對齊評估(rivD13)。
+- **U-3b 第一刀 ✅(2026-10-26,旗標長尾+兩簿兌現)**:①`-g` 登記冊=oracle 自身錯誤文本逐字鏡像(6 代際+25 feature 開關),未知 -g=**exit 255**(R0 收據 exit 1 翻案,registry 列表 byte-equal 對拍)+已知 feature 受理;②`-f`/`-c` cmdfile(整行=單一路徑 token/# 註解/選項行=parse failure 兩行形 exit 1/缺檔一行形);③`-M` depfile(成功編譯後寫出;實測規則=sources 一次+每個 -y 解析庫檔**恰兩次**,n=3 探針);④`-T` min/typ/max 驗證(invalid -Tgeo 形 exit 1;**三值選擇語義=ledgered pending**,oracle 探針不結論前不猜);⑤`-W` 已知 7 類靜默/未知類 stderr 一行續跑;⑥`-p` 受理忽略;⑦`-P` 頂層選擇(未知名=非致命一行+回退自動偵測,實測 exit 0);⑧`-S`=未規劃合成目標指針硬錯;⑨`-i` 真實作(ElabInput.allow_missing_instances,缺模組例化=靜默跳過 exit 0,oracle 實證);⑩寫檔失敗=rivD13 翻 ALIGNED(255 兩行形,errno 2/13/21 映射);⑪rivvp `-l -`=rivD14 釘死實作(stderr 全量副本;-q 只靜 stdout);⑫regress toolbox 閘補 fail 傳播(此前 GATE FAIL 印出不入帳=閘無執法力,本輪環境事故 revealing:CLT MacOSX27.sdk tbd 破格式斷 verilator 鏈接,SDKROOT 釘 26.5 復原=機器級非 repo 級)。**U-3b 殘**:dialect 關鍵字×代際受理表本體(R8 SV 特句法落地時生效——現有已解析構句全在 oracle 1995 接受域,實測無可執法縫)+`-E` oracle 正規化差分閘+-T 選擇語義+parse 多錯誤計數 exit 類(oracle exit=錯誤數 2..6,我方首錯即停 exit 2,單錯 case 全對齊)。閘=cli_gate riv-cli 31 測;兩臂 SUMMARY 逐字零漂移(58/59、21/22)。
 - **R3 殘項**:named events(->ev/@ev,零實作零語料;**elab 指針仍寫 R3 但 R3 已 ✅——R4 弧同輪修訂指針歸屬並實作,採礦 family 依賴它**)、`$stop`(expr.rs:1561,同為 R3 指針殘項,2026-10-25 對抗審補登)、VPI-first shim(系統任務=直譯 `Op::SysCall`,riv-ir lib.rs:595,註冊面收斂留 R7)。
 - 偏差(out.riv 前拉 R6→R2、最小 dump 前拉 R5→C3、$value$plusargs 前拉 R5→C5、runner 正規化=rivD8、e2e pending ledger 檔機制)=riv-r2-design §9 逐條在帳;48_frac_delay 的 rivD7 預登記已撤回(§6 表,live probe 反證)。
 

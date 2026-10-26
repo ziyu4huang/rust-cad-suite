@@ -125,12 +125,12 @@ impl USim {
             .iter()
             .map(|(p, ts)| riv_elab::FileTs { path: p.clone(), timescale: ts.clone() })
             .collect();
-        let design = riv_elab::elaborate(riv_elab::ElabInput {
+        let design = riv_elab::elaborate(riv_elab::ElabInput::strict(
             modules,
             sm,
-            top: Some(top),
-            files: &file_ts,
-        })
+            Some(top),
+            &file_ts,
+        ))
         .map_err(|e| err(e.message))?;
         let rc = std::rc::Rc::new(design);
         let mut kernel = Kernel::new((*rc).clone()).map_err(|e| err(e.0))?;
