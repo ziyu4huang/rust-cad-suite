@@ -1,9 +1,12 @@
 //! U-4 slice-1 gate: the unified engine's rVPI firing points (ADR-0009;
-//! registry-on-embedder lands in slice 2 — the CbFn embedder decoupling is
-//! an ADR-0003 amendment). Asserts the ADR-0003 trigger contract directly
-//! on the Kernel: start once at entry, value-change post-settle at the
-//! commit funnel (in commit order, value already stored), after-delay at
-//! wheel advance with the NEW now before the slots, end exactly once.
+//! slice 2 landed 2026-10-26 — CbFn embedder decoupled via the VpiHost
+//! trait, ADR-0003 D5 amendment; usim_vpi_gate drives the registry face).
+//! Asserts the ADR-0003 trigger contract directly on the Kernel: start
+//! once at entry, value-change post-settle at the commit funnel (in
+//! commit order, value already stored), after-delay at wheel advance with
+//! the NEW now before the slots (plus the slice-2 stop_as_finish check
+//! after the hook — a timer's finish short-circuits the time step), end
+//! exactly once.
 
 use riv_ir::{Base, Design, Literal, Lval, Op, Thread, ThreadKind, Var, VarKind};
 use riv_kernel::vpi::VpiHooks;
@@ -129,6 +132,34 @@ fn firing_points_match_adr0003_contract() {
     let i1 = e.iter().position(|s| s == "vc q=1").unwrap();
     let i0 = e.iter().position(|s| s == "vc q=0").unwrap();
     assert!(i1 < i0, "{e:?}");
+}
+
+#[test]
+fn after_delay_finish_short_circuits_the_time_step() {
+    // U-4 slice-2 kernel amendment: a timer callback's finish request
+    // (stop_as_finish, the vpi_control(vpiFinish) analog) lands after the
+    // after_delay hook, BEFORE the slots of that time step — the step's commits never happen (legacy fire_due_timers → finish parity).
+    let mut k = Kernel::new(design()).expect("kernel");
+    let log: Log = Default::default();
+    let l = log.clone();
+    k.vpi_hooks.after_delay = Some(Box::new(move |k, now| {
+        l.borrow_mut().push(format!("t{now}"));
+        if now >= 4 {
+            // q's t=4 commit has NOT run yet — the host face reads the
+            // previous settled value here.
+            let v = k.vpi_read_var(0).unwrap().fmt_bin();
+            l.borrow_mut().push(format!("finish q={v}"));
+            k.stop_as_finish = true;
+        }
+    }));
+    let outcome = k.run(&mut Noop);
+    // -N/finish-stop exit contract: stopped_silently → stop_exit (0 default).
+    assert_eq!(outcome.exit, 0);
+    assert_eq!(
+        *log.borrow(),
+        vec!["t2".to_string(), "t4".to_string(), "finish q=1".to_string()],
+        "t=4000 slots are short-circuited; t=6000/8000 never advance"
+    );
 }
 
 #[test]

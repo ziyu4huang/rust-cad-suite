@@ -94,6 +94,7 @@
 | D13 | rVPI EndOfSimulation | C 於 $finish 後回調 | 兩個 Ok 出口觸發,SimError 路徑不觸發 | 註冊分歧 | vpi_gate |
 | D14 | rVPI finish/stop | vpiFinish/vpiStop 有別 | 合流(同 $stop 既有行為) | 與 TB 系統任務行為一致 | interp syscall |
 | D15 | rVPI Transport/Inertial put | 脈衝消除有別 | 切片 2:兩模式同義(事件模型無脈衝消除) | 註冊分歧,切片 2 落地 | ADR-0003 D4 |
+| D16 | rVPI vc 排水節奏雙面:legacy Sim=槽邊界三排水點(寫爆發摺疊窗=槽),統一引擎 USim=kernel 單漏斗每 commit post-settle 即排水(摺疊窗=單 commit);CbInfo.time 兩面皆=提交 tick,值語義(last-wins)不變 | 2026-10-26 U-4 slice-2 實測(usim_vpi_gate usim_firing_order_parity 對 vpi_gate firing_order_and_nba_visibility) | 結構等價面=註冊面/觸發點/host 讀寫同源;節奏差隨面走,ADR-0003 D5 修訂 | usim_vpi_gate 3 測;ADR-0003 D5 |
 | D16 | 混合 timescale 檔序 | TIMESCALEMOD 警告預設致命(檔序相關) | 不報(通過) | 語料面已修(XLS 生成檔注入 timescale);引擎面對齊候補 | corpus-external/xls;REGISTRY 1023 |
 | D18 | XLS 適配器 `.sv` | XLS 預設 iverilog 以 `-g2012` 受理部分 SystemVerilog | 明確拒收(exit 1) | 範圍外=硬錯,milestone;XLS 測試若要 SV 先擴引擎,不在適配器靜默改寫 | rv-xls-sim contract `systemverilog_is_refused_explicitly` |
 | D19 | XLS 適配器診斷流 | XLS 介面把 iverilog 錯誤放 stderr | CLI 維持 Verilator 全-stdout;適配器把診斷導到 stderr、設計輸出留 stdout | 只有適配器這張臉分流;CLI 契約不動(regress e2e 仍 byte-exact) | docs/XLS-ADAPTER.md;contract `parse_error_goes_to_stderr` |

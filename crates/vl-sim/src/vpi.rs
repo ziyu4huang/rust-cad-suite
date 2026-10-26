@@ -146,7 +146,29 @@ pub struct CbInfo {
     pub value: Option<Bits>,
 }
 
-pub type CbFn = Box<dyn FnMut(&mut Sim, &CbInfo)>;
+/// U-4 slice-2 (ADR-0009 / ADR-0003 amendment): the embedder view a
+/// callback sees. The registry stays ONE concrete type (VpiState) shared
+/// by every face — the legacy segments Sim and the unified-engine USim
+/// bridge both implement this trait, so `register_cb` code is portable
+/// across faces. Decision recorded in ADR-0003 (trait beat the generic
+/// `VpiState<E>`: a type parameter forks the registry per embedder and
+/// cannot unify the kernel's closure hooks; dyn cost = once per event).
+pub trait VpiHost {
+    /// Current stored value of a table object.
+    fn bits(&self, h: VpiHandle) -> SResult<Bits>;
+    /// `vpiNoDelay` write through the face's single write funnel.
+    fn put_bits(&mut self, h: VpiHandle, bits: &Bits) -> SResult<()>;
+    /// Canonical table name.
+    fn name(&self, h: VpiHandle) -> &str;
+    /// `vpi_get_time`.
+    fn time(&self, ts: TimeScale) -> u64;
+    /// `vpi_control(vpiFinish)` (Stop conflates; matches `$stop`).
+    fn finish(&mut self);
+}
+
+/// Callbacks see the embedder only through [`VpiHost`] — no direct
+/// `&mut Sim` coupling (that hard binding was the slice-2 target).
+pub type CbFn = Box<dyn FnMut(&mut dyn VpiHost, &CbInfo)>;
 
 /// Opaque callback id (`vpi_remove_cb` token). Ids are never recycled.
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -200,14 +222,121 @@ impl VpiState {
         id
     }
 
-    fn has_reason(&self, pred: impl Fn(&CbReason) -> bool) -> bool {
+    pub fn has_vc_callbacks(&self) -> bool {
         self.cbs
             .iter()
-            .any(|c| c.as_ref().is_some_and(|e| pred(&e.reason)))
+            .any(|c| c.as_ref().is_some_and(|e| matches!(e.reason, CbReason::ValueChange(_))))
     }
 
-    pub fn has_vc_callbacks(&self) -> bool {
-        self.has_reason(|r| matches!(r, CbReason::ValueChange(_)))
+    /// U-4 slice-2: any live callback at all (hook-install gate on the
+    /// unified-engine face — no callbacks = kernel pays zero cost).
+    pub fn has_callbacks(&self) -> bool {
+        self.cbs.iter().any(|c| c.is_some())
+    }
+
+    /// U-4 slice-2: registration lives on the registry itself so both
+    /// faces (legacy Sim / unified USim) share one registration surface.
+    /// Canonicalizes ValueChange handles so aliases and the write-site
+    /// records agree (the legacy Sim wrapper additionally folds union-find
+    /// aliases before landing here).
+    pub fn register(&mut self, reason: CbReason, f: CbFn) -> CbId {
+        let reason = match reason {
+            CbReason::ValueChange(h) => {
+                let name = self.table[h.0 as usize].name.clone();
+                match self.index.get(&name).copied() {
+                    Some(i) => CbReason::ValueChange(VpiHandle(i)),
+                    None => CbReason::ValueChange(h),
+                }
+            }
+            r => r,
+        };
+        if let CbReason::ValueChange(h) = &reason {
+            debug_assert!((*h).0 < self.table.len() as u32);
+        }
+        self.add_cb(reason, f)
+    }
+
+    /// U-4 slice-2 firing protocol: only the firing set (callbacks,
+    /// pending writes, timers, id counter) leaves the state — the frozen
+    /// table and index STAY, so a callback reading via the host face
+    /// (host.bits → Sim::vpi_bits → self.vpi.table) sees a live registry.
+    pub(crate) fn take_fire_set(&mut self) -> FireSet {
+        FireSet {
+            cbs: std::mem::take(&mut self.cbs),
+            pending_vc: std::mem::take(&mut self.pending_vc),
+            timers: std::mem::take(&mut self.timers),
+            next_cb: std::mem::take(&mut self.next_cb),
+        }
+    }
+
+    /// Merge the firing set back. Fire-window side effects (a callback
+    /// writing through the host lands in the live pending map / timer map)
+    /// win on conflicts; the taken set only contributes its leftovers.
+    pub(crate) fn restore_fire_set(&mut self, mut fs: FireSet) {
+        self.cbs = std::mem::take(&mut fs.cbs);
+        let mut pend = std::mem::take(&mut self.pending_vc);
+        for (k, v) in std::mem::take(&mut fs.pending_vc) {
+            pend.entry(k).or_insert(v);
+        }
+        self.pending_vc = pend;
+        let mut tim = std::mem::take(&mut self.timers);
+        for (t, ids) in std::mem::take(&mut fs.timers) {
+            tim.entry(t).or_insert(ids);
+        }
+        self.timers = tim;
+        self.next_cb = self.next_cb.max(fs.next_cb);
+    }
+
+    /// Drain collapsed value-change callbacks. Thin wrapper: take firing
+    /// set, fire, merge back (used by faces whose host never re-enters
+    /// the registry cell — the legacy Sim face drives FireSet directly).
+    pub fn fire_vc(&mut self, host: &mut dyn VpiHost) -> SResult<()> {
+        let mut fs = self.take_fire_set();
+        let r = fs.fire_vc(host);
+        self.restore_fire_set(fs);
+        r
+    }
+
+    /// Fire `cbAfterDelay(t)` timers due at the newly-advanced `now`.
+    pub fn fire_due_timers(&mut self, host: &mut dyn VpiHost) -> SResult<()> {
+        let mut fs = self.take_fire_set();
+        let r = fs.fire_due_timers(host);
+        self.restore_fire_set(fs);
+        r
+    }
+
+    /// `cbStartOfSimulation`.
+    pub fn fire_start(&mut self, host: &mut dyn VpiHost) -> SResult<()> {
+        let mut fs = self.take_fire_set();
+        let r = fs.fire_start(host);
+        self.restore_fire_set(fs);
+        r
+    }
+
+    /// `cbEndOfSimulation` (both natural-end and `$finish` exits; not on
+    /// simulation errors — registered divergence).
+    pub fn fire_end(&mut self, host: &mut dyn VpiHost) -> SResult<()> {
+        let mut fs = self.take_fire_set();
+        let r = fs.fire_end(host);
+        self.restore_fire_set(fs);
+        r
+    }
+}
+
+/// The movable part of the registry during a firing window (U-4 slice-2).
+/// The table/index stay in VpiState so host reads see a live registry.
+pub(crate) struct FireSet {
+    cbs: Vec<Option<CbEntry>>,
+    pending_vc: BTreeMap<u32, Bits>,
+    timers: BTreeMap<u64, Vec<usize>>,
+    next_cb: u32,
+}
+
+impl FireSet {
+    fn has_vc_callbacks(&self) -> bool {
+        self.cbs
+            .iter()
+            .any(|c| c.as_ref().is_some_and(|e| matches!(e.reason, CbReason::ValueChange(_))))
     }
 
     /// Indices (in registration order) of live callbacks matching `want`.
@@ -222,7 +351,121 @@ impl VpiState {
             .map(|(i, _)| i)
             .collect()
     }
+
+    /// Drain collapsed value-change callbacks (take-drain; a callback that
+    /// writes appends to the freshly-taken map's successor — fires at the
+    /// next drain point, never re-entrantly). `host` is the embedder view
+    /// (U-4 slice-2: callbacks no longer see `&mut Sim` directly).
+    pub fn fire_vc(&mut self, host: &mut dyn VpiHost) -> SResult<()> {
+        if !self.has_vc_callbacks() {
+            self.pending_vc.clear();
+            return Ok(());
+        }
+        let due: Vec<(u32, Bits)> = std::mem::take(&mut self.pending_vc).into_iter().collect();
+        let now = host.time(TimeScale::Precision);
+        let mut invocations = 0u32;
+        for (hidx, bits) in due {
+            let ids = self.matching(&CbReason::ValueChange(VpiHandle(hidx)));
+            for i in ids {
+                let Some(mut entry) = self.cbs[i].take() else {
+                    continue;
+                };
+                invocations += 1;
+                if invocations > CB_CASCADE_BUDGET {
+                    self.cbs[i] = Some(entry);
+                    return Err(SimError::new(
+                        "rVPI callback cascade exceeded budget (runaway value-change loop?)",
+                        None,
+                    ));
+                }
+                let info = CbInfo {
+                    reason: CbReason::ValueChange(VpiHandle(hidx)),
+                    time: now,
+                    value: Some(bits.clone()),
+                };
+                (entry.f)(host, &info);
+                self.cbs[i] = Some(entry);
+            }
+        }
+        Ok(())
+    }
+
+    /// Fire `cbAfterDelay(t)` timers due at the newly-advanced `now`.
+    pub fn fire_due_timers(&mut self, host: &mut dyn VpiHost) -> SResult<()> {
+        let now = host.time(TimeScale::Precision);
+        loop {
+            let Some((&t, _)) = self.timers.iter().next() else {
+                break;
+            };
+            if t > now {
+                break;
+            }
+            let ids = self.timers.remove(&t).unwrap_or_default();
+            let mut invocations = 0u32;
+            for i in ids {
+                let Some(mut entry) = self.cbs[i].take() else {
+                    continue;
+                };
+                invocations += 1;
+                if invocations > CB_CASCADE_BUDGET {
+                    self.cbs[i] = Some(entry);
+                    return Err(SimError::new(
+                        "rVPI callback cascade exceeded budget (timer loop?)",
+                        None,
+                    ));
+                }
+                let info = CbInfo {
+                    reason: CbReason::AfterDelay(t),
+                    time: now,
+                    value: None,
+                };
+                (entry.f)(host, &info);
+                self.cbs[i] = Some(entry);
+            }
+        }
+        Ok(())
+    }
+
+    /// `cbStartOfSimulation`.
+    pub fn fire_start(&mut self, host: &mut dyn VpiHost) -> SResult<()> {
+        let ids = self.matching(&CbReason::StartOfSimulation);
+        let now = host.time(TimeScale::Precision);
+        for i in ids {
+            let Some(mut entry) = self.cbs[i].take() else {
+                continue;
+            };
+            let info = CbInfo {
+                reason: CbReason::StartOfSimulation,
+                time: now,
+                value: None,
+            };
+            (entry.f)(host, &info);
+            self.cbs[i] = Some(entry);
+        }
+        Ok(())
+    }
+
+    /// `cbEndOfSimulation` (both natural-end and `$finish` exits; not on
+    /// simulation errors — registered divergence).
+    pub fn fire_end(&mut self, host: &mut dyn VpiHost) -> SResult<()> {
+        let ids = self.matching(&CbReason::EndOfSimulation);
+        let now = host.time(TimeScale::Precision);
+        for i in ids {
+            let Some(mut entry) = self.cbs[i].take() else {
+                continue;
+            };
+            let info = CbInfo {
+                reason: CbReason::EndOfSimulation,
+                time: now,
+                value: None,
+            };
+            (entry.f)(host, &info);
+            self.cbs[i] = Some(entry);
+        }
+        Ok(())
+    }
 }
+
 
 fn cb_reason_matches(a: &CbReason, fired: &CbReason) -> bool {
     match (a, fired) {
@@ -601,8 +844,9 @@ impl Sim {
     // ---------- callbacks ----------
 
     pub fn register_cb(&mut self, reason: CbReason, f: CbFn) -> CbId {
+        // Fold union-find aliases to the canonical handle first, then the
+        // shared registry canonicalization (U-4 slice-2).
         let reason = match reason {
-            // Canonicalize so aliases and the write-site records agree.
             CbReason::ValueChange(h) => {
                 let name = self.vpi.table[h.0 as usize].name.clone();
                 match self.canon_idx(&name) {
@@ -612,10 +856,7 @@ impl Sim {
             }
             r => r,
         };
-        if let CbReason::ValueChange(h) = &reason {
-            debug_assert!((*h).0 < self.vpi.table.len() as u32);
-        }
-        self.vpi.add_cb(reason, f)
+        self.vpi.register(reason, f)
     }
 
     pub fn remove_cb(&mut self, id: CbId) {
@@ -624,118 +865,58 @@ impl Sim {
         }
     }
 
-    /// Drain collapsed value-change callbacks (take-drain; a callback that
-    /// writes appends to the freshly-taken map's successor — fires at the
-    /// next drain point, never re-entrantly).
+    /// Drain collapsed value-change callbacks. mem::take keeps the borrow
+    /// split: the registry fires while `self` serves as the [`VpiHost`].
     pub fn drain_vc_callbacks(&mut self) -> SResult<()> {
-        if !self.vpi.has_vc_callbacks() || self.vpi.pending_vc.is_empty() {
-            self.vpi.pending_vc.clear();
-            return Ok(());
-        }
-        let due: Vec<(u32, Bits)> = std::mem::take(&mut self.vpi.pending_vc)
-            .into_iter()
-            .collect();
-        let now = self.now;
-        let mut invocations = 0u32;
-        for (hidx, bits) in due {
-            let ids = self.vpi.matching(&CbReason::ValueChange(VpiHandle(hidx)));
-            for i in ids {
-                let Some(mut entry) = self.vpi.cbs[i].take() else {
-                    continue;
-                };
-                invocations += 1;
-                if invocations > CB_CASCADE_BUDGET {
-                    self.vpi.cbs[i] = Some(entry);
-                    return Err(SimError::new(
-                        "rVPI callback cascade exceeded budget (runaway value-change loop?)",
-                        None,
-                    ));
-                }
-                let info = CbInfo {
-                    reason: CbReason::ValueChange(VpiHandle(hidx)),
-                    time: now,
-                    value: Some(bits.clone()),
-                };
-                (entry.f)(self, &info);
-                self.vpi.cbs[i] = Some(entry);
-            }
-        }
-        Ok(())
+        let mut fs = self.vpi.take_fire_set();
+        let r = fs.fire_vc(self);
+        self.vpi.restore_fire_set(fs);
+        r
     }
 
     /// Fire `cbAfterDelay(t)` timers due at the newly-advanced `now`.
     pub fn fire_due_timers(&mut self) -> SResult<()> {
-        loop {
-            let Some((&t, _)) = self.vpi.timers.iter().next() else {
-                break;
-            };
-            if t > self.now {
-                break;
-            }
-            let ids = self.vpi.timers.remove(&t).unwrap_or_default();
-            let now = self.now;
-            let mut invocations = 0u32;
-            for i in ids {
-                let Some(mut entry) = self.vpi.cbs[i].take() else {
-                    continue;
-                };
-                invocations += 1;
-                if invocations > CB_CASCADE_BUDGET {
-                    self.vpi.cbs[i] = Some(entry);
-                    return Err(SimError::new(
-                        "rVPI callback cascade exceeded budget (timer loop?)",
-                        None,
-                    ));
-                }
-                let info = CbInfo {
-                    reason: CbReason::AfterDelay(t),
-                    time: now,
-                    value: None,
-                };
-                (entry.f)(self, &info);
-                self.vpi.cbs[i] = Some(entry);
-            }
-        }
-        Ok(())
+        let mut fs = self.vpi.take_fire_set();
+        let r = fs.fire_due_timers(self);
+        self.vpi.restore_fire_set(fs);
+        r
     }
 
     /// `cbStartOfSimulation`.
     pub fn fire_start_of_simulation(&mut self) -> SResult<()> {
-        let ids = self.vpi.matching(&CbReason::StartOfSimulation);
-        let now = self.now;
-        for i in ids {
-            let Some(mut entry) = self.vpi.cbs[i].take() else {
-                continue;
-            };
-            let info = CbInfo {
-                reason: CbReason::StartOfSimulation,
-                time: now,
-                value: None,
-            };
-            (entry.f)(self, &info);
-            self.vpi.cbs[i] = Some(entry);
-        }
-        Ok(())
+        let mut fs = self.vpi.take_fire_set();
+        let r = fs.fire_start(self);
+        self.vpi.restore_fire_set(fs);
+        r
     }
 
     /// `cbEndOfSimulation` (both natural-end and `$finish` exits; not on
     /// simulation errors — registered divergence).
     pub fn fire_end_of_simulation(&mut self) -> SResult<()> {
-        let ids = self.vpi.matching(&CbReason::EndOfSimulation);
-        let now = self.now;
-        for i in ids {
-            let Some(mut entry) = self.vpi.cbs[i].take() else {
-                continue;
-            };
-            let info = CbInfo {
-                reason: CbReason::EndOfSimulation,
-                time: now,
-                value: None,
-            };
-            (entry.f)(self, &info);
-            self.vpi.cbs[i] = Some(entry);
-        }
-        Ok(())
+        let mut fs = self.vpi.take_fire_set();
+        let r = fs.fire_end(self);
+        self.vpi.restore_fire_set(fs);
+        r
+    }
+}
+
+/// U-4 slice-2: the legacy segments face as a [`VpiHost`] — pure
+/// delegation to the pre-existing Sim rVPI methods.
+impl VpiHost for Sim {
+    fn bits(&self, h: VpiHandle) -> SResult<Bits> {
+        self.vpi_bits(h)
+    }
+    fn put_bits(&mut self, h: VpiHandle, bits: &Bits) -> SResult<()> {
+        self.vpi_write_bits(h, bits)
+    }
+    fn name(&self, h: VpiHandle) -> &str {
+        self.vpi_name(h)
+    }
+    fn time(&self, ts: TimeScale) -> u64 {
+        self.vpi_time(ts)
+    }
+    fn finish(&mut self) {
+        self.finished = true;
     }
 }
 

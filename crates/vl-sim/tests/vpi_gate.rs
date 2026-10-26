@@ -158,7 +158,7 @@ fn two_paths_one_truth_against_corpus() {
         {
             let lines = lines.clone();
             Box::new(move |s, _i| {
-                if let Ok(VpiValue::Vector(b)) = s.vpi_get_as(lfsr, Format::Vector) {
+                if let Ok(b) = s.bits(lfsr) {
                     lines.borrow_mut().push(format!("lfsr={}", b.fmt_hex()));
                 }
             })

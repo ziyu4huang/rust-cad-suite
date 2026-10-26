@@ -623,6 +623,15 @@ impl Kernel {
             if let Some(mut f) = self.vpi_hooks.after_delay.take() {
                 f(self, at);
                 self.vpi_hooks.after_delay = Some(f);
+                // U-4 slice-2: a timer callback's finish request
+                // (vpi_control(vpiFinish) analog, UsimHost::finish) lands
+                // between time steps — honor it before the slots run, so
+                // the stop short-circuits this time step entirely (the
+                // legacy face's fire_due_timers → finish does the same).
+                if self.stop_as_finish {
+                    self.stopped_silently = true;
+                    return self.finish_out(sink, None);
+                }
             }
             if let Some(mut gates) = self.gate_due.remove(&at) {
                 while let Some(gi) = gates.pop() {
