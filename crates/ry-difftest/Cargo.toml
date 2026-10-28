@@ -1,0 +1,12 @@
+[package]
+name = "ry-difftest"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+publish = false
+
+# ry-difftest — ryosys 的 oracle 差分 harness(RYOSYS-MVP §4)。
+# dev-only,不隨產品 ship(publish=false,對齊 vl-difftest/riv-difftest 慣例)。
+# 零外部依賴:歸一化/錄製/對拍全手寫。
+[dependencies]

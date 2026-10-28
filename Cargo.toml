@@ -7,6 +7,9 @@ members = [
     "crates/riv-gen",
     "crates/riv-elab",
     "crates/riv-kernel",
+    "crates/ry-ir",
+    "crates/ry-cli",
+    "crates/ry-difftest",
     "crates/rcs-diag",
     "crates/vl-syntax",
     "crates/vl-values",
@@ -37,6 +40,9 @@ riv-ir = { path = "crates/riv-ir" }
 riv-gen = { path = "crates/riv-gen" }
 riv-elab = { path = "crates/riv-elab" }
 riv-kernel = { path = "crates/riv-kernel" }
+ry-ir = { path = "crates/ry-ir" }
+ry-cli = { path = "crates/ry-cli" }
+ry-difftest = { path = "crates/ry-difftest" }
 vl-sim = { path = "crates/vl-sim" }
 vl-vcd = { path = "crates/vl-vcd" }
 vl-spec = { path = "crates/vl-spec" }

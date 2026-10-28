@@ -1,0 +1,10 @@
+[package]
+name = "ry-ir"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+# ry-ir: RTLIL 對象模型 + 行導向 lexer/遞迴下降 parser + write_rtlil -readable
+# 打印機。零外部依賴(PLAN §2 政策);插入序容器自帶。
+[dependencies]

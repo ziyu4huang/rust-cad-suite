@@ -1,0 +1,16 @@
+[package]
+name = "ry-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+# ry-cli — bin `ryosys`(RYOSYS-MVP §1.2/§2):兩層 registry + `-p` 解析
+# 契約 + 實現層 5 命令(read_rtlil/write_rtlil -readable/write_json/check/
+# stat 無參)。依賴=ry-ir(IR 主權層);0 外部依賴(手寫 flags,同 vl-cli)。
+[dependencies]
+ry-ir = { path = "../ry-ir" }
+
+[[bin]]
+name = "ryosys"
+path = "src/main.rs"
