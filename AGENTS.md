@@ -203,7 +203,7 @@
   5.052 實錄 58 檔;churn=升級信號要讀;日常錄單案例=`--corpus` 指向
   含案例子目錄的父層)。正規化期望零漂移=升級無語義變化的免費證明。
 
-## 10.9 riv runner 紀律(2026-10-24,C4 立法)
+
 
 - **riv-difftest 正規化=丟行白名單**(vl-difftest 四前綴 ∪ finish 橫幅/
   `VCD info: ` 形),禁內容改寫;敵意 fixture(`-7div2=-3`、`tb.v:6: `
@@ -218,3 +218,19 @@
   子串 `milestone R`(R0 無括號形與 §5-5 括號形通吃),M7/M8 舊族指針=
   error 非 pending。SUMMARY 精確數基線(C4 定盤 e2e=28/59、iv=4/10;
   2026-10-25 R2/R3 弧末=**e2e=42/59、iv=8/10**)隨能力同輪上調。
+
+## 10.9-r ryosys 紀律(2026-10-27,M0/ADR-0010;正典=SKILL「ryosys 增補」節)
+
+- **RTLIL-first**:輸入一律 oracle 產 .il;golden 錄製入 git、測試零 oracle
+  依賴;未實現命令=登記層 stub 硬錯 `milestone Y0..Y3`,普查外名字逐字重現
+  oracle 錯;`-p` 切分=token 尾分號。迭代序契約(dict/pool 正向=逆插入、
+  erase=swap-and-pop 移尾補位;simplemap 的 cell 序面由此外生)、
+  兩出口順序禁互推、歸一化敵意 fixture、`SUMMARY ys=402/402` regress 基線
+  (M1 弧末:三擴容層 -hier/-rj/-sm 各 87 全數在庫)
+  ——條文與證據指針=SKILL ryosys 節+docs/RYOSYS-MVP.md+ADR-0010。
+- **工具鏈對齊(M1/§7.0-4)**:Xcode 26.x ld 不認 CLT 27 SDK .tbd(`tapi
+  error: malformed file`),C++ 鏈接腿必紅;regress.sh 頂部 3 行防禦性
+  `DEVELOPER_DIR=CLT`(僅未設且 CLT 在場觸發;顯式設置尊重不覆蓋;無 CLT
+  短路零影響)——正典=SKILL ryosys 節工具鏈條目,形態禁脫離 3 行 `-d` 判定
+  (RM1-7 半損壞 CLT 角=紅燈可診斷非假綠,登記在案)。
+

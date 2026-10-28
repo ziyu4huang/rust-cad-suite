@@ -4,6 +4,14 @@
 # Usage: bash scripts/regress.sh [--with-record]
 set -u
 cd "$(dirname "$0")/.."
+# Toolchain alignment (M1 slice-1, RYOSYS-MVP §7.3): default xcode-select may
+# point at Xcode 26.x whose ld cannot read CLT 27.x SDK .tbd files (tapi error:
+# malformed file — §7.0-4), breaking every C++-linking leg (rv-diff/toolbox).
+# Defensive only: export CLT when DEVELOPER_DIR is unset AND CLT exists;
+# explicit DEVELOPER_DIR wins (user sovereignty); CLT-less machines no-op.
+if [ -z "${DEVELOPER_DIR:-}" ] && [ -d /Library/Developer/CommandLineTools/usr/bin ]; then
+    export DEVELOPER_DIR=/Library/Developer/CommandLineTools
+fi
 fail=0
 
 echo "== [1/4] build (clean-ish) =="
@@ -296,6 +304,32 @@ fi
 # upstream header clone). Run with WITH_XLS_CPP=1.
 if [ "${WITH_XLS_CPP:-0}" = "1" ]; then
     bash scripts/xls-cpp-gate.sh || { echo "GATE FAIL: xls cpp subclass"; fail=1; }
+fi
+
+# S4 ryosys (M0+M1, RYOSYS-MVP §3-M0 闸④/§3-M1 闸①③):CLI 契约 goldens +
+# ys-e2e 精确数 100%(402 例四件套对拍,stderr 零归一化)。守卫块按
+# crates/ry-cli/Cargo.toml 在场判定;既有闸零扰动。
+if [ -f crates/ry-cli/Cargo.toml ]; then
+    ry_ct=$(cargo test -p ry-cli 2>&1 | grep -E "^test result" | tail -1)
+    echo "$ry_ct" | grep -q "test result: ok" || { echo "GATE FAIL: ry-cli contract goldens: $ry_ct"; fail=1; }
+    ys_out=$(cargo run -q -p ry-difftest -- --corpus corpus/ys-e2e 2>&1)
+    ys_sum=$(echo "$ys_out" | grep -E "^SUMMARY ys=" || true)
+    [ -n "$ys_sum" ] || { echo "GATE FAIL: ys-e2e SUMMARY missing"; fail=1; }
+    echo "$ys_sum" | grep -q "SUMMARY ys=402/402" || { echo "GATE FAIL: ys-e2e baseline (want exact 402/402): $ys_sum"; fail=1; }
+    ys_fail=$(echo "$ys_out" | grep -c "	FAIL	" || true)
+    [ "$ys_fail" -eq 0 ] || { echo "GATE FAIL: ys-e2e FAIL x$ys_fail"; echo "$ys_out" | grep "	FAIL	"; fail=1; }
+    echo "ryosys M0+M1(a-e): ry-cli contract + ys-e2e 402/402"
+    # live-compare 腿(§3-M1 闸③):oracle 在场=即时重录对拍不低于入库
+    # 基线;缺 oracle=skip+note(比照 lint-parity 闸形态)。
+    ys_live=$(cargo run -q -p ry-difftest -- --live --corpus corpus/ys-e2e 2>&1 | grep -E "^LIVE ys=" || true)
+    if echo "$ys_live" | grep -q "LIVE ys=skip"; then
+        echo "ryosys live-compare: $ys_live"
+    elif [ -n "$ys_live" ]; then
+        echo "$ys_live" | grep -q "LIVE ys=402/402" || { echo "GATE FAIL: ryosys live-compare below baseline: $ys_live"; fail=1; }
+        [ "$ys_live" = "LIVE ys=402/402" ] && echo "ryosys live-compare: 402/402 vs committed goldens"
+    else
+        echo "GATE FAIL: ryosys live-compare produced no LIVE line"; fail=1
+    fi
 fi
 
 if [ "${1:-}" = "--with-record" ]; then

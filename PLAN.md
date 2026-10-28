@@ -15,10 +15,23 @@
   線用,docs/RIVERILOG-PLAN.md)。
 - oss-cad-suite 二進制包 darwin-arm64-20261020(526MB)已下載至
   `vendor-reference/suite-dl/`(gitignored),Phase 2+ 各工具的 oracle 候選。
+- suite 內 yosys 實測 `Yosys 0.70+179 (git sha1 9534a7f4d, …)`
+  (vendor-reference/suite-dl/oss-cad-suite/bin/yosys,2026-10-27);
+  read_verilog→proc→write_rtlil -readable 錄製管線確定性+roundtrip 冪等
+  已實測;默認 write_rtlil=twines 形(M0 釘 -readable 形);`-H` 普查
+  306 條命令、無 read_sverilog(已併入 read_verilog)。
 - upstream 63 個工具腳本清單見 `vendor-reference/oss-cad-suite-build/default/scripts/`。
 
 ## 1. Suite 路線圖(Phase 1 之後的排序)
-1. **P2 yosys-equiv 綜合核**——最高槓桿,復用 vl-syntax/vl-elab。
+1. **P2 yosys-equiv 綜合核(ryosys)**——正典企劃=docs/RYOSYS-MVP.md
+   (2026-10-27 立項,ADR-0010)。策略=RTLIL-first:輸入一律 oracle 產的
+   process-free .il,繞過 Verilog/ast 前端;M0=read_rtlil→{check,stat}→
+   write_rtlil(-readable)/write_json 縱切+corpus/ys-e2e 錄製 golden 差分閘
+   (141 例四件套,P-bearing 54 例入庫即 process 硬錯契約,M2 翻轉閘);
+   M1=零轉換 pass 面(hierarchy/simplemap/read_json 閉環);M2=proc 家族
+   +opt_expr 子集。crate=ry-ir/ry-cli(bin ryosys)/ry-difftest;硬錯家族
+   =milestone Y0..Y3;oracle=suite 內 yosys 0.70+179(sha1 9534a7f4d),
+   golden 錄製入 git、測試零 oracle 依賴。
 2. **P3 iverilog-equiv(riverilog)**——事件驅動調度器 + VPI 子集;**正典企劃=docs/RIVERILOG-PLAN.md(2026-10-24 立項)**;R0 ✅(CLI 契約 goldens+iv-e2e 10 例 chase ledger);**R2+R3 ✅ 2026-10-25**(docs/riv-r2-design.md C1-C6 弧:vl-values 提取+riv-ir/riv-elab/riv-kernel 三 crate+兩段式 `riverilog -o out.riv`→`rivvp` 貫通;riv e2e **42/59**、iv **8/10** byte-exact,17 個 e2e pending 全帶 `milestone R4` 結構層指針;R1 ◐=-g 受理但 dialect/-E/-t null 未落+tri_gate 順延——iverilog 已復位可開工;named events/VPI shim=R3 殘項)。**下一弧=R4 收割弧(2026-10-25 立案,獨立對抗審 15 項吸收,SSOT=RIVERILOG-PLAN §8.1:步驟 0=iv 錄製腿+tri_gate 先行;例化含參數覆寫+net/cont-assign 執行期語義獨立探針;generate/unpacked array/readmem 前拉收編;逐例終態表目標 e2e 59/59、iv 9/10+採礦 19/20;強度/picorv32/yosys 腿順延=偏差帳在案;M9 tier-B 續停)。**R4 ✅ 2026-10-25 一弧收網**:riv-ir v4+riv-elab Scope 堆疊+kernel 陣列/閘/事件/延遲 NBA;e2e **58/59**(53=rivD10 ledger 兩 oracle 實測分歧)、iv **19/20**(09_udp=R9)、採礦 10 例 enforced(首輪抓三真缺口=intra-assign 延遲/閘延遲解析/force 位選語義,全部實作收編);TRI agree=56 bug=0;rivD9 兌現(VCD 交叉閘);perf release ~308k cycles/s(RK5 200k 停線不觸發,R10 1M 留優化輪)。**追加輪 ✅ 2026-10-25**:RK5 效能輪(308k→**575k cycles/s** +87%,vvp 差距 2.2×,樣本驅動三發=反向索引+零分配敏感表+Const 預解析);R5 IO 批次(fopen 家族+dump 控制+$random=iv **21/22**,rivD11;VCD 閘迴圈化);yosys-simple 同位腿(**68/68+19 排除**,--simple 閘;附帶 `+:`/`-:` 實作+resolve_hier 無限循環等四真修);ZipCPU GPLv3 唯讀語料輪(**EXT 46/46+ZIPLINT 46/46** 排除 5,即時 oracle 對拍零入庫;參數基準 part-select/零寬重複兩真修)。
 3. **P3.5 SV-UNIFY 統一 SystemVerilog 弧(2026-10-25 立案;正典=docs/SV-ELAB-STUDY.md)**——單一共用 SV 前端(vl-syntax dialect 擴充,禁第二 parser)×雙語義引擎;外部參照=povik/sv-elab(ISC,Yosys v0.67 內建/OSS CAD Suite 的 SV 前端,slang 下游=一前端多下游同構證據);三路取值=回歸語料入 git(tests/{various,unit} ISC)/支援矩陣正典/slang 架構研究;弧序 SV-1 語料同位閘→SV-2 即時斷言→SV-3 類型族→SV-4 interface→SV-5 always_ff/fill→SV-6 長字串;riverilog R8 與 rverilator M8-M9 SV 候補在此弧合流。
 4. **P3.6 統一引擎弧(2026-10-25 立案,ADR-0009 接受,推翻 RIVERILOG-PLAN §3 選項 C 裁決與 OD2)**——使用者調整目標:rverilator 與 riverilog 合流為**單一 Rust 引擎**(riv-kernel 4-state 事件核升格),CLI 合規雙面(rverilator=Verilator 形;riverilog+rivvp=iverilog 形);方言=語義開關非引擎分叉;動機=統一 Rust 生態/簡單/跨平台+SV-UNIFY 功能一次落雙面+維護 1×;合流步 U-1 ✅(2026-10-25,USim 驅動 --binary,e2e 59/59 金樣零漂移)→U-2 ✅(2026-10-25,求值面合流=vl-ops 單一語義源三面共呼;雙 oracle 七探針揭發並修 `~`/signed-bitwise/logic-x 三語義分歧,REGISTRY incident 10-24)→U-3 ◐ 前半 ✅(2026-10-25,riverilog -t null/-E/-y fixpoint/-D 雙形+rivvp -N/-q/-l,共享 -E 前端=vl-syntax::pp,兩臂零漂移;U-3b 殘=dialect 關鍵字受理表/-l -/-i/-M 長尾)→U-3 CLI 後半(U-3b)**◐ 第一刀 ✅ 2026-10-26**(-g 登記冊 255/feature 受理+-f/-c/-M/-T 驗證/-W/-p/-P 非致命/-S 指針/-i 真實作/寫檔失敗 255=rivD13 對齊/rivvp -l -=rivD14 釘死;殘=dialect 受理表本體[R8 生效]/-E 正規化閘/-T 選擇語義/parse 錯誤計數)→U-4 rVPI 收編(◐ slice-1 ✅ 2026-10-26 Kernel 四觸發點零成本掛鉤+hooks 閘;slice-2=CbFn embedder 解耦+USim 註冊面)→U-5 segments 退役→U-6 tier-B 重定向;每步 regress 全綠才進,不可達即回退雙引擎現狀;已知代價=riverilog 效能須統一核重驗、profile 差異例登記分歧。
@@ -36,7 +49,10 @@ crates/
 ├── vl-elab/      鏈接/參數/generate/寬度 → 降到 vl-ir        (M3)
 ├── vl-sim/       調度器 + 解釋器 + 4-state 值 + VCD          (M4-M6)
 ├── vl-cli/       bin `rverilator`                            (現用,0 外部依賴)
-└── vl-difftest/  dev-only oracle 差分 harness               (M4)
+├── vl-difftest/  dev-only oracle 差分 harness               (M4)
+├── ry-ir/         RTLIL 對象模型+parser+打印機(-readable 形)  [0 deps]
+├── ry-cli/        bin `ryosys`(registry+-p+check/stat/write_*) [ry-ir]
+└── ry-difftest/   dev-only oracle 差分 harness(publish=false)
 corpus/           自寫樣例 + oracle 期望輸出(入 git)
 corpus-external/  外部語料快照(入 git,帶 LICENSE;收編即解除 ignore):
                   yosys-simple/ =YosysHQ/yosys tests/simple 87 檔(ISC)+LINT-DIFF.tsv;
@@ -70,6 +86,9 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 | M7 | 記憶體陣列+\$readmem+閘原始件 | 30_gen_mux 轉綠+新例 oracle 錄製 | ✅ 2026-10-23:unpack 陣列(單 range)/逐字 VCD(mem[i] 元件變數=oracle 實證)/\$readmemh/\$readmemb(@addr 跳址+start/finish+註解;x-index 寫忽略/OOB 讀 x)/12 種閘原始件(§7 4-state 表,bufif/notif 停動驅 z);**E2E 55/55=100%**(52_mem_basic/53_readmem/54_gates/55_mem_nba oracle 錄製) |
 | M7b | lint-only 差分軌(yosys tests/simple 收編) | lint parity 對 verilator --lint-only -Wno-fatal | ✅ 2026-10-23 四輪 44→80/87;**2026-10-24 五輪(M8)=83/87 (95.4%)**(寬埠宣告三案例翻綠,ADR-0008)(四輪=IndexedPart lvalue/埠屬性 ANSI 前導/defparam 前置收集三修;三輪 77=u128 ADR-0006)(二輪修:命名單一 begin 塊無隱式 genblk/fill literals/attributes 兩處/函數註冊提前/巨集貼合併);閘基線 73 入 regress.sh;餘 13=u128 擴寫(×5~7)/defparam/multiplier lvalue 範圍/mem_arst 形狀 + M8 功能(reals/字串/intra-assign) |
 | M7c | **rVPI**(Rust 原生 VPI 結構等價) | 句柄/值讀寫/回調/時間/控制,庫面測試直驅 | ✅ 2026-10-23 slice 1:`vl-sim::vpi`(凍結名表句柄+四類回調+get/put NoDelay+children 迭代);vpi_gate 8 測+two-paths-vs-corpus+rVPI×VCD 內部交叉;ADR-0003;分歧 D12-D15。切片 2=Synch 回調/延遲 put 模式/Ports 迭代 |
+| ryosys M0 | RTLIL 縱切(read_rtlil/check/stat/write_rtlil -readable/write_json+CLI 契約) | cargo test -p ry-ir roundtrip ≥20 例 byte-exact;ry-difftest ys-e2e 精確數 100%(141 例四件套對拍,stderr 零歸一化);regress 守衛塊綠 | ✅ 2026-10-27(141/141+ry-cli 契約 18 例+ry-ir 55 例) |
+| ryosys M1 | 零轉換 pass 面(hierarchy/simplemap/check 組合環)+read_json 閉環+live-compare 腿 | 擴容基線逐字 grep;交叉閉環 byte-exact;live 腿不降基線 | ✅ 2026-10-27(a-e 全勾):a(hierarchy -auto-top/-top,三形態 byte-exact)+b(read_json 自家輸出閉環 87 例)+e(live-compare 腿)✅,基線 141→314/314;c(check 組合環)✅:celledges.cc 全 dispatch 移植(參與條件=cell_evaluable||mem/barrier||is_builtin_ff;邊緣觸發 ff **不建 D→Q 邊**;arith/shift/mux/compare/ff_op/mem_op 精確邊+detail_costly≥1024 fallback)+log_signal_bit 裸名規則修正;d(simplemap)✅:simplemap.cc 45 條 dispatch+mapper 家族+FfData slice/emit(ff 量化表已錄 PROVENANCE:粗 ff 78 實例/564 fine cell,**上輪口頭 234 無檔不符實錄以實錄為準**)+`$auto$simplemap.cc:<L>`/`$auto$ff.cc:337:slice$N` 自動名(16 行號錨=二進制普查與 clone 零漂移)+hashlib dict swap-and-pop 序;順帶修 M0 dormant bug(cells.rs `$_MUX_` 族端口表缺 S/C/D → write_json port_directions 錯,25 例 -sm JSON-DIFF 揭發);wand/wor 多驅動解析(hierarchy.cc:1364-1481;`$auto$hierarchy.cc:1485/1524/1526:execute$N`+`$auto$rtlil.cc:3249:And/3250:Or` 二進制行號錨;寬 1 wor 探針實錄 :1517)+wandwor-hier 補錄;**基線 314→402/402**(-hier 87[wandwor-hier 補錄]+-rj 87+-sm 87,oracle 普查 87/87 零排除),LIVE ys=402/402 |
+| ryosys M2 | proc 家族+opt_expr(-keepdc)子集;process 硬錯翻轉 | process 案例翻綠精確數;Y2 硬錯 fixture 刪除同輪;proc 後雙後端 byte-exact | |
 | M7d | **WASM facade + 瀏覽器 playground**(`crates/vl-wasm`) | wasm 構建+bun 差分閘同 goldens | ✅ 2026-10-23:薄殼 cdylib(vl-sim 零改動);500KB wasm;差分 6/6 + **功能閘**(`$readmem` 虛擬檔注入 run_verilog_with_files/inject_file + rVPI JS 回調 on_value_change/on_after_delay/vpi_get/vpi_put_int/finish)2/2 + VCD 解析器檢查;閘入 regress.sh(pkg 過期自動重建)。**瀏覽器 demo 頁** `wasm-demo/`(source→run→stdout+VCD 波形 canvas;no-store server;真瀏覽器目檢截圖=docs/e2e-report/wasm-demo-verified.png);讀數:進程內 0.106ms/run |
 | M7e | **C-ABI host facade**(`crates/vl-ffi`)+Bun 呼叫兩式 | FFI/subprocess 差分閘同 goldens | ✅ 2026-10-23:`rcs_run(manifest)/rcs_version/rcs_free`(行式 manifest,Bun bun:ffi dlopen);bun-example/run.mjs(FFI 進程內)+spawn.mjs(subprocess)均 PASS-vs-golden;閘入 regress.sh |
 | M7f | **XLS 語料上游**(`corpus-external/xls/`) | XLS codegen Verilog 收編為差分語料 | ✅ 2026-10-23:收割管線=`.github/workflows/xls-harvest.yml`(workflow_dispatch 一鍵,linux-x64 release,4 輪迭代全靠工具自身證據修旗標/關鍵字);57_xls_add3+58_xls_acc_pipe oracle 錄製入庫;Apache-2.0 LICENSE+NOTICE 隨快照;DSLX→tier-B 研究筆記=docs/DSLX-STUDY.md(位寬即型別/match 窮盡性/不可變 let 三項直接可偷) |
