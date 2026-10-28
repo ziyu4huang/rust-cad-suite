@@ -1,0 +1,33 @@
+-- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module omsp_dbg_uart...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== omsp_dbg_uart ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       15 wires
+       27 wire bits
+        7 public wires
+       11 public wire bits
+        4 ports
+        4 port bits
+        2 processes
+        5 cells
+        1   $and
+        1   $eq
+        1   $mux
+        1   $ne
+        1   $or
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

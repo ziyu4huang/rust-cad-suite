@@ -1,0 +1,3955 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "memtest13": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/memory.v:293.1-319.10"
+      },
+      "ports": {
+        "clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "rst": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "a1": {
+          "direction": "input",
+          "bits": [ 4, 5 ]
+        },
+        "a2": {
+          "direction": "input",
+          "bits": [ 6, 7 ]
+        },
+        "a3": {
+          "direction": "input",
+          "bits": [ 8, 9 ]
+        },
+        "a4": {
+          "direction": "input",
+          "bits": [ 10, 11 ]
+        },
+        "a5": {
+          "direction": "input",
+          "bits": [ 12, 13 ]
+        },
+        "a6": {
+          "direction": "input",
+          "bits": [ 14, 15 ]
+        },
+        "off1": {
+          "direction": "input",
+          "bits": [ 16, 17, 18, 19 ]
+        },
+        "off2": {
+          "direction": "input",
+          "bits": [ 20, 21, 22, 23 ]
+        },
+        "din1": {
+          "direction": "input",
+          "offset": 5,
+          "bits": [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50 ]
+        },
+        "din2": {
+          "direction": "input",
+          "bits": [ 51, 52, 53, 54 ]
+        },
+        "din3": {
+          "direction": "input",
+          "bits": [ 55, 56, 57, 58 ]
+        },
+        "dout1": {
+          "direction": "output",
+          "bits": [ 59, 60, 61, 62 ]
+        },
+        "dout2": {
+          "direction": "output",
+          "bits": [ 63, 64, 65, 66 ]
+        },
+        "dout3": {
+          "direction": "output",
+          "offset": 5,
+          "bits": [ 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/memory.v:313$add$465": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000100000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:313.12-313.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "B": [ 16, 17, 18, 19 ],
+            "Y": [ 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:313$shl$464": {
+          "hide_name": 1,
+          "type": "$shl",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:313.4-313.34"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 55, 56, 57, 58 ],
+            "B": [ 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157 ],
+            "Y": [ 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:313$shl$468": {
+          "hide_name": 1,
+          "type": "$shl",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000011011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:313.4-313.34"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1", "1", "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "B": [ 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157 ],
+            "Y": [ 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:313$sub$467": {
+          "hide_name": 1,
+          "type": "$sub",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000100000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:313.4-313.34"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125 ],
+            "B": [ "1", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:314$memrd$469$\\mem": {
+          "hide_name": 1,
+          "type": "$memrd",
+          "parameters": {
+            "ABITS": "00000000000000000000000000000010",
+            "CLK_ENABLE": "00000000000000000000000000000000",
+            "CLK_POLARITY": "00000000000000000000000000000000",
+            "MEMID": "\\mem",
+            "TRANSPARENT": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:314.13-314.16"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "output",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ 10, 11 ],
+            "CLK": [ "x" ],
+            "DATA": [ 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238 ],
+            "EN": [ "x" ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:315$add$471": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000100000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:315.21-315.29"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "B": [ 20, 21, 22, 23 ],
+            "Y": [ 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:315$memrd$470$\\mem": {
+          "hide_name": 1,
+          "type": "$memrd",
+          "parameters": {
+            "ABITS": "00000000000000000000000000000010",
+            "CLK_ENABLE": "00000000000000000000000000000000",
+            "CLK_POLARITY": "00000000000000000000000000000000",
+            "MEMID": "\\mem",
+            "TRANSPARENT": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:315.13-315.16"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "output",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ 12, 13 ],
+            "CLK": [ "x" ],
+            "DATA": [ 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297 ],
+            "EN": [ "x" ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:315$shiftx$475": {
+          "hide_name": 1,
+          "type": "$shiftx",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000011011",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:315.20-315.35"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297 ],
+            "B": [ 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329 ],
+            "Y": [ 330, 331, 332, 333 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:316$memrd$476$\\mem": {
+          "hide_name": 1,
+          "type": "$memrd",
+          "parameters": {
+            "ABITS": "00000000000000000000000000000010",
+            "CLK_ENABLE": "00000000000000000000000000000000",
+            "CLK_POLARITY": "00000000000000000000000000000000",
+            "MEMID": "\\mem",
+            "TRANSPARENT": "00000000000000000000000000000000",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:316.13-316.16"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "output",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ 14, 15 ],
+            "CLK": [ "x" ],
+            "DATA": [ 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360 ],
+            "EN": [ "x" ]
+          }
+        },
+        "$auto$ff.cc:337:slice$675": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 216 ],
+            "E": [ 3 ],
+            "Q": [ 59 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$676": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 217 ],
+            "E": [ 3 ],
+            "Q": [ 60 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$677": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 218 ],
+            "E": [ 3 ],
+            "Q": [ 61 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$678": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 219 ],
+            "E": [ 3 ],
+            "Q": [ 62 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$679": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 330 ],
+            "E": [ 3 ],
+            "Q": [ 63 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$680": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 331 ],
+            "E": [ 3 ],
+            "Q": [ 64 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$681": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 332 ],
+            "E": [ 3 ],
+            "Q": [ 65 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$682": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 333 ],
+            "E": [ 3 ],
+            "Q": [ 66 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$685": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 334 ],
+            "E": [ 3 ],
+            "Q": [ 67 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$686": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 335 ],
+            "E": [ 3 ],
+            "Q": [ 68 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$687": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 336 ],
+            "E": [ 3 ],
+            "Q": [ 69 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$688": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 337 ],
+            "E": [ 3 ],
+            "Q": [ 70 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$689": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 338 ],
+            "E": [ 3 ],
+            "Q": [ 71 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$690": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 339 ],
+            "E": [ 3 ],
+            "Q": [ 72 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$691": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 340 ],
+            "E": [ 3 ],
+            "Q": [ 73 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$692": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 341 ],
+            "E": [ 3 ],
+            "Q": [ 74 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$693": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 342 ],
+            "E": [ 3 ],
+            "Q": [ 75 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$694": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 343 ],
+            "E": [ 3 ],
+            "Q": [ 76 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$695": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 344 ],
+            "E": [ 3 ],
+            "Q": [ 77 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$696": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 345 ],
+            "E": [ 3 ],
+            "Q": [ 78 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$697": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 346 ],
+            "E": [ 3 ],
+            "Q": [ 79 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$698": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 347 ],
+            "E": [ 3 ],
+            "Q": [ 80 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$699": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 348 ],
+            "E": [ 3 ],
+            "Q": [ 81 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$700": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 349 ],
+            "E": [ 3 ],
+            "Q": [ 82 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$701": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 350 ],
+            "E": [ 3 ],
+            "Q": [ 83 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$702": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 351 ],
+            "E": [ 3 ],
+            "Q": [ 84 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$703": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 352 ],
+            "E": [ 3 ],
+            "Q": [ 85 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$704": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 353 ],
+            "E": [ 3 ],
+            "Q": [ 86 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$705": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 354 ],
+            "E": [ 3 ],
+            "Q": [ 87 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$706": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 355 ],
+            "E": [ 3 ],
+            "Q": [ 88 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$707": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 356 ],
+            "E": [ 3 ],
+            "Q": [ 89 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$708": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 357 ],
+            "E": [ 3 ],
+            "Q": [ 90 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$709": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 358 ],
+            "E": [ 3 ],
+            "Q": [ 91 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$710": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 359 ],
+            "E": [ 3 ],
+            "Q": [ 92 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$711": {
+          "hide_name": 1,
+          "type": "$_DFFE_PN_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 360 ],
+            "E": [ 3 ],
+            "Q": [ 93 ]
+          }
+        },
+        "$auto$genrtlil.cc:1651:genRTLIL$473": {
+          "hide_name": 1,
+          "type": "$sub",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000100000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270 ],
+            "B": [ "1", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329 ]
+          }
+        },
+        "$auto$proc_memwr.cc:46:proc_memwr$549": {
+          "hide_name": 1,
+          "type": "$memwr_v2",
+          "parameters": {
+            "ABITS": "00000000000000000000000000100000",
+            "CLK_ENABLE": "1",
+            "CLK_POLARITY": "1",
+            "MEMID": "\\mem",
+            "PORTID": "00000000000000000000000000000000",
+            "PRIORITY_MASK": "",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:306.4-306.15"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "input",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "CLK": [ 2 ],
+            "DATA": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "EN": [ 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361 ]
+          }
+        },
+        "$auto$proc_memwr.cc:46:proc_memwr$550": {
+          "hide_name": 1,
+          "type": "$memwr_v2",
+          "parameters": {
+            "ABITS": "00000000000000000000000000100000",
+            "CLK_ENABLE": "1",
+            "CLK_POLARITY": "1",
+            "MEMID": "\\mem",
+            "PORTID": "00000000000000000000000000000001",
+            "PRIORITY_MASK": "1",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:307.4-307.15"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "input",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "CLK": [ 2 ],
+            "DATA": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "EN": [ 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361 ]
+          }
+        },
+        "$auto$proc_memwr.cc:46:proc_memwr$551": {
+          "hide_name": 1,
+          "type": "$memwr_v2",
+          "parameters": {
+            "ABITS": "00000000000000000000000000100000",
+            "CLK_ENABLE": "1",
+            "CLK_POLARITY": "1",
+            "MEMID": "\\mem",
+            "PORTID": "00000000000000000000000000000010",
+            "PRIORITY_MASK": "11",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:308.4-308.15"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "input",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "CLK": [ 2 ],
+            "DATA": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "EN": [ 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361 ]
+          }
+        },
+        "$auto$proc_memwr.cc:46:proc_memwr$552": {
+          "hide_name": 1,
+          "type": "$memwr_v2",
+          "parameters": {
+            "ABITS": "00000000000000000000000000100000",
+            "CLK_ENABLE": "1",
+            "CLK_POLARITY": "1",
+            "MEMID": "\\mem",
+            "PORTID": "00000000000000000000000000000011",
+            "PRIORITY_MASK": "111",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:309.4-309.15"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "input",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "CLK": [ 2 ],
+            "DATA": [ "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "EN": [ 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361 ]
+          }
+        },
+        "$auto$proc_memwr.cc:46:proc_memwr$553": {
+          "hide_name": 1,
+          "type": "$memwr_v2",
+          "parameters": {
+            "ABITS": "00000000000000000000000000000010",
+            "CLK_ENABLE": "1",
+            "CLK_POLARITY": "1",
+            "MEMID": "\\mem",
+            "PORTID": "00000000000000000000000000000100",
+            "PRIORITY_MASK": "0000",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:311.4-311.19"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "input",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ 362, 363 ],
+            "CLK": [ 2 ],
+            "DATA": [ 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390 ],
+            "EN": [ 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391 ]
+          }
+        },
+        "$auto$proc_memwr.cc:46:proc_memwr$554": {
+          "hide_name": 1,
+          "type": "$memwr_v2",
+          "parameters": {
+            "ABITS": "00000000000000000000000000000010",
+            "CLK_ENABLE": "1",
+            "CLK_POLARITY": "1",
+            "MEMID": "\\mem",
+            "PORTID": "00000000000000000000000000000101",
+            "PRIORITY_MASK": "10000",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:312.4-312.26"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "input",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ 392, 393 ],
+            "CLK": [ 2 ],
+            "DATA": [ 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420 ],
+            "EN": [ "0", "0", "0", "0", "0", "0", 391, 391, 391, 391, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ]
+          }
+        },
+        "$auto$proc_memwr.cc:46:proc_memwr$555": {
+          "hide_name": 1,
+          "type": "$memwr_v2",
+          "parameters": {
+            "ABITS": "00000000000000000000000000000010",
+            "CLK_ENABLE": "1",
+            "CLK_POLARITY": "1",
+            "MEMID": "\\mem",
+            "PORTID": "00000000000000000000000000000110",
+            "PRIORITY_MASK": "110000",
+            "WIDTH": "00000000000000000000000000011011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:313.4-313.34"
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "input",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ 421, 422 ],
+            "CLK": [ 2 ],
+            "DATA": [ 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449 ],
+            "EN": [ 450, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$561": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 364 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$562": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 25 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 365 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$563": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 26 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 366 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$564": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 27 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 367 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$565": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 28 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 368 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$566": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 29 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 369 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$567": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 30 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 370 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$568": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 31 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 371 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$569": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 32 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 372 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$570": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 33 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 373 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$571": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 34 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 374 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$572": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 35 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 375 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$573": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 36 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 376 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$574": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 37 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 377 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$575": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 38 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 378 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$576": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 39 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 379 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$577": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 40 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 380 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$578": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 41 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 381 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$579": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 42 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 382 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$580": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 43 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 383 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$581": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 44 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 384 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$582": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 45 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 385 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$583": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 46 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 386 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$584": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 47 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 387 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$585": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 48 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 388 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$586": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 49 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 389 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$587": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 50 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 390 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$588": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1" ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 391 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$589": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 392 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$590": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 393 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$591": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 394 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$592": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 395 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$593": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 396 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$594": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 397 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$595": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 398 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$596": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 399 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$597": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 51 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 400 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$598": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 52 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 401 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$599": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 53 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 402 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$600": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 54 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 403 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$601": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 404 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$602": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 405 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$603": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 406 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$604": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 407 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$605": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 408 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$606": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 409 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$607": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 410 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$608": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 411 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$609": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 412 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$610": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 413 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$611": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 414 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$612": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 415 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$613": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 416 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$614": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 417 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$615": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 418 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$616": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 419 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$617": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 420 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$618": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 8 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 421 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$619": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 422 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$620": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 158 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 423 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$621": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 159 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 424 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$622": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 160 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 425 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$623": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 161 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 426 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$624": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 162 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 427 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$625": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 163 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 428 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$626": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 164 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 429 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$627": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 165 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 430 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$628": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 166 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 431 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$629": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 167 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 432 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$630": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 168 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 433 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$631": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 169 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 434 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$632": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 170 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 435 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$633": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 171 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 436 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$634": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 172 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 437 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$635": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 173 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 438 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$636": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 174 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 439 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$637": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 175 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 440 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$638": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 176 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 441 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$639": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 177 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 442 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$640": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 178 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 443 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$641": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 179 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 444 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$642": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 180 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 445 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$643": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 181 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 446 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$644": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 182 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 447 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$645": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 183 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 448 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$646": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 184 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 449 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$647": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 185 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 450 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$648": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 186 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 451 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$649": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 187 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 452 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$650": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 188 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 453 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$651": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 189 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 454 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$652": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 190 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 455 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$653": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 191 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 456 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$654": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 192 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 457 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$655": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 193 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 458 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$656": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 194 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 459 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$657": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 195 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 460 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$658": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 196 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 461 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$659": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 197 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 462 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$660": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 198 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 463 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$661": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 199 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 464 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$662": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 200 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 465 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$663": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 201 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 466 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$664": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 202 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 467 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$665": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 203 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 468 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$666": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 204 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 469 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$667": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 205 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 470 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$668": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 206 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 471 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$669": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 207 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 472 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$670": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 208 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 473 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$671": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 209 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 474 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$672": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 210 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 475 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$673": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 211 ],
+            "B": [ "0" ],
+            "S": [ 3 ],
+            "Y": [ 476 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$674": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "1" ],
+            "S": [ 3 ],
+            "Y": [ 361 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$683": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 362 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$684": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:305.7-305.10|../../../corpus-external/yosys-simple/memory.v:305.3-317.6"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5 ],
+            "B": [ "x" ],
+            "S": [ 3 ],
+            "Y": [ 363 ]
+          }
+        }
+      },
+      "memories": {
+        "mem": {
+          "hide_name": 0,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:302.13-302.16"
+          },
+          "width": 27,
+          "start_offset": 0,
+          "size": 4
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/memory.v:313$add$461_Y": {
+          "hide_name": 1,
+          "bits": [ 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:313.12-313.20"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:313$shl$464_Y": {
+          "hide_name": 1,
+          "bits": [ 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:313.4-313.34"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:313$shl$468_Y": {
+          "hide_name": 1,
+          "bits": [ 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:313.4-313.34"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:313$sub$463_Y": {
+          "hide_name": 1,
+          "bits": [ 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:313.4-313.34"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:314$memrd$469$\\mem_DATA": {
+          "hide_name": 1,
+          "bits": [ 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:314.13-314.16"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:315$add$471_Y": {
+          "hide_name": 1,
+          "bits": [ 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255, 256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:315.21-315.29"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:315$memrd$470$\\mem_DATA": {
+          "hide_name": 1,
+          "bits": [ 271, 272, 273, 274, 275, 276, 277, 278, 279, 280, 281, 282, 283, 284, 285, 286, 287, 288, 289, 290, 291, 292, 293, 294, 295, 296, 297 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:315.13-315.16"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:315$shiftx$475_Y": {
+          "hide_name": 1,
+          "bits": [ 330, 331, 332, 333 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:315.20-315.35"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/memory.v:316$memrd$476$\\mem_DATA": {
+          "hide_name": 1,
+          "bits": [ 334, 335, 336, 337, 338, 339, 340, 341, 342, 343, 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:316.13-316.16"
+          }
+        },
+        "$0$memwr$\\mem$../../../corpus-external/yosys-simple/memory.v:306$421_EN[26:0]$431": {
+          "hide_name": 1,
+          "bits": [ 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361, 361 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          }
+        },
+        "$0$memwr$\\mem$../../../corpus-external/yosys-simple/memory.v:311$425_ADDR[1:0]$435": {
+          "hide_name": 1,
+          "bits": [ 362, 363 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          }
+        },
+        "$0$memwr$\\mem$../../../corpus-external/yosys-simple/memory.v:311$425_DATA[26:0]$436": {
+          "hide_name": 1,
+          "bits": [ 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388, 389, 390 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          }
+        },
+        "$0$memwr$\\mem$../../../corpus-external/yosys-simple/memory.v:311$425_EN[26:0]$437": {
+          "hide_name": 1,
+          "bits": [ 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391, 391 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          }
+        },
+        "$0$memwr$\\mem$../../../corpus-external/yosys-simple/memory.v:312$426_ADDR[1:0]$438": {
+          "hide_name": 1,
+          "bits": [ 392, 393 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          }
+        },
+        "$0$memwr$\\mem$../../../corpus-external/yosys-simple/memory.v:312$426_DATA[26:0]$439": {
+          "hide_name": 1,
+          "bits": [ 394, 395, 396, 397, 398, 399, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 416, 417, 418, 419, 420 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          }
+        },
+        "$0$memwr$\\mem$../../../corpus-external/yosys-simple/memory.v:313$427_ADDR[1:0]$441": {
+          "hide_name": 1,
+          "bits": [ 421, 422 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          }
+        },
+        "$0$memwr$\\mem$../../../corpus-external/yosys-simple/memory.v:313$427_DATA[26:0]$442": {
+          "hide_name": 1,
+          "bits": [ 423, 424, 425, 426, 427, 428, 429, 430, 431, 432, 433, 434, 435, 436, 437, 438, 439, 440, 441, 442, 443, 444, 445, 446, 447, 448, 449 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          }
+        },
+        "$0$memwr$\\mem$../../../corpus-external/yosys-simple/memory.v:313$427_EN[26:0]$443": {
+          "hide_name": 1,
+          "bits": [ 450, 451, 452, 453, 454, 455, 456, 457, 458, 459, 460, 461, 462, 463, 464, 465, 466, 467, 468, 469, 470, 471, 472, 473, 474, 475, 476 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:304.2-318.5"
+          }
+        },
+        "$auto$rtlil.cc:3263:Sub$474": {
+          "hide_name": 1,
+          "bits": [ 298, 299, 300, 301, 302, 303, 304, 305, 306, 307, 308, 309, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329 ],
+          "attributes": {
+          }
+        },
+        "a1": {
+          "hide_name": 0,
+          "bits": [ 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:295.14-295.16"
+          }
+        },
+        "a2": {
+          "hide_name": 0,
+          "bits": [ 6, 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:295.18-295.20"
+          }
+        },
+        "a3": {
+          "hide_name": 0,
+          "bits": [ 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:295.22-295.24"
+          }
+        },
+        "a4": {
+          "hide_name": 0,
+          "bits": [ 10, 11 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:295.26-295.28"
+          }
+        },
+        "a5": {
+          "hide_name": 0,
+          "bits": [ 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:295.30-295.32"
+          }
+        },
+        "a6": {
+          "hide_name": 0,
+          "bits": [ 14, 15 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:295.34-295.36"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:294.8-294.11"
+          }
+        },
+        "din1": {
+          "hide_name": 0,
+          "bits": [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50 ],
+          "offset": 5,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:297.15-297.19"
+          }
+        },
+        "din2": {
+          "hide_name": 0,
+          "bits": [ 51, 52, 53, 54 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:298.14-298.18"
+          }
+        },
+        "din3": {
+          "hide_name": 0,
+          "bits": [ 55, 56, 57, 58 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:298.20-298.24"
+          }
+        },
+        "dout1": {
+          "hide_name": 0,
+          "bits": [ 59, 60, 61, 62 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:299.19-299.24"
+          }
+        },
+        "dout2": {
+          "hide_name": 0,
+          "bits": [ 63, 64, 65, 66 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:299.26-299.31"
+          }
+        },
+        "dout3": {
+          "hide_name": 0,
+          "bits": [ 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93 ],
+          "offset": 5,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:300.20-300.25"
+          }
+        },
+        "off1": {
+          "hide_name": 0,
+          "bits": [ 16, 17, 18, 19 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:296.14-296.18"
+          }
+        },
+        "off2": {
+          "hide_name": 0,
+          "bits": [ 20, 21, 22, 23 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:296.20-296.24"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/memory.v:294.13-294.16"
+          }
+        }
+      }
+    }
+  }
+}

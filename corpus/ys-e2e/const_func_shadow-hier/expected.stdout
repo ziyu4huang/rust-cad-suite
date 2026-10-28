@@ -1,0 +1,36 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `const_func_shadow_top'. Setting top module to const_func_shadow_top.
+
+2.1. Analyzing design hierarchy..
+Top module:  \const_func_shadow_top
+
+2.2. Analyzing design hierarchy..
+Top module:  \const_func_shadow_top
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module const_func_shadow_top...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== const_func_shadow_top ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        4 wires
+     9621 wire bits
+        4 public wires
+     9621 public wire bits
+        4 ports
+     9621 port bits
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

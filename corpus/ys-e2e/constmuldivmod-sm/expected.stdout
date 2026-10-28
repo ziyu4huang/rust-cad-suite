@@ -1,0 +1,95 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping constmuldivmod.$auto$opt_reduce.cc:131:opt_pmux$132 ($reduce_or).
+Mapping constmuldivmod.$auto$opt_reduce.cc:131:opt_pmux$130 ($reduce_or).
+Mapping constmuldivmod.$auto$opt_reduce.cc:131:opt_pmux$128 ($reduce_or).
+Mapping constmuldivmod.$procmux$71_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$70_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$69_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$68_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$67_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$66_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$65_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$64_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$63_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$62_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$61_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$60_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$59_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$58_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$57_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$56_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$55_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$54_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$53_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$52_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$51_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$49 ($pmux).
+Mapping constmuldivmod.$procmux$50_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$79_CMP0 ($eq).
+Mapping constmuldivmod.$auto$opt_reduce.cc:131:opt_pmux$138 ($reduce_or).
+Mapping constmuldivmod.$procmux$89_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$90_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$80_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$81_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$82_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$83_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$84_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$85_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$86_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$78_CMP0 ($eq).
+Mapping constmuldivmod.$auto$opt_expr.cc:1834:replace_const_cells$98 ($and).
+Mapping constmuldivmod.$procmux$87_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$91_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$92_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$77_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$76_CMP0 ($eq).
+Mapping constmuldivmod.$auto$opt_reduce.cc:131:opt_pmux$136 ($reduce_or).
+Mapping constmuldivmod.$auto$opt_expr.cc:1833:replace_const_cells$107 ($reduce_or).
+Mapping constmuldivmod.$auto$opt_expr.cc:1834:replace_const_cells$109 ($and).
+Mapping constmuldivmod.$procmux$75_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$73_CMP0 ($eq).
+Mapping constmuldivmod.$auto$opt_reduce.cc:131:opt_pmux$134 ($reduce_or).
+Mapping constmuldivmod.$auto$opt_expr.cc:1833:replace_const_cells$118 ($reduce_or).
+Mapping constmuldivmod.$auto$opt_expr.cc:1834:replace_const_cells$120 ($and).
+Mapping constmuldivmod.$procmux$74_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$72_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$88_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$93_CMP0 ($eq).
+Mapping constmuldivmod.$procmux$94_CMP0 ($logic_not).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module constmuldivmod...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== constmuldivmod ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      596 wires
+     1271 wire bits
+        3 public wires
+       22 public wire bits
+        3 ports
+       22 port bits
+     1079 cells
+      243   $_AND_
+        8   $_MUX_
+       45   $_NOT_
+      504   $_OR_
+      264   $_XOR_
+        3   $add
+        4   $div
+        4   $mod
+        4   $neg
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

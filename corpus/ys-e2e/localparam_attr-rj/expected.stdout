@@ -1,0 +1,26 @@
+-- Running command `read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing JSON frontend.
+Importing module uut_localparam_attr from JSON tree.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module uut_localparam_attr...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== uut_localparam_attr ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+        2 wire bits
+        2 public wires
+        2 public wire bits
+        2 ports
+        2 port bits
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

@@ -1,0 +1,1 @@
+ERROR: Module a23_barrel_shift_fpga_rotate contains processes, which are not supported by JSON backend (run `proc` first).

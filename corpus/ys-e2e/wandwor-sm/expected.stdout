@@ -1,0 +1,79 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping wandwor_test1.$auto$hierarchy.cc:1524:execute$12 ($and).
+Mapping wandwor_test1.$auto$hierarchy.cc:1524:execute$10 ($and).
+Mapping wandwor_test1.$auto$hierarchy.cc:1526:execute$8 ($or).
+Mapping wandwor_test1.$auto$hierarchy.cc:1526:execute$6 ($or).
+Mapping wandwor_test1.$../../../corpus-external/yosys-simple/wandwor.v:27$reduce_xor$1 ($reduce_xor).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module wandwor_test1...
+Checking module wandwor_bar...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== wandwor_test1 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       14 wires
+       48 wire bits
+        7 public wires
+       25 public wire bits
+        7 ports
+       25 port bits
+       23 cells
+        8   $_AND_
+        8   $_OR_
+        7   $_XOR_
+        1 submodules
+        1   wandwor_bar
+
+=== wandwor_bar ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        3 wires
+       24 wire bits
+        3 public wires
+       24 public wire bits
+        3 ports
+       24 port bits
+        1 cells
+        1   $add
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+       24 wandwor_test1
+        1 wandwor_bar
+
+        +----------Count including submodules.
+        | 
+       17 wires
+       72 wire bits
+       10 public wires
+       49 public wire bits
+       10 ports
+       49 port bits
+        - memories
+        - memory bits
+        - processes
+       24 cells
+        8   $_AND_
+        8   $_OR_
+        7   $_XOR_
+        1   $add
+        1 submodules
+        1   wandwor_bar
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

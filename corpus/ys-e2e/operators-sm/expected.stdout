@@ -1,0 +1,180 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping optest.$procmux$189_CMP0 ($eq).
+Mapping optest.$procmux$188_CMP0 ($eq).
+Mapping optest.$procmux$187_CMP0 ($eq).
+Mapping optest.$procmux$186_CMP0 ($eq).
+Mapping optest.$procmux$185_CMP0 ($eq).
+Mapping optest.$procmux$184_CMP0 ($eq).
+Mapping optest.$procmux$183_CMP0 ($eq).
+Mapping optest.$procmux$182_CMP0 ($eq).
+Mapping optest.$procmux$181_CMP0 ($eq).
+Mapping optest.$procmux$180_CMP0 ($eq).
+Mapping optest.$procmux$179_CMP0 ($eq).
+Mapping optest.$procmux$178_CMP0 ($eq).
+Mapping optest.$procmux$177_CMP0 ($eq).
+Mapping optest.$procmux$176_CMP0 ($eq).
+Mapping optest.$procmux$175_CMP0 ($eq).
+Mapping optest.$procmux$174_CMP0 ($eq).
+Mapping optest.$procmux$173_CMP0 ($eq).
+Mapping optest.$procmux$172_CMP0 ($eq).
+Mapping optest.$procmux$171_CMP0 ($eq).
+Mapping optest.$procmux$170_CMP0 ($eq).
+Mapping optest.$procmux$169_CMP0 ($eq).
+Mapping optest.$procmux$168_CMP0 ($eq).
+Mapping optest.$procmux$167_CMP0 ($eq).
+Mapping optest.$procmux$166_CMP0 ($eq).
+Mapping optest.$procmux$165_CMP0 ($eq).
+Mapping optest.$procmux$164_CMP0 ($eq).
+Mapping optest.$procmux$163_CMP0 ($eq).
+Mapping optest.$procmux$162_CMP0 ($eq).
+Mapping optest.$procmux$161_CMP0 ($eq).
+Mapping optest.$procmux$160_CMP0 ($eq).
+Mapping optest.$procmux$159_CMP0 ($eq).
+Mapping optest.$procmux$158_CMP0 ($eq).
+Mapping optest.$procmux$157_CMP0 ($eq).
+Mapping optest.$procmux$156_CMP0 ($eq).
+Mapping optest.$procmux$155_CMP0 ($eq).
+Mapping optest.$procmux$154_CMP0 ($eq).
+Mapping optest.$procmux$153_CMP0 ($eq).
+Mapping optest.$procmux$152_CMP0 ($eq).
+Mapping optest.$procmux$151_CMP0 ($eq).
+Mapping optest.$procmux$150_CMP0 ($eq).
+Mapping optest.$procmux$149_CMP0 ($eq).
+Mapping optest.$procmux$148_CMP0 ($eq).
+Mapping optest.$procmux$147_CMP0 ($eq).
+Mapping optest.$procmux$146_CMP0 ($eq).
+Mapping optest.$procmux$145_CMP0 ($eq).
+Mapping optest.$procmux$144_CMP0 ($eq).
+Mapping optest.$procmux$143_CMP0 ($eq).
+Mapping optest.$procmux$142_CMP0 ($eq).
+Mapping optest.$procmux$141_CMP0 ($eq).
+Mapping optest.$procmux$140_CMP0 ($eq).
+Mapping optest.$procmux$139_CMP0 ($eq).
+Mapping optest.$procmux$138_CMP0 ($eq).
+Mapping optest.$procmux$137_CMP0 ($eq).
+Mapping optest.$procmux$136_CMP0 ($eq).
+Mapping optest.$procmux$135_CMP0 ($eq).
+Mapping optest.$procmux$134_CMP0 ($eq).
+Mapping optest.$procmux$133_CMP0 ($eq).
+Mapping optest.$procmux$132_CMP0 ($eq).
+Mapping optest.$procmux$131_CMP0 ($eq).
+Mapping optest.$procmux$130_CMP0 ($eq).
+Mapping optest.$procmux$129_CMP0 ($eq).
+Mapping optest.$procmux$128_CMP0 ($eq).
+Mapping optest.$procmux$127_CMP0 ($eq).
+Mapping optest.$procmux$125 ($pmux).
+Mapping optest.$procmux$126_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:117$ternary$124 ($mux).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:116$ternary$123 ($mux).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:115$ternary$122 ($mux).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:114$ternary$121 ($mux).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:112$and$120 ($and).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:111$xor$119 ($xor).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:109$logic_and$118 ($logic_and).
+Mapping optest.$procdff$210 ($dff).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:109$logic_not$116 ($logic_not).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:107$reduce_and$115 ($reduce_and).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:107$logic_not$114 ($logic_not).
+Mapping optest.$procmux$209_CMP0 ($logic_not).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:107$reduce_or$112 ($reduce_or).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:107$logic_not$111 ($logic_not).
+Mapping optest.$procmux$208_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:107$reduce_xor$109 ($reduce_xor).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:107$reduce_xnor$108 ($reduce_xnor).
+Mapping optest.$procmux$207_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:106$reduce_and$106 ($reduce_and).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:106$logic_not$105 ($logic_not).
+Mapping optest.$procmux$206_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:106$reduce_or$103 ($reduce_or).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:106$logic_not$102 ($logic_not).
+Mapping optest.$procmux$205_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:106$reduce_xor$100 ($reduce_xor).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:106$reduce_xnor$99 ($reduce_xnor).
+Mapping optest.$procmux$204_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:105$reduce_and$97 ($reduce_and).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:105$logic_not$96 ($logic_not).
+Mapping optest.$procmux$203_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:105$reduce_or$94 ($reduce_or).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:105$logic_not$93 ($logic_not).
+Mapping optest.$procmux$202_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:105$reduce_xor$91 ($reduce_xor).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:105$reduce_xnor$90 ($reduce_xnor).
+Mapping optest.$procmux$201_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:104$reduce_and$88 ($reduce_and).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:104$logic_not$87 ($logic_not).
+Mapping optest.$procmux$200_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:104$reduce_or$85 ($reduce_or).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:104$logic_not$84 ($logic_not).
+Mapping optest.$procmux$199_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:104$reduce_xor$82 ($reduce_xor).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:104$reduce_xnor$81 ($reduce_xnor).
+Mapping optest.$procmux$198_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:102$logic_not$79 ($logic_not).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:101$not$78 ($not).
+Mapping optest.$procmux$193_CMP0 ($eq).
+Mapping optest.$procmux$197_CMP0 ($eq).
+Mapping optest.$procmux$192_CMP0 ($eq).
+Mapping optest.$procmux$196_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:97$logic_not$72 ($logic_not).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:96$not$71 ($not).
+Mapping optest.$procmux$191_CMP0 ($eq).
+Mapping optest.$procmux$195_CMP0 ($eq).
+Mapping optest.$procmux$190_CMP0 ($eq).
+Mapping optest.$procmux$194_CMP0 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:52$ne$33 ($ne).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:51$ne$32 ($ne).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:50$ne$31 ($ne).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:49$ne$30 ($ne).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:47$eq$29 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:46$eq$28 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:45$eq$27 ($eq).
+Mapping optest.$../../../corpus-external/yosys-simple/operators.v:44$eq$26 ($eq).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module optest...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== optest ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     1410 wires
+     3434 wire bits
+        7 public wires
+       32 public wire bits
+        7 ports
+       32 port bits
+     2827 cells
+      689   $_AND_
+        8   $_DFF_P_
+       24   $_MUX_
+      119   $_NOT_
+     1292   $_OR_
+      637   $_XOR_
+        4   $add
+        4   $div
+        4   $ge
+        4   $gt
+        4   $le
+        4   $lt
+        4   $mod
+        4   $mul
+        2   $neg
+        2   $pow
+        6   $shl
+        4   $shr
+        4   $sshl
+        4   $sshr
+        4   $sub
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

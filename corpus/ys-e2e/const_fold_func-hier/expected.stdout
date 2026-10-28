@@ -1,0 +1,42 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `const_fold_func_top'. Setting top module to const_fold_func_top.
+
+2.1. Analyzing design hierarchy..
+Top module:  \const_fold_func_top
+
+2.2. Analyzing design hierarchy..
+Top module:  \const_fold_func_top
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module const_fold_func_top...
+Warning: Wire const_fold_func_top.\out6 [3] is used but has no driver.
+Found and reported 1 problems.
+
+4. Printing statistics.
+
+=== const_fold_func_top ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       24 wires
+       96 wire bits
+       22 public wires
+       88 public wire bits
+        7 ports
+       28 port bits
+        5 cells
+        2   $mul
+        3   $not
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.
+
+Warnings: 1 unique messages, 1 total

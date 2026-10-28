@@ -1,0 +1,2810 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "aes": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/loops.v:6.1-78.10"
+      },
+      "ports": {
+        "addroundkey_data_i": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "addroundkey_data_reg": {
+          "direction": "input",
+          "bits": [ 6, 7, 8, 9 ]
+        },
+        "addroundkey_round": {
+          "direction": "input",
+          "bits": [ 10, 11, 12, 13 ]
+        },
+        "key_i": {
+          "direction": "input",
+          "bits": [ 14, 15, 16, 17 ]
+        },
+        "keysched_new_key_o": {
+          "direction": "input",
+          "bits": [ 18, 19, 20, 21 ]
+        },
+        "round": {
+          "direction": "input",
+          "bits": [ 22, 23, 24, 25 ]
+        },
+        "addroundkey_start_i": {
+          "direction": "input",
+          "bits": [ 26 ]
+        },
+        "keysched_ready_o": {
+          "direction": "input",
+          "bits": [ 27 ]
+        },
+        "keysched_last_key_i": {
+          "direction": "output",
+          "bits": [ 28, 29, 30, 31 ]
+        },
+        "keysched_round_i": {
+          "direction": "output",
+          "bits": [ 32, 33, 34, 35 ]
+        },
+        "next_addroundkey_data_reg": {
+          "direction": "output",
+          "bits": [ 36, 37, 38, 39 ]
+        },
+        "next_addroundkey_round": {
+          "direction": "output",
+          "bits": [ 40, 41, 42, 43 ]
+        },
+        "round_data_var": {
+          "direction": "output",
+          "bits": [ 36, 37, 38, 39 ]
+        },
+        "keysched_start_i": {
+          "direction": "output",
+          "bits": [ 44 ]
+        },
+        "next_addroundkey_ready_o": {
+          "direction": "output",
+          "bits": [ 45 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/loops.v:65$add$13": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:65.22-65.43"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$378": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:71.20-71.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 18 ],
+            "B": [ 2 ],
+            "Y": [ 78 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$379": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:71.20-71.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 19 ],
+            "B": [ 3 ],
+            "Y": [ 79 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$380": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:71.20-71.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 20 ],
+            "B": [ 4 ],
+            "Y": [ 80 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$381": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:71.20-71.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 21 ],
+            "B": [ 5 ],
+            "Y": [ 81 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$385": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10 ],
+            "B": [ 22 ],
+            "Y": [ 82 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$386": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11 ],
+            "B": [ 23 ],
+            "Y": [ 83 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$387": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12 ],
+            "B": [ 24 ],
+            "Y": [ 84 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$388": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13 ],
+            "B": [ 25 ],
+            "Y": [ 85 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$402": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10 ],
+            "B": [ 22 ],
+            "Y": [ 86 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$403": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11 ],
+            "B": [ 23 ],
+            "Y": [ 87 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$404": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12 ],
+            "B": [ 24 ],
+            "Y": [ 88 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$405": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13 ],
+            "B": [ 25 ],
+            "Y": [ 89 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$418": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:49.20-49.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 14 ],
+            "B": [ 2 ],
+            "Y": [ 90 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$419": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:49.20-49.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 15 ],
+            "B": [ 3 ],
+            "Y": [ 91 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$420": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:49.20-49.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 16 ],
+            "B": [ 4 ],
+            "Y": [ 92 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$421": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:49.20-49.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 17 ],
+            "B": [ 5 ],
+            "Y": [ 93 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$438": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10 ],
+            "B": [ "1" ],
+            "Y": [ 94 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$439": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11 ],
+            "B": [ "0" ],
+            "Y": [ 95 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$440": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12 ],
+            "B": [ "0" ],
+            "Y": [ 96 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$441": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13 ],
+            "B": [ "0" ],
+            "Y": [ 97 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$392": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 82 ],
+            "B": [ 83 ],
+            "Y": [ 98 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$393": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 84 ],
+            "B": [ 85 ],
+            "Y": [ 99 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$395": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 98 ],
+            "B": [ 99 ],
+            "Y": [ 100 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$408": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 86 ],
+            "B": [ 87 ],
+            "Y": [ 101 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$409": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 88 ],
+            "B": [ 89 ],
+            "Y": [ 102 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$411": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 101 ],
+            "B": [ 102 ],
+            "Y": [ 103 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$414": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.34-53.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 22 ],
+            "B": [ 23 ],
+            "Y": [ 104 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$415": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.34-53.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24 ],
+            "B": [ 25 ],
+            "Y": [ 105 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$417": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.34-53.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 104 ],
+            "B": [ 105 ],
+            "Y": [ 106 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$445": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 94 ],
+            "B": [ 95 ],
+            "Y": [ 107 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$446": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 96 ],
+            "B": [ 97 ],
+            "Y": [ 108 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$448": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 107 ],
+            "B": [ 108 ],
+            "Y": [ 109 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$424": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 22 ],
+            "B": [ 23 ],
+            "Y": [ 110 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$425": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24 ],
+            "B": [ 25 ],
+            "Y": [ 111 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$427": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 110 ],
+            "B": [ 111 ],
+            "Y": [ 112 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$431": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.32-40.54"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10 ],
+            "B": [ 11 ],
+            "Y": [ 113 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$432": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.32-40.54"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12 ],
+            "B": [ 13 ],
+            "Y": [ 114 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$434": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.32-40.54"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 113 ],
+            "B": [ 114 ],
+            "Y": [ 115 ]
+          }
+        },
+        "$auto$simplemap.cc:227:simplemap_lognot$397": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.37"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 100 ],
+            "Y": [ 116 ]
+          }
+        },
+        "$auto$simplemap.cc:227:simplemap_lognot$428": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 112 ],
+            "Y": [ 117 ]
+          }
+        },
+        "$auto$simplemap.cc:227:simplemap_lognot$435": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.32-40.54"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 115 ],
+            "Y": [ 118 ]
+          }
+        },
+        "$auto$simplemap.cc:227:simplemap_lognot$450": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 109 ],
+            "Y": [ 119 ]
+          }
+        },
+        "$auto$simplemap.cc:256:simplemap_logbin$382": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 116 ],
+            "B": [ 27 ],
+            "Y": [ 120 ]
+          }
+        },
+        "$auto$simplemap.cc:256:simplemap_logbin$399": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 103 ],
+            "B": [ 27 ],
+            "Y": [ 121 ]
+          }
+        },
+        "$auto$simplemap.cc:256:simplemap_logbin$412": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 26 ],
+            "B": [ 106 ],
+            "Y": [ 122 ]
+          }
+        },
+        "$auto$simplemap.cc:256:simplemap_logbin$422": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 117 ],
+            "B": [ 26 ],
+            "Y": [ 123 ]
+          }
+        },
+        "$auto$simplemap.cc:256:simplemap_logbin$429": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.54"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 119 ],
+            "B": [ 118 ],
+            "Y": [ 124 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$312": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 125 ],
+            "B": [ 90 ],
+            "S": [ 123 ],
+            "Y": [ 36 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$313": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 126 ],
+            "B": [ 91 ],
+            "S": [ 123 ],
+            "Y": [ 37 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$314": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 127 ],
+            "B": [ 92 ],
+            "S": [ 123 ],
+            "Y": [ 38 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$315": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 128 ],
+            "B": [ 93 ],
+            "S": [ 123 ],
+            "Y": [ 39 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$316": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 129 ],
+            "B": [ 10 ],
+            "S": [ 123 ],
+            "Y": [ 40 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$317": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 130 ],
+            "B": [ 11 ],
+            "S": [ 123 ],
+            "Y": [ 41 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$318": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 131 ],
+            "B": [ 12 ],
+            "S": [ 123 ],
+            "Y": [ 42 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$319": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 132 ],
+            "B": [ 13 ],
+            "S": [ 123 ],
+            "Y": [ 43 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$320": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 133 ],
+            "B": [ "0" ],
+            "S": [ 123 ],
+            "Y": [ 44 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$321": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 134 ],
+            "B": [ 46 ],
+            "S": [ 121 ],
+            "Y": [ 135 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$322": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 136 ],
+            "B": [ 47 ],
+            "S": [ 121 ],
+            "Y": [ 137 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$323": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 138 ],
+            "B": [ 48 ],
+            "S": [ 121 ],
+            "Y": [ 139 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$324": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 140 ],
+            "B": [ 49 ],
+            "S": [ 121 ],
+            "Y": [ 141 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$325": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10 ],
+            "B": [ 46 ],
+            "S": [ 121 ],
+            "Y": [ 142 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$326": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11 ],
+            "B": [ 47 ],
+            "S": [ 121 ],
+            "Y": [ 143 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$327": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12 ],
+            "B": [ 48 ],
+            "S": [ 121 ],
+            "Y": [ 144 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$328": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13 ],
+            "B": [ 49 ],
+            "S": [ 121 ],
+            "Y": [ 145 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$329": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 142 ],
+            "B": [ "1" ],
+            "S": [ 122 ],
+            "Y": [ 146 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$330": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 143 ],
+            "B": [ "0" ],
+            "S": [ 122 ],
+            "Y": [ 147 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$331": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 144 ],
+            "B": [ "0" ],
+            "S": [ 122 ],
+            "Y": [ 148 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$332": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 145 ],
+            "B": [ "0" ],
+            "S": [ 122 ],
+            "Y": [ 149 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$333": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 150 ],
+            "B": [ 6 ],
+            "S": [ 121 ],
+            "Y": [ 151 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$334": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 152 ],
+            "B": [ 7 ],
+            "S": [ 121 ],
+            "Y": [ 153 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$335": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 154 ],
+            "B": [ 8 ],
+            "S": [ 121 ],
+            "Y": [ 155 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$336": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 156 ],
+            "B": [ 9 ],
+            "S": [ 121 ],
+            "Y": [ 157 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$337": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 158 ],
+            "B": [ 18 ],
+            "S": [ 121 ],
+            "Y": [ 159 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$338": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 160 ],
+            "B": [ 19 ],
+            "S": [ 121 ],
+            "Y": [ 161 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$339": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 162 ],
+            "B": [ 20 ],
+            "S": [ 121 ],
+            "Y": [ 163 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$340": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 164 ],
+            "B": [ 21 ],
+            "S": [ 121 ],
+            "Y": [ 165 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$341": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57|../../../corpus-external/yosys-simple/loops.v:67.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 6 ],
+            "B": [ 78 ],
+            "S": [ 120 ],
+            "Y": [ 150 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$342": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57|../../../corpus-external/yosys-simple/loops.v:67.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 79 ],
+            "S": [ 120 ],
+            "Y": [ 152 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$343": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57|../../../corpus-external/yosys-simple/loops.v:67.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 8 ],
+            "B": [ 80 ],
+            "S": [ 120 ],
+            "Y": [ 154 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$344": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57|../../../corpus-external/yosys-simple/loops.v:67.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ 81 ],
+            "S": [ 120 ],
+            "Y": [ 156 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$345": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "1" ],
+            "S": [ 121 ],
+            "Y": [ 166 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$346": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 167 ],
+            "B": [ "0" ],
+            "S": [ 122 ],
+            "Y": [ 168 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$347": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 151 ],
+            "B": [ 6 ],
+            "S": [ 122 ],
+            "Y": [ 125 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$348": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 153 ],
+            "B": [ 7 ],
+            "S": [ 122 ],
+            "Y": [ 126 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$349": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 155 ],
+            "B": [ 8 ],
+            "S": [ 122 ],
+            "Y": [ 127 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$350": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 157 ],
+            "B": [ 9 ],
+            "S": [ 122 ],
+            "Y": [ 128 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$351": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 146 ],
+            "B": [ 10 ],
+            "S": [ 123 ],
+            "Y": [ 32 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$352": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 147 ],
+            "B": [ 11 ],
+            "S": [ 123 ],
+            "Y": [ 33 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$353": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 148 ],
+            "B": [ 12 ],
+            "S": [ 123 ],
+            "Y": [ 34 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$354": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 149 ],
+            "B": [ 13 ],
+            "S": [ 123 ],
+            "Y": [ 35 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$355": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 159 ],
+            "B": [ 14 ],
+            "S": [ 122 ],
+            "Y": [ 169 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$356": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 161 ],
+            "B": [ 15 ],
+            "S": [ 122 ],
+            "Y": [ 170 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$357": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 163 ],
+            "B": [ 16 ],
+            "S": [ 122 ],
+            "Y": [ 171 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$358": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 165 ],
+            "B": [ 17 ],
+            "S": [ 122 ],
+            "Y": [ 172 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$359": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57|../../../corpus-external/yosys-simple/loops.v:60.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 173 ],
+            "B": [ "0" ],
+            "S": [ 121 ],
+            "Y": [ 167 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$360": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 166 ],
+            "B": [ "1" ],
+            "S": [ 122 ],
+            "Y": [ 133 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$361": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57|../../../corpus-external/yosys-simple/loops.v:67.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "1" ],
+            "S": [ 120 ],
+            "Y": [ 173 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$362": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.54|../../../corpus-external/yosys-simple/loops.v:40.2-43.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 18 ],
+            "B": [ 14 ],
+            "S": [ 124 ],
+            "Y": [ 158 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$363": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.54|../../../corpus-external/yosys-simple/loops.v:40.2-43.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 19 ],
+            "B": [ 15 ],
+            "S": [ 124 ],
+            "Y": [ 160 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$364": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.54|../../../corpus-external/yosys-simple/loops.v:40.2-43.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 20 ],
+            "B": [ 16 ],
+            "S": [ 124 ],
+            "Y": [ 162 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$365": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.54|../../../corpus-external/yosys-simple/loops.v:40.2-43.44"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 21 ],
+            "B": [ 17 ],
+            "S": [ 124 ],
+            "Y": [ 164 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$366": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 135 ],
+            "B": [ "1" ],
+            "S": [ 122 ],
+            "Y": [ 129 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$367": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 137 ],
+            "B": [ "0" ],
+            "S": [ 122 ],
+            "Y": [ 130 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$368": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 139 ],
+            "B": [ "0" ],
+            "S": [ 122 ],
+            "Y": [ 131 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$369": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44|../../../corpus-external/yosys-simple/loops.v:53.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 141 ],
+            "B": [ "0" ],
+            "S": [ 122 ],
+            "Y": [ 132 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$370": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 169 ],
+            "B": [ 158 ],
+            "S": [ 123 ],
+            "Y": [ 28 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$371": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 170 ],
+            "B": [ 160 ],
+            "S": [ 123 ],
+            "Y": [ 29 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$372": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 171 ],
+            "B": [ 162 ],
+            "S": [ 123 ],
+            "Y": [ 30 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$373": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 172 ],
+            "B": [ 164 ],
+            "S": [ 123 ],
+            "Y": [ 31 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$374": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57|../../../corpus-external/yosys-simple/loops.v:67.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10 ],
+            "B": [ "0" ],
+            "S": [ 120 ],
+            "Y": [ 134 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$375": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57|../../../corpus-external/yosys-simple/loops.v:67.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11 ],
+            "B": [ "0" ],
+            "S": [ 120 ],
+            "Y": [ 136 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$376": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57|../../../corpus-external/yosys-simple/loops.v:67.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12 ],
+            "B": [ "0" ],
+            "S": [ 120 ],
+            "Y": [ 138 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$377": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57|../../../corpus-external/yosys-simple/loops.v:67.7-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13 ],
+            "B": [ "0" ],
+            "S": [ 120 ],
+            "Y": [ 140 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$398": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39|../../../corpus-external/yosys-simple/loops.v:45.2-75.5"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 168 ],
+            "B": [ "1" ],
+            "S": [ 123 ],
+            "Y": [ 45 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/loops.v:40$eq$2_Y": {
+          "hide_name": 1,
+          "bits": [ 119 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.28"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:40$eq$3_Y": {
+          "hide_name": 1,
+          "bits": [ 118 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.32-40.54"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:40$logic_or$4_Y": {
+          "hide_name": 1,
+          "bits": [ 124 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:40.6-40.54"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:45$eq$5_Y": {
+          "hide_name": 1,
+          "bits": [ 117 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.16"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:45$logic_and$6_Y": {
+          "hide_name": 1,
+          "bits": [ 123 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:45.6-45.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:49$xor$7_Y": {
+          "hide_name": 1,
+          "bits": [ 90, 91, 92, 93 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:49.20-49.44"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:53$logic_and$9_Y": {
+          "hide_name": 1,
+          "bits": [ 122 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.11-53.44"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:53$ne$8_Y": {
+          "hide_name": 1,
+          "bits": [ 106 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:53.34-53.44"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:60$logic_and$11_Y": {
+          "hide_name": 1,
+          "bits": [ 121 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.57"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:60$ne$10_Y": {
+          "hide_name": 1,
+          "bits": [ 103 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:60.11-60.37"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:62$add$12_Y": {
+          "hide_name": 1,
+          "bits": [ 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:62.28-62.49"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:67$eq$14_Y": {
+          "hide_name": 1,
+          "bits": [ 116 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.37"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:67$logic_and$15_Y": {
+          "hide_name": 1,
+          "bits": [ 120 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:67.11-67.57"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/loops.v:71$xor$16_Y": {
+          "hide_name": 1,
+          "bits": [ 78, 79, 80, 81 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:71.20-71.44"
+          }
+        },
+        "$1\\keysched_last_key_i[3:0]": {
+          "hide_name": 1,
+          "bits": [ 158, 160, 162, 164 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$2\\keysched_round_i[3:0]": {
+          "hide_name": 1,
+          "bits": [ 146, 147, 148, 149 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$2\\keysched_start_i[0:0]": {
+          "hide_name": 1,
+          "bits": [ 133 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$2\\next_addroundkey_data_reg[3:0]": {
+          "hide_name": 1,
+          "bits": [ 125, 126, 127, 128 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$2\\next_addroundkey_ready_o[0:0]": {
+          "hide_name": 1,
+          "bits": [ 168 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$2\\next_addroundkey_round[3:0]": {
+          "hide_name": 1,
+          "bits": [ 129, 130, 131, 132 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$3\\keysched_last_key_i[3:0]": {
+          "hide_name": 1,
+          "bits": [ 169, 170, 171, 172 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$3\\keysched_round_i[3:0]": {
+          "hide_name": 1,
+          "bits": [ 142, 143, 144, 145 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$3\\keysched_start_i[0:0]": {
+          "hide_name": 1,
+          "bits": [ 166 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$3\\next_addroundkey_data_reg[3:0]": {
+          "hide_name": 1,
+          "bits": [ 151, 153, 155, 157 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$3\\next_addroundkey_ready_o[0:0]": {
+          "hide_name": 1,
+          "bits": [ 167 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$3\\next_addroundkey_round[3:0]": {
+          "hide_name": 1,
+          "bits": [ 135, 137, 139, 141 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$4\\keysched_last_key_i[3:0]": {
+          "hide_name": 1,
+          "bits": [ 159, 161, 163, 165 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$4\\next_addroundkey_data_reg[3:0]": {
+          "hide_name": 1,
+          "bits": [ 150, 152, 154, 156 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$4\\next_addroundkey_ready_o[0:0]": {
+          "hide_name": 1,
+          "bits": [ 173 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$4\\next_addroundkey_round[3:0]": {
+          "hide_name": 1,
+          "bits": [ 134, 136, 138, 140 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:31.1-76.4"
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$391": {
+          "hide_name": 1,
+          "bits": [ 98, 99 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$394": {
+          "hide_name": 1,
+          "bits": [ 174 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$407": {
+          "hide_name": 1,
+          "bits": [ 101, 102 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$410": {
+          "hide_name": 1,
+          "bits": [ 175 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$413": {
+          "hide_name": 1,
+          "bits": [ 104, 105 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$416": {
+          "hide_name": 1,
+          "bits": [ 176 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$444": {
+          "hide_name": 1,
+          "bits": [ 107, 108 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$447": {
+          "hide_name": 1,
+          "bits": [ 177 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$423": {
+          "hide_name": 1,
+          "bits": [ 110, 111 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$426": {
+          "hide_name": 1,
+          "bits": [ 112 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$430": {
+          "hide_name": 1,
+          "bits": [ 113, 114 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$433": {
+          "hide_name": 1,
+          "bits": [ 115 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:271:simplemap_eqne$383": {
+          "hide_name": 1,
+          "bits": [ 82, 83, 84, 85 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:271:simplemap_eqne$400": {
+          "hide_name": 1,
+          "bits": [ 86, 87, 88, 89 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:271:simplemap_eqne$436": {
+          "hide_name": 1,
+          "bits": [ 94, 95, 96, 97 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:277:simplemap_eqne$389": {
+          "hide_name": 1,
+          "bits": [ 100 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:277:simplemap_eqne$442": {
+          "hide_name": 1,
+          "bits": [ 109 ],
+          "attributes": {
+          }
+        },
+        "addroundkey_data_i": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:8.14-8.32"
+          }
+        },
+        "addroundkey_data_reg": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:9.14-9.34"
+          }
+        },
+        "addroundkey_round": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:10.14-10.31"
+          }
+        },
+        "addroundkey_start_i": {
+          "hide_name": 0,
+          "bits": [ 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:14.8-14.27"
+          }
+        },
+        "key_i": {
+          "hide_name": 0,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:11.14-11.19"
+          }
+        },
+        "keysched_last_key_i": {
+          "hide_name": 0,
+          "bits": [ 28, 29, 30, 31 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:18.19-18.38"
+          }
+        },
+        "keysched_new_key_o": {
+          "hide_name": 0,
+          "bits": [ 18, 19, 20, 21 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:12.14-12.32"
+          }
+        },
+        "keysched_ready_o": {
+          "hide_name": 0,
+          "bits": [ 27 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:15.8-15.24"
+          }
+        },
+        "keysched_round_i": {
+          "hide_name": 0,
+          "bits": [ 32, 33, 34, 35 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:19.19-19.35"
+          }
+        },
+        "keysched_start_i": {
+          "hide_name": 0,
+          "bits": [ 44 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:23.13-23.29"
+          }
+        },
+        "next_addroundkey_data_reg": {
+          "hide_name": 0,
+          "bits": [ 36, 37, 38, 39 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:20.19-20.44"
+          }
+        },
+        "next_addroundkey_ready_o": {
+          "hide_name": 0,
+          "bits": [ 45 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:24.13-24.37"
+          }
+        },
+        "next_addroundkey_round": {
+          "hide_name": 0,
+          "bits": [ 40, 41, 42, 43 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:21.19-21.41"
+          }
+        },
+        "round": {
+          "hide_name": 0,
+          "bits": [ 22, 23, 24, 25 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:13.14-13.19"
+          }
+        },
+        "round_data_var": {
+          "hide_name": 0,
+          "bits": [ 36, 37, 38, 39 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loops.v:22.19-22.33"
+          }
+        }
+      }
+    }
+  }
+}

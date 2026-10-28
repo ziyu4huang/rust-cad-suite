@@ -1,0 +1,1 @@
+read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json

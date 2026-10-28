@@ -1,0 +1,79 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `attrib03_foo'. Setting top module to attrib03_foo.
+
+2.1. Analyzing design hierarchy..
+Top module:  \attrib03_foo
+Used module:     $paramod\attrib03_bar\WIDTH=s32'00000000000000000000000000001000
+
+2.2. Analyzing design hierarchy..
+Top module:  \attrib03_foo
+Used module:     $paramod\attrib03_bar\WIDTH=s32'00000000000000000000000000001000
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module attrib03_foo...
+Checking module $paramod\attrib03_bar\WIDTH=s32'00000000000000000000000000001000...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== attrib03_foo ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        4 wires
+       18 wire bits
+        4 public wires
+       18 public wire bits
+        4 ports
+       18 port bits
+        1 submodules
+        1   $paramod\attrib03_bar\WIDTH=s32'00000000000000000000000000001000
+
+=== $paramod\attrib03_bar\WIDTH=s32'00000000000000000000000000001000 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        5 wires
+       50 wire bits
+        4 public wires
+       18 public wire bits
+        4 ports
+       18 port bits
+        2 cells
+        1   $add
+        1   $sdff
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+        2 attrib03_foo
+        2 $paramod\attrib03_bar\WIDTH=s32'00000000000000000000000000001000
+
+        +----------Count including submodules.
+        | 
+        9 wires
+       68 wire bits
+        8 public wires
+       36 public wire bits
+        8 ports
+       36 port bits
+        - memories
+        - memory bits
+        - processes
+        2 cells
+        1   $add
+        1   $sdff
+        1 submodules
+        1   $paramod\attrib03_bar\WIDTH=s32'00000000000000000000000000001000
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

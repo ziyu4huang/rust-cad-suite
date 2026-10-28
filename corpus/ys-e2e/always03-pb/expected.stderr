@@ -1,0 +1,1 @@
+ERROR: Module uut_always03 contains processes, which are not supported by JSON backend (run `proc` first).

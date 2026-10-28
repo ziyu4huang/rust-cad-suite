@@ -1,0 +1,235 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "$paramod$13e4c40ad4eb4f9982560128338ac3e13d3e1c1d\\inc": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "hdlname": "inc",
+        "src": "../../../corpus-external/yosys-simple/paramods.v:42.1-52.10"
+      },
+      "parameter_default_values": {
+        "step": "00000000000000000000000000000111",
+        "width": "00000000000000000000000000000100"
+      },
+      "ports": {
+        "in": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "out": {
+          "direction": "output",
+          "bits": [ 6, 7, 8, 9 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/paramods.v:50$add$2": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:50.14-50.23"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "B": [ "1", "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/paramods.v:50$add$2_Y": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:50.14-50.23"
+          }
+        },
+        "in": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:47.19-47.21"
+          }
+        },
+        "out": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:48.20-48.23"
+          }
+        }
+      }
+    },
+    "$paramod\\inc\\step=s32'00000000000000000000000000000011": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "hdlname": "inc",
+        "src": "../../../corpus-external/yosys-simple/paramods.v:42.1-52.10"
+      },
+      "parameter_default_values": {
+        "step": "00000000000000000000000000000011",
+        "width": "00000000000000000000000000001000"
+      },
+      "ports": {
+        "in": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+        },
+        "out": {
+          "direction": "output",
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/paramods.v:50$add$3": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:50.14-50.23"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/paramods.v:50$add$3_Y": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:50.14-50.23"
+          }
+        },
+        "in": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:47.19-47.21"
+          }
+        },
+        "out": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:48.20-48.23"
+          }
+        }
+      }
+    },
+    "pm_test3": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/paramods.v:26.1-38.10"
+      },
+      "ports": {
+        "a": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+        },
+        "b": {
+          "direction": "input",
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+        },
+        "x": {
+          "direction": "output",
+          "bits": [ 18, 19, 20, 21, 22, 23, 24, 25 ]
+        },
+        "y": {
+          "direction": "output",
+          "bits": [ 26, 27, 28, 29, "0", "0", "0", "0" ]
+        }
+      },
+      "cells": {
+        "inc_a": {
+          "hide_name": 0,
+          "type": "$paramod\\inc\\step=s32'00000000000000000000000000000011",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:31.5-31.28"
+          },
+          "port_directions": {
+            "in": "input",
+            "out": "output"
+          },
+          "connections": {
+            "in": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "out": [ 18, 19, 20, 21, 22, 23, 24, 25 ]
+          }
+        },
+        "inc_b": {
+          "hide_name": 0,
+          "type": "$paramod$13e4c40ad4eb4f9982560128338ac3e13d3e1c1d\\inc",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:32.5-32.17"
+          },
+          "port_directions": {
+            "in": "input",
+            "out": "output"
+          },
+          "connections": {
+            "in": [ 10, 11, 12, 13 ],
+            "out": [ 26, 27, 28, 29 ]
+          }
+        }
+      },
+      "netnames": {
+        "a": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:28.13-28.14"
+          }
+        },
+        "b": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:28.16-28.17"
+          }
+        },
+        "x": {
+          "hide_name": 0,
+          "bits": [ 18, 19, 20, 21, 22, 23, 24, 25 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:29.14-29.15"
+          }
+        },
+        "y": {
+          "hide_name": 0,
+          "bits": [ 26, 27, 28, 29, "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/paramods.v:29.17-29.18"
+          }
+        }
+      }
+    }
+  }
+}

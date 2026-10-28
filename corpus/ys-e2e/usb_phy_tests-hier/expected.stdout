@@ -1,0 +1,43 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `usb_phy_test01'. Setting top module to usb_phy_test01.
+
+2.1. Analyzing design hierarchy..
+Top module:  \usb_phy_test01
+
+2.2. Analyzing design hierarchy..
+Top module:  \usb_phy_test01
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module usb_phy_test01...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== usb_phy_test01 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       14 wires
+       19 wire bits
+        6 public wires
+        8 public wire bits
+        4 ports
+        4 port bits
+       11 cells
+        3   $eq
+        1   $logic_not
+        3   $mux
+        2   $pmux
+        1   $reduce_or
+        1   $sdff
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

@@ -1,0 +1,34 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `genblock_collide_top2'. Setting top module to genblock_collide_top2.
+
+2.1. Analyzing design hierarchy..
+Top module:  \genblock_collide_top2
+
+2.2. Analyzing design hierarchy..
+Top module:  \genblock_collide_top2
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module genblock_collide_top2...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== genblock_collide_top2 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        1 wires
+        1 wire bits
+        1 public wires
+        1 public wire bits
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

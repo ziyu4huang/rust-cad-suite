@@ -1,0 +1,116 @@
+-- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111...
+Checking module FullAdder...
+Checking module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101...
+Checking module Multiplier_2D...
+Checking module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+       31 wire bits
+        6 public wires
+       31 public wire bits
+        5 ports
+       23 port bits
+        7 submodules
+        7   FullAdder
+
+=== FullAdder ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+        7 wire bits
+        5 public wires
+        5 public wire bits
+        5 ports
+        5 port bits
+        2 cells
+        2   $add
+
+=== $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+       23 wire bits
+        6 public wires
+       23 public wire bits
+        5 ports
+       17 port bits
+        5 submodules
+        5   FullAdder
+
+=== Multiplier_2D ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       19 wires
+      105 wire bits
+       19 public wires
+      105 public wire bits
+        3 ports
+       16 port bits
+        4 cells
+        4   $and
+        3 submodules
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111
+
+=== $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+       27 wire bits
+        6 public wires
+       27 public wire bits
+        5 ports
+       20 port bits
+        6 submodules
+        6   FullAdder
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+       40 Multiplier_2D
+        2   FullAdder
+        2   FullAdder
+        2   FullAdder
+
+        +----------Count including submodules.
+        | 
+      145 wires
+      312 wire bits
+      127 public wires
+      276 public wire bits
+      108 ports
+      166 port bits
+        - memories
+        - memory bits
+        - processes
+       40 cells
+       36   $add
+        4   $and
+        3 submodules
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

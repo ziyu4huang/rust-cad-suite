@@ -1,0 +1,115 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "test10": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/vloghammer.v:68.1-74.10"
+      },
+      "ports": {
+        "a": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "b": {
+          "direction": "input",
+          "signed": 1,
+          "bits": [ 3, 4 ]
+        },
+        "c": {
+          "direction": "input",
+          "signed": 1,
+          "bits": [ 5, 6, 7 ]
+        },
+        "y": {
+          "direction": "output",
+          "bits": [ 8 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/vloghammer.v:73$reduce_xor$19": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/vloghammer.v:73.14-73.26"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9, 10, 11 ],
+            "Y": [ 8 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/vloghammer.v:73$ternary$18": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/vloghammer.v:73.16-73.25"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5, 6, 7 ],
+            "B": [ 3, 4, 4 ],
+            "S": [ 2 ],
+            "Y": [ 9, 10, 11 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/vloghammer.v:73$ternary$18_Y": {
+          "hide_name": 1,
+          "bits": [ 9, 10, 11 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/vloghammer.v:73.16-73.25"
+          }
+        },
+        "a": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/vloghammer.v:69.9-69.10"
+          }
+        },
+        "b": {
+          "hide_name": 0,
+          "bits": [ 3, 4 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/vloghammer.v:70.22-70.23"
+          }
+        },
+        "c": {
+          "hide_name": 0,
+          "bits": [ 5, 6, 7 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/vloghammer.v:71.22-71.23"
+          }
+        },
+        "y": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/vloghammer.v:72.10-72.11"
+          }
+        }
+      }
+    }
+  }
+}

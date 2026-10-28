@@ -1,0 +1,32 @@
+-- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module a23_barrel_shift_fpga_rotate...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== a23_barrel_shift_fpga_rotate ===
+
+        +----------Local Count, excluding submodules.
+        | 
+     1134 wires
+     1510 wire bits
+       14 public wires
+      390 public wire bits
+        4 ports
+       70 port bits
+      160 processes
+      960 cells
+      320   $and
+      160   $not
+      160   $or
+      320   $xor
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

@@ -1,0 +1,70 @@
+-- Running command `read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing JSON frontend.
+Importing module attrib09_foo from JSON tree.
+Importing module attrib09_bar from JSON tree.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module attrib09_bar...
+Checking module attrib09_foo...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== attrib09_bar ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        8 wires
+       10 wire bits
+        4 public wires
+        6 public wire bits
+        4 ports
+        6 port bits
+        5 cells
+        3   $eq
+        1   $logic_not
+        1   $pmux
+
+=== attrib09_foo ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        4 wires
+        6 wire bits
+        4 public wires
+        6 public wire bits
+        4 ports
+        6 port bits
+        1 submodules
+        1   attrib09_bar
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+        5 attrib09_foo
+        5 attrib09_bar
+
+        +----------Count including submodules.
+        | 
+       12 wires
+       16 wire bits
+        8 public wires
+       12 public wire bits
+        8 ports
+       12 port bits
+        - memories
+        - memory bits
+        - processes
+        5 cells
+        3   $eq
+        1   $logic_not
+        1   $pmux
+        1 submodules
+        1   attrib09_bar
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

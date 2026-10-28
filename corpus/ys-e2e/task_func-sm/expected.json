@@ -1,0 +1,85 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "task_func_test05": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/task_func.v:127.1-141.10"
+      },
+      "ports": {
+        "data_in": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "data_out": {
+          "direction": "output",
+          "bits": [ 3 ]
+        },
+        "clk": {
+          "direction": "input",
+          "bits": [ 4 ]
+        }
+      },
+      "cells": {
+        "$auto$ff.cc:337:slice$142": {
+          "hide_name": 1,
+          "type": "$_DFF_P_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/task_func.v:138.2-140.5"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 4 ],
+            "D": [ 2 ],
+            "Q": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/task_func.v:130.8-130.11"
+          }
+        },
+        "data_in": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/task_func.v:129.8-129.15"
+          }
+        },
+        "data_out": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/task_func.v:128.13-128.21"
+          }
+        },
+        "myTask$func$../../../corpus-external/yosys-simple/task_func.v:139$134.in": {
+          "hide_name": 0,
+          "bits": [ "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/task_func.v:134.9-134.11"
+          }
+        },
+        "myTask$func$../../../corpus-external/yosys-simple/task_func.v:139$134.out": {
+          "hide_name": 0,
+          "bits": [ "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/task_func.v:133.10-133.13"
+          }
+        }
+      }
+    }
+  }
+}

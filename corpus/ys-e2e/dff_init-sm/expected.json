@@ -1,0 +1,98 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "dff_test_997": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/dff_init.v:44.1-54.10"
+      },
+      "ports": {
+        "y": {
+          "direction": "output",
+          "bits": [ 2, 3 ]
+        },
+        "clk": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "wire4": {
+          "direction": "input",
+          "signed": 1,
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$ff.cc:337:slice$16": {
+          "hide_name": 1,
+          "type": "$_DFF_P_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/dff_init.v:50.4-52.7"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 4 ],
+            "D": [ 5 ],
+            "Q": [ 2 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$17": {
+          "hide_name": 1,
+          "type": "$_DFF_P_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/dff_init.v:50.4-52.7"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "C": [ 4 ],
+            "D": [ 5 ],
+            "Q": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/dff_init.v:47.22-47.25"
+          }
+        },
+        "reg10": {
+          "hide_name": 0,
+          "bits": [ 2, 3 ],
+          "attributes": {
+            "init": "00",
+            "src": "../../../corpus-external/yosys-simple/dff_init.v:49.15-49.20"
+          }
+        },
+        "wire4": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/dff_init.v:48.22-48.27"
+          }
+        },
+        "y": {
+          "hide_name": 0,
+          "bits": [ 2, 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/dff_init.v:46.22-46.23"
+          }
+        }
+      }
+    }
+  }
+}

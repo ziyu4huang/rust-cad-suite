@@ -1,0 +1,78 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping fsm_test.$auto$simple.cc:200:make_patterns_logic$108 ($ne).
+Mapping fsm_test.$auto$opt_reduce.cc:131:opt_pmux$104 ($reduce_or).
+Mapping fsm_test.$auto$opt_reduce.cc:131:opt_pmux$79 ($reduce_or).
+Mapping fsm_test.$auto$opt_reduce.cc:131:opt_pmux$77 ($reduce_or).
+Mapping fsm_test.$procmux$53_CMP0 ($eq).
+Mapping fsm_test.$procmux$50 ($mux).
+Mapping fsm_test.$auto$simple.cc:200:make_patterns_logic$92 ($ne).
+Mapping fsm_test.$auto$ff.cc:337:slice$99 ($sdff).
+Mapping fsm_test.$auto$ff.cc:337:slice$106 ($sdffe).
+Mapping fsm_test.$auto$ff.cc:337:slice$86 ($sdff).
+Mapping fsm_test.$auto$simple.cc:200:make_patterns_logic$94 ($ne).
+Mapping fsm_test.$auto$ff.cc:337:slice$85 ($sdff).
+Mapping fsm_test.$auto$simple.cc:200:make_patterns_logic$96 ($reduce_bool).
+Mapping fsm_test.$auto$ff.cc:337:slice$84 ($sdff).
+Mapping fsm_test.$procmux$36 ($mux).
+Mapping fsm_test.$auto$ff.cc:337:slice$83 ($sdff).
+Mapping fsm_test.$auto$simple.cc:217:make_patterns_logic$110 ($reduce_and).
+Mapping fsm_test.$auto$simple.cc:200:make_patterns_logic$90 ($ne).
+Mapping fsm_test.$procmux$28 ($mux).
+Mapping fsm_test.$procmux$67_CMP0 ($eq).
+Mapping fsm_test.$auto$simple.cc:81:create_not$100 ($not).
+Mapping fsm_test.$procmux$65 ($mux).
+Mapping fsm_test.$procmux$22 ($pmux).
+Mapping fsm_test.$procmux$63 ($mux).
+Mapping fsm_test.$auto$simple.cc:242:combine_resets$103 ($reduce_or).
+Mapping fsm_test.$procmux$62_CMP0 ($eq).
+Mapping fsm_test.$procmux$14 ($pmux).
+Mapping fsm_test.$procmux$60 ($mux).
+Mapping fsm_test.$../../../corpus-external/yosys-simple/fsm.v:62$eq$13 ($eq).
+Mapping fsm_test.$../../../corpus-external/yosys-simple/fsm.v:55$eq$11 ($eq).
+Mapping fsm_test.$procmux$59_CMP0 ($eq).
+Mapping fsm_test.$auto$opt_reduce.cc:131:opt_pmux$81 ($reduce_or).
+Mapping fsm_test.$procmux$56_CMP0 ($eq).
+Mapping fsm_test.$procmux$54 ($mux).
+Mapping fsm_test.$procmux$52 ($pmux).
+Mapping fsm_test.$../../../corpus-external/yosys-simple/fsm.v:34$logic_and$5 ($logic_and).
+Mapping fsm_test.$../../../corpus-external/yosys-simple/fsm.v:34$logic_not$4 ($logic_not).
+Mapping fsm_test.$../../../corpus-external/yosys-simple/fsm.v:32$logic_and$3 ($logic_and).
+Mapping fsm_test.$../../../corpus-external/yosys-simple/fsm.v:32$logic_not$2 ($logic_not).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module fsm_test...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== fsm_test ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      310 wires
+      895 wire bits
+       10 public wires
+       44 public wire bits
+        8 ports
+        8 port bits
+      842 cells
+      138   $_AND_
+      196   $_MUX_
+       10   $_NOT_
+      280   $_OR_
+       29   $_SDFFE_PP0P_
+        3   $_SDFFE_PP1P_
+        6   $_SDFF_PP0_
+        2   $_SDFF_PP1_
+      177   $_XOR_
+        1   $add
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

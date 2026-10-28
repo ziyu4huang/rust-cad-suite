@@ -1,0 +1,172 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "case_expr_non_const_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:3.1-59.10"
+      },
+      "ports": {
+        "a": {
+          "direction": "output",
+          "bits": [ "1" ]
+        },
+        "b": {
+          "direction": "output",
+          "bits": [ "1" ]
+        },
+        "c": {
+          "direction": "output",
+          "bits": [ "1" ]
+        },
+        "d": {
+          "direction": "output",
+          "bits": [ "1" ]
+        },
+        "e": {
+          "direction": "output",
+          "bits": [ "1" ]
+        },
+        "f": {
+          "direction": "output",
+          "bits": [ "1" ]
+        },
+        "g": {
+          "direction": "output",
+          "bits": [ "1" ]
+        },
+        "h": {
+          "direction": "output",
+          "bits": [ "1" ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "a": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:5.16-5.17"
+          }
+        },
+        "b": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:5.19-5.20"
+          }
+        },
+        "c": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:5.22-5.23"
+          }
+        },
+        "d": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:5.25-5.26"
+          }
+        },
+        "e": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:5.28-5.29"
+          }
+        },
+        "f": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:5.31-5.32"
+          }
+        },
+        "g": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:5.34-5.35"
+          }
+        },
+        "h": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:5.37-5.38"
+          }
+        },
+        "x_1b0": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:7.9-7.14"
+          }
+        },
+        "x_1b1": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:8.9-8.14"
+          }
+        },
+        "x_1sb0": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:9.16-9.22"
+          }
+        },
+        "x_1sb1": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:10.16-10.22"
+          }
+        },
+        "x_2b0": {
+          "hide_name": 0,
+          "bits": [ "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:11.15-11.20"
+          }
+        },
+        "x_2b11": {
+          "hide_name": 0,
+          "bits": [ "1", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:12.15-12.21"
+          }
+        },
+        "x_2sb01": {
+          "hide_name": 0,
+          "bits": [ "1", "0" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:13.22-13.29"
+          }
+        },
+        "x_2sb11": {
+          "hide_name": 0,
+          "bits": [ "1", "1" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:14.22-14.29"
+          }
+        },
+        "x_3b0": {
+          "hide_name": 0,
+          "bits": [ "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/case_expr_non_const.v:15.15-15.20"
+          }
+        }
+      }
+    }
+  }
+}

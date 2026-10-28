@@ -1,0 +1,56 @@
+-- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module optest...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== optest ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      131 wires
+      735 wire bits
+        7 public wires
+       32 public wire bits
+        7 ports
+       32 port bits
+        1 processes
+      123 cells
+        4   $add
+        1   $and
+        4   $div
+        4   $eq
+        4   $ge
+        4   $gt
+        4   $le
+        2   $logic_and
+       11   $logic_not
+        4   $lt
+        4   $mod
+        4   $mul
+        4   $mux
+        4   $ne
+        2   $neg
+        2   $not
+        8   $pos
+        2   $pow
+        8   $reduce_and
+        8   $reduce_or
+        8   $reduce_xnor
+        4   $reduce_xor
+        6   $shl
+        4   $shr
+        4   $sshl
+        4   $sshr
+        4   $sub
+        1   $xor
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

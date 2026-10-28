@@ -1,0 +1,34 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping select_leaves.$../../../corpus-external/yosys-simple/muxtree.v:81$ternary$9 ($mux).
+Mapping select_leaves.$../../../corpus-external/yosys-simple/muxtree.v:81$ternary$8 ($mux).
+Mapping select_leaves.$auto$ff.cc:337:slice$14 ($sdff).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module select_leaves...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== select_leaves ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+        6 wire bits
+        4 public wires
+        4 public wire bits
+        4 ports
+        4 port bits
+        3 cells
+        2   $_MUX_
+        1   $_SDFF_PN0_
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

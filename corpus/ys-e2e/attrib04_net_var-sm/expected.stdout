@@ -1,0 +1,76 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping attrib04_bar.$auto$ff.cc:337:slice$10 ($sdff).
+Mapping attrib04_bar.$procdff$9 ($dff).
+Mapping attrib04_bar.$../../../corpus-external/yosys-simple/attrib04_net_var.v:16$xor$3 ($xor).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module attrib04_foo...
+Checking module attrib04_bar...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== attrib04_foo ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        4 wires
+        4 wire bits
+        4 public wires
+        4 public wire bits
+        4 ports
+        4 port bits
+        1 submodules
+        1   attrib04_bar
+
+=== attrib04_bar ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        7 wires
+       45 wire bits
+        6 public wires
+       13 public wire bits
+        4 ports
+        4 port bits
+       11 cells
+        8   $_DFF_P_
+        1   $_SDFF_PP0_
+        1   $_XOR_
+        1   $add
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+       11 attrib04_foo
+       11 attrib04_bar
+
+        +----------Count including submodules.
+        | 
+       11 wires
+       49 wire bits
+       10 public wires
+       17 public wire bits
+        8 ports
+        8 port bits
+        - memories
+        - memory bits
+        - processes
+       11 cells
+        8   $_DFF_P_
+        1   $_SDFF_PP0_
+        1   $_XOR_
+        1   $add
+        1 submodules
+        1   attrib04_bar
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

@@ -1,0 +1,33 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping retime_test.$procdff$4 ($dff).
+Mapping retime_test.$../../../corpus-external/yosys-simple/retime.v:4$reduce_xor$2 ($reduce_xor).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module retime_test...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== retime_test ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        8 wires
+       26 wire bits
+        4 public wires
+       18 public wire bits
+        3 ports
+       10 port bits
+       15 cells
+        8   $_DFF_P_
+        7   $_XOR_
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

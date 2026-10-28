@@ -1,0 +1,37 @@
+-- Running command `read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing JSON frontend.
+Importing module memtest13 from JSON tree.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module memtest13...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== memtest13 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       35 wires
+      527 wire bits
+       16 public wires
+       92 public wire bits
+       16 ports
+       92 port bits
+        1 memories
+      108 memory bits
+       29 cells
+        2   $add
+        3   $dffe
+        3   $memrd
+        7   $memwr_v2
+        9   $mux
+        1   $shiftx
+        2   $shl
+        2   $sub
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

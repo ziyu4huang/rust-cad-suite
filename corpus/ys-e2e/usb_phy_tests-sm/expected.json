@@ -1,0 +1,1230 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "usb_phy_test01": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:3.1-35.10"
+      },
+      "ports": {
+        "clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "rst": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "rx_en": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "fs_ce": {
+          "direction": "output",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$auto$ff.cc:337:slice$101": {
+          "hide_name": 1,
+          "type": "$_SDFF_PP0_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:11.1-12.42"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "Q": "output",
+            "R": "input"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 6 ],
+            "Q": [ 7 ],
+            "R": [ 3 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$102": {
+          "hide_name": 1,
+          "type": "$_SDFF_PP0_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:11.1-12.42"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "Q": "output",
+            "R": "input"
+          },
+          "connections": {
+            "C": [ 2 ],
+            "D": [ 8 ],
+            "Q": [ 9 ],
+            "R": [ 3 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$107": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:20.32-20.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ "1" ],
+            "Y": [ 10 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$108": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:20.32-20.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ "0" ],
+            "Y": [ 11 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$81": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ "1" ],
+            "Y": [ 12 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$82": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ "1" ],
+            "Y": [ 13 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$93": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:25.6-25.6|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ "0" ],
+            "Y": [ 14 ]
+          }
+        },
+        "$auto$simplemap.cc:106:simplemap_bitop$94": {
+          "hide_name": 1,
+          "type": "$_XOR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:25.6-25.6|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ "1" ],
+            "Y": [ 15 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$112": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:20.32-20.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10 ],
+            "B": [ 11 ],
+            "Y": [ 16 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$128": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 17 ],
+            "B": [ 18 ],
+            "Y": [ 19 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$130": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 19 ],
+            "B": [ 20 ],
+            "Y": [ 21 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$86": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12 ],
+            "B": [ 13 ],
+            "Y": [ 22 ]
+          }
+        },
+        "$auto$simplemap.cc:157:simplemap_reduce$98": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:25.6-25.6|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 14 ],
+            "B": [ 15 ],
+            "Y": [ 23 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$116": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:17.18-17.18|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 9 ],
+            "Y": [ 24 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$119": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 25 ],
+            "B": [ 21 ],
+            "Y": [ 26 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$125": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 27 ],
+            "B": [ 28 ],
+            "Y": [ 29 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$47": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 20 ],
+            "B": [ 17 ],
+            "Y": [ 30 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$48": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 25 ],
+            "B": [ 18 ],
+            "Y": [ 31 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$50": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 30 ],
+            "B": [ 31 ],
+            "Y": [ 32 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$60": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 33 ],
+            "B": [ 34 ],
+            "Y": [ 35 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$61": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 36 ],
+            "B": [ 37 ],
+            "Y": [ 38 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$63": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 35 ],
+            "B": [ 38 ],
+            "Y": [ 39 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$74": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 40 ],
+            "B": [ 41 ],
+            "Y": [ 42 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$75": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 43 ],
+            "B": [ 44 ],
+            "Y": [ 45 ]
+          }
+        },
+        "$auto$simplemap.cc:198:logic_reduce$77": {
+          "hide_name": 1,
+          "type": "$_OR_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 42 ],
+            "B": [ 45 ],
+            "Y": [ 46 ]
+          }
+        },
+        "$auto$simplemap.cc:227:simplemap_lognot$100": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:25.6-25.6|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 23 ],
+            "Y": [ 17 ]
+          }
+        },
+        "$auto$simplemap.cc:227:simplemap_lognot$114": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:20.32-20.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 16 ],
+            "Y": [ 25 ]
+          }
+        },
+        "$auto$simplemap.cc:227:simplemap_lognot$117": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:17.18-17.18|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 24 ],
+            "Y": [ 18 ]
+          }
+        },
+        "$auto$simplemap.cc:227:simplemap_lognot$88": {
+          "hide_name": 1,
+          "type": "$_NOT_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 22 ],
+            "Y": [ 20 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$103": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:27.6-27.11|../../../corpus-external/yosys-simple/usb_phy_tests.v:27.3-28.32"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1" ],
+            "B": [ "0" ],
+            "S": [ 4 ],
+            "Y": [ 47 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$104": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:27.6-27.11|../../../corpus-external/yosys-simple/usb_phy_tests.v:27.3-28.32"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1" ],
+            "B": [ "0" ],
+            "S": [ 4 ],
+            "Y": [ 48 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$44": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:19.6-19.11|../../../corpus-external/yosys-simple/usb_phy_tests.v:19.3-20.32"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1" ],
+            "B": [ "0" ],
+            "S": [ 4 ],
+            "Y": [ 49 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$45": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:19.6-19.11|../../../corpus-external/yosys-simple/usb_phy_tests.v:19.3-20.32"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "0" ],
+            "S": [ 4 ],
+            "Y": [ 50 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$89": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:23.6-23.11|../../../corpus-external/yosys-simple/usb_phy_tests.v:23.3-24.32"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ "1" ],
+            "S": [ 4 ],
+            "Y": [ 51 ]
+          }
+        },
+        "$auto$simplemap.cc:298:simplemap_mux$90": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:23.6-23.11|../../../corpus-external/yosys-simple/usb_phy_tests.v:23.3-24.32"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1" ],
+            "B": [ "1" ],
+            "S": [ 4 ],
+            "Y": [ 52 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$120": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1" ],
+            "B": [ 25 ],
+            "Y": [ 27 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$122": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ 21 ],
+            "Y": [ 28 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$51": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ 20 ],
+            "Y": [ 33 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$53": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 47 ],
+            "B": [ 17 ],
+            "Y": [ 34 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$55": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 51 ],
+            "B": [ 25 ],
+            "Y": [ 36 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$57": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 49 ],
+            "B": [ 18 ],
+            "Y": [ 37 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$65": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0" ],
+            "B": [ 20 ],
+            "Y": [ 40 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$67": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 48 ],
+            "B": [ 17 ],
+            "Y": [ 41 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$69": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 52 ],
+            "B": [ 25 ],
+            "Y": [ 43 ]
+          }
+        },
+        "$auto$simplemap.cc:460:simplemap_pmux$71": {
+          "hide_name": 1,
+          "type": "$_AND_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 50 ],
+            "B": [ 18 ],
+            "Y": [ 44 ]
+          }
+        },
+        "$auto$simplemap.cc:474:simplemap_pmux$126": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x" ],
+            "B": [ 29 ],
+            "S": [ 26 ],
+            "Y": [ 5 ]
+          }
+        },
+        "$auto$simplemap.cc:474:simplemap_pmux$64": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x" ],
+            "B": [ 39 ],
+            "S": [ 32 ],
+            "Y": [ 6 ]
+          }
+        },
+        "$auto$simplemap.cc:474:simplemap_pmux$78": {
+          "hide_name": 1,
+          "type": "$_MUX_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:28.32-28.32|../../../corpus-external/yosys-simple/usb_phy_tests.v:17.2-32.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x" ],
+            "B": [ 46 ],
+            "S": [ 32 ],
+            "Y": [ 8 ]
+          }
+        }
+      },
+      "netnames": {
+        "$2\\dpll_next_state[1:0]": {
+          "hide_name": 1,
+          "bits": [ 49, 50 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:14.1-33.7"
+          }
+        },
+        "$3\\dpll_next_state[1:0]": {
+          "hide_name": 1,
+          "bits": [ 51, 52 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:14.1-33.7"
+          }
+        },
+        "$4\\dpll_next_state[1:0]": {
+          "hide_name": 1,
+          "bits": [ 47, 48 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:14.1-33.7"
+          }
+        },
+        "$auto$opt_reduce.cc:137:opt_pmux$42": {
+          "hide_name": 1,
+          "bits": [ 21 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$111": {
+          "hide_name": 1,
+          "bits": [ 53 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$127": {
+          "hide_name": 1,
+          "bits": [ 19 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$129": {
+          "hide_name": 1,
+          "bits": [ 54 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$85": {
+          "hide_name": 1,
+          "bits": [ 55 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:148:simplemap_reduce$97": {
+          "hide_name": 1,
+          "bits": [ 56 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$115": {
+          "hide_name": 1,
+          "bits": [ 24 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$118": {
+          "hide_name": 1,
+          "bits": [ 26 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$124": {
+          "hide_name": 1,
+          "bits": [ 29 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$46": {
+          "hide_name": 1,
+          "bits": [ 30, 31 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$49": {
+          "hide_name": 1,
+          "bits": [ 32 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$59": {
+          "hide_name": 1,
+          "bits": [ 35, 38 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$62": {
+          "hide_name": 1,
+          "bits": [ 39 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$73": {
+          "hide_name": 1,
+          "bits": [ 42, 45 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:189:logic_reduce$76": {
+          "hide_name": 1,
+          "bits": [ 46 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:271:simplemap_eqne$105": {
+          "hide_name": 1,
+          "bits": [ 10, 11 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:271:simplemap_eqne$79": {
+          "hide_name": 1,
+          "bits": [ 12, 13 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:271:simplemap_eqne$91": {
+          "hide_name": 1,
+          "bits": [ 14, 15 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:277:simplemap_eqne$109": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:277:simplemap_eqne$83": {
+          "hide_name": 1,
+          "bits": [ 22 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:277:simplemap_eqne$95": {
+          "hide_name": 1,
+          "bits": [ 23 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$121": {
+          "hide_name": 1,
+          "bits": [ 27 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$123": {
+          "hide_name": 1,
+          "bits": [ 28 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$52": {
+          "hide_name": 1,
+          "bits": [ 33 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$54": {
+          "hide_name": 1,
+          "bits": [ 34 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$56": {
+          "hide_name": 1,
+          "bits": [ 36 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$58": {
+          "hide_name": 1,
+          "bits": [ 37 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$66": {
+          "hide_name": 1,
+          "bits": [ 40 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$68": {
+          "hide_name": 1,
+          "bits": [ 41 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$70": {
+          "hide_name": 1,
+          "bits": [ 43 ],
+          "attributes": {
+          }
+        },
+        "$auto$simplemap.cc:465:simplemap_pmux$72": {
+          "hide_name": 1,
+          "bits": [ 44 ],
+          "attributes": {
+          }
+        },
+        "$procmux$14_CMP": {
+          "hide_name": 1,
+          "bits": [ 17 ],
+          "attributes": {
+          }
+        },
+        "$procmux$21_CMP": {
+          "hide_name": 1,
+          "bits": [ 25 ],
+          "attributes": {
+          }
+        },
+        "$procmux$29_CMP": {
+          "hide_name": 1,
+          "bits": [ 18 ],
+          "attributes": {
+          }
+        },
+        "$procmux$31_CMP": {
+          "hide_name": 1,
+          "bits": [ 20 ],
+          "attributes": {
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:5.8-5.11"
+          }
+        },
+        "dpll_next_state": {
+          "hide_name": 0,
+          "bits": [ 6, 8 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:8.11-8.26"
+          }
+        },
+        "dpll_state": {
+          "hide_name": 0,
+          "bits": [ 7, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:9.11-9.21"
+          }
+        },
+        "fs_ce": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:7.12-7.17"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:5.13-5.16"
+          }
+        },
+        "rx_en": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/usb_phy_tests.v:6.8-6.13"
+          }
+        }
+      }
+    }
+  }
+}

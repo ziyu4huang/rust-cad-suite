@@ -1,0 +1,45 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `up3down5'. Setting top module to up3down5.
+
+2.1. Analyzing design hierarchy..
+Top module:  \up3down5
+
+2.2. Analyzing design hierarchy..
+Top module:  \up3down5
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module up3down5...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== up3down5 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       19 wires
+       69 wire bits
+        9 public wires
+       33 public wire bits
+        8 ports
+       24 port bits
+       14 cells
+        1   $add
+        2   $and
+        4   $dff
+        3   $eq
+        1   $logic_not
+        1   $pmux
+        1   $reduce_xor
+        1   $sub
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

@@ -1,0 +1,28 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "undef_eqx_nex": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/undef_eqx_nex.v:1.1-11.10"
+      },
+      "ports": {
+        "y": {
+          "direction": "output",
+          "bits": [ "x", "0", "x", "x", "1", "0", "0", "1" ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "y": {
+          "hide_name": 0,
+          "bits": [ "x", "0", "x", "x", "1", "0", "0", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/undef_eqx_nex.v:2.14-2.15"
+          }
+        }
+      }
+    }
+  }
+}

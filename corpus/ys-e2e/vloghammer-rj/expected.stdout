@@ -1,0 +1,29 @@
+-- Running command `read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing JSON frontend.
+Importing module test10 from JSON tree.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module test10...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== test10 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        5 wires
+       10 wire bits
+        4 public wires
+        7 public wire bits
+        4 ports
+        7 port bits
+        2 cells
+        1   $mux
+        1   $reduce_xor
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

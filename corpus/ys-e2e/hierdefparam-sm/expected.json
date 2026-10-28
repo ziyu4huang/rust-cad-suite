@@ -1,0 +1,274 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "$paramod\\hierdefparam_a": {
+      "attributes": {
+        "hdlname": "hierdefparam_a",
+        "src": "../../../corpus-external/yosys-simple/hierdefparam.v:11.1-20.10"
+      },
+      "ports": {
+        "A": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+        },
+        "Y": {
+          "direction": "output",
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+        }
+      },
+      "cells": {
+        "bar[0].mod_b": {
+          "hide_name": 0,
+          "type": "$paramod\\hierdefparam_b\\addvalue=s32'00000000000000000000000000101010",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:16.22-16.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "Y": [ 18, 19, 20, 21, 22, 23, 24, 25 ]
+          }
+        },
+        "bar[1].mod_b": {
+          "hide_name": 0,
+          "type": "$paramod\\hierdefparam_b\\addvalue=s32'00000000000000000000000000101011",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:16.22-16.41"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 18, 19, 20, 21, 22, 23, 24, 25 ],
+            "Y": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+          }
+        }
+      },
+      "netnames": {
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:11.40-11.41"
+          }
+        },
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:11.61-11.62"
+          }
+        },
+        "bar[0].a": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:15.18-15.19"
+          }
+        },
+        "bar[0].y": {
+          "hide_name": 0,
+          "bits": [ 18, 19, 20, 21, 22, 23, 24, 25 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:15.21-15.22"
+          }
+        },
+        "bar[1].a": {
+          "hide_name": 0,
+          "bits": [ 18, 19, 20, 21, 22, 23, 24, 25 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:15.18-15.19"
+          }
+        },
+        "bar[1].y": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:15.21-15.22"
+          }
+        }
+      }
+    },
+    "$paramod\\hierdefparam_b\\addvalue=s32'00000000000000000000000000101010": {
+      "attributes": {
+        "hdlname": "hierdefparam_b",
+        "src": "../../../corpus-external/yosys-simple/hierdefparam.v:22.1-25.10"
+      },
+      "parameter_default_values": {
+        "addvalue": "00101010"
+      },
+      "ports": {
+        "A": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+        },
+        "Y": {
+          "direction": "output",
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/hierdefparam.v:24$add$3": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:24.14-24.26"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "0", "1", "0", "1", "0", "0" ],
+            "Y": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+          }
+        }
+      },
+      "netnames": {
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:22.40-22.41"
+          }
+        },
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:22.61-22.62"
+          }
+        }
+      }
+    },
+    "$paramod\\hierdefparam_b\\addvalue=s32'00000000000000000000000000101011": {
+      "attributes": {
+        "hdlname": "hierdefparam_b",
+        "src": "../../../corpus-external/yosys-simple/hierdefparam.v:22.1-25.10"
+      },
+      "parameter_default_values": {
+        "addvalue": "00101011"
+      },
+      "ports": {
+        "A": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+        },
+        "Y": {
+          "direction": "output",
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/hierdefparam.v:24$add$2": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:24.14-24.26"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "1", "0", "1", "0", "1", "0", "0" ],
+            "Y": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+          }
+        }
+      },
+      "netnames": {
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:22.40-22.41"
+          }
+        },
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:22.61-22.62"
+          }
+        }
+      }
+    },
+    "hierdefparam_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/hierdefparam.v:3.1-9.10"
+      },
+      "ports": {
+        "A": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+        },
+        "Y": {
+          "direction": "output",
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+        }
+      },
+      "cells": {
+        "foo.mod_a": {
+          "hide_name": 0,
+          "type": "$paramod\\hierdefparam_a",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:5.20-5.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "Y": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+          }
+        }
+      },
+      "netnames": {
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:3.42-3.43"
+          }
+        },
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/hierdefparam.v:3.63-3.64"
+          }
+        }
+      }
+    }
+  }
+}

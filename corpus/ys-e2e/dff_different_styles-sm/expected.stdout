@@ -1,0 +1,82 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping dffsr2.$../../../corpus-external/yosys-simple/dff_different_styles.v:88$logic_and$17 ($logic_and).
+Mapping dffsr2.$../../../corpus-external/yosys-simple/dff_different_styles.v:88$logic_not$16 ($logic_not).
+Mapping dffsr2.$../../../corpus-external/yosys-simple/dff_different_styles.v:88$logic_and$15 ($logic_and).
+Mapping dffsr2.$../../../corpus-external/yosys-simple/dff_different_styles.v:88$logic_not$14 ($logic_not).
+Mapping dffsr2_sub.$auto$proc_dff.cc:74:gen_dffsr_complex$25 ($mux).
+Mapping dffsr2_sub.$auto$proc_dff.cc:78:gen_dffsr_complex$23 ($mux).
+Mapping dffsr2_sub.$auto$proc_dff.cc:78:gen_dffsr_complex$29 ($mux).
+Mapping dffsr2_sub.$procdff$31 ($dffsr).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module dffsr2...
+Checking module dffsr2_sub...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== dffsr2 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        9 wires
+        9 wire bits
+        5 public wires
+        5 public wire bits
+        5 ports
+        5 port bits
+        4 cells
+        2   $_AND_
+        2   $_NOT_
+        1 submodules
+        1   dffsr2_sub
+
+=== dffsr2_sub ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        8 wires
+        8 wire bits
+        5 public wires
+        5 public wire bits
+        5 ports
+        5 port bits
+        4 cells
+        1   $_DFFSR_PPP_
+        3   $_MUX_
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+        8 dffsr2
+        4 dffsr2_sub
+
+        +----------Count including submodules.
+        | 
+       17 wires
+       17 wire bits
+       10 public wires
+       10 public wire bits
+       10 ports
+       10 port bits
+        - memories
+        - memory bits
+        - processes
+        8 cells
+        2   $_AND_
+        1   $_DFFSR_PPP_
+        3   $_MUX_
+        2   $_NOT_
+        1 submodules
+        1   dffsr2_sub
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

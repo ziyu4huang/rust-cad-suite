@@ -1,0 +1,36 @@
+-- Running command `read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing JSON frontend.
+Importing module constmuldivmod from JSON tree.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module constmuldivmod...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== constmuldivmod ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       74 wires
+      219 wire bits
+        3 public wires
+       22 public wire bits
+        3 ports
+       22 port bits
+       72 cells
+        3   $add
+        3   $and
+        4   $div
+       44   $eq
+        1   $logic_not
+        4   $mod
+        4   $neg
+        1   $pmux
+        8   $reduce_or
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

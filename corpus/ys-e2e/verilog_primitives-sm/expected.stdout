@@ -1,0 +1,35 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping verilog_primitives.$../../../corpus-external/yosys-simple/verilog_primitives.v:11$not$6 ($not).
+Mapping verilog_primitives.$../../../corpus-external/yosys-simple/verilog_primitives.v:13$not$3 ($not).
+Mapping verilog_primitives.$../../../corpus-external/yosys-simple/verilog_primitives.v:13$xor$2 ($xor).
+Mapping verilog_primitives.$../../../corpus-external/yosys-simple/verilog_primitives.v:13$xor$1 ($xor).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module verilog_primitives...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== verilog_primitives ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       14 wires
+       14 wire bits
+       12 public wires
+       12 public wire bits
+       12 ports
+       12 port bits
+        4 cells
+        2   $_NOT_
+        2   $_XOR_
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

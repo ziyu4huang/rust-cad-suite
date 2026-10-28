@@ -1,0 +1,35 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "genblock_port_shadow_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/genblk_port_shadow.v:1.1-10.10"
+      },
+      "ports": {
+        "x": {
+          "direction": "output",
+          "bits": [ "0" ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "blk.x": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/genblk_port_shadow.v:4.9-4.10"
+          }
+        },
+        "x": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/genblk_port_shadow.v:8.14-8.15"
+          }
+        }
+      }
+    }
+  }
+}

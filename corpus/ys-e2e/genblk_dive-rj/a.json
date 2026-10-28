@@ -1,0 +1,56 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "genblk_dive_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/genblk_dive.v:2.1-21.10"
+      },
+      "ports": {
+        "x": {
+          "direction": "output",
+          "bits": [ "0" ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "Z.A.B.C.x": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/genblk_dive.v:10.12-10.13"
+          }
+        },
+        "Z.A.B.C.z": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/genblk_dive.v:12.12-12.13"
+          }
+        },
+        "Z.A.B.x": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/genblk_dive.v:8.11-8.12"
+          }
+        },
+        "Z.A.x": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/genblk_dive.v:6.10-6.11"
+          }
+        },
+        "x": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/genblk_dive.v:2.36-2.37"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+-- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module func_block_top...
+Warning: Wire func_block_top.\func3$func$../../../corpus-external/yosys-simple/func_block.v:32$8.$result [0] is used but has no driver.
+Found and reported 1 problems.
+
+3. Printing statistics.
+
+=== func_block_top ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       90 wires
+     2879 wire bits
+       15 public wires
+      480 public wire bits
+        4 ports
+      128 port bits
+        3 processes
+       64 cells
+       64   $xor
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

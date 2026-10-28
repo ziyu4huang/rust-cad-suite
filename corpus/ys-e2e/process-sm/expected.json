@@ -1,0 +1,218 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "uart": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/process.v:61.1-83.10"
+      },
+      "ports": {
+        "reset": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "txclk": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "ld_tx_data": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "tx_empty": {
+          "direction": "output",
+          "bits": [ 5 ]
+        },
+        "tx_cnt": {
+          "direction": "output",
+          "bits": [ 6, 7, 8, 9 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/process.v:79$add$13": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:79.16-79.26"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 6, 7, 8, 9 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$30": {
+          "hide_name": 1,
+          "type": "$_SDFFE_PP1P_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:70.1-81.4"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output",
+            "R": "input"
+          },
+          "connections": {
+            "C": [ 3 ],
+            "D": [ "0" ],
+            "E": [ 4 ],
+            "Q": [ 5 ],
+            "R": [ 2 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$31": {
+          "hide_name": 1,
+          "type": "$_SDFFE_PP0N_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:70.1-81.4"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output",
+            "R": "input"
+          },
+          "connections": {
+            "C": [ 3 ],
+            "D": [ 10 ],
+            "E": [ 5 ],
+            "Q": [ 6 ],
+            "R": [ 2 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$32": {
+          "hide_name": 1,
+          "type": "$_SDFFE_PP0N_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:70.1-81.4"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output",
+            "R": "input"
+          },
+          "connections": {
+            "C": [ 3 ],
+            "D": [ 11 ],
+            "E": [ 5 ],
+            "Q": [ 7 ],
+            "R": [ 2 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$33": {
+          "hide_name": 1,
+          "type": "$_SDFFE_PP0N_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:70.1-81.4"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output",
+            "R": "input"
+          },
+          "connections": {
+            "C": [ 3 ],
+            "D": [ 12 ],
+            "E": [ 5 ],
+            "Q": [ 8 ],
+            "R": [ 2 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$34": {
+          "hide_name": 1,
+          "type": "$_SDFFE_PP0N_",
+          "parameters": {
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:70.1-81.4"
+          },
+          "port_directions": {
+            "C": "input",
+            "D": "input",
+            "E": "input",
+            "Q": "output",
+            "R": "input"
+          },
+          "connections": {
+            "C": [ 3 ],
+            "D": [ 13 ],
+            "E": [ 5 ],
+            "Q": [ 9 ],
+            "R": [ 2 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/process.v:79$add$13_Y": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:79.16-79.26"
+          }
+        },
+        "ld_tx_data": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:65.7-65.17"
+          }
+        },
+        "reset": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:63.7-63.12"
+          }
+        },
+        "tx_cnt": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:68.18-68.24"
+          }
+        },
+        "tx_empty": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:67.12-67.20"
+          }
+        },
+        "txclk": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/process.v:64.7-64.12"
+          }
+        }
+      }
+    }
+  }
+}

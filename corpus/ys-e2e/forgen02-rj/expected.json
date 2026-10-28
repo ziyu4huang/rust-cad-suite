@@ -1,0 +1,1171 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "uut_forgen02": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/forgen02.v:1.1-30.10"
+      },
+      "parameter_default_values": {
+        "WIDTH": "00000000000000000000000000001000"
+      },
+      "ports": {
+        "a": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+        },
+        "b": {
+          "direction": "input",
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ]
+        },
+        "cin": {
+          "direction": "input",
+          "bits": [ 18 ]
+        },
+        "y": {
+          "direction": "output",
+          "bits": [ 19, 20, 21, 22, 23, 24, 25, 26 ]
+        },
+        "cout": {
+          "direction": "output",
+          "bits": [ 27 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$1": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:23.17-23.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 2, 18 ],
+            "Y": [ 19 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$11": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:23.17-23.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12, 4, 28 ],
+            "Y": [ 21 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$16": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:23.17-23.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13, 5, 29 ],
+            "Y": [ 22 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$21": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:23.17-23.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 14, 6, 30 ],
+            "Y": [ 23 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$26": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:23.17-23.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 15, 7, 31 ],
+            "Y": [ 24 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$31": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:23.17-23.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 16, 8, 32 ],
+            "Y": [ 25 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$36": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:23.17-23.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 17, 9, 33 ],
+            "Y": [ 26 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$6": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:23.17-23.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11, 3, 34 ],
+            "Y": [ 20 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$14": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 35 ],
+            "B": [ 28 ],
+            "Y": [ 36 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$19": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 37 ],
+            "B": [ 29 ],
+            "Y": [ 38 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$24": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 39 ],
+            "B": [ 30 ],
+            "Y": [ 40 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$29": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 41 ],
+            "B": [ 31 ],
+            "Y": [ 42 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$34": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 43 ],
+            "B": [ 32 ],
+            "Y": [ 44 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$39": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 45 ],
+            "B": [ 33 ],
+            "Y": [ 46 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$4": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 47 ],
+            "B": [ 18 ],
+            "Y": [ 48 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$9": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 49 ],
+            "B": [ 34 ],
+            "Y": [ 50 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$or$10": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 51 ],
+            "B": [ 50 ],
+            "Y": [ 28 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$or$15": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 52 ],
+            "B": [ 36 ],
+            "Y": [ 29 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$or$20": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 53 ],
+            "B": [ 38 ],
+            "Y": [ 30 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$or$25": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 54 ],
+            "B": [ 40 ],
+            "Y": [ 31 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$or$30": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 55 ],
+            "B": [ 42 ],
+            "Y": [ 32 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$or$35": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 56 ],
+            "B": [ 44 ],
+            "Y": [ 33 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$or$40": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 57 ],
+            "B": [ 46 ],
+            "Y": [ 27 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$or$5": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.47"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 58 ],
+            "B": [ 48 ],
+            "Y": [ 34 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$12": {
+          "hide_name": 1,
+          "type": "$reduce_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 12 ],
+            "Y": [ 52 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$17": {
+          "hide_name": 1,
+          "type": "$reduce_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5, 13 ],
+            "Y": [ 53 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$2": {
+          "hide_name": 1,
+          "type": "$reduce_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 10 ],
+            "Y": [ 58 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$22": {
+          "hide_name": 1,
+          "type": "$reduce_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 6, 14 ],
+            "Y": [ 54 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$27": {
+          "hide_name": 1,
+          "type": "$reduce_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7, 15 ],
+            "Y": [ 55 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$32": {
+          "hide_name": 1,
+          "type": "$reduce_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 8, 16 ],
+            "Y": [ 56 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$37": {
+          "hide_name": 1,
+          "type": "$reduce_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9, 17 ],
+            "Y": [ 57 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$7": {
+          "hide_name": 1,
+          "type": "$reduce_and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3, 11 ],
+            "Y": [ 51 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$13": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12, 4 ],
+            "Y": [ 35 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$18": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13, 5 ],
+            "Y": [ 37 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$23": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 14, 6 ],
+            "Y": [ 39 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$28": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 15, 7 ],
+            "Y": [ 41 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$3": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 2 ],
+            "Y": [ 47 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$33": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 16, 8 ],
+            "Y": [ 43 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$38": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 17, 9 ],
+            "Y": [ 45 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$8": {
+          "hide_name": 1,
+          "type": "$reduce_xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11, 3 ],
+            "Y": [ 49 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$14_Y": {
+          "hide_name": 1,
+          "bits": [ 36 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$19_Y": {
+          "hide_name": 1,
+          "bits": [ 38 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$24_Y": {
+          "hide_name": 1,
+          "bits": [ 40 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$29_Y": {
+          "hide_name": 1,
+          "bits": [ 42 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$34_Y": {
+          "hide_name": 1,
+          "bits": [ 44 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$39_Y": {
+          "hide_name": 1,
+          "bits": [ 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$4_Y": {
+          "hide_name": 1,
+          "bits": [ 48 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$and$9_Y": {
+          "hide_name": 1,
+          "bits": [ 50 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.46"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$12_Y": {
+          "hide_name": 1,
+          "bits": [ 52 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$17_Y": {
+          "hide_name": 1,
+          "bits": [ 53 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$22_Y": {
+          "hide_name": 1,
+          "bits": [ 54 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$27_Y": {
+          "hide_name": 1,
+          "bits": [ 55 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$2_Y": {
+          "hide_name": 1,
+          "bits": [ 58 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$32_Y": {
+          "hide_name": 1,
+          "bits": [ 56 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$37_Y": {
+          "hide_name": 1,
+          "bits": [ 57 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$7_Y": {
+          "hide_name": 1,
+          "bits": [ 51 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.21-24.28"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$13_Y": {
+          "hide_name": 1,
+          "bits": [ 35 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$18_Y": {
+          "hide_name": 1,
+          "bits": [ 37 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$23_Y": {
+          "hide_name": 1,
+          "bits": [ 39 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$28_Y": {
+          "hide_name": 1,
+          "bits": [ 41 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$33_Y": {
+          "hide_name": 1,
+          "bits": [ 43 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$38_Y": {
+          "hide_name": 1,
+          "bits": [ 45 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$3_Y": {
+          "hide_name": 1,
+          "bits": [ 47 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$8_Y": {
+          "hide_name": 1,
+          "bits": [ 49 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:24.32-24.39"
+          }
+        },
+        "a": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:5.19-5.20"
+          }
+        },
+        "adder[0].D": {
+          "hide_name": 0,
+          "bits": [ 10, 2, 18 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:16.14-16.15"
+          }
+        },
+        "adder[1].D": {
+          "hide_name": 0,
+          "bits": [ 11, 3, 34 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:16.14-16.15"
+          }
+        },
+        "adder[2].D": {
+          "hide_name": 0,
+          "bits": [ 12, 4, 28 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:16.14-16.15"
+          }
+        },
+        "adder[3].D": {
+          "hide_name": 0,
+          "bits": [ 13, 5, 29 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:16.14-16.15"
+          }
+        },
+        "adder[4].D": {
+          "hide_name": 0,
+          "bits": [ 14, 6, 30 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:16.14-16.15"
+          }
+        },
+        "adder[5].D": {
+          "hide_name": 0,
+          "bits": [ 15, 7, 31 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:16.14-16.15"
+          }
+        },
+        "adder[6].D": {
+          "hide_name": 0,
+          "bits": [ 16, 8, 32 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:16.14-16.15"
+          }
+        },
+        "adder[7].D": {
+          "hide_name": 0,
+          "bits": [ 17, 9, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:16.14-16.15"
+          }
+        },
+        "b": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:5.22-5.23"
+          }
+        },
+        "carry": {
+          "hide_name": 0,
+          "bits": [ 34, 28, 29, 30, 31, 32, 33, 27 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:12.18-12.23"
+          }
+        },
+        "cin": {
+          "hide_name": 0,
+          "bits": [ 18 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:6.7-6.10"
+          }
+        },
+        "cout": {
+          "hide_name": 0,
+          "bits": [ 27 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:9.8-9.12"
+          }
+        },
+        "y": {
+          "hide_name": 0,
+          "bits": [ 19, 20, 21, 22, 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen02.v:8.20-8.21"
+          }
+        }
+      }
+    }
+  }
+}

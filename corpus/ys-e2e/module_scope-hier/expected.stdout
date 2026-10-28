@@ -1,0 +1,153 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `module_scope_top'. Setting top module to module_scope_top.
+
+2.1. Analyzing design hierarchy..
+Top module:  \module_scope_top
+Used module:     $paramod$6b9b5cdc146d5a842cb47327012eb57339d2e425\module_scope_ExampleLong
+Used module:     $paramod$7bd55438bff2d47b311996d3f767b5806064d3e1\module_scope_ExampleLong
+Used module:     \module_scope_ExampleLong
+Used module:     $paramod$c9280f0ba33de107ac8d15d0d860f610ca0c9035\module_scope_Example
+Used module:     $paramod\module_scope_Example\v1=s32'00000000000000000000000000000001
+Used module:     \module_scope_Example
+
+2.2. Analyzing design hierarchy..
+Top module:  \module_scope_top
+Used module:     $paramod$6b9b5cdc146d5a842cb47327012eb57339d2e425\module_scope_ExampleLong
+Used module:     $paramod$7bd55438bff2d47b311996d3f767b5806064d3e1\module_scope_ExampleLong
+Used module:     \module_scope_ExampleLong
+Used module:     $paramod$c9280f0ba33de107ac8d15d0d860f610ca0c9035\module_scope_Example
+Used module:     $paramod\module_scope_Example\v1=s32'00000000000000000000000000000001
+Used module:     \module_scope_Example
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module $paramod\module_scope_Example\v1=s32'00000000000000000000000000000001...
+Checking module $paramod$c9280f0ba33de107ac8d15d0d860f610ca0c9035\module_scope_Example...
+Checking module $paramod$7bd55438bff2d47b311996d3f767b5806064d3e1\module_scope_ExampleLong...
+Checking module $paramod$6b9b5cdc146d5a842cb47327012eb57339d2e425\module_scope_ExampleLong...
+Checking module module_scope_top...
+Checking module module_scope_ExampleLong...
+Checking module module_scope_Example...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== $paramod\module_scope_Example\v1=s32'00000000000000000000000000000001 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+       64 wire bits
+        2 public wires
+       64 public wire bits
+        2 ports
+       64 port bits
+
+=== $paramod$c9280f0ba33de107ac8d15d0d860f610ca0c9035\module_scope_Example ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+       64 wire bits
+        2 public wires
+       64 public wire bits
+        2 ports
+       64 port bits
+
+=== $paramod$7bd55438bff2d47b311996d3f767b5806064d3e1\module_scope_ExampleLong ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+       64 wire bits
+        2 public wires
+       64 public wire bits
+        2 ports
+       64 port bits
+
+=== $paramod$6b9b5cdc146d5a842cb47327012eb57339d2e425\module_scope_ExampleLong ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+       64 wire bits
+        2 public wires
+       64 public wire bits
+        2 ports
+       64 port bits
+
+=== module_scope_top ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       12 wires
+      384 wire bits
+       12 public wires
+      384 public wire bits
+       12 ports
+      384 port bits
+        6 submodules
+        1   $paramod$6b9b5cdc146d5a842cb47327012eb57339d2e425\module_scope_ExampleLong
+        1   $paramod$7bd55438bff2d47b311996d3f767b5806064d3e1\module_scope_ExampleLong
+        1   $paramod$c9280f0ba33de107ac8d15d0d860f610ca0c9035\module_scope_Example
+        1   $paramod\module_scope_Example\v1=s32'00000000000000000000000000000001
+        1   module_scope_Example
+        1   module_scope_ExampleLong
+
+=== module_scope_ExampleLong ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+       64 wire bits
+        2 public wires
+       64 public wire bits
+        2 ports
+       64 port bits
+
+=== module_scope_Example ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+       64 wire bits
+        2 public wires
+       64 public wire bits
+        2 ports
+       64 port bits
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+        - module_scope_top
+
+        +----------Count including submodules.
+        | 
+       24 wires
+      768 wire bits
+       24 public wires
+      768 public wire bits
+       24 ports
+      768 port bits
+        - memories
+        - memory bits
+        - processes
+        - cells
+        6 submodules
+        1   $paramod$6b9b5cdc146d5a842cb47327012eb57339d2e425\module_scope_ExampleLong
+        1   $paramod$7bd55438bff2d47b311996d3f767b5806064d3e1\module_scope_ExampleLong
+        1   $paramod$c9280f0ba33de107ac8d15d0d860f610ca0c9035\module_scope_Example
+        1   $paramod\module_scope_Example\v1=s32'00000000000000000000000000000001
+        1   module_scope_Example
+        1   module_scope_ExampleLong
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

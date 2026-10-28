@@ -1,0 +1,39 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping uut_arrays01.$procdff$19 ($dff).
+Mapping uut_arrays01.$procmux$17 ($mux).
+Mapping uut_arrays01.$procmux$14 ($mux).
+Mapping uut_arrays01.$procmux$11 ($mux).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module uut_arrays01...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== uut_arrays01 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        9 wires
+       30 wire bits
+        5 public wires
+       14 public wire bits
+        5 ports
+       14 port bits
+        1 memories
+       64 memory bits
+       15 cells
+        4   $_DFF_P_
+        9   $_MUX_
+        1   $memrd
+        1   $memwr_v2
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

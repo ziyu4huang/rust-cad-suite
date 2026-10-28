@@ -1,0 +1,66 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `optest'. Setting top module to optest.
+
+2.1. Analyzing design hierarchy..
+Top module:  \optest
+
+2.2. Analyzing design hierarchy..
+Top module:  \optest
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module optest...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== optest ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      194 wires
+      742 wire bits
+        7 public wires
+       32 public wire bits
+        7 ports
+       32 port bits
+      188 cells
+        4   $add
+        1   $and
+        1   $dff
+        4   $div
+       87   $eq
+        4   $ge
+        4   $gt
+        4   $le
+        1   $logic_and
+       12   $logic_not
+        4   $lt
+        4   $mod
+        4   $mul
+        4   $mux
+        4   $ne
+        2   $neg
+        2   $not
+        1   $pmux
+        2   $pow
+        4   $reduce_and
+        4   $reduce_or
+        4   $reduce_xnor
+        4   $reduce_xor
+        6   $shl
+        4   $shr
+        4   $sshl
+        4   $sshr
+        4   $sub
+        1   $xor
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

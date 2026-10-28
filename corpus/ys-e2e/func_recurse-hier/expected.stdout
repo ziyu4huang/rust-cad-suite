@@ -1,0 +1,38 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `func_recurse_top'. Setting top module to func_recurse_top.
+
+2.1. Analyzing design hierarchy..
+Top module:  \func_recurse_top
+
+2.2. Analyzing design hierarchy..
+Top module:  \func_recurse_top
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module func_recurse_top...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== func_recurse_top ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        8 wires
+       32 wire bits
+        7 public wires
+       28 public wire bits
+        3 ports
+       12 port bits
+        2 cells
+        2   $mul
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

@@ -1,0 +1,72 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$43 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$44 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$38 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$37 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$36 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$35 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$34 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$33 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$32 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$31 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$30 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$29 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$28 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$27 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$26 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$25 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$24 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$23 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$22 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$21 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$20 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$19 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$18 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$17 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$16 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$15 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$14 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$13 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$12 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$11 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$10 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$9 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$8 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:17$xor$7 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$6 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$5 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$or$4 ($or).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:16$and$3 ($and).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:14$xor$2 ($xor).
+Mapping carryadd.$../../../corpus-external/yosys-simple/carryadd.v:14$and$1 ($and).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module carryadd...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== carryadd ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       59 wires
+       80 wire bits
+       34 public wires
+       55 public wire bits
+        3 ports
+       24 port bits
+       40 cells
+       13   $_AND_
+       12   $_OR_
+       15   $_XOR_
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

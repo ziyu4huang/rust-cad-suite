@@ -1,0 +1,45 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "uut_param_attr": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/param_attr.v:1.1-11.10"
+      },
+      "parameter_default_values": {
+        "WIDTH": "00000000000000000000000000000001"
+      },
+      "ports": {
+        "I": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "O": {
+          "direction": "output",
+          "bits": [ 2 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "I": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "single_bit_vector": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/param_attr.v:6.25-6.26"
+          }
+        },
+        "O": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "single_bit_vector": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/param_attr.v:7.25-7.26"
+          }
+        }
+      }
+    }
+  }
+}

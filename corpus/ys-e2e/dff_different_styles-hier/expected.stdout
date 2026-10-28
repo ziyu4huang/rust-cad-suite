@@ -1,0 +1,84 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `dffsr2'. Setting top module to dffsr2.
+
+2.1. Analyzing design hierarchy..
+Top module:  \dffsr2
+Used module:     \dffsr2_sub
+
+2.2. Analyzing design hierarchy..
+Top module:  \dffsr2
+Used module:     \dffsr2_sub
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module dffsr2...
+Checking module dffsr2_sub...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== dffsr2 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        9 wires
+        9 wire bits
+        5 public wires
+        5 public wire bits
+        5 ports
+        5 port bits
+        4 cells
+        2   $logic_and
+        2   $logic_not
+        1 submodules
+        1   dffsr2_sub
+
+=== dffsr2_sub ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        8 wires
+        8 wire bits
+        5 public wires
+        5 public wire bits
+        5 ports
+        5 port bits
+        4 cells
+        1   $dffsr
+        3   $mux
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+        8 dffsr2
+        4 dffsr2_sub
+
+        +----------Count including submodules.
+        | 
+       17 wires
+       17 wire bits
+       10 public wires
+       10 public wire bits
+       10 ports
+       10 port bits
+        - memories
+        - memory bits
+        - processes
+        8 cells
+        1   $dffsr
+        2   $logic_and
+        2   $logic_not
+        3   $mux
+        1 submodules
+        1   dffsr2_sub
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

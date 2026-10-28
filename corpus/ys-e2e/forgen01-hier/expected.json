@@ -1,0 +1,86 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "uut_forgen01": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/forgen01.v:4.1-23.10"
+      },
+      "ports": {
+        "a": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6 ]
+        },
+        "y": {
+          "direction": "output",
+          "bits": [ 7 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/forgen01.v:21$shiftx$3": {
+          "hide_name": 1,
+          "type": "$shiftx",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000100000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000101",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen01.v:21.15-21.18"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "1", "1", "0", "1", "0", "1", "0", "0", "0", "1", "0", "1", "0", "0", "0", "1", "0", "1", "0", "0", "0", "1", "0", "0", "0", "0", "0", "1", "0", "1" ],
+            "B": [ 2, 3, 4, 5, 6 ],
+            "Y": [ 7 ]
+          }
+        }
+      },
+      "netnames": {
+        "a": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen01.v:6.13-6.14"
+          }
+        },
+        "i": {
+          "hide_name": 0,
+          "bits": [ "0", "0", "0", "0", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen01.v:9.9-9.10"
+          }
+        },
+        "j": {
+          "hide_name": 0,
+          "bits": [ "0", "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen01.v:9.12-9.13"
+          }
+        },
+        "lut": {
+          "hide_name": 0,
+          "bits": [ "0", "0", "1", "1", "0", "1", "0", "1", "0", "0", "0", "1", "0", "1", "0", "0", "0", "1", "0", "1", "0", "0", "0", "1", "0", "0", "0", "0", "0", "1", "0", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen01.v:10.12-10.15"
+          }
+        },
+        "y": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/forgen01.v:7.8-7.9"
+          }
+        }
+      }
+    }
+  }
+}

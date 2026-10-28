@@ -1,0 +1,24 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "nested_genblk_resolve_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/nested_genblk_resolve.v:2.1-14.10"
+      },
+      "ports": {
+      },
+      "cells": {
+      },
+      "netnames": {
+        "genblk1.x": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/nested_genblk_resolve.v:5.18-5.19"
+          }
+        }
+      }
+    }
+  }
+}

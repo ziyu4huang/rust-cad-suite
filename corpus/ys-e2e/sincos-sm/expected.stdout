@@ -1,0 +1,80 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping d.$procdff$132 ($adff).
+Mapping d.$procmux$84 ($pmux).
+Mapping d.$auto$ff.cc:337:slice$199 ($adffe).
+Mapping d.$procmux$81 ($pmux).
+Mapping d.$auto$ff.cc:337:slice$192 ($adffe).
+Mapping d.$procmux$78 ($pmux).
+Mapping d.$auto$simple.cc:217:make_patterns_logic$181 ($reduce_and).
+Mapping d.$procmux$75 ($pmux).
+Mapping d.$auto$ff.cc:337:slice$182 ($adffe).
+Mapping d.$auto$ff.cc:337:slice$173 ($adffe).
+Mapping d.$procmux$71 ($mux).
+Mapping d.$auto$simple.cc:217:make_patterns_logic$166 ($reduce_and).
+Mapping d.$auto$ff.cc:337:slice$170 ($adffe).
+Mapping d.$procmux$65 ($mux).
+Mapping d.$auto$simple.cc:200:make_patterns_logic$196 ($ne).
+Mapping d.$auto$ff.cc:337:slice$167 ($adffe).
+Mapping d.$procmux$59 ($mux).
+Mapping d.$auto$simple.cc:217:make_patterns_logic$198 ($reduce_and).
+Mapping d.$auto$simple.cc:200:make_patterns_logic$179 ($ne).
+Mapping d.$procmux$53 ($mux).
+Mapping d.$auto$simple.cc:200:make_patterns_logic$172 ($ne).
+Mapping d.$auto$ff.cc:337:slice$164 ($adffe).
+Mapping d.$procmux$47 ($mux).
+Mapping d.$procmux$43 ($mux).
+Mapping d.$procmux$107_CMP0 ($not).
+Mapping d.$procmux$38 ($mux).
+Mapping d.$procmux$105 ($mux).
+Mapping d.$procmux$33 ($mux).
+Mapping d.$procmux$102 ($pmux).
+Mapping d.$procmux$28 ($mux).
+Mapping d.$procmux$100 ($mux).
+Mapping d.$procmux$23 ($mux).
+Mapping d.$procmux$87 ($pmux).
+Mapping d.$procmux$18 ($mux).
+Mapping d.$../../../corpus-external/yosys-simple/sincos.v:110$eq$11 ($eq).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module d...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== d ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      271 wires
+      801 wire bits
+       12 public wires
+      130 public wire bits
+        7 ports
+       64 port bits
+        1 memories
+      640 memory bits
+      570 cells
+      137   $_AND_
+      105   $_DFFE_PP0P_
+        1   $_DFFE_PP1P_
+        1   $_DFF_PP0_
+      221   $_MUX_
+        2   $_NOT_
+       80   $_OR_
+       11   $_XOR_
+        4   $add
+        1   $ge
+        1   $meminit
+        1   $memrd_v2
+        2   $sshr
+        3   $sub
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

@@ -1,0 +1,29 @@
+-- Running command `read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing JSON frontend.
+Importing module loop_prefix_case_top from JSON tree.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module loop_prefix_case_top...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== loop_prefix_case_top ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        4 wires
+        4 wire bits
+        3 public wires
+        3 public wire bits
+        2 ports
+        2 port bits
+        2 cells
+        1   $not
+        1   $pmux
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

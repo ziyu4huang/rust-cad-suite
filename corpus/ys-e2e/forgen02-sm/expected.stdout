@@ -1,0 +1,72 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$or$40 ($or).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$and$39 ($and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$38 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$37 ($reduce_and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$36 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$or$35 ($or).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$and$34 ($and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$33 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$32 ($reduce_and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$31 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$or$30 ($or).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$and$29 ($and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$28 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$27 ($reduce_and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$26 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$or$25 ($or).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$and$24 ($and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$23 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$22 ($reduce_and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$21 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$or$20 ($or).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$and$19 ($and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$18 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$17 ($reduce_and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$16 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$or$15 ($or).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$and$14 ($and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$13 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$12 ($reduce_and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$11 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$or$10 ($or).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$and$9 ($and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$8 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$7 ($reduce_and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$6 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$or$5 ($or).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$and$4 ($and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_xor$3 ($reduce_xor).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:24$reduce_and$2 ($reduce_and).
+Mapping uut_forgen02.$../../../corpus-external/yosys-simple/forgen02.v:23$reduce_xor$1 ($reduce_xor).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module uut_forgen02...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== uut_forgen02 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       70 wires
+      114 wire bits
+       14 public wires
+       58 public wire bits
+        5 ports
+       26 port bits
+       48 cells
+       16   $_AND_
+        8   $_OR_
+       24   $_XOR_
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

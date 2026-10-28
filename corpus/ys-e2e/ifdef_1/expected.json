@@ -1,0 +1,61 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "ifdef_1_top": {
+      "attributes": {
+        "blackbox": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/ifdef_1.v:1.1-88.10"
+      },
+      "ports": {
+        "o1": {
+          "direction": "output",
+          "bits": [ 2 ]
+        },
+        "o2": {
+          "direction": "output",
+          "bits": [ 3 ]
+        },
+        "o3": {
+          "direction": "output",
+          "bits": [ 4 ]
+        },
+        "o4": {
+          "direction": "output",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "o1": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/ifdef_1.v:43.17-43.19"
+          }
+        },
+        "o2": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/ifdef_1.v:36.16-36.18"
+          }
+        },
+        "o3": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/ifdef_1.v:27.15-27.17"
+          }
+        },
+        "o4": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/ifdef_1.v:16.14-16.16"
+          }
+        }
+      }
+    }
+  }
+}

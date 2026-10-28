@@ -1,0 +1,70 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping aes.$procmux$228 ($mux).
+Mapping aes.$procmux$243 ($mux).
+Mapping aes.$procmux$240 ($mux).
+Mapping aes.$procmux$117 ($mux).
+Mapping aes.$procmux$90 ($mux).
+Mapping aes.$procmux$177 ($mux).
+Mapping aes.$procmux$162 ($mux).
+Mapping aes.$procmux$108 ($mux).
+Mapping aes.$procmux$54 ($mux).
+Mapping aes.$procmux$99 ($mux).
+Mapping aes.$procmux$207 ($mux).
+Mapping aes.$procmux$213 ($mux).
+Mapping aes.$procmux$246 ($mux).
+Mapping aes.$procmux$189 ($mux).
+Mapping aes.$procmux$144 ($mux).
+Mapping aes.$procmux$183 ($mux).
+Mapping aes.$procmux$30 ($mux).
+Mapping aes.$procmux$252 ($mux).
+Mapping aes.$procmux$171 ($mux).
+Mapping aes.$procmux$249 ($mux).
+Mapping aes.$procmux$18 ($mux).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:71$xor$16 ($xor).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:67$logic_and$15 ($logic_and).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:67$eq$14 ($eq).
+Mapping aes.$procmux$225 ($mux).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:60$logic_and$11 ($logic_and).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:60$ne$10 ($ne).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:53$logic_and$9 ($logic_and).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:53$ne$8 ($reduce_bool).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:49$xor$7 ($xor).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:45$logic_and$6 ($logic_and).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:45$eq$5 ($logic_not).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:40$logic_or$4 ($logic_or).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:40$eq$3 ($logic_not).
+Mapping aes.$../../../corpus-external/yosys-simple/loops.v:40$eq$2 ($eq).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module aes...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== aes ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       62 wires
+      180 wire bits
+       15 public wires
+       48 public wire bits
+       15 ports
+       48 port bits
+      115 cells
+        4   $_AND_
+       67   $_MUX_
+        4   $_NOT_
+       19   $_OR_
+       20   $_XOR_
+        1   $add
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

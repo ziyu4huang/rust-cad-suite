@@ -1,0 +1,41 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `repwhile_test001'. Setting top module to repwhile_test001.
+
+2.1. Analyzing design hierarchy..
+Top module:  \repwhile_test001
+
+2.2. Analyzing design hierarchy..
+Top module:  \repwhile_test001
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module repwhile_test001...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== repwhile_test001 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        4 wires
+       78 wire bits
+        4 public wires
+       78 public wire bits
+        3 ports
+       46 port bits
+        2 memories
+     2560 memory bits
+      130 cells
+      128   $meminit_v2
+        2   $memrd
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

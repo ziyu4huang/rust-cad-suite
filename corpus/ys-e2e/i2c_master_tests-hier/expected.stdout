@@ -1,0 +1,43 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `i2c_test02'. Setting top module to i2c_test02.
+
+2.1. Analyzing design hierarchy..
+Top module:  \i2c_test02
+
+2.2. Analyzing design hierarchy..
+Top module:  \i2c_test02
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module i2c_test02...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== i2c_test02 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       13 wires
+       73 wire bits
+        7 public wires
+       22 public wire bits
+        6 ports
+       21 port bits
+        9 cells
+        2   $dffe
+        3   $mux
+        1   $ne
+        1   $reduce_or
+        1   $sdff
+        1   $sub
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

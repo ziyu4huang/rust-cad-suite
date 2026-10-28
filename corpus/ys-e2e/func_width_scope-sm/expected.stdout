@@ -1,0 +1,33 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:29$not$24 ($not).
+Mapping func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:19$not$19 ($not).
+Mapping func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:7$not$14 ($not).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module func_width_scope_top...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== func_width_scope_top ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       15 wires
+     2324 wire bits
+       15 public wires
+     2324 public wire bits
+        3 ports
+     2049 port bits
+       18 cells
+       18   $_NOT_
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

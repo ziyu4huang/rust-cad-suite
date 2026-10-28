@@ -1,0 +1,306 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "omsp_dbg_uart": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:2.1-33.10"
+      },
+      "parameter_default_values": {
+        "RX_CMD": "001",
+        "RX_DATA": "010",
+        "RX_SYNC": "000"
+      },
+      "ports": {
+        "dbg_clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "dbg_rst": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "mem_burst": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "cmd_valid": {
+          "direction": "output",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:21$ternary$2": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:21.34-21.63"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0" ],
+            "B": [ "0", "1", "0" ],
+            "S": [ 4 ],
+            "Y": [ 6, 7, 8 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:28$or$4": {
+          "hide_name": 1,
+          "type": "$or",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:28.12-28.33"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ 4 ],
+            "Y": [ 10 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:30$and$6": {
+          "hide_name": 1,
+          "type": "$and",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:30.20-30.52"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11 ],
+            "B": [ 9 ],
+            "Y": [ 5 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:31$ne$7": {
+          "hide_name": 1,
+          "type": "$reduce_bool",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:31.20-31.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12, 13, 14 ],
+            "Y": [ 9 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$17": {
+          "hide_name": 1,
+          "type": "$adffe",
+          "parameters": {
+            "ARST_POLARITY": "00000000000000000000000000000001",
+            "ARST_VALUE": "000",
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "EN_POLARITY": "00000000000000000000000000000001",
+            "WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26.1-28.64"
+          },
+          "port_directions": {
+            "ARST": "input",
+            "CLK": "input",
+            "D": "input",
+            "EN": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "ARST": [ 3 ],
+            "CLK": [ 2 ],
+            "D": [ 15, 16, 17 ],
+            "EN": [ 10 ],
+            "Q": [ 12, 13, 14 ]
+          }
+        },
+        "$procmux$11": {
+          "hide_name": 1,
+          "type": "$pmux",
+          "parameters": {
+            "S_WIDTH": "00000000000000000000000000000010",
+            "WIDTH": "00000000000000000000000000000011"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:21.64-21.64|../../../corpus-external/yosys-simple/omsp_dbg_uart.v:19.3-24.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "1", "0", "0" ],
+            "B": [ "0", "0", "0", 6, 7, 8 ],
+            "S": [ 18, 11 ],
+            "Y": [ 15, 16, 17 ]
+          }
+        },
+        "$procmux$12_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:21.64-21.64|../../../corpus-external/yosys-simple/omsp_dbg_uart.v:19.3-24.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12, 13, 14 ],
+            "B": [ "0", "1", "0" ],
+            "Y": [ 18 ]
+          }
+        },
+        "$procmux$13_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000011",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000011",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:20.41-20.41|../../../corpus-external/yosys-simple/omsp_dbg_uart.v:19.3-24.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12, 13, 14 ],
+            "B": [ "1", "0", "0" ],
+            "Y": [ 11 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:21$ternary$2_Y": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 8 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:21.34-21.63"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:28$or$4_Y": {
+          "hide_name": 1,
+          "bits": [ 10 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:28.12-28.33"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:30$eq$5_Y": {
+          "hide_name": 1,
+          "bits": [ 11 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:30.21-30.39"
+          }
+        },
+        "$procmux$12_CMP": {
+          "hide_name": 1,
+          "bits": [ 18 ],
+          "attributes": {
+          }
+        },
+        "cmd_valid": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:7.8-7.17"
+          }
+        },
+        "dbg_clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:4.7-4.14"
+          }
+        },
+        "dbg_rst": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:5.7-5.14"
+          }
+        },
+        "mem_burst": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:6.7-6.16"
+          }
+        },
+        "uart_state": {
+          "hide_name": 0,
+          "bits": [ 12, 13, 14 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:9.11-9.21"
+          }
+        },
+        "uart_state_nxt": {
+          "hide_name": 0,
+          "bits": [ 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:10.11-10.25"
+          }
+        },
+        "xfer_done": {
+          "hide_name": 0,
+          "bits": [ 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/omsp_dbg_uart.v:12.6-12.15"
+          }
+        }
+      }
+    }
+  }
+}

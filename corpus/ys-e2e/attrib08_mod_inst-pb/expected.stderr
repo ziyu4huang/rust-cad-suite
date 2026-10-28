@@ -1,0 +1,1 @@
+ERROR: Module attrib08_bar contains processes, which are not supported by JSON backend (run `proc` first).

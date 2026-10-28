@@ -1,0 +1,86 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping MyMem.$procmux$180_CMP0 ($eq).
+Mapping MyMem.$procmux$163_CMP0 ($eq).
+Mapping MyMem.$procmux$132_CMP0 ($eq).
+Mapping MyMem.$procmux$237_CMP0 ($logic_not).
+Mapping MyMem.$procmux$198_CMP0 ($eq).
+Mapping MyMem.$procmux$118_CMP0 ($eq).
+Mapping MyMem.$procmux$217_CMP0 ($eq).
+Mapping MyMem.$auto$ff.cc:337:slice$392 ($adffe).
+Mapping MyMem.$procmux$105_CMP0 ($eq).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$394 ($reduce_and).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$352 ($reduce_and).
+Mapping MyMem.$procmux$93_CMP0 ($eq).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$355 ($reduce_and).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$358 ($reduce_and).
+Mapping MyMem.$procmux$82_CMP0 ($eq).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$361 ($reduce_and).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$364 ($reduce_and).
+Mapping MyMem.$procmux$72_CMP0 ($eq).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$367 ($reduce_and).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$370 ($reduce_and).
+Mapping MyMem.$procmux$63_CMP0 ($eq).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$373 ($reduce_and).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$376 ($reduce_and).
+Mapping MyMem.$procmux$55_CMP0 ($eq).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$379 ($reduce_and).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$382 ($reduce_and).
+Mapping MyMem.$procmux$48_CMP0 ($eq).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$385 ($reduce_and).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$388 ($reduce_and).
+Mapping MyMem.$procmux$42_CMP0 ($eq).
+Mapping MyMem.$auto$ff.cc:337:slice$389 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$386 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$383 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$380 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$377 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$374 ($adffe).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$397 ($reduce_and).
+Mapping MyMem.$procmux$147_CMP0 ($eq).
+Mapping MyMem.$auto$ff.cc:337:slice$371 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$368 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$365 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$362 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$359 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$356 ($adffe).
+Mapping MyMem.$procdff$249 ($adff).
+Mapping MyMem.$procmux$23 ($pmux).
+Mapping MyMem.$auto$ff.cc:337:slice$353 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$350 ($adffe).
+Mapping MyMem.$auto$ff.cc:337:slice$395 ($adffe).
+Mapping MyMem.$auto$simple.cc:217:make_patterns_logic$391 ($reduce_and).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module MyMem...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== MyMem ===
+
+        +----------Local Count, excluding submodules.
+        | 
+      218 wires
+      425 wire bits
+       23 public wires
+      111 public wire bits
+        6 ports
+       15 port bits
+      351 cells
+       80   $_AND_
+       64   $_DFFE_PN0P_
+        4   $_DFF_PN0_
+        4   $_MUX_
+       16   $_NOT_
+      123   $_OR_
+       60   $_XOR_
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

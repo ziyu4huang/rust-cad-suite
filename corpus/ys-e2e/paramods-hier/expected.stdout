@@ -1,0 +1,96 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `pm_test3'. Setting top module to pm_test3.
+
+2.1. Analyzing design hierarchy..
+Top module:  \pm_test3
+Used module:     $paramod$13e4c40ad4eb4f9982560128338ac3e13d3e1c1d\inc
+Used module:     $paramod\inc\step=s32'00000000000000000000000000000011
+
+2.2. Analyzing design hierarchy..
+Top module:  \pm_test3
+Used module:     $paramod$13e4c40ad4eb4f9982560128338ac3e13d3e1c1d\inc
+Used module:     $paramod\inc\step=s32'00000000000000000000000000000011
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module pm_test3...
+Checking module $paramod$13e4c40ad4eb4f9982560128338ac3e13d3e1c1d\inc...
+Checking module $paramod\inc\step=s32'00000000000000000000000000000011...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== pm_test3 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        4 wires
+       32 wire bits
+        4 public wires
+       32 public wire bits
+        4 ports
+       32 port bits
+        2 submodules
+        1   $paramod$13e4c40ad4eb4f9982560128338ac3e13d3e1c1d\inc
+        1   $paramod\inc\step=s32'00000000000000000000000000000011
+
+=== $paramod$13e4c40ad4eb4f9982560128338ac3e13d3e1c1d\inc ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        3 wires
+       40 wire bits
+        2 public wires
+        8 public wire bits
+        2 ports
+        8 port bits
+        1 cells
+        1   $add
+
+=== $paramod\inc\step=s32'00000000000000000000000000000011 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        3 wires
+       48 wire bits
+        2 public wires
+       16 public wire bits
+        2 ports
+       16 port bits
+        1 cells
+        1   $add
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+        2 pm_test3
+        1 $paramod$13e4c40ad4eb4f9982560128338ac3e13d3e1c1d\inc
+        1 $paramod\inc\step=s32'00000000000000000000000000000011
+
+        +----------Count including submodules.
+        | 
+       10 wires
+      120 wire bits
+        8 public wires
+       56 public wire bits
+        8 ports
+       56 port bits
+        - memories
+        - memory bits
+        - processes
+        2 cells
+        2   $add
+        2 submodules
+        1   $paramod$13e4c40ad4eb4f9982560128338ac3e13d3e1c1d\inc
+        1   $paramod\inc\step=s32'00000000000000000000000000000011
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

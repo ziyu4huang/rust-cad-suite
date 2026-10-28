@@ -1,0 +1,46 @@
+-- Running command `read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+Attribute `top' found on module `aes'. Setting top module to aes.
+
+2.1. Analyzing design hierarchy..
+Top module:  \aes
+
+2.2. Analyzing design hierarchy..
+Top module:  \aes
+Removed 0 unused modules.
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module aes...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== aes ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       45 wires
+      148 wire bits
+       15 public wires
+       48 public wire bits
+       15 ports
+       48 port bits
+       36 cells
+        1   $add
+        2   $eq
+        4   $logic_and
+        2   $logic_not
+        1   $logic_or
+       22   $mux
+        1   $ne
+        1   $reduce_bool
+        2   $xor
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

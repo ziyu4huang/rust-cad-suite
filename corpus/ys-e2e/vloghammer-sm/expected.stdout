@@ -1,0 +1,33 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping test10.$../../../corpus-external/yosys-simple/vloghammer.v:73$ternary$18 ($mux).
+Mapping test10.$../../../corpus-external/yosys-simple/vloghammer.v:73$reduce_xor$19 ($reduce_xor).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module test10...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== test10 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        7 wires
+       12 wire bits
+        4 public wires
+        7 public wire bits
+        4 ports
+        7 port bits
+        5 cells
+        3   $_MUX_
+        2   $_XOR_
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

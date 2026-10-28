@@ -1,0 +1,74 @@
+-- Running command `read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing SIMPLEMAP pass (map simple cells to gate primitives).
+Mapping aoi12.$../../../corpus-external/yosys-simple/arraycells.v:13$not$3 ($not).
+Mapping aoi12.$../../../corpus-external/yosys-simple/arraycells.v:13$or$2 ($or).
+Mapping aoi12.$../../../corpus-external/yosys-simple/arraycells.v:13$and$1 ($and).
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module aoi12...
+Checking module array_test001...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== aoi12 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+        6 wire bits
+        4 public wires
+        4 public wire bits
+        4 ports
+        4 port bits
+        3 cells
+        1   $_AND_
+        1   $_NOT_
+        1   $_OR_
+
+=== array_test001 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        4 wires
+       97 wire bits
+        4 public wires
+       97 public wire bits
+        4 ports
+       97 port bits
+       32 submodules
+       32   aoi12
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+       96 array_test001
+        3 aoi12
+
+        +----------Count including submodules.
+        | 
+      196 wires
+      289 wire bits
+      132 public wires
+      225 public wire bits
+      132 ports
+      225 port bits
+        - memories
+        - memory bits
+        - processes
+       96 cells
+       32   $_AND_
+       32   $_NOT_
+       32   $_OR_
+       32 submodules
+       32   aoi12
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

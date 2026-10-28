@@ -1,0 +1,42 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "loop_var_shadow_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/loop_var_shadow.v:1.1-15.10"
+      },
+      "ports": {
+        "out": {
+          "direction": "output",
+          "bits": [ "1", "1", "1", "1", "1", "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ]
+        }
+      },
+      "cells": {
+      },
+      "netnames": {
+        "loop[0].blk.x": {
+          "hide_name": 0,
+          "bits": [ "1", "1", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loop_var_shadow.v:8.16-8.17"
+          }
+        },
+        "loop[1].blk.x": {
+          "hide_name": 0,
+          "bits": [ "1", "1", "1", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loop_var_shadow.v:8.16-8.17"
+          }
+        },
+        "out": {
+          "hide_name": 0,
+          "bits": [ "1", "1", "1", "1", "1", "1", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/loop_var_shadow.v:13.21-13.24"
+          }
+        }
+      }
+    }
+  }
+}

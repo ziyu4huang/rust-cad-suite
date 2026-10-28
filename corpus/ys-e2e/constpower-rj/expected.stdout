@@ -1,0 +1,26 @@
+-- Running command `read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing JSON frontend.
+Importing module constpower from JSON tree.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module constpower...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== constpower ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+     1024 wire bits
+        2 public wires
+     1024 public wire bits
+        2 ports
+     1024 port bits
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

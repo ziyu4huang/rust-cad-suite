@@ -1,0 +1,77 @@
+-- Running command `read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing JSON frontend.
+Importing module demo_004 from JSON tree.
+Importing module $paramod\demo_003\p=s32'00000000000000000000000000000001 from JSON tree.
+Importing module $paramod$9ba9697041a7ee0a7182557e576a5947aaca1a05\demo_003 from JSON tree.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module $paramod$9ba9697041a7ee0a7182557e576a5947aaca1a05\demo_003...
+Checking module $paramod\demo_003\p=s32'00000000000000000000000000000001...
+Checking module demo_004...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== $paramod$9ba9697041a7ee0a7182557e576a5947aaca1a05\demo_003 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+        2 wire bits
+        2 public wires
+        2 public wire bits
+        2 ports
+        2 port bits
+
+=== $paramod\demo_003\p=s32'00000000000000000000000000000001 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        2 wires
+        2 wire bits
+        2 public wires
+        2 public wire bits
+        2 ports
+        2 port bits
+
+=== demo_004 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        4 wires
+        4 wire bits
+        4 public wires
+        4 public wire bits
+        4 ports
+        4 port bits
+        2 submodules
+        1   $paramod$9ba9697041a7ee0a7182557e576a5947aaca1a05\demo_003
+        1   $paramod\demo_003\p=s32'00000000000000000000000000000001
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+        - demo_004
+
+        +----------Count including submodules.
+        | 
+        8 wires
+        8 wire bits
+        8 public wires
+        8 public wire bits
+        8 ports
+        8 port bits
+        - memories
+        - memory bits
+        - processes
+        - cells
+        2 submodules
+        1   $paramod$9ba9697041a7ee0a7182557e576a5947aaca1a05\demo_003
+        1   $paramod\demo_003\p=s32'00000000000000000000000000000001
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.

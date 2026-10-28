@@ -1,0 +1,33 @@
+-- Running command `read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing JSON frontend.
+Importing module uut_arrays01 from JSON tree.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module uut_arrays01...
+Found and reported 0 problems.
+
+3. Printing statistics.
+
+=== uut_arrays01 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        9 wires
+       30 wire bits
+        5 public wires
+       14 public wire bits
+        5 ports
+       14 port bits
+        1 memories
+       64 memory bits
+        6 cells
+        1   $dff
+        1   $memrd
+        1   $memwr_v2
+        3   $mux
+
+4. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+5. Executing JSON backend.
