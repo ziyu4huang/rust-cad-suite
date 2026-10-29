@@ -1,14 +1,16 @@
 //! 登記層命令表(yosys -H 普查,2026-10-27 錄製;RYOSYS-MVP §1.2/§7.0-1)。
 //!
 //! 來源=oracle 實跑 `yosys -H` 的 306 條「名字+描述」行(§0-12),名單
-//! 同輪入 corpus/ys-e2e/PROVENANCE——**普查 306=本表實數 298+實現層 8
+//! 同輪入 corpus/ys-e2e/PROVENANCE——**普查 306=本表實數 286+實現層 20
 //! 命令**(main.rs:read_rtlil/read_json/write_rtlil/write_json/check/
 //! stat/hierarchy/simplemap——M0 五命令+M1 兌現 hierarchy/read_json/
-//! simplemap;實現層不在本表,stub 數隨弧遞減:M1 前段 299、M1-d 後
-//! **298**)。命中本表=stub 硬錯 `ERROR: <cmd>: not implemented in
-//! ryosys (milestone Yx)`(D-ys2);普查外名字=逐字重現 oracle 的
-//! `No such command` 錯誤。Y 碼映射(§1.2,按 §7.0-1 勘誤修訂):
-//! proc*/opt*→Y2(M2);read_verilog 族→Y3;其餘→Y0(read_sverilog
+//! simplemap;M2 兌現 proc+proc_arst/clean/dff/dlatch/init/memwr/mux/
+//! prune/rmdead/rom+opt_expr;實現層不在本表,stub 數隨弧遞減:M2 後
+//! **286**)。命中本表=stub 硬錯 `ERROR: <cmd>: not implemented in
+//! ryosys (milestone Yx)`(D-ys2);普查外名字=逐字重現
+//! oracle 的 `No such command` 錯誤。Y 碼映射(§1.2,按 §7.0-1 勘誤
+//! 修訂):opt 家族其餘 18 條→Y2(後續弧);read_verilog 族→Y3;其餘
+//! →Y0(read_sverilog
 //! **不在普查內**——0.70+179 已併入 read_verilog,普查外名字=逐字
 //! No such command,非 Y3 stub;§1.2/§1.3 舊映射文字為 M0 時點筆誤)。
 
@@ -162,7 +164,6 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("opt_clean", "Y2"),
     ("opt_demorgan", "Y2"),
     ("opt_dff", "Y2"),
-    ("opt_expr", "Y2"),
     ("opt_ffinv", "Y2"),
     ("opt_hier", "Y2"),
     ("opt_lut", "Y2"),
@@ -185,17 +186,6 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("portlist", "Y0"),
     ("prep", "Y0"),
     ("printattrs", "Y0"),
-    ("proc", "Y2"),
-    ("proc_arst", "Y2"),
-    ("proc_clean", "Y2"),
-    ("proc_dff", "Y2"),
-    ("proc_dlatch", "Y2"),
-    ("proc_init", "Y2"),
-    ("proc_memwr", "Y2"),
-    ("proc_mux", "Y2"),
-    ("proc_prune", "Y2"),
-    ("proc_rmdead", "Y2"),
-    ("proc_rom", "Y2"),
     ("qbfsat", "Y0"),
     ("ql_bram_merge", "Y0"),
     ("ql_bram_types", "Y0"),

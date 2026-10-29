@@ -128,6 +128,29 @@ impl<V> InsertMap<V> {
             self.entries.push((key, value));
         }
     }
+
+    /// dict operator[] 賦值語義:已存在=覆蓋值、位置不動;不存在=尾插
+    /// (proc_init 寫 wireinit、proc_rmdead 的 set_bool_attribute 等用)。
+    pub fn set(&mut self, key: Id, value: V) {
+        if let Some(e) = self.entries.iter_mut().find(|(k, _)| *k == key) {
+            e.1 = value;
+        } else {
+            self.entries.push((key, value));
+        }
+    }
+
+    /// hashlib dict erase 語義(kernel/hashlib.h):swap-and-pop——把尾
+    /// 元素移到被刪位。**剩餘元素順序會變**(dump 序外生面,proc 弧用)。
+    pub fn swap_pop_remove(&mut self, key: &str) -> bool {
+        if let Some(i) = self.entries.iter().position(|(k, _)| k == key) {
+            let last = self.entries.len() - 1;
+            self.entries.swap(i, last);
+            self.entries.pop();
+            true
+        } else {
+            false
+        }
+    }
 }
 
 /// SigSpec 的單一位:wire 位(帶 wire 名與該 wire 內的 bit offset)或常數位。
@@ -144,7 +167,7 @@ pub enum SigBit {
 /// 值序上連續、物理 offset 遞增連續的 wire 位合併;相鄰常數位合併。
 /// 實測錨:`{ \bus [0] \bus [1] \bus [3:2] }` 保持三 chunk(物理序與值序
 /// 相反不合併)、`{ 1'0 1'1 }` 合併成 `2'01`。
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash)]
 pub struct SigSpec {
     pub bits: Vec<SigBit>,
 }

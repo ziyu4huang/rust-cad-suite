@@ -313,7 +313,7 @@ fn check_module(module: &Module, design: &Design, log: &mut String, warnings: &m
                 if matches!(bit, SigBit::Wire { .. }) || !wire.port_output {
                     drivers_push(
                         bit,
-                        format!("module input {}[{}]", wire.name, i),
+                        format!("module input {}[{}]", crate::sigops::id_unescape(&wire.name), i),
                         &mut wire_drivers,
                     );
                 }
@@ -356,8 +356,8 @@ fn check_module(module: &Module, design: &Design, log: &mut String, warnings: &m
     for (bit, drvs) in wire_drivers.iter().rev() {
         if count_of(bit, &wire_drivers_count) > 1 {
             let mut msg = format!(
-                "multiple conflicting drivers for {}:{}:\n",
-                crate::jsonout::unescape(&module.name),
+                "multiple conflicting drivers for {}.{}:\n",
+                crate::sigops::id_unescape(&module.name),
                 log_signal_bit(module, bit)
             );
             for s in drvs {

@@ -194,6 +194,12 @@ pub fn sig_chunks(sig: &SigSpec) -> Vec<ChunkView> {
 
 /// dump_sigspec(rtlil_backend.cc:120-133):單 chunk 印本体(autoint=true),
 /// 多 chunk 印 `{ c_n … c_1 }`(值序高位在前,chunk 內 autoint=false)。
+pub fn log_signal(sig: &SigSpec, wire_widths: &HashMap<&str, i64>) -> String {
+    let mut out = String::new();
+    dump_sigspec(&mut out, sig, wire_widths);
+    out
+}
+
 fn dump_sigspec(out: &mut String, sig: &SigSpec, wire_widths: &HashMap<&str, i64>) {
     let chunks = sig_chunks(sig);
     if chunks.len() == 1 {
@@ -244,7 +250,7 @@ fn dump_sigchunk(
 fn dump_wire(out: &mut String, indent: &str, wire: &Wire) {
     dump_attributes(out, indent, &wire.attributes);
     out.push_str(&format!("{indent}wire "));
-    if wire.width != 1 {
+    if wire.width != 1 && wire.width != 0 {
         out.push_str(&format!("width {} ", wire.width));
     }
     if wire.upto {

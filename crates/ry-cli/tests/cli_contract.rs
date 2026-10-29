@@ -127,12 +127,9 @@ fn hierarchy_and_read_json_m1_surface() {
 
 #[test]
 fn registered_stub_milestones() {
-    // Y 碼映射(§1.2;M1 後 hierarchy/read_json/simplemap 已兌現實現層):
-    // proc*/opt*→Y2(M2);read_verilog 族→Y3;其餘→Y0。
+    // Y 碼映射(§1.2;M2 後 proc 族/opt_expr 已兌現實現層,鐵則 3 同輪
+    // 刪三條 Y2 fixture;read_verilog 族→Y3;其餘→Y0。
     for (cmd, y) in [
-        ("proc", "Y2"),
-        ("opt_expr -keepdc", "Y2"),
-        ("proc_dff", "Y2"),
         ("read_verilog a.v", "Y3"),
         ("read_verilog_file_list f.txt", "Y3"),
         ("techmap", "Y0"),
@@ -148,6 +145,44 @@ fn registered_stub_milestones() {
             "{cmd}"
         );
     }
+}
+
+#[test]
+fn proc_and_opt_expr_keepdc_flip_pass() {
+    // M2 翻轉契約(鐵則 3 同輪新增):proc 無參形與 opt_expr 僅 -keepdc
+    // 單旗標=實現層(sync edge 拒收契約在 proc_stub_in_flip_script;
+    // byte-exact 面由 ys-e2e -pb 層 golden 承擔)。
+    let dir = std::env::temp_dir().join(format!("ry-cli-proc-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(
+        &dir.join("case.il"),
+        "module \\top\n  wire input 1 \\d\n  wire output 2 \\q\n  process \\$p\n    assign \\q \\d\n    sync always\n      update \\q \\d\n  end\nend\n",
+    )
+    .unwrap();
+    let out = ryosys()
+        .arg("-p")
+        .arg("read_rtlil case.il; proc; check; write_rtlil -readable o.il")
+        .current_dir(&dir)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0));
+    let so = String::from_utf8_lossy(&out.stdout);
+    assert!(so.contains("Executing PROC pass (convert processes to netlists).\n"));
+    assert!(so.contains("12. Executing OPT_EXPR pass (perform const folding).\n"));
+    let il = std::fs::read_to_string(dir.join("o.il")).unwrap();
+    assert!(il.contains("connect \\q \\d"));
+
+    // opt_expr 其餘旗標=Y2 硬錯(詳案 §8.4)。
+    let out = ryosys()
+        .arg("-p")
+        .arg("read_rtlil case.il; opt_expr -full")
+        .current_dir(&dir)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(1));
+    assert!(String::from_utf8_lossy(&out.stderr).contains("milestone Y2"));
+    let _ = std::fs::remove_dir_all(&dir);
 }
 
 #[test]
@@ -423,6 +458,66 @@ fn p_split_trailing_args_flush() {
             vec!["stat".to_string(), "-width".to_string()]
         ]
     );
+}
+
+// ---------------------------------------------------------------------------
+// M2 翻轉腳本契約(RYOSYS-MVP §8.5-slice-1;先釘死再擴命令面,R2)
+// ---------------------------------------------------------------------------
+
+/// 翻轉腳本逐字(§8.2-P2;slice-5 的 SCRIPT_PB 常量同串)。
+const SCRIPT_PB: &str = "read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json";
+
+#[test]
+fn proc_flip_script_split_contract() {
+    // 翻轉腳本在 -p 解析契約下切 6 命令、token 逐字(token 尾分號切分,
+    // §0-11)——slice-5 的 ry-difftest SCRIPT_PB 常量與 ys-m2-anchors
+    // script.txt 同串,解析面先於命令面釘死。
+    assert_eq!(
+        cmds(SCRIPT_PB),
+        vec![
+            vec!["read_rtlil".to_string(), "case.il".to_string()],
+            vec!["proc".to_string()],
+            vec!["check".to_string()],
+            vec!["stat".to_string()],
+            vec![
+                "write_rtlil".to_string(),
+                "-readable".to_string(),
+                "expected.rtlil".to_string(),
+            ],
+            vec!["write_json".to_string(), "expected.json".to_string()],
+        ]
+    );
+}
+
+#[test]
+fn proc_stub_in_flip_script() {
+    // 翻轉後契約(鐵則 3 同輪改寫):翻轉腳本對 sync edge 形(P7-① 自寫
+    // 最小案例)產 proc_dff 的逐字拒收 ERROR(exit 1、ERROR 走 stderr;
+    // ys-m2-anchors/edge_reject golden 同源形)。
+    let dir = std::env::temp_dir().join(format!("ry-cli-pb-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(
+        &dir.join("case.il"),
+        "module \\top\n  wire width 4 input 1 \\d\n  wire width 4 output 2 \\q\n  wire input 3 \\c\n  process \\$proc\n    assign \\q \\d\n    sync edge \\c\n      update \\q \\d\n  end\nend\n",
+    )
+    .unwrap();
+    let out = ryosys()
+        .arg("-p")
+        .arg(SCRIPT_PB)
+        .current_dir(&dir)
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(1));
+    let se = String::from_utf8_lossy(&out.stderr);
+    assert_eq!(
+        se,
+        "ERROR: Event with any-edge sensitivity found for this signal!\n"
+    );
+    let so = String::from_utf8_lossy(&out.stdout);
+    assert!(so.starts_with(&format!("-- Running command `{SCRIPT_PB}' --\n")));
+    assert!(!so.contains("ERROR"));
+    let _ = std::fs::remove_dir_all(&dir);
 }
 
 // 讓 Write 引入不觸發 unused 警告(happy_path 的 Stdio 用 piping)。

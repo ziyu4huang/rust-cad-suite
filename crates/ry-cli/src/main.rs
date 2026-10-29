@@ -2,7 +2,7 @@
 //!
 //! * `-p "<script>"`:唯一腳本入口(oracle 同形);切分契約=script.rs。
 //! * `-V`:自標識 `ryosys <version>`,不冒充 yosys 版本串(分歧 D-ys1)。
-//! * 兩層 registry:`-H` 普查 306 條=登記層 stub 表 298(registry.rs;
+//! * 兩層 registry:`-H` 普查 306 條=登記層 stub 表 286(registry.rs;
 //!   Y0..Y3 硬錯,D-ys2)+實現層 8 命令(read_rtlil/read_json/
 //!   write_rtlil/write_json/check/stat/hierarchy/simplemap——M0 五命令
 //!   +M1 增 hierarchy/read_json/simplemap);普查外名字=逐字重現
@@ -14,11 +14,15 @@
 
 mod cells;
 mod check;
+mod consteval;
 mod hierarchy;
 mod jsonin;
 mod jsonout;
+mod opt_expr;
+mod proc;
 mod registry;
 mod sigmap;
+mod sigops;
 mod simplemap;
 mod stat;
 
@@ -34,12 +38,16 @@ pub(crate) struct Log {
     out: String,
     newline_count: usize,
     header_stack: Vec<u32>,
+    /// log_warning 的訊息(stderr 分流?否——warning 走 stdout 行+彙總計數)。
+    pub warnings: Vec<String>,
 }
 
 impl Log {
     pub(crate) fn new() -> Log {
-        Log { out: String::new(), newline_count: 0, header_stack: vec![0] }
+        Log { out: String::new(), newline_count: 0, header_stack: vec![0], warnings: Vec::new() }
     }
+
+
 
     pub(crate) fn log(&mut self, s: &str) {
         self.out.push_str(s);
@@ -103,6 +111,7 @@ fn main() {
         }
     };
     let mut ctx = Ctx { log: Log::new(), design: None, warnings: Vec::new() };
+    let _ = &mut ctx.warnings;
     // driver 橫幅:逐字回顯 -p 串(歸一化保留此行;兩端同串=byte-exact)。
     ctx.log.log(&format!("-- Running command `{script}' --\n"));
     let commands = match script::split_script(&script) {
@@ -116,10 +125,18 @@ fn main() {
         if let Err(HardError(msg)) = exec_command(&mut ctx, argv) {
             flush_and_fail(&ctx.log.out, &msg);
         }
+        // Pass::post_execute(register.cc:129):每 pass 末印 debug 抑制計數。
+        let n = proc::dbg_take();
+        if n > 0 {
+            ctx.log.log(&format!("<suppressed ~{n} debug messages>\n"));
+        }
     }
     // driver 末尾 print_stats 塊(driver.cc:714-719):**無條件 spacer**
     // (此空行先於 `End of script` 錨,是 golden 內容——values 例 golden
     // 尾部 `backend.\n` 即它),之後僅 total>0 時印警告彙總。
+    for w in std::mem::take(&mut ctx.log.warnings) {
+        ctx.warnings.push(w);
+    }
     ctx.log.spacer();
     if !ctx.warnings.is_empty() {
         let total = ctx.warnings.len();
@@ -154,6 +171,18 @@ fn exec_command(ctx: &mut Ctx, argv: &[String]) -> Result<(), HardError> {
         "stat" => cmd_stat(ctx, argv),
         "hierarchy" => cmd_hierarchy(ctx, argv),
         "simplemap" => cmd_simplemap(ctx, argv),
+        "proc" => cmd_proc_family(ctx, argv, proc::run_proc),
+        "proc_clean" => cmd_proc_family(ctx, argv, proc::run_proc_clean),
+        "proc_rmdead" => cmd_proc_family(ctx, argv, proc::run_proc_rmdead),
+        "proc_prune" => cmd_proc_family(ctx, argv, proc::run_proc_prune),
+        "proc_init" => cmd_proc_family(ctx, argv, proc::run_proc_init),
+        "proc_arst" => cmd_proc_family(ctx, argv, proc::run_proc_arst),
+        "proc_rom" => cmd_proc_family(ctx, argv, proc::run_proc_rom),
+        "proc_mux" => cmd_proc_family(ctx, argv, proc::run_proc_mux),
+        "proc_dlatch" => cmd_proc_family(ctx, argv, proc::run_proc_dlatch),
+        "proc_dff" => cmd_proc_family(ctx, argv, proc::run_proc_dff),
+        "proc_memwr" => cmd_proc_family(ctx, argv, proc::run_proc_memwr),
+        "opt_expr" => cmd_proc_family(ctx, argv, opt_expr::run_opt_expr),
         _ => {
             if let Some((_, ycode)) = registry::REGISTERED.iter().find(|(n, _)| *n == name) {
                 Err(HardError(format!(
@@ -330,6 +359,18 @@ fn cmd_simplemap(ctx: &mut Ctx, argv: &[String]) -> Result<(), HardError> {
     simplemap::run_simplemap(&mut design, &mut ctx.log);
     ctx.design = Some(design);
     ctx.log.resync();
+    Ok(())
+}
+
+/// proc 子 pass 共用外殼:M2 實現層(§8.3-2;design clone+ProcError 包裝)。
+fn cmd_proc_family(
+    ctx: &mut Ctx,
+    argv: &[String],
+    f: fn(&mut Design, &[String], &mut Log) -> Result<(), proc::ProcError>,
+) -> Result<(), HardError> {
+    let mut design = need_design(ctx, &argv[0].clone())?.clone();
+    f(&mut design, argv, &mut ctx.log).map_err(|e| HardError(e.0))?;
+    ctx.design = Some(design);
     Ok(())
 }
 

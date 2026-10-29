@@ -36,6 +36,9 @@ use ry_difftest::{normalize_il, normalize_json, normalize_stdout, SCRIPT_B};
 const SCRIPT_HIER: &str = "read_rtlil case.il; hierarchy -auto-top; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json";
 const SCRIPT_RJ: &str = "read_json a.json; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json";
 const SCRIPT_SM: &str = "read_rtlil case.il; simplemap; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json";
+/// M2 翻轉腳本(§8.2-P2 逐字;-pb 層):-pb 層錄製與 compare 同一常量
+/// (RM2-7:結構上不可能單側翻)。
+pub const SCRIPT_PB: &str = "read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json";
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -111,8 +114,10 @@ fn record(corpus: &Path) {
                 let _ = fs::remove_dir_all(&dir);
                 continue;
             }
-            // 階段 B:統一脚本,兩層同一條(§4.1)。
-            let (rc, so, se) = run_in(&dir, &yosys, SCRIPT_B);
+            // 階段 B:P-free 層=統一脚本(§4.1);-pb 層=翻轉腳本
+            // (SCRIPT_PB,§8.3-7——M2 翻轉後 -pb 層 exit=0+expected.json)。
+            let script_b = if with_proc { SCRIPT_B } else { SCRIPT_PB };
+            let (rc, so, se) = run_in(&dir, &yosys, script_b);
             fs::write(dir.join("expected.stdout"), normalize_stdout(&so)).unwrap();
             fs::write(dir.join("expected.stderr"), se).unwrap();
             fs::write(dir.join("expected.exit"), format!("{rc}\n")).unwrap();
@@ -153,6 +158,8 @@ fn record(corpus: &Path) {
                 let (rc, so, se) = run_in(&sdir, &yosys, SCRIPT_SM);
                 write_golden(&sdir, rc, &so, &se);
             } else {
+                // -pb 層的腳本檔(與 -hier/-rj/-sm 同機制;M2 翻轉腳本)。
+                fs::write(dir.join("script.txt"), format!("{SCRIPT_PB}\n")).unwrap();
                 n_pbearing += 1;
             }
         }
