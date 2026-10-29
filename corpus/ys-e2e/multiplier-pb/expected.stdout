@@ -1,9 +1,58 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 4 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$12'.
+Creating decoders for process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$11'.
+Creating decoders for process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$10'.
+Creating decoders for process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:87$proc$8'.
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\Multiplier_2D.\PP[3]' from process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$12'.
+No latch inferred for signal `\Multiplier_2D.\PP[2]' from process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$11'.
+No latch inferred for signal `\Multiplier_2D.\PP[1]' from process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$10'.
+No latch inferred for signal `\Multiplier_2D.\PP[0]' from process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:87$proc$8'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$12'.
+Removing empty process `Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$11'.
+Removing empty process `Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$10'.
+Removing empty process `Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:87$proc$8'.
+Cleaned up 0 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111.
+Optimizing module FullAdder.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101.
+Optimizing module Multiplier_2D.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110.
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111...
 Checking module FullAdder...
 Checking module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101...
@@ -11,7 +60,7 @@ Checking module Multiplier_2D...
 Checking module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111 ===
 
@@ -62,7 +111,6 @@ Found and reported 0 problems.
       105 public wire bits
         3 ports
        16 port bits
-        4 processes
         4 cells
         4   $and
         3 submodules
@@ -102,7 +150,7 @@ Found and reported 0 problems.
       166 port bits
         - memories
         - memory bits
-        4 processes
+        - processes
        40 cells
        36   $add
         4   $and
@@ -111,7 +159,7 @@ Found and reported 0 problems.
         1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110
         1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.

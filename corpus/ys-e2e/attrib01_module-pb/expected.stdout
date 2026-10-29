@@ -1,14 +1,56 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $../../../corpus-external/yosys-simple/attrib01_module.v:7$proc$1 in module attrib01_bar.
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 1 redundant assignment.
+Promoted 0 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~1 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\attrib01_bar.$../../../corpus-external/yosys-simple/attrib01_module.v:7$proc$1'.
+     1/1: $0\out[0:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\attrib01_bar.\out' using process `\attrib01_bar.$../../../corpus-external/yosys-simple/attrib01_module.v:7$proc$1'.
+  created $dff cell `$procdff$6' with positive edge clock.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\attrib01_bar.$../../../corpus-external/yosys-simple/attrib01_module.v:7$proc$1'.
+Removing empty process `attrib01_bar.$../../../corpus-external/yosys-simple/attrib01_module.v:7$proc$1'.
+Cleaned up 1 empty switch.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module attrib01_foo.
+Optimizing module attrib01_bar.
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module attrib01_foo...
 Checking module attrib01_bar...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === attrib01_foo ===
 
@@ -27,40 +69,43 @@ Found and reported 0 problems.
 
         +----------Local Count, excluding submodules.
         | 
-        6 wires
-        6 wire bits
+        8 wires
+        8 wire bits
         4 public wires
         4 public wire bits
         4 ports
         4 port bits
-        1 processes
-        1 cells
+        3 cells
+        1   $dff
+        1   $mux
         1   $not
 
 === design hierarchy ===
 
         +----------Count including submodules.
         | 
-        1 attrib01_foo
-        1 attrib01_bar
+        3 attrib01_foo
+        3 attrib01_bar
 
         +----------Count including submodules.
         | 
-       10 wires
-       10 wire bits
+       12 wires
+       12 wire bits
         8 public wires
         8 public wire bits
         8 ports
         8 port bits
         - memories
         - memory bits
-        1 processes
-        1 cells
+        - processes
+        3 cells
+        1   $dff
+        1   $mux
         1   $not
         1 submodules
         1   attrib01_bar
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.

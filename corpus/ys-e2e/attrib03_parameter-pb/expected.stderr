@@ -1,1 +1,0 @@
-ERROR: Module $paramod\attrib03_bar\WIDTH=s32'00000000000000000000000000001000 contains processes, which are not supported by JSON backend (run `proc` first).

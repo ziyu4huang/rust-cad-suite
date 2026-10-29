@@ -1,0 +1,148 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "mem2reg_test6": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/mem2reg.v:97.1-116.10"
+      },
+      "ports": {
+        "din": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "dout": {
+          "direction": "output",
+          "bits": [ 6, 7, 4, 5 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/mem2reg.v:111$add$51": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:111.42-111.77"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "B": [ 4 ],
+            "Y": [ 6, 7 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y": {
+          "hide_name": 1,
+          "bits": [ 6, 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:111.42-111.77"
+          }
+        },
+        "$0$splitcmplxassign$../../../corpus-external/yosys-simple/mem2reg.v:111$48[1:0]$50": {
+          "hide_name": 1,
+          "bits": [ 6, 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:104.9-115.12"
+          }
+        },
+        "$0\\din_array[0][1:0]": {
+          "hide_name": 1,
+          "bits": [ 2, 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:104.9-115.12"
+          }
+        },
+        "$0\\din_array[1][1:0]": {
+          "hide_name": 1,
+          "bits": [ 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:104.9-115.12"
+          }
+        },
+        "$0\\dout[3:0]": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:104.9-115.12"
+          }
+        },
+        "$0\\dout_array[0][1:0]": {
+          "hide_name": 1,
+          "bits": [ 6, 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:104.9-115.12"
+          }
+        },
+        "$0\\dout_array[1][1:0]": {
+          "hide_name": 1,
+          "bits": [ 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:104.9-115.12"
+          }
+        },
+        "$splitcmplxassign$../../../corpus-external/yosys-simple/mem2reg.v:111$48": {
+          "hide_name": 1,
+          "bits": [ "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:111.3-111.77"
+          }
+        },
+        "din": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:98.31-98.34"
+          }
+        },
+        "din_array[0]": {
+          "hide_name": 0,
+          "bits": [ 2, 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:101.19-101.28"
+          }
+        },
+        "din_array[1]": {
+          "hide_name": 0,
+          "bits": [ 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:101.19-101.28"
+          }
+        },
+        "dout": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:99.31-99.35"
+          }
+        },
+        "dout_array[0]": {
+          "hide_name": 0,
+          "bits": [ 6, 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:102.19-102.29"
+          }
+        },
+        "dout_array[1]": {
+          "hide_name": 0,
+          "bits": [ 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg.v:102.19-102.29"
+          }
+        }
+      }
+    }
+  }
+}

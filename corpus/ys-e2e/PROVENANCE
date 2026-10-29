@@ -118,7 +118,8 @@
   追加 `-hier`(stage B 前插 `hierarchy -auto-top`)、`-rj`(輸入=
   oracle 從 case.il 預產的 a.json,read_json→check/stat→write_rtlil/
   write_json 交叉閉環)與 `-sm`(M1-d:`read_rtlil case.il; simplemap;
-  check; stat; write_rtlil -readable; write_json`)三個案例目錄,腳本
+  check; stat; write_rtlil -readable expected.rtlil; write_json
+  expected.json`)三個案例目錄,腳本
   逐字存於各目錄 `script.txt`(compare 端無 script.txt=M0 默認腳本)。
   **SUMMARY 基線=402/402**(141 M0+87 -hier+87 -rj+87 -sm);live-compare
   腿=`ry-difftest --live`(oracle 在場重錄對拍入庫 golden,同基線)。
@@ -153,5 +154,98 @@
     (celltypes.h:216-224 對照;M0 語料無 gate cell 故 314 例未暴露,
     simplemap 產 gate 後 write_json 的 port_directions 即錯——87 例
     -sm 普查 25 例 JSON-DIFF 全部由此而來,修後 87/87)。
+- **M2 registry 收口**(2026-10-28):proc+proc_arst/clean/dff/dlatch/
+  init/memwr/mux/prune/rom+opt_expr(-keepdc 契約形)12 條翻實現層——
+  stub **286**(Y0 266/Y2 18/Y3 2)+實現層 **20**=306;五處口徑一致
+  (REGISTRY ry-cli 行/registry.rs 頭注/本節/ry-cli main.rs/RYOSYS-MVP §8)。
+- **M2 翻轉錄製實錄**(2026-10-28,SCRIPT_PB 首錄):-pb 54 例全量重錄
+  =exit **0** 54/54+expected.stderr 空+expected.json 在庫(翻轉收據,
+  驗收 4=54);**byte-exact 49/54**,紅 5 例(mem_arst/subbytes/case_expr_
+  non_const/constmuldivmod/loops)已定位為**深層內部序**(snippet 池處理
+  序、arst 的 apply_reset 樹形、opt_expr -keepdc 的 replace 計數 24 vs 46)
+  ——rtlil 的 cell/參數面已對齐、差在輸出**順序**與**內部節點計數**,
+  待續弧收口;四件套 golden 以 oracle 錄製為準(鐵則:禁手寫)。
+  * **續修輪(2026-10-29)收平 dff_different_styles**:根因=proc_dff 的
+    log_warning(Complex async reset/Async reset value not constant)未進
+    driver 的 `Warnings:` 彙總(oracle 實錄 stdout 尾有該行);修=Log 加
+    warnings 通道、main 末尾併入彙總。SUMMARY 400/406→**401/406**。
+    * **續修輪四至五(2026-10-29)**:subbytes 的 stdout 全平
+      (detect_const_or connect/suppressed 23:23/Latch warning 入彙總);
+      剩 rtlil 84 行=adff 極性面(invert_map 鍵=SigMap 代表元未命中)。
+    * **紅 5 例現清單**(續修輪五末):mem_arst/subbytes/case_expr_
+      non_const/constmuldivmod/loops(dff_different_styles 已於續修輪
+      一收平)。
+    * **續弧指南**=RYOSYS-MVP §8.8-3(subbytes/case_expr+loops/
+      constmuldivmod/mem_arst 四線的入口與工具)。
 - **日常禁手改 expected.\***;oracle 升級=全量重錄輪(churn 檢視,
   AGENTS 10.8),重錄後必讀 `git diff corpus/ys-e2e` 逐 case 對帳。
+- **M2 proc 普查**(2026-10-28,RYOSYS-MVP §8.2-P1..P8 本輪獨立重演實錄;
+  探針工具坑=RM2-8):
+  * **P1 命令普查**:oracle `-H` 312 原始行−6 噪声(` Yosys` 帶前導空格
+    形態×1+`Yosys`×1+`Type`×2+`Time`+`End`)=**306**;proc 族 11 條在冊
+    (proc=translate processes to netlists、proc_clean=remove empty parts
+    of processes、proc_rmdead=eliminate dead trees in decision trees、
+    proc_prune=remove redundant assignments、proc_init=convert initial
+    block to init attributes、proc_arst=detect asynchronous resets、
+    proc_rom=convert switches to ROMs、proc_mux=convert decision trees
+    to multiplexers、proc_dlatch=extract latches from processes、
+    proc_dff=extract flip-flops from processes、proc_memwr=extract
+    memory writes from processes)+opt_expr=perform const folding and
+    simple expression rewriting。
+  * **P2 翻轉普查**(54 例,臨時目錄副本;翻轉腳本逐字=`read_rtlil
+    case.il; proc; check; stat; write_rtlil -readable expected.rtlil;
+    write_json expected.json`):**exit=0 54/54、stderr 空 54/54、
+    expected.json 非空 54/54**——成功路徑「兩端 stderr 必空」契約在
+    proc 後 -pb 層成立。
+  * **P3 編排等價**:裸 `proc` vs 顯式 11 調用序(proc_clean;proc_rmdead;
+    proc_prune;proc_init;proc_arst;proc_rom;proc_mux;proc_dlatch;
+    proc_dff;proc_memwr;proc_clean;opt_expr -keepdc)→ **54/54
+    expected.rtlil 與 expected.json 均 cmp 一致**(編排契約由二進制行為
+    釘死,含**第二遍 proc_clean**與尾巴 opt_expr 兩處最易漏)。
+  * **P4 尾巴量化**:11 調用序去尾巴(去 opt_expr -keepdc)→ **29/54
+    例 rtlil 有差**;尾巴可觀測面=$xor/$xnor 單常數輸入分支造名
+    **`$auto$opt_expr.cc:702:replace_const_cells$N` ×33**(cell `$not`)
+    +既有 cell 端口改寫(muxtree 實例:`$eq` 的 invert_map A/B 交換+
+    S 換反相面)、$eq→$not/$ne→$not 改型、$mux const-S 折疊等——
+    opt_expr 子集有實質可觀測面,非 no-op。
+  * **P5 `$auto$` 命名錨普查**(54 例 proc 後 expected.rtlil 全量,
+    本輪 21 token 完整表;詳案 P5 所記 15 錨=proc/opt/mem 專屬子集):
+    ```
+    rtlil.cc:3201:Not(213) rtlil.cc:3205:ReduceOr(154)
+    opt_expr.cc:702:replace_const_cells(33) rtlil.cc:3249:And(31)
+    proc_dff.cc:221:proc_dff(25) rtlil.cc:3337:Mux(20)
+    proc_memwr.cc:46:proc_memwr(8) proc_dlatch.cc:559:proc_dlatch(5)
+    proc_dlatch.cc:337:make_hold(4) rtlil.cc:3263:Sub(3)
+    proc_rom.cc:155:do_switch(3) proc_rom.cc:154:do_switch(3)
+    proc_dlatch.cc:549:proc_dlatch(3) proc_dlatch.cc:350:make_hold(3)
+    proc_dff.cc:243:proc_dff(3) proc_dff.cc:78:gen_dffsr_complex(2)
+    proc_dff.cc:74:gen_dffsr_complex(1) mem.cc:349:emit(1)
+    mem.cc:303:emit(1) genrtlil.cc:1651:genRTLIL(1)
+    ```
+    (rtlil.cc/genrtlil.cc 錨=Module::Not/ReduceOr/And/Mux/Sub helper
+    內 `addWire(NEW_ID,…)` 的 DEF_METHOD 展開行——**helper 的 wire 名
+    行號=rtlil.cc 定義處,cell 名=調用方 NEW_ID 處**,兩層錨機制實錄;
+    行號以二進制 golden 為準、clone 僅讀碼,RM1-1 紀律。)
+  * **P6 proc 後 cell 產出面**(54 例全量):$eq 492、$xor 334、$and 333、
+    $not 269、**$mux 213**、$or 162、**$meminit_v2 128**、**$dff 76**、
+    $add 44、$logic_not 39、**$adff 34**、**$pmux 33**、$mul 30、
+    \FullAdder 18、$mod 16、$div 16、$sub 14、$reduce_or 11、
+    $logic_and 10、$pos 9、$neg 9、$shl 8、$reduce_xnor 8、
+    $reduce_and 8、**$memwr_v2 8**、$sshr 6、$shift 6、$reduce_xor 6、
+    **$memrd 6**、$ne 5、$ge 5、**$dlatch 5**、$sshl 4、$shr 4、$lt 4、
+    $le 4、$gt 4、$reduce_bool 3、$shiftx 2、$print 2——全部在 check
+    已知 47 簡式表內(PROVENANCE:89-99),check/write_json 支撐面已備。
+  * **P7 sync 形態普查**(54 例 case.il):always 222/posedge 39/init 5/
+    negedge 2,**edge/global=0**。手寫 .il 探針四形實錄(=ys-m2-anchors
+    四例底稿,含 EN=WIDTH 逐位契約與 sync 塊無 `end` 的文法實證):
+    ①`sync edge`+update→proc_dff 段逐字
+    `ERROR: Event with any-edge sensitivity found for this signal!`
+    exit=1;②`sync global`+update→exit=0 產 `$ff`+process 清空;
+    ③`sync global`+memwr→逐字 `ERROR: process memory write with
+    unsupported sync type in top.$proc` exit=1;④posedge memwr→
+    exit=0 產 `$memwr_v2`。
+  * **P8 memwr 實形**(corpus):動作行(`memwr <mem> <addr> <data> <en>
+    <極性const>` 五段形)僅 arrays01-pb 1 行+memory-pb 7 行=**2 例 8 行**,
+    極位 `0'x`/`1'1`/`4'0000`/`7'10000` 等實測在場;init 塊 memwr(恆地址
+    形)與 posedge memwr(信號地址形)兩族在庫;memory-pb 的 EN 極性常數
+    寬逐行遞增(26 位→27 位)——priority_mask 的位寬承載面。

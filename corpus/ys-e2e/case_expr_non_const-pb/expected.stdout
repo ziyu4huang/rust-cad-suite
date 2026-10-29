@@ -1,27 +1,112 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 8 switch rules as full_case in process $../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10 in module case_expr_non_const_top.
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 17 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~8 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10'.
+     1/8: $1\h[0:0]
+     2/8: $1\g[0:0]
+     3/8: $1\f[0:0]
+     4/8: $1\e[0:0]
+     5/8: $1\d[0:0]
+     6/8: $1\c[0:0]
+     7/8: $1\b[0:0]
+     8/8: $1\a[0:0]
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:15$proc$9'.
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:14$proc$8'.
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:13$proc$7'.
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:12$proc$6'.
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:11$proc$5'.
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:10$proc$4'.
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:9$proc$3'.
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:8$proc$2'.
+Creating decoders for process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:7$proc$1'.
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\case_expr_non_const_top.\a' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10'.
+No latch inferred for signal `\case_expr_non_const_top.\d' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10'.
+No latch inferred for signal `\case_expr_non_const_top.\e' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10'.
+No latch inferred for signal `\case_expr_non_const_top.\f' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10'.
+No latch inferred for signal `\case_expr_non_const_top.\g' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10'.
+No latch inferred for signal `\case_expr_non_const_top.\h' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10'.
+Warning: Latch inferred for signal `\case_expr_non_const_top.\b' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10': $auto$proc_dlatch.cc:559:proc_dlatch$71
+Warning: Latch inferred for signal `\case_expr_non_const_top.\c' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10': $auto$proc_dlatch.cc:559:proc_dlatch$90
+No latch inferred for signal `\case_expr_non_const_top.\x_3b0' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:15$proc$9'.
+No latch inferred for signal `\case_expr_non_const_top.\x_2sb11' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:14$proc$8'.
+No latch inferred for signal `\case_expr_non_const_top.\x_2sb01' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:13$proc$7'.
+No latch inferred for signal `\case_expr_non_const_top.\x_2b11' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:12$proc$6'.
+No latch inferred for signal `\case_expr_non_const_top.\x_2b0' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:11$proc$5'.
+No latch inferred for signal `\case_expr_non_const_top.\x_1sb1' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:10$proc$4'.
+No latch inferred for signal `\case_expr_non_const_top.\x_1sb0' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:9$proc$3'.
+No latch inferred for signal `\case_expr_non_const_top.\x_1b1' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:8$proc$2'.
+No latch inferred for signal `\case_expr_non_const_top.\x_1b0' from process `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:7$proc$1'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 8 empty switches in `\case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:17$proc$10'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:15$proc$9'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:14$proc$8'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:13$proc$7'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:12$proc$6'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:11$proc$5'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:10$proc$4'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:9$proc$3'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:8$proc$2'.
+Removing empty process `case_expr_non_const_top.$../../../corpus-external/yosys-simple/case_expr_non_const.v:7$proc$1'.
+Cleaned up 8 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module case_expr_non_const_top.
+<suppressed ~60 debug messages>
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module case_expr_non_const_top...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === case_expr_non_const_top ===
 
         +----------Local Count, excluding submodules.
         | 
-       42 wires
-       54 wire bits
+       92 wires
+      104 wire bits
        17 public wires
        23 public wire bits
         8 ports
         8 port bits
-       10 processes
+        2 cells
+        2   $dlatch
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.
+
+Warnings: 2 unique messages, 2 total

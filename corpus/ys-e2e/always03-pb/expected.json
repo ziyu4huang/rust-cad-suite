@@ -1,0 +1,425 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "uut_always03": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/always03.v:1.1-22.10"
+      },
+      "ports": {
+        "clock": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "in1": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "in2": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "in3": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "in4": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "in5": {
+          "direction": "input",
+          "bits": [ 7 ]
+        },
+        "in6": {
+          "direction": "input",
+          "bits": [ 8 ]
+        },
+        "in7": {
+          "direction": "input",
+          "bits": [ 9 ]
+        },
+        "out1": {
+          "direction": "output",
+          "bits": [ 10 ]
+        },
+        "out2": {
+          "direction": "output",
+          "bits": [ 11 ]
+        },
+        "out3": {
+          "direction": "output",
+          "bits": [ 12 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/always03.v:10$logic_not$2": {
+          "hide_name": 1,
+          "type": "$logic_not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:10.10-10.15"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "Y": [ 13 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/always03.v:19$xor$3": {
+          "hide_name": 1,
+          "type": "$xor",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:19.9-19.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 14 ],
+            "B": [ 11 ],
+            "Y": [ 15 ]
+          }
+        },
+        "$procdff$14": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:7.1-20.4"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 15 ],
+            "Q": [ 10 ]
+          }
+        },
+        "$procdff$15": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:7.1-20.4"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 16 ],
+            "Q": [ 11 ]
+          }
+        },
+        "$procdff$16": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:7.1-20.4"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 17 ],
+            "Q": [ 12 ]
+          }
+        },
+        "$procmux$10": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/always03.v:15.7-15.10|../../../corpus-external/yosys-simple/always03.v:15.3-18.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "B": [ 8 ],
+            "S": [ 7 ],
+            "Y": [ 18 ]
+          }
+        },
+        "$procmux$12": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:14.6-14.9|../../../corpus-external/yosys-simple/always03.v:14.2-18.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 12 ],
+            "B": [ 18 ],
+            "S": [ 6 ],
+            "Y": [ 17 ]
+          }
+        },
+        "$procmux$5": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/always03.v:9.6-9.9|../../../corpus-external/yosys-simple/always03.v:9.2-10.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "B": [ 13 ],
+            "S": [ 4 ],
+            "Y": [ 14 ]
+          }
+        },
+        "$procmux$7": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:12.6-12.9|../../../corpus-external/yosys-simple/always03.v:12.2-13.16"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 14 ],
+            "B": [ 11 ],
+            "S": [ 5 ],
+            "Y": [ 16 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/always03.v:10$logic_not$2_Y": {
+          "hide_name": 1,
+          "bits": [ 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:10.10-10.15"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/always03.v:19$xor$3_Y": {
+          "hide_name": 1,
+          "bits": [ 15 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:19.9-19.20"
+          }
+        },
+        "$0\\out1[0:0]": {
+          "hide_name": 1,
+          "bits": [ 15 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:7.1-20.4"
+          }
+        },
+        "$0\\out2[0:0]": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:7.1-20.4"
+          }
+        },
+        "$0\\out3[0:0]": {
+          "hide_name": 1,
+          "bits": [ 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:7.1-20.4"
+          }
+        },
+        "$1\\out1[0:0]": {
+          "hide_name": 1,
+          "bits": [ 14 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:7.1-20.4"
+          }
+        },
+        "$procmux$10_Y": {
+          "hide_name": 1,
+          "bits": [ 18 ],
+          "attributes": {
+          }
+        },
+        "$procmux$11_CMP": {
+          "hide_name": 1,
+          "bits": [ 7 ],
+          "attributes": {
+          }
+        },
+        "$procmux$12_Y": {
+          "hide_name": 1,
+          "bits": [ 17 ],
+          "attributes": {
+          }
+        },
+        "$procmux$13_CMP": {
+          "hide_name": 1,
+          "bits": [ 6 ],
+          "attributes": {
+          }
+        },
+        "$procmux$5_Y": {
+          "hide_name": 1,
+          "bits": [ 14 ],
+          "attributes": {
+          }
+        },
+        "$procmux$6_CMP": {
+          "hide_name": 1,
+          "bits": [ 4 ],
+          "attributes": {
+          }
+        },
+        "$procmux$7_Y": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$8_CMP": {
+          "hide_name": 1,
+          "bits": [ 5 ],
+          "attributes": {
+          }
+        },
+        "clock": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:3.7-3.12"
+          }
+        },
+        "in1": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:3.14-3.17"
+          }
+        },
+        "in2": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:3.19-3.22"
+          }
+        },
+        "in3": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:3.24-3.27"
+          }
+        },
+        "in4": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:3.29-3.32"
+          }
+        },
+        "in5": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:3.34-3.37"
+          }
+        },
+        "in6": {
+          "hide_name": 0,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:3.39-3.42"
+          }
+        },
+        "in7": {
+          "hide_name": 0,
+          "bits": [ 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:3.44-3.47"
+          }
+        },
+        "out1": {
+          "hide_name": 0,
+          "bits": [ 10 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:4.8-4.12"
+          }
+        },
+        "out2": {
+          "hide_name": 0,
+          "bits": [ 11 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:4.14-4.18"
+          }
+        },
+        "out3": {
+          "hide_name": 0,
+          "bits": [ 12 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/always03.v:4.20-4.24"
+          }
+        }
+      }
+    }
+  }
+}

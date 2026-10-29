@@ -67,16 +67,16 @@ module \forloops02
     connect \A \a
     connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$not$24_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/forloops.v:19.11-19.35"
-  cell $shr $../../../corpus-external/yosys-simple/forloops.v:19$shr$25
+  attribute \src "../../../corpus-external/yosys-simple/forloops.v:24.13-24.23"
+  cell $sub $../../../corpus-external/yosys-simple/forloops.v:24$sub$37
     parameter \A_SIGNED 0
     parameter \B_SIGNED 0
-    parameter \A_WIDTH 4
-    parameter \B_WIDTH 2
-    parameter \Y_WIDTH 4
-    connect \A { $../../../corpus-external/yosys-simple/forloops.v:19$not$24_Y $../../../corpus-external/yosys-simple/forloops.v:19$not$23_Y \a \b }
-    connect \B 2'00
-    connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$shr$25_Y
+    parameter \A_WIDTH 32
+    parameter \B_WIDTH 32
+    parameter \Y_WIDTH 32
+    connect \A 4
+    connect \B { 30'000000000000000000000000000000 \a \b }
+    connect \Y $../../../corpus-external/yosys-simple/forloops.v:24$sub$37_Y
   end
   attribute \src "../../../corpus-external/yosys-simple/forloops.v:19.16-19.18"
   cell $not $../../../corpus-external/yosys-simple/forloops.v:19$not$26
@@ -94,16 +94,16 @@ module \forloops02
     connect \A \a
     connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$not$27_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/forloops.v:19.11-19.35"
-  cell $shr $../../../corpus-external/yosys-simple/forloops.v:19$shr$28
+  attribute \src "../../../corpus-external/yosys-simple/forloops.v:22.7-22.17"
+  cell $add $../../../corpus-external/yosys-simple/forloops.v:22$add$36
     parameter \A_SIGNED 0
     parameter \B_SIGNED 0
-    parameter \A_WIDTH 4
-    parameter \B_WIDTH 2
-    parameter \Y_WIDTH 4
-    connect \A { $../../../corpus-external/yosys-simple/forloops.v:19$not$27_Y $../../../corpus-external/yosys-simple/forloops.v:19$not$26_Y \a \b }
-    connect \B 2'01
-    connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$shr$28_Y
+    parameter \A_WIDTH 32
+    parameter \B_WIDTH 32
+    parameter \Y_WIDTH 32
+    connect \A 4
+    connect \B { 30'000000000000000000000000000000 \a \b }
+    connect \Y $../../../corpus-external/yosys-simple/forloops.v:22$add$36_Y
   end
   attribute \src "../../../corpus-external/yosys-simple/forloops.v:19.16-19.18"
   cell $not $../../../corpus-external/yosys-simple/forloops.v:19$not$29
@@ -121,16 +121,13 @@ module \forloops02
     connect \A \a
     connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$not$30_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/forloops.v:19.11-19.35"
-  cell $shr $../../../corpus-external/yosys-simple/forloops.v:19$shr$31
+  attribute \src "../../../corpus-external/yosys-simple/forloops.v:19.12-19.14"
+  cell $not $../../../corpus-external/yosys-simple/forloops.v:19$not$33
     parameter \A_SIGNED 0
-    parameter \B_SIGNED 0
-    parameter \A_WIDTH 4
-    parameter \B_WIDTH 2
-    parameter \Y_WIDTH 4
-    connect \A { $../../../corpus-external/yosys-simple/forloops.v:19$not$30_Y $../../../corpus-external/yosys-simple/forloops.v:19$not$29_Y \a \b }
-    connect \B 2'10
-    connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$shr$31_Y
+    parameter \A_WIDTH 1
+    parameter \Y_WIDTH 1
+    connect \A \a
+    connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$not$33_Y
   end
   attribute \src "../../../corpus-external/yosys-simple/forloops.v:19.16-19.18"
   cell $not $../../../corpus-external/yosys-simple/forloops.v:19$not$32
@@ -140,66 +137,18 @@ module \forloops02
     connect \A \b
     connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$not$32_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/forloops.v:19.12-19.14"
-  cell $not $../../../corpus-external/yosys-simple/forloops.v:19$not$33
-    parameter \A_SIGNED 0
-    parameter \A_WIDTH 1
-    parameter \Y_WIDTH 1
-    connect \A \a
-    connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$not$33_Y
-  end
-  attribute \src "../../../corpus-external/yosys-simple/forloops.v:19.11-19.35"
-  cell $shr $../../../corpus-external/yosys-simple/forloops.v:19$shr$34
-    parameter \A_SIGNED 0
-    parameter \B_SIGNED 0
-    parameter \A_WIDTH 4
-    parameter \B_WIDTH 2
-    parameter \Y_WIDTH 4
-    connect \A { $../../../corpus-external/yosys-simple/forloops.v:19$not$33_Y $../../../corpus-external/yosys-simple/forloops.v:19$not$32_Y \a \b }
-    connect \B 2'11
-    connect \Y $../../../corpus-external/yosys-simple/forloops.v:19$shr$34_Y
-  end
-  attribute \src "../../../corpus-external/yosys-simple/forloops.v:22.7-22.17"
-  cell $add $../../../corpus-external/yosys-simple/forloops.v:22$add$36
-    parameter \A_SIGNED 0
-    parameter \B_SIGNED 0
-    parameter \A_WIDTH 32
-    parameter \B_WIDTH 32
-    parameter \Y_WIDTH 32
-    connect \A \k
-    connect \B { 30'000000000000000000000000000000 \a \b }
-    connect \Y $../../../corpus-external/yosys-simple/forloops.v:22$add$36_Y
-  end
-  attribute \src "../../../corpus-external/yosys-simple/forloops.v:24.13-24.23"
-  cell $sub $../../../corpus-external/yosys-simple/forloops.v:24$sub$37
-    parameter \A_SIGNED 0
-    parameter \B_SIGNED 0
-    parameter \A_WIDTH 32
-    parameter \B_WIDTH 32
-    parameter \Y_WIDTH 32
-    connect \A \k
-    connect \B { 30'000000000000000000000000000000 \a \b }
-    connect \Y $../../../corpus-external/yosys-simple/forloops.v:24$sub$37_Y
-  end
-  attribute \src "../../../corpus-external/yosys-simple/forloops.v:17.2-20.5"
-  process $../../../corpus-external/yosys-simple/forloops.v:17$proc$22
-    assign { } { }
-    assign { } { }
-    assign $0\q[3:0] [0] $../../../corpus-external/yosys-simple/forloops.v:19$shr$25_Y [0]
-    assign $0\q[3:0] [1] $../../../corpus-external/yosys-simple/forloops.v:19$shr$28_Y [0]
-    assign $0\q[3:0] [2] $../../../corpus-external/yosys-simple/forloops.v:19$shr$31_Y [0]
-    assign $0\q[3:0] [3] $../../../corpus-external/yosys-simple/forloops.v:19$shr$34_Y [0]
-    assign $0\k[31:0] 4
-    sync always
-      update \q $0\q[3:0]
-      update \k $0\k[31:0]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/forloops.v:21.2-23.5"
-  process $../../../corpus-external/yosys-simple/forloops.v:21$proc$35
-    assign { } { }
-    assign $0\x[3:0] $../../../corpus-external/yosys-simple/forloops.v:22$add$36_Y [3:0]
-    sync always
-      update \x $0\x[3:0]
-  end
   connect \y $../../../corpus-external/yosys-simple/forloops.v:24$sub$37_Y [3:0]
+  connect $0\x[3:0] $../../../corpus-external/yosys-simple/forloops.v:22$add$36_Y [3:0]
+  connect $0\k[31:0] 4
+  connect $0\q[3:0] [3] $../../../corpus-external/yosys-simple/forloops.v:19$shr$34_Y [0]
+  connect $0\q[3:0] [2] $../../../corpus-external/yosys-simple/forloops.v:19$shr$31_Y [0]
+  connect $0\q[3:0] [1] $../../../corpus-external/yosys-simple/forloops.v:19$shr$28_Y [0]
+  connect $0\q[3:0] [0] $../../../corpus-external/yosys-simple/forloops.v:19$shr$25_Y [0]
+  connect \x $../../../corpus-external/yosys-simple/forloops.v:22$add$36_Y [3:0]
+  connect \q { $../../../corpus-external/yosys-simple/forloops.v:19$shr$34_Y [0] $../../../corpus-external/yosys-simple/forloops.v:19$shr$31_Y [0] $../../../corpus-external/yosys-simple/forloops.v:19$shr$28_Y [0] $../../../corpus-external/yosys-simple/forloops.v:19$shr$25_Y [0] }
+  connect \k 4
+  connect $../../../corpus-external/yosys-simple/forloops.v:19$shr$25_Y { $../../../corpus-external/yosys-simple/forloops.v:19$not$24_Y $../../../corpus-external/yosys-simple/forloops.v:19$not$23_Y \a \b }
+  connect $../../../corpus-external/yosys-simple/forloops.v:19$shr$28_Y { 1'0 $../../../corpus-external/yosys-simple/forloops.v:19$not$27_Y $../../../corpus-external/yosys-simple/forloops.v:19$not$26_Y \a }
+  connect $../../../corpus-external/yosys-simple/forloops.v:19$shr$31_Y { 2'00 $../../../corpus-external/yosys-simple/forloops.v:19$not$30_Y $../../../corpus-external/yosys-simple/forloops.v:19$not$29_Y }
+  connect $../../../corpus-external/yosys-simple/forloops.v:19$shr$34_Y { 3'000 $../../../corpus-external/yosys-simple/forloops.v:19$not$33_Y }
 end

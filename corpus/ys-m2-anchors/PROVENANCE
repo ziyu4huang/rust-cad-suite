@@ -1,0 +1,31 @@
+# corpus/ys-m2-anchors — M2 proc 弧補錨語料 PROVENANCE
+
+- **作者權**:四例 case.il 皆為本倉自寫(authored)RTLIL,自有版權、零授權面
+  (RM2-4);§1.2「memwr 覆蓋不足處由 M2 proc 弧補」承諾的兌現載體
+  (RYOSYS-MVP §8.3-5)。
+- **錄製**(2026-10-28):oracle 實跑 `ry-difftest --record-il`,script.txt=
+  翻轉腳本逐字(§8.2-P2:`read_rtlil case.il; proc; check; stat;
+  write_rtlil -readable expected.rtlil; write_json expected.json`);錄前
+  兩跑 byte-equal 確定性探針(D-ys5 紀律,exit/stderr/rtlil/json+歸一化
+  stdout 五路斷言全過)。
+- **四例形態**(§8.2-P7 四形):
+  * `global_ff`:sync global+update → exit=0 產 `$ff`+process 清空
+    (成功形 golden 四件套全)。
+  * `posedge_memwr`:sync posedge+memwr(EN 寬=WIDTH=4'1111)→ exit=0
+    產 `$memwr_v2`(EN=WIDTH 逐位契約錄時實證:EN 寬 1'1 形觸 check
+    `Expected port to have width 4` 硬錯——fixture 以語料實形為準,
+    RM2-8)。
+  * `edge_reject`:sync edge → exit=1,stderr 逐字
+    `ERROR: Event with any-edge sensitivity found for this signal!`
+    (P7-①;拒收形 golden)。
+  * `global_memwr`:sync global+memwr → exit=1,stderr 逐字
+    `ERROR: process memory write with unsupported sync type in top.$proc`
+    (P7-③;拒收形 golden)。
+- **拒收形 expected.rtlil=0-byte 檔**:翻轉腳本中 proc 先於 write_rtlil,
+  oracle 硬錯中止= rtlil/json 皆不產出;expected.rtlil 以 0-byte 檔
+  機械編碼「無產物」(與「rc!=0 刪 expected.json」同構;compare 端
+  unwrap_or_default() 空=空對空)。非手寫期望。
+- **slice-5 動線**:本目錄在 ry-difftest compare 遍歷面之外
+  (corpus/ys-e2e 才遍歷);slice-5 遷入 corpus/ys-e2e 同輪上 SUMMARY
+  基線(RYOSYS-MVP §8.5-slice-5)。
+- **日常禁手改 expected.\***;oracle 升級=隨全量重錄輪重錄本節。

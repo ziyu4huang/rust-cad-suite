@@ -1,0 +1,382 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "func_recurse_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/func_recurse.v:1.1-25.10"
+      },
+      "ports": {
+        "inp": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "out1": {
+          "direction": "output",
+          "bits": [ 6, 7, 8, 9 ]
+        },
+        "out2": {
+          "direction": "output",
+          "bits": [ "0", "0", "1", "0" ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/func_recurse.v:10$mul$34": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:10.13-10.40"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "B": [ "1", "0", "0", "0" ],
+            "Y": [ 10, 11, 12, 13 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_recurse.v:10$mul$35": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:10.13-10.40"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "B": [ 10, 11, 12, 13 ],
+            "Y": [ 14, 15, 16, 17 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_recurse.v:10$mul$36": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:10.13-10.40"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "B": [ 14, 15, 16, 17 ],
+            "Y": [ 6, 7, 8, 9 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/func_recurse.v:10$mul$34_Y": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:10.13-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_recurse.v:10$mul$35_Y": {
+          "hide_name": 1,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:10.13-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_recurse.v:10$mul$36_Y": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:10.13-10.40"
+          }
+        },
+        "$0\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$13": {
+          "hide_name": 1,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$0\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base[3:0]$14": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$0\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$15": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$0\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$16": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$0\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$17": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$0\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$18": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$0\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$1.$result[3:0]$10": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$0\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$11": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$0\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.base[3:0]$12": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$1\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$20": {
+          "hide_name": 1,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$1\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base[3:0]$21": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$1\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$22": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$1\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$23": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$1\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$24": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$1\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$25": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$1\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$19": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$2\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$26": {
+          "hide_name": 1,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$2\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$27": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$2\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$28": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$2\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$29": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$2\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$30": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$3\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$31": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$3\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$32": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "$3\\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$33": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
+          }
+        },
+        "inp": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:2.19-2.22"
+          }
+        },
+        "out1": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:3.20-3.24"
+          }
+        },
+        "out2": {
+          "hide_name": 0,
+          "bits": [ "0", "0", "1", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:3.26-3.30"
+          }
+        },
+        "pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:5.32-5.32"
+          }
+        },
+        "pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:6.15-6.19"
+          }
+        },
+        "pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:5.32-5.32"
+          }
+        },
+        "pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:6.15-6.19"
+          }
+        },
+        "pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:5.32-5.32"
+          }
+        },
+        "pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:6.15-6.19"
+          }
+        },
+        "pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$1.$result": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:5.32-5.32"
+          }
+        },
+        "pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:5.32-5.32"
+          }
+        },
+        "pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.base": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_recurse.v:6.15-6.19"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "select_leaves": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/muxtree.v:76.1-82.10"
+      },
+      "ports": {
+        "R": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "C": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "D": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "Q": {
+          "direction": "output",
+          "bits": [ 5 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/muxtree.v:78$logic_not$7": {
+          "hide_name": 1,
+          "type": "$logic_not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:78.7-78.9"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 6 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/muxtree.v:81$ternary$8": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:81.17-81.26"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5 ],
+            "B": [ 4 ],
+            "S": [ 4 ],
+            "Y": [ 7 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/muxtree.v:81$ternary$9": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:81.9-81.26"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 5 ],
+            "S": [ 5 ],
+            "Y": [ 8 ]
+          }
+        },
+        "$procdff$13": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:77.2-81.27"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 9 ],
+            "Q": [ 5 ]
+          }
+        },
+        "$procmux$11": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:78.7-78.9|../../../corpus-external/yosys-simple/muxtree.v:78.3-81.27"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "B": [ 8 ],
+            "S": [ 2 ],
+            "Y": [ 9 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/muxtree.v:78$logic_not$7_Y": {
+          "hide_name": 1,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:78.7-78.9"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/muxtree.v:81$ternary$8_Y": {
+          "hide_name": 1,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:81.17-81.26"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/muxtree.v:81$ternary$9_Y": {
+          "hide_name": 1,
+          "bits": [ 8 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:81.9-81.26"
+          }
+        },
+        "$0\\Q[0:0]": {
+          "hide_name": 1,
+          "bits": [ 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:77.2-81.27"
+          }
+        },
+        "$procmux$11_Y": {
+          "hide_name": 1,
+          "bits": [ 9 ],
+          "attributes": {
+          }
+        },
+        "$procmux$12_CMP": {
+          "hide_name": 1,
+          "bits": [ 6 ],
+          "attributes": {
+          }
+        },
+        "C": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:76.31-76.32"
+          }
+        },
+        "D": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:76.34-76.35"
+          }
+        },
+        "Q": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:76.48-76.49"
+          }
+        },
+        "R": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/muxtree.v:76.28-76.29"
+          }
+        }
+      }
+    }
+  }
+}

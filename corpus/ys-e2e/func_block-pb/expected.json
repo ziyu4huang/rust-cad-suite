@@ -1,0 +1,1474 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "func_block_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/func_block.v:3.1-33.10"
+      },
+      "parameter_default_values": {
+        "func3$func$../../../corpus-external/yosys-simple/func_block.v:32$8.B": "00000000000000000000000000000001"
+      },
+      "ports": {
+        "inp": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ]
+        },
+        "out1": {
+          "direction": "output",
+          "bits": [ 2, 34, 4, 35, 6, 36, 8, 37, 10, 38, 12, 39, 14, 40, 16, 41, 18, 42, 20, 43, 22, 44, 24, 45, 26, 46, 28, 47, 30, 48, 32, 49 ]
+        },
+        "out2": {
+          "direction": "output",
+          "bits": [ 2, 50, 4, 51, 6, 52, 8, 53, 10, 54, 12, 55, 14, 56, 16, 57, 18, 58, 20, 59, 22, 60, 24, 61, 26, 62, 28, 63, 30, 64, 32, 65 ]
+        },
+        "out3": {
+          "direction": "output",
+          "bits": [ 66, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ]
+        }
+      },
+      "cells": {
+        "$auto$opt_expr.cc:702:replace_const_cells$101": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 17 ],
+            "Y": [ 41 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$103": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 19 ],
+            "Y": [ 42 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$105": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 21 ],
+            "Y": [ 43 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$107": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 23 ],
+            "Y": [ 44 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$109": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 25 ],
+            "Y": [ 45 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$111": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 27 ],
+            "Y": [ 46 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$113": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 29 ],
+            "Y": [ 47 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$115": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 31 ],
+            "Y": [ 48 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$117": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 33 ],
+            "Y": [ 49 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$119": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "Y": [ 50 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$121": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5 ],
+            "Y": [ 51 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$123": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "Y": [ 52 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$125": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "Y": [ 53 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$127": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11 ],
+            "Y": [ 54 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$129": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13 ],
+            "Y": [ 55 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$131": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 15 ],
+            "Y": [ 56 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$133": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 17 ],
+            "Y": [ 57 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$135": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 19 ],
+            "Y": [ 58 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$137": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 21 ],
+            "Y": [ 59 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$139": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 23 ],
+            "Y": [ 60 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$141": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 25 ],
+            "Y": [ 61 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$143": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 27 ],
+            "Y": [ 62 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$145": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 29 ],
+            "Y": [ 63 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$147": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 31 ],
+            "Y": [ 64 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$149": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 33 ],
+            "Y": [ 65 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$87": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3 ],
+            "Y": [ 34 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$89": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 5 ],
+            "Y": [ 35 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$91": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "Y": [ 36 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$93": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 9 ],
+            "Y": [ 37 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$95": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 11 ],
+            "Y": [ 38 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$97": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 13 ],
+            "Y": [ 39 ]
+          }
+        },
+        "$auto$opt_expr.cc:702:replace_const_cells$99": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 15 ],
+            "Y": [ 40 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$14_Y": {
+          "hide_name": 1,
+          "bits": [ 2, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$15_Y": {
+          "hide_name": 1,
+          "bits": [ 34, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$16_Y": {
+          "hide_name": 1,
+          "bits": [ 4, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$17_Y": {
+          "hide_name": 1,
+          "bits": [ 35, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$18_Y": {
+          "hide_name": 1,
+          "bits": [ 6, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$19_Y": {
+          "hide_name": 1,
+          "bits": [ 36, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$20_Y": {
+          "hide_name": 1,
+          "bits": [ 8, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$21_Y": {
+          "hide_name": 1,
+          "bits": [ 37, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$22_Y": {
+          "hide_name": 1,
+          "bits": [ 10, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$23_Y": {
+          "hide_name": 1,
+          "bits": [ 38, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$24_Y": {
+          "hide_name": 1,
+          "bits": [ 12, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$25_Y": {
+          "hide_name": 1,
+          "bits": [ 39, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$26_Y": {
+          "hide_name": 1,
+          "bits": [ 14, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$27_Y": {
+          "hide_name": 1,
+          "bits": [ 40, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$28_Y": {
+          "hide_name": 1,
+          "bits": [ 16, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$29_Y": {
+          "hide_name": 1,
+          "bits": [ 41, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$30_Y": {
+          "hide_name": 1,
+          "bits": [ 18, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$31_Y": {
+          "hide_name": 1,
+          "bits": [ 42, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$32_Y": {
+          "hide_name": 1,
+          "bits": [ 20, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$33_Y": {
+          "hide_name": 1,
+          "bits": [ 43, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$34_Y": {
+          "hide_name": 1,
+          "bits": [ 22, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$35_Y": {
+          "hide_name": 1,
+          "bits": [ 44, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$36_Y": {
+          "hide_name": 1,
+          "bits": [ 24, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$37_Y": {
+          "hide_name": 1,
+          "bits": [ 45, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$38_Y": {
+          "hide_name": 1,
+          "bits": [ 26, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$39_Y": {
+          "hide_name": 1,
+          "bits": [ 46, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$40_Y": {
+          "hide_name": 1,
+          "bits": [ 28, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$41_Y": {
+          "hide_name": 1,
+          "bits": [ 47, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$42_Y": {
+          "hide_name": 1,
+          "bits": [ 30, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$43_Y": {
+          "hide_name": 1,
+          "bits": [ 48, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$44_Y": {
+          "hide_name": 1,
+          "bits": [ 32, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:10$xor$45_Y": {
+          "hide_name": 1,
+          "bits": [ 49, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:10.17-10.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$51_Y": {
+          "hide_name": 1,
+          "bits": [ 2, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$52_Y": {
+          "hide_name": 1,
+          "bits": [ 50, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$53_Y": {
+          "hide_name": 1,
+          "bits": [ 4, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$54_Y": {
+          "hide_name": 1,
+          "bits": [ 51, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$55_Y": {
+          "hide_name": 1,
+          "bits": [ 6, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$56_Y": {
+          "hide_name": 1,
+          "bits": [ 52, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$57_Y": {
+          "hide_name": 1,
+          "bits": [ 8, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$58_Y": {
+          "hide_name": 1,
+          "bits": [ 53, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$59_Y": {
+          "hide_name": 1,
+          "bits": [ 10, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$60_Y": {
+          "hide_name": 1,
+          "bits": [ 54, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$61_Y": {
+          "hide_name": 1,
+          "bits": [ 12, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$62_Y": {
+          "hide_name": 1,
+          "bits": [ 55, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$63_Y": {
+          "hide_name": 1,
+          "bits": [ 14, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$64_Y": {
+          "hide_name": 1,
+          "bits": [ 56, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$65_Y": {
+          "hide_name": 1,
+          "bits": [ 16, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$66_Y": {
+          "hide_name": 1,
+          "bits": [ 57, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$67_Y": {
+          "hide_name": 1,
+          "bits": [ 18, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$68_Y": {
+          "hide_name": 1,
+          "bits": [ 58, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$69_Y": {
+          "hide_name": 1,
+          "bits": [ 20, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$70_Y": {
+          "hide_name": 1,
+          "bits": [ 59, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$71_Y": {
+          "hide_name": 1,
+          "bits": [ 22, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$72_Y": {
+          "hide_name": 1,
+          "bits": [ 60, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$73_Y": {
+          "hide_name": 1,
+          "bits": [ 24, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$74_Y": {
+          "hide_name": 1,
+          "bits": [ 61, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$75_Y": {
+          "hide_name": 1,
+          "bits": [ 26, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$76_Y": {
+          "hide_name": 1,
+          "bits": [ 62, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$77_Y": {
+          "hide_name": 1,
+          "bits": [ 28, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$78_Y": {
+          "hide_name": 1,
+          "bits": [ 63, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$79_Y": {
+          "hide_name": 1,
+          "bits": [ 30, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$80_Y": {
+          "hide_name": 1,
+          "bits": [ 64, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$81_Y": {
+          "hide_name": 1,
+          "bits": [ 32, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/func_block.v:18$xor$82_Y": {
+          "hide_name": 1,
+          "bits": [ 65, "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:18.17-18.40"
+          }
+        },
+        "$0\\func1$func$../../../corpus-external/yosys-simple/func_block.v:30$3.$result[31:0]$10": {
+          "hide_name": 1,
+          "bits": [ 2, 34, 4, 35, 6, 36, 8, 37, 10, 38, 12, 39, 14, 40, 16, 41, 18, 42, 20, 43, 22, 44, 24, 45, 26, 46, 28, 47, 30, 48, 32, 49 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:30.16-30.21"
+          }
+        },
+        "$0\\func1$func$../../../corpus-external/yosys-simple/func_block.v:30$6.$result[31:0]$11": {
+          "hide_name": 1,
+          "bits": [ 2, 34, 4, 35, 6, 36, 8, 37, 10, 38, 12, 39, 14, 40, 16, 41, 18, 42, 20, 43, 22, 44, 24, 45, 26, 46, 28, 47, 30, 48, 32, 49 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:30.16-30.21"
+          }
+        },
+        "$0\\func1$func$../../../corpus-external/yosys-simple/func_block.v:30$6.idx[31:0]$13": {
+          "hide_name": 1,
+          "bits": [ "0", "0", "0", "0", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:30.16-30.21"
+          }
+        },
+        "$0\\func1$func$../../../corpus-external/yosys-simple/func_block.v:30$6.inp[31:0]$12": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:30.16-30.21"
+          }
+        },
+        "$0\\func2$func$../../../corpus-external/yosys-simple/func_block.v:31$4.$result[31:0]$47": {
+          "hide_name": 1,
+          "bits": [ 2, 50, 4, 51, 6, 52, 8, 53, 10, 54, 12, 55, 14, 56, 16, 57, 18, 58, 20, 59, 22, 60, 24, 61, 26, 62, 28, 63, 30, 64, 32, 65 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:31.16-31.21"
+          }
+        },
+        "$0\\func2$func$../../../corpus-external/yosys-simple/func_block.v:31$7.$result[31:0]$48": {
+          "hide_name": 1,
+          "bits": [ 2, 50, 4, 51, 6, 52, 8, 53, 10, 54, 12, 55, 14, 56, 16, 57, 18, 58, 20, 59, 22, 60, 24, 61, 26, 62, 28, 63, 30, 64, 32, 65 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:31.16-31.21"
+          }
+        },
+        "$0\\func2$func$../../../corpus-external/yosys-simple/func_block.v:31$7.idx[31:0]$50": {
+          "hide_name": 1,
+          "bits": [ "0", "0", "0", "0", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:31.16-31.21"
+          }
+        },
+        "$0\\func2$func$../../../corpus-external/yosys-simple/func_block.v:31$7.inp[31:0]$49": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:31.16-31.21"
+          }
+        },
+        "$0\\func3$func$../../../corpus-external/yosys-simple/func_block.v:32$5.$result[31:0]$84": {
+          "hide_name": 1,
+          "bits": [ 66, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:32.16-32.21"
+          }
+        },
+        "$0\\func3$func$../../../corpus-external/yosys-simple/func_block.v:32$8.$result[31:1]$85": {
+          "hide_name": 1,
+          "bits": [ 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:32.16-32.21"
+          }
+        },
+        "$0\\func3$func$../../../corpus-external/yosys-simple/func_block.v:32$8.inp[31:0]$86": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:32.16-32.21"
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$100": {
+          "hide_name": 1,
+          "bits": [ 40 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$102": {
+          "hide_name": 1,
+          "bits": [ 41 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$104": {
+          "hide_name": 1,
+          "bits": [ 42 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$106": {
+          "hide_name": 1,
+          "bits": [ 43 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$108": {
+          "hide_name": 1,
+          "bits": [ 44 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$110": {
+          "hide_name": 1,
+          "bits": [ 45 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$112": {
+          "hide_name": 1,
+          "bits": [ 46 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$114": {
+          "hide_name": 1,
+          "bits": [ 47 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$116": {
+          "hide_name": 1,
+          "bits": [ 48 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$118": {
+          "hide_name": 1,
+          "bits": [ 49 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$120": {
+          "hide_name": 1,
+          "bits": [ 50 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$122": {
+          "hide_name": 1,
+          "bits": [ 51 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$124": {
+          "hide_name": 1,
+          "bits": [ 52 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$126": {
+          "hide_name": 1,
+          "bits": [ 53 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$128": {
+          "hide_name": 1,
+          "bits": [ 54 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$130": {
+          "hide_name": 1,
+          "bits": [ 55 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$132": {
+          "hide_name": 1,
+          "bits": [ 56 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$134": {
+          "hide_name": 1,
+          "bits": [ 57 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$136": {
+          "hide_name": 1,
+          "bits": [ 58 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$138": {
+          "hide_name": 1,
+          "bits": [ 59 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$140": {
+          "hide_name": 1,
+          "bits": [ 60 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$142": {
+          "hide_name": 1,
+          "bits": [ 61 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$144": {
+          "hide_name": 1,
+          "bits": [ 62 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$146": {
+          "hide_name": 1,
+          "bits": [ 63 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$148": {
+          "hide_name": 1,
+          "bits": [ 64 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$150": {
+          "hide_name": 1,
+          "bits": [ 65 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$88": {
+          "hide_name": 1,
+          "bits": [ 34 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$90": {
+          "hide_name": 1,
+          "bits": [ 35 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$92": {
+          "hide_name": 1,
+          "bits": [ 36 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$94": {
+          "hide_name": 1,
+          "bits": [ 37 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$96": {
+          "hide_name": 1,
+          "bits": [ 38 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$98": {
+          "hide_name": 1,
+          "bits": [ 39 ],
+          "attributes": {
+          }
+        },
+        "func1$func$../../../corpus-external/yosys-simple/func_block.v:30$3.$result": {
+          "hide_name": 0,
+          "bits": [ 2, 34, 4, 35, 6, 36, 8, 37, 10, 38, 12, 39, 14, 40, 16, 41, 18, 42, 20, 43, 22, 44, 24, 45, 26, 46, 28, 47, 30, 48, 32, 49 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:6.33-6.33"
+          }
+        },
+        "func1$func$../../../corpus-external/yosys-simple/func_block.v:30$6.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_block.v:6.33-6.33"
+          }
+        },
+        "func1$func$../../../corpus-external/yosys-simple/func_block.v:30$6.idx": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_block.v:8.14-8.17"
+          }
+        },
+        "func1$func$../../../corpus-external/yosys-simple/func_block.v:30$6.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_block.v:7.16-7.19"
+          }
+        },
+        "func2$func$../../../corpus-external/yosys-simple/func_block.v:31$4.$result": {
+          "hide_name": 0,
+          "bits": [ 2, 50, 4, 51, 6, 52, 8, 53, 10, 54, 12, 55, 14, 56, 16, 57, 18, 58, 20, 59, 22, 60, 24, 61, 26, 62, 28, 63, 30, 64, 32, 65 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:14.33-14.33"
+          }
+        },
+        "func2$func$../../../corpus-external/yosys-simple/func_block.v:31$7.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_block.v:14.33-14.33"
+          }
+        },
+        "func2$func$../../../corpus-external/yosys-simple/func_block.v:31$7.idx": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_block.v:16.14-16.17"
+          }
+        },
+        "func2$func$../../../corpus-external/yosys-simple/func_block.v:31$7.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_block.v:15.16-15.19"
+          }
+        },
+        "func3$func$../../../corpus-external/yosys-simple/func_block.v:32$5.$result": {
+          "hide_name": 0,
+          "bits": [ 66, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:22.33-22.33"
+          }
+        },
+        "func3$func$../../../corpus-external/yosys-simple/func_block.v:32$8.$result": {
+          "hide_name": 0,
+          "bits": [ 66, "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_block.v:22.33-22.33"
+          }
+        },
+        "func3$func$../../../corpus-external/yosys-simple/func_block.v:32$8.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/func_block.v:25.16-25.19"
+          }
+        },
+        "inp": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:4.20-4.23"
+          }
+        },
+        "out1": {
+          "hide_name": 0,
+          "bits": [ 2, 34, 4, 35, 6, 36, 8, 37, 10, 38, 12, 39, 14, 40, 16, 41, 18, 42, 20, 43, 22, 44, 24, 45, 26, 46, 28, 47, 30, 48, 32, 49 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:29.21-29.25"
+          }
+        },
+        "out2": {
+          "hide_name": 0,
+          "bits": [ 2, 50, 4, 51, 6, 52, 8, 53, 10, 54, 12, 55, 14, 56, 16, 57, 18, 58, 20, 59, 22, 60, 24, 61, 26, 62, 28, 63, 30, 64, 32, 65 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:29.27-29.31"
+          }
+        },
+        "out3": {
+          "hide_name": 0,
+          "bits": [ 66, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/func_block.v:29.33-29.37"
+          }
+        }
+      }
+    }
+  }
+}

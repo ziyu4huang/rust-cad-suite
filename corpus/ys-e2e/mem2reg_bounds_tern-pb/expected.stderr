@@ -1,1 +1,0 @@
-ERROR: Module mem2reg_bounds_term_top contains processes, which are not supported by JSON backend (run `proc` first).

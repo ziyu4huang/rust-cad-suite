@@ -93,16 +93,13 @@ module \test
     connect \A $../../../corpus-external/yosys-simple/sign_part_assign.v:16$shift$8_Y
     connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:16$not$9_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:16.2-16.35"
-  cell $and $../../../corpus-external/yosys-simple/sign_part_assign.v:16$and$10
-    parameter \A_SIGNED 0
-    parameter \B_SIGNED 0
-    parameter \A_WIDTH 16
-    parameter \B_WIDTH 16
-    parameter \Y_WIDTH 16
-    connect \A 16'0000000000000000
-    connect \B $../../../corpus-external/yosys-simple/sign_part_assign.v:16$not$9_Y
-    connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:16$and$10_Y
+  attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:17.2-17.30"
+  cell $neg $../../../corpus-external/yosys-simple/sign_part_assign.v:17$neg$19
+    parameter \A_SIGNED 1
+    parameter \A_WIDTH 33
+    parameter \Y_WIDTH 33
+    connect \A { 1'0 $../../../corpus-external/yosys-simple/sign_part_assign.v:17$add$14_Y }
+    connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:17$neg$19_Y
   end
   attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:16.2-16.35"
   cell $neg $../../../corpus-external/yosys-simple/sign_part_assign.v:16$neg$11
@@ -123,16 +120,16 @@ module \test
     connect \B $../../../corpus-external/yosys-simple/sign_part_assign.v:16$neg$11_Y
     connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:16$shift$12_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:16.2-16.35"
-  cell $or $../../../corpus-external/yosys-simple/sign_part_assign.v:16$or$13
+  attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:17.2-17.30"
+  cell $shift $../../../corpus-external/yosys-simple/sign_part_assign.v:17$shift$20
     parameter \A_SIGNED 0
-    parameter \B_SIGNED 0
-    parameter \A_WIDTH 16
-    parameter \B_WIDTH 16
+    parameter \B_SIGNED 1
+    parameter \A_WIDTH 4
+    parameter \B_WIDTH 33
     parameter \Y_WIDTH 16
-    connect \A $../../../corpus-external/yosys-simple/sign_part_assign.v:16$and$10_Y
-    connect \B $../../../corpus-external/yosys-simple/sign_part_assign.v:16$shift$12_Y
-    connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:16$or$13_Y
+    connect \A 4'1111
+    connect \B $../../../corpus-external/yosys-simple/sign_part_assign.v:17$neg$19_Y
+    connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:17$shift$20_Y
   end
   attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:17.8-17.21"
   cell $add $../../../corpus-external/yosys-simple/sign_part_assign.v:17$add$14
@@ -172,63 +169,24 @@ module \test
     connect \A $../../../corpus-external/yosys-simple/sign_part_assign.v:17$shift$16_Y
     connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:17$not$17_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:17.2-17.30"
-  cell $and $../../../corpus-external/yosys-simple/sign_part_assign.v:17$and$18
-    parameter \A_SIGNED 0
-    parameter \B_SIGNED 0
-    parameter \A_WIDTH 16
-    parameter \B_WIDTH 16
-    parameter \Y_WIDTH 16
-    connect \A 16'0000000000000000
-    connect \B $../../../corpus-external/yosys-simple/sign_part_assign.v:17$not$17_Y
-    connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:17$and$18_Y
-  end
-  attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:17.2-17.30"
-  cell $neg $../../../corpus-external/yosys-simple/sign_part_assign.v:17$neg$19
-    parameter \A_SIGNED 1
-    parameter \A_WIDTH 33
-    parameter \Y_WIDTH 33
-    connect \A { 1'0 $../../../corpus-external/yosys-simple/sign_part_assign.v:17$add$14_Y }
-    connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:17$neg$19_Y
-  end
-  attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:17.2-17.30"
-  cell $shift $../../../corpus-external/yosys-simple/sign_part_assign.v:17$shift$20
-    parameter \A_SIGNED 0
-    parameter \B_SIGNED 1
-    parameter \A_WIDTH 4
-    parameter \B_WIDTH 33
-    parameter \Y_WIDTH 16
-    connect \A 4'1111
-    connect \B $../../../corpus-external/yosys-simple/sign_part_assign.v:17$neg$19_Y
-    connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:17$shift$20_Y
-  end
-  attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:17.2-17.30"
-  cell $or $../../../corpus-external/yosys-simple/sign_part_assign.v:17$or$21
-    parameter \A_SIGNED 0
-    parameter \B_SIGNED 0
-    parameter \A_WIDTH 16
-    parameter \B_WIDTH 16
-    parameter \Y_WIDTH 16
-    connect \A $../../../corpus-external/yosys-simple/sign_part_assign.v:17$and$18_Y
-    connect \B $../../../corpus-external/yosys-simple/sign_part_assign.v:17$shift$20_Y
-    connect \Y $../../../corpus-external/yosys-simple/sign_part_assign.v:17$or$21_Y
-  end
-  attribute \src "../../../corpus-external/yosys-simple/sign_part_assign.v:10.1-18.4"
-  process $../../../corpus-external/yosys-simple/sign_part_assign.v:10$proc$3
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0$bitselwrite$pos$../../../corpus-external/yosys-simple/sign_part_assign.v:16$1[31:0]$4 $../../../corpus-external/yosys-simple/sign_part_assign.v:16$add$6_Y
-    assign $0\data_ref_o[15:0] $../../../corpus-external/yosys-simple/sign_part_assign.v:16$or$13_Y
-    assign $0$bitselwrite$pos$../../../corpus-external/yosys-simple/sign_part_assign.v:17$2[31:0]$5 $../../../corpus-external/yosys-simple/sign_part_assign.v:17$add$14_Y
-    assign $0\data_o[15:0] $../../../corpus-external/yosys-simple/sign_part_assign.v:17$or$21_Y
-    sync always
-      update \data_o $0\data_o[15:0]
-      update \data_ref_o $0\data_ref_o[15:0]
-      update $bitselwrite$pos$../../../corpus-external/yosys-simple/sign_part_assign.v:16$1 32'x
-      update $bitselwrite$pos$../../../corpus-external/yosys-simple/sign_part_assign.v:17$2 32'x
-  end
+  connect $0\data_o[15:0] $../../../corpus-external/yosys-simple/sign_part_assign.v:17$or$21_Y
+  connect $0$bitselwrite$pos$../../../corpus-external/yosys-simple/sign_part_assign.v:17$2[31:0]$5 $../../../corpus-external/yosys-simple/sign_part_assign.v:17$add$14_Y
+  connect $0\data_ref_o[15:0] $../../../corpus-external/yosys-simple/sign_part_assign.v:16$or$13_Y
+  connect $0$bitselwrite$pos$../../../corpus-external/yosys-simple/sign_part_assign.v:16$1[31:0]$4 $../../../corpus-external/yosys-simple/sign_part_assign.v:16$add$6_Y
+  connect \data_o $../../../corpus-external/yosys-simple/sign_part_assign.v:17$or$21_Y
+  connect \data_ref_o $../../../corpus-external/yosys-simple/sign_part_assign.v:16$or$13_Y
+  connect $bitselwrite$pos$../../../corpus-external/yosys-simple/sign_part_assign.v:16$1 32'x
+  connect $bitselwrite$pos$../../../corpus-external/yosys-simple/sign_part_assign.v:17$2 32'x
+  connect $../../../corpus-external/yosys-simple/sign_part_assign.v:16$and$10_Y 16'0000000000000000
+  connect { } { }
+  connect { } { }
+  connect $../../../corpus-external/yosys-simple/sign_part_assign.v:16$or$13_Y $../../../corpus-external/yosys-simple/sign_part_assign.v:16$shift$12_Y
+  connect { } { }
+  connect { } { }
+  connect $../../../corpus-external/yosys-simple/sign_part_assign.v:17$and$18_Y 16'0000000000000000
+  connect { } { }
+  connect { } { }
+  connect $../../../corpus-external/yosys-simple/sign_part_assign.v:17$or$21_Y $../../../corpus-external/yosys-simple/sign_part_assign.v:17$shift$20_Y
+  connect { } { }
+  connect { } { }
 end

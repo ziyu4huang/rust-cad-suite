@@ -1,0 +1,2797 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "constmuldivmod": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:1.1-67.10"
+      },
+      "ports": {
+        "A": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ]
+        },
+        "mode": {
+          "direction": "input",
+          "bits": [ 10, 11, 12, 13, 14, 15 ]
+        },
+        "Y": {
+          "direction": "output",
+          "bits": [ 16, 17, 18, 19, 20, 21, 22, 23 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:10$mul$7": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:10.11-10.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 24, 25, 26, 27, 28, 29, 30, 31 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:12$div$8": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:12.11-12.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 32, 33, 34, 35, 36, 37, 38, 39 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:13$mod$9": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:13.11-13.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 40, 41, 42, 43, 44, 45, 46, 47 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:14$mul$10": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:14.11-14.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 48, 49, 50, 51, 52, 53, 54, 55 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:16$div$11": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:16.11-16.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "1", "0", "0", "0", "0", "0" ],
+            "Y": [ 56, 57, 58, 59, 60, 61, 62, 63 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:17$mod$12": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:17.12-17.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "1", "0", "0", "0", "0", "0" ],
+            "Y": [ 64, 65, 66, 67, 68, 69, 70, 71 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:18$mul$13": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:18.12-18.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "1", "0", "0", "0", "0", "0" ],
+            "Y": [ 72, 73, 74, 75, 76, 77, 78, 79 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:20$div$14": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:20.12-20.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "1", "0", "0", "0", "0" ],
+            "Y": [ 80, 81, 82, 83, 84, 85, 86, 87 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:21$mod$15": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:21.12-21.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "1", "0", "0", "0", "0" ],
+            "Y": [ 88, 89, 90, 91, 92, 93, 94, 95 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:22$mul$16": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:22.12-22.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "1", "0", "0", "0", "0" ],
+            "Y": [ 96, 97, 98, 99, 100, 101, 102, 103 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:26$mul$19": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:26.12-26.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 104, 105, 106, 107, 108, 109, 110, 111 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:28$div$20": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:28.12-28.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 112, 113, 114, 115, 116, 117, 118, 119 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:29$mod$21": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:29.12-29.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 120, 121, 122, 123, 124, 125, 126, 127 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:30$mul$22": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:30.12-30.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 128, 129, 130, 131, 132, 133, 134, 135 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:32$div$23": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:32.12-32.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 136, 137, 138, 139, 140, 141, 142, 143 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:33$mod$24": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:33.12-33.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 144, 145, 146, 147, 148, 149, 150, 151 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:34$mul$25": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:34.12-34.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 152, 153, 154, 155, 156, 157, 158, 159 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:36$div$26": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:36.12-36.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "1", "0", "0", "0", "0", "0" ],
+            "Y": [ 160, 161, 162, 163, 164, 165, 166, 167 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:37$mod$27": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:37.12-37.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "1", "0", "0", "0", "0", "0" ],
+            "Y": [ 168, 169, 170, 171, 172, 173, 174, 175 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:38$mul$28": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:38.12-38.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "1", "0", "0", "0", "0", "0" ],
+            "Y": [ 176, 177, 178, 179, 180, 181, 182, 183 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:40$div$29": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:40.12-40.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "1", "0", "0", "0", "0" ],
+            "Y": [ 184, 185, 186, 187, 188, 189, 190, 191 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:41$mod$30": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:41.12-41.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "1", "0", "0", "0", "0" ],
+            "Y": [ 192, 193, 194, 195, 196, 197, 198, 199 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:42$mul$31": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:42.12-42.38"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "1", "0", "0", "0", "0" ],
+            "Y": [ 200, 201, 202, 203, 204, 205, 206, 207 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:46$mul$34": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:46.12-46.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 208, 209, 210, 211, 212, 213, 214, 215 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:48$div$35": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:48.12-48.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "1", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 216, 217, 218, 219, 220, 221, 222, 223 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:49$mod$36": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:49.12-49.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "1", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 224, 225, 226, 227, 228, 229, 230, 231 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:50$mul$37": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:50.12-50.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "1", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 232, 233, 234, 235, 236, 237, 238, 239 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:52$div$38": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:52.12-52.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 240, 241, 242, 243, 244, 245, 246, 247 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:53$mod$39": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:53.12-53.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 248, 249, 250, 251, 252, 253, 254, 255 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:54$mul$40": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:54.12-54.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "1", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 256, 257, 258, 259, 260, 261, 262, 263 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:56$div$41": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:56.12-56.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 264, 265, 266, 267, 268, 269, 270, 271 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:57$mod$42": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:57.12-57.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 272, 273, 274, 275, 276, 277, 278, 279 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:58$mul$43": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:58.12-58.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "1", "1", "1", "1", "1", "1" ],
+            "Y": [ 280, 281, 282, 283, 284, 285, 286, 287 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:6$mul$4": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:6.11-6.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 288, 289, 290, 291, 292, 293, 294, 295 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:60$div$44": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:60.12-60.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "1", "1", "1", "1", "1" ],
+            "Y": [ 296, 297, 298, 299, 300, 301, 302, 303 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:61$mod$45": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:61.12-61.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "1", "1", "1", "1", "1" ],
+            "Y": [ 304, 305, 306, 307, 308, 309, 310, 311 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:62$mul$46": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000001",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000001",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:62.12-62.39"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "0", "0", "0", "1", "1", "1", "1", "1" ],
+            "Y": [ 312, 313, 314, 315, 316, 317, 318, 319 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:64$mul$47": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:64.17-64.26"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0", "1", "0", "0", "0" ],
+            "B": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "Y": [ 320, 321, 322, 323, 324, 325, 326, 327 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:8$div$5": {
+          "hide_name": 1,
+          "type": "$div",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:8.11-8.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 328, 329, 330, 331, 332, 333, 334, 335 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:9$mod$6": {
+          "hide_name": 1,
+          "type": "$mod",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:9.11-9.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 336, 337, 338, 339, 340, 341, 342, 343 ]
+          }
+        },
+        "$procmux$49": {
+          "hide_name": 1,
+          "type": "$pmux",
+          "parameters": {
+            "S_WIDTH": "00000000000000000000000000101101",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:61.40-61.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 320, 321, 322, 323, 324, 325, 326, 327 ],
+            "B": [ 312, 313, 314, 315, 316, 317, 318, 319, 304, 305, 306, 307, 308, 309, 310, 311, 296, 297, 298, 299, 300, 301, 302, 303, 280, 281, 282, 283, 284, 285, 286, 287, 272, 273, 274, 275, 276, 277, 278, 279, 264, 265, 266, 267, 268, 269, 270, 271, 256, 257, 258, 259, 260, 261, 262, 263, 248, 249, 250, 251, 252, 253, 254, 255, 240, 241, 242, 243, 244, 245, 246, 247, 232, 233, 234, 235, 236, 237, 238, 239, 224, 225, 226, 227, 228, 229, 230, 231, 216, 217, 218, 219, 220, 221, 222, 223, 208, 209, 210, 211, 212, 213, 214, 215, "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", 200, 201, 202, 203, 204, 205, 206, 207, 192, 193, 194, 195, 196, 197, 198, 199, 184, 185, 186, 187, 188, 189, 190, 191, 176, 177, 178, 179, 180, 181, 182, 183, 168, 169, 170, 171, 172, 173, 174, 175, 160, 161, 162, 163, 164, 165, 166, 167, 152, 153, 154, 155, 156, 157, 158, 159, 144, 145, 146, 147, 148, 149, 150, 151, 136, 137, 138, 139, 140, 141, 142, 143, 128, 129, 130, 131, 132, 133, 134, 135, 120, 121, 122, 123, 124, 125, 126, 127, 112, 113, 114, 115, 116, 117, 118, 119, 104, 105, 106, 107, 108, 109, 110, 111, "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", 96, 97, 98, 99, 100, 101, 102, 103, 88, 89, 90, 91, 92, 93, 94, 95, 80, 81, 82, 83, 84, 85, 86, 87, 72, 73, 74, 75, 76, 77, 78, 79, 64, 65, 66, 67, 68, 69, 70, 71, 56, 57, 58, 59, 60, 61, 62, 63, 48, 49, 50, 51, 52, 53, 54, 55, 40, 41, 42, 43, 44, 45, 46, 47, 32, 33, 34, 35, 36, 37, 38, 39, 24, 25, 26, 27, 28, 29, 30, 31, 336, 337, 338, 339, 340, 341, 342, 343, 328, 329, 330, 331, 332, 333, 334, 335, 288, 289, 290, 291, 292, 293, 294, 295, "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x" ],
+            "S": [ 344, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 357, 358, 359, 360, 361, 362, 363, 364, 365, 366, 367, 368, 369, 370, 371, 372, 373, 374, 375, 376, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 387, 388 ],
+            "Y": [ 16, 17, 18, 19, 20, 21, 22, 23 ]
+          }
+        },
+        "$procmux$50_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:61.40-61.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "1", "1", "0", "1" ],
+            "Y": [ 344 ]
+          }
+        },
+        "$procmux$51_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:60.40-60.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "0", "1", "0", "1" ],
+            "Y": [ 345 ]
+          }
+        },
+        "$procmux$52_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:58.40-58.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "0", "1", "0", "1" ],
+            "Y": [ 346 ]
+          }
+        },
+        "$procmux$53_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:57.40-57.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "0", "1", "0", "1" ],
+            "Y": [ 347 ]
+          }
+        },
+        "$procmux$54_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:56.40-56.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "0", "1", "0", "1" ],
+            "Y": [ 348 ]
+          }
+        },
+        "$procmux$55_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:54.40-54.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "1", "0", "0", "1" ],
+            "Y": [ 349 ]
+          }
+        },
+        "$procmux$56_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:53.40-53.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "1", "0", "0", "1" ],
+            "Y": [ 350 ]
+          }
+        },
+        "$procmux$57_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:52.40-52.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "1", "0", "0", "1" ],
+            "Y": [ 351 ]
+          }
+        },
+        "$procmux$58_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:50.40-50.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "1", "0", "0", "1" ],
+            "Y": [ 352 ]
+          }
+        },
+        "$procmux$59_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:49.40-49.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "0", "0", "0", "1" ],
+            "Y": [ 353 ]
+          }
+        },
+        "$procmux$60_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:48.40-48.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "0", "0", "0", "1" ],
+            "Y": [ 354 ]
+          }
+        },
+        "$procmux$61_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:46.40-46.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "0", "0", "0", "1" ],
+            "Y": [ 355 ]
+          }
+        },
+        "$procmux$62_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:45.40-45.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "0", "0", "0", "1" ],
+            "Y": [ 356 ]
+          }
+        },
+        "$procmux$63_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:44.40-44.40|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "1", "1", "1", "0" ],
+            "Y": [ 357 ]
+          }
+        },
+        "$procmux$64_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:42.39-42.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "1", "1", "1", "0" ],
+            "Y": [ 358 ]
+          }
+        },
+        "$procmux$65_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:41.39-41.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "1", "1", "1", "0" ],
+            "Y": [ 359 ]
+          }
+        },
+        "$procmux$66_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:40.39-40.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "1", "1", "1", "0" ],
+            "Y": [ 360 ]
+          }
+        },
+        "$procmux$67_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:38.39-38.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "0", "1", "1", "0" ],
+            "Y": [ 361 ]
+          }
+        },
+        "$procmux$68_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:37.39-37.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "0", "1", "1", "0" ],
+            "Y": [ 362 ]
+          }
+        },
+        "$procmux$69_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:36.39-36.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "0", "1", "1", "0" ],
+            "Y": [ 363 ]
+          }
+        },
+        "$procmux$70_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:34.39-34.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "0", "1", "1", "0" ],
+            "Y": [ 364 ]
+          }
+        },
+        "$procmux$71_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:33.39-33.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "1", "0", "1", "0" ],
+            "Y": [ 365 ]
+          }
+        },
+        "$procmux$72_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:32.39-32.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "1", "0", "1", "0" ],
+            "Y": [ 366 ]
+          }
+        },
+        "$procmux$73_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:30.39-30.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "1", "0", "1", "0" ],
+            "Y": [ 367 ]
+          }
+        },
+        "$procmux$74_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:29.39-29.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "1", "0", "1", "0" ],
+            "Y": [ 368 ]
+          }
+        },
+        "$procmux$75_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:28.39-28.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "0", "0", "1", "0" ],
+            "Y": [ 369 ]
+          }
+        },
+        "$procmux$76_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:26.39-26.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "0", "0", "1", "0" ],
+            "Y": [ 370 ]
+          }
+        },
+        "$procmux$77_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:25.39-25.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "0", "0", "1", "0" ],
+            "Y": [ 371 ]
+          }
+        },
+        "$procmux$78_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:24.39-24.39|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "0", "0", "1", "0" ],
+            "Y": [ 372 ]
+          }
+        },
+        "$procmux$79_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:22.21-22.21|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "1", "1", "0", "0" ],
+            "Y": [ 373 ]
+          }
+        },
+        "$procmux$80_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:21.21-21.21|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "1", "1", "0", "0" ],
+            "Y": [ 374 ]
+          }
+        },
+        "$procmux$81_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:20.21-20.21|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "1", "1", "0", "0" ],
+            "Y": [ 375 ]
+          }
+        },
+        "$procmux$82_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:18.21-18.21|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "1", "1", "0", "0" ],
+            "Y": [ 376 ]
+          }
+        },
+        "$procmux$83_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:17.21-17.21|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "0", "1", "0", "0" ],
+            "Y": [ 377 ]
+          }
+        },
+        "$procmux$84_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:16.20-16.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "0", "1", "0", "0" ],
+            "Y": [ 378 ]
+          }
+        },
+        "$procmux$85_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:14.20-14.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "0", "1", "0", "0" ],
+            "Y": [ 379 ]
+          }
+        },
+        "$procmux$86_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:13.20-13.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "0", "1", "0", "0" ],
+            "Y": [ 380 ]
+          }
+        },
+        "$procmux$87_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:12.20-12.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "1", "0", "0", "0" ],
+            "Y": [ 381 ]
+          }
+        },
+        "$procmux$88_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:10.20-10.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "1", "0", "0", "0" ],
+            "Y": [ 382 ]
+          }
+        },
+        "$procmux$89_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:9.20-9.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "1", "0", "0", "0" ],
+            "Y": [ 383 ]
+          }
+        },
+        "$procmux$90_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:8.20-8.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "0", "1", "0", "0", "0" ],
+            "Y": [ 384 ]
+          }
+        },
+        "$procmux$91_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:6.20-6.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "1", "0", "0", "0", "0" ],
+            "Y": [ 385 ]
+          }
+        },
+        "$procmux$92_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:5.20-5.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "0", "1", "0", "0", "0", "0" ],
+            "Y": [ 386 ]
+          }
+        },
+        "$procmux$93_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:4.20-4.20|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "B": [ "1", "0", "0", "0", "0", "0" ],
+            "Y": [ 387 ]
+          }
+        },
+        "$procmux$94_CMP0": {
+          "hide_name": 1,
+          "type": "$logic_not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000110",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:3.14-3.14|../../../corpus-external/yosys-simple/constmuldivmod.v:3.3-65.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 10, 11, 12, 13, 14, 15 ],
+            "Y": [ 388 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:10$mul$7_Y": {
+          "hide_name": 1,
+          "bits": [ 24, 25, 26, 27, 28, 29, 30, 31 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:10.11-10.19"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:12$div$8_Y": {
+          "hide_name": 1,
+          "bits": [ 32, 33, 34, 35, 36, 37, 38, 39 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:12.11-12.19"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:13$mod$9_Y": {
+          "hide_name": 1,
+          "bits": [ 40, 41, 42, 43, 44, 45, 46, 47 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:13.11-13.19"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:14$mul$10_Y": {
+          "hide_name": 1,
+          "bits": [ 48, 49, 50, 51, 52, 53, 54, 55 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:14.11-14.19"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:16$div$11_Y": {
+          "hide_name": 1,
+          "bits": [ 56, 57, 58, 59, 60, 61, 62, 63 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:16.11-16.19"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:17$mod$12_Y": {
+          "hide_name": 1,
+          "bits": [ 64, 65, 66, 67, 68, 69, 70, 71 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:17.12-17.20"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:18$mul$13_Y": {
+          "hide_name": 1,
+          "bits": [ 72, 73, 74, 75, 76, 77, 78, 79 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:18.12-18.20"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:20$div$14_Y": {
+          "hide_name": 1,
+          "bits": [ 80, 81, 82, 83, 84, 85, 86, 87 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:20.12-20.20"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:21$mod$15_Y": {
+          "hide_name": 1,
+          "bits": [ 88, 89, 90, 91, 92, 93, 94, 95 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:21.12-21.20"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:22$mul$16_Y": {
+          "hide_name": 1,
+          "bits": [ 96, 97, 98, 99, 100, 101, 102, 103 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:22.12-22.20"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:24$div$17_Y": {
+          "hide_name": 1,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:24.12-24.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:25$mod$18_Y": {
+          "hide_name": 1,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:25.12-25.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:26$mul$19_Y": {
+          "hide_name": 1,
+          "bits": [ 104, 105, 106, 107, 108, 109, 110, 111 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:26.12-26.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:28$div$20_Y": {
+          "hide_name": 1,
+          "bits": [ 112, 113, 114, 115, 116, 117, 118, 119 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:28.12-28.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:29$mod$21_Y": {
+          "hide_name": 1,
+          "bits": [ 120, 121, 122, 123, 124, 125, 126, 127 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:29.12-29.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:30$mul$22_Y": {
+          "hide_name": 1,
+          "bits": [ 128, 129, 130, 131, 132, 133, 134, 135 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:30.12-30.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:32$div$23_Y": {
+          "hide_name": 1,
+          "bits": [ 136, 137, 138, 139, 140, 141, 142, 143 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:32.12-32.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:33$mod$24_Y": {
+          "hide_name": 1,
+          "bits": [ 144, 145, 146, 147, 148, 149, 150, 151 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:33.12-33.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:34$mul$25_Y": {
+          "hide_name": 1,
+          "bits": [ 152, 153, 154, 155, 156, 157, 158, 159 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:34.12-34.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:36$div$26_Y": {
+          "hide_name": 1,
+          "bits": [ 160, 161, 162, 163, 164, 165, 166, 167 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:36.12-36.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:37$mod$27_Y": {
+          "hide_name": 1,
+          "bits": [ 168, 169, 170, 171, 172, 173, 174, 175 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:37.12-37.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:38$mul$28_Y": {
+          "hide_name": 1,
+          "bits": [ 176, 177, 178, 179, 180, 181, 182, 183 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:38.12-38.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:4$div$2_Y": {
+          "hide_name": 1,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:4.11-4.19"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:40$div$29_Y": {
+          "hide_name": 1,
+          "bits": [ 184, 185, 186, 187, 188, 189, 190, 191 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:40.12-40.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:41$mod$30_Y": {
+          "hide_name": 1,
+          "bits": [ 192, 193, 194, 195, 196, 197, 198, 199 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:41.12-41.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:42$mul$31_Y": {
+          "hide_name": 1,
+          "bits": [ 200, 201, 202, 203, 204, 205, 206, 207 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:42.12-42.38"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:44$div$32_Y": {
+          "hide_name": 1,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:44.12-44.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:45$mod$33_Y": {
+          "hide_name": 1,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:45.12-45.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:46$mul$34_Y": {
+          "hide_name": 1,
+          "bits": [ 208, 209, 210, 211, 212, 213, 214, 215 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:46.12-46.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:48$div$35_Y": {
+          "hide_name": 1,
+          "bits": [ 216, 217, 218, 219, 220, 221, 222, 223 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:48.12-48.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:49$mod$36_Y": {
+          "hide_name": 1,
+          "bits": [ 224, 225, 226, 227, 228, 229, 230, 231 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:49.12-49.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:5$mod$3_Y": {
+          "hide_name": 1,
+          "bits": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:5.11-5.19"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:50$mul$37_Y": {
+          "hide_name": 1,
+          "bits": [ 232, 233, 234, 235, 236, 237, 238, 239 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:50.12-50.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:52$div$38_Y": {
+          "hide_name": 1,
+          "bits": [ 240, 241, 242, 243, 244, 245, 246, 247 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:52.12-52.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:53$mod$39_Y": {
+          "hide_name": 1,
+          "bits": [ 248, 249, 250, 251, 252, 253, 254, 255 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:53.12-53.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:54$mul$40_Y": {
+          "hide_name": 1,
+          "bits": [ 256, 257, 258, 259, 260, 261, 262, 263 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:54.12-54.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:56$div$41_Y": {
+          "hide_name": 1,
+          "bits": [ 264, 265, 266, 267, 268, 269, 270, 271 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:56.12-56.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:57$mod$42_Y": {
+          "hide_name": 1,
+          "bits": [ 272, 273, 274, 275, 276, 277, 278, 279 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:57.12-57.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:58$mul$43_Y": {
+          "hide_name": 1,
+          "bits": [ 280, 281, 282, 283, 284, 285, 286, 287 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:58.12-58.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:6$mul$4_Y": {
+          "hide_name": 1,
+          "bits": [ 288, 289, 290, 291, 292, 293, 294, 295 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:6.11-6.19"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:60$div$44_Y": {
+          "hide_name": 1,
+          "bits": [ 296, 297, 298, 299, 300, 301, 302, 303 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:60.12-60.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:61$mod$45_Y": {
+          "hide_name": 1,
+          "bits": [ 304, 305, 306, 307, 308, 309, 310, 311 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:61.12-61.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:62$mul$46_Y": {
+          "hide_name": 1,
+          "bits": [ 312, 313, 314, 315, 316, 317, 318, 319 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:62.12-62.39"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:64$mul$47_Y": {
+          "hide_name": 1,
+          "bits": [ 320, 321, 322, 323, 324, 325, 326, 327 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:64.17-64.26"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:8$div$5_Y": {
+          "hide_name": 1,
+          "bits": [ 328, 329, 330, 331, 332, 333, 334, 335 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:8.11-8.19"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/constmuldivmod.v:9$mod$6_Y": {
+          "hide_name": 1,
+          "bits": [ 336, 337, 338, 339, 340, 341, 342, 343 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:9.11-9.19"
+          }
+        },
+        "$0\\Y[7:0]": {
+          "hide_name": 1,
+          "bits": [ 16, 17, 18, 19, 20, 21, 22, 23 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:2.2-66.5"
+          }
+        },
+        "$1\\Y[7:0]": {
+          "hide_name": 1,
+          "bits": [ 16, 17, 18, 19, 20, 21, 22, 23 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:2.2-66.5"
+          }
+        },
+        "$procmux$49_Y": {
+          "hide_name": 1,
+          "bits": [ 16, 17, 18, 19, 20, 21, 22, 23 ],
+          "attributes": {
+          }
+        },
+        "$procmux$50_CMP": {
+          "hide_name": 1,
+          "bits": [ 344 ],
+          "attributes": {
+          }
+        },
+        "$procmux$51_CMP": {
+          "hide_name": 1,
+          "bits": [ 345 ],
+          "attributes": {
+          }
+        },
+        "$procmux$52_CMP": {
+          "hide_name": 1,
+          "bits": [ 346 ],
+          "attributes": {
+          }
+        },
+        "$procmux$53_CMP": {
+          "hide_name": 1,
+          "bits": [ 347 ],
+          "attributes": {
+          }
+        },
+        "$procmux$54_CMP": {
+          "hide_name": 1,
+          "bits": [ 348 ],
+          "attributes": {
+          }
+        },
+        "$procmux$55_CMP": {
+          "hide_name": 1,
+          "bits": [ 349 ],
+          "attributes": {
+          }
+        },
+        "$procmux$56_CMP": {
+          "hide_name": 1,
+          "bits": [ 350 ],
+          "attributes": {
+          }
+        },
+        "$procmux$57_CMP": {
+          "hide_name": 1,
+          "bits": [ 351 ],
+          "attributes": {
+          }
+        },
+        "$procmux$58_CMP": {
+          "hide_name": 1,
+          "bits": [ 352 ],
+          "attributes": {
+          }
+        },
+        "$procmux$59_CMP": {
+          "hide_name": 1,
+          "bits": [ 353 ],
+          "attributes": {
+          }
+        },
+        "$procmux$60_CMP": {
+          "hide_name": 1,
+          "bits": [ 354 ],
+          "attributes": {
+          }
+        },
+        "$procmux$61_CMP": {
+          "hide_name": 1,
+          "bits": [ 355 ],
+          "attributes": {
+          }
+        },
+        "$procmux$62_CMP": {
+          "hide_name": 1,
+          "bits": [ 356 ],
+          "attributes": {
+          }
+        },
+        "$procmux$63_CMP": {
+          "hide_name": 1,
+          "bits": [ 357 ],
+          "attributes": {
+          }
+        },
+        "$procmux$64_CMP": {
+          "hide_name": 1,
+          "bits": [ 358 ],
+          "attributes": {
+          }
+        },
+        "$procmux$65_CMP": {
+          "hide_name": 1,
+          "bits": [ 359 ],
+          "attributes": {
+          }
+        },
+        "$procmux$66_CMP": {
+          "hide_name": 1,
+          "bits": [ 360 ],
+          "attributes": {
+          }
+        },
+        "$procmux$67_CMP": {
+          "hide_name": 1,
+          "bits": [ 361 ],
+          "attributes": {
+          }
+        },
+        "$procmux$68_CMP": {
+          "hide_name": 1,
+          "bits": [ 362 ],
+          "attributes": {
+          }
+        },
+        "$procmux$69_CMP": {
+          "hide_name": 1,
+          "bits": [ 363 ],
+          "attributes": {
+          }
+        },
+        "$procmux$70_CMP": {
+          "hide_name": 1,
+          "bits": [ 364 ],
+          "attributes": {
+          }
+        },
+        "$procmux$71_CMP": {
+          "hide_name": 1,
+          "bits": [ 365 ],
+          "attributes": {
+          }
+        },
+        "$procmux$72_CMP": {
+          "hide_name": 1,
+          "bits": [ 366 ],
+          "attributes": {
+          }
+        },
+        "$procmux$73_CMP": {
+          "hide_name": 1,
+          "bits": [ 367 ],
+          "attributes": {
+          }
+        },
+        "$procmux$74_CMP": {
+          "hide_name": 1,
+          "bits": [ 368 ],
+          "attributes": {
+          }
+        },
+        "$procmux$75_CMP": {
+          "hide_name": 1,
+          "bits": [ 369 ],
+          "attributes": {
+          }
+        },
+        "$procmux$76_CMP": {
+          "hide_name": 1,
+          "bits": [ 370 ],
+          "attributes": {
+          }
+        },
+        "$procmux$77_CMP": {
+          "hide_name": 1,
+          "bits": [ 371 ],
+          "attributes": {
+          }
+        },
+        "$procmux$78_CMP": {
+          "hide_name": 1,
+          "bits": [ 372 ],
+          "attributes": {
+          }
+        },
+        "$procmux$79_CMP": {
+          "hide_name": 1,
+          "bits": [ 373 ],
+          "attributes": {
+          }
+        },
+        "$procmux$80_CMP": {
+          "hide_name": 1,
+          "bits": [ 374 ],
+          "attributes": {
+          }
+        },
+        "$procmux$81_CMP": {
+          "hide_name": 1,
+          "bits": [ 375 ],
+          "attributes": {
+          }
+        },
+        "$procmux$82_CMP": {
+          "hide_name": 1,
+          "bits": [ 376 ],
+          "attributes": {
+          }
+        },
+        "$procmux$83_CMP": {
+          "hide_name": 1,
+          "bits": [ 377 ],
+          "attributes": {
+          }
+        },
+        "$procmux$84_CMP": {
+          "hide_name": 1,
+          "bits": [ 378 ],
+          "attributes": {
+          }
+        },
+        "$procmux$85_CMP": {
+          "hide_name": 1,
+          "bits": [ 379 ],
+          "attributes": {
+          }
+        },
+        "$procmux$86_CMP": {
+          "hide_name": 1,
+          "bits": [ 380 ],
+          "attributes": {
+          }
+        },
+        "$procmux$87_CMP": {
+          "hide_name": 1,
+          "bits": [ 381 ],
+          "attributes": {
+          }
+        },
+        "$procmux$88_CMP": {
+          "hide_name": 1,
+          "bits": [ 382 ],
+          "attributes": {
+          }
+        },
+        "$procmux$89_CMP": {
+          "hide_name": 1,
+          "bits": [ 383 ],
+          "attributes": {
+          }
+        },
+        "$procmux$90_CMP": {
+          "hide_name": 1,
+          "bits": [ 384 ],
+          "attributes": {
+          }
+        },
+        "$procmux$91_CMP": {
+          "hide_name": 1,
+          "bits": [ 385 ],
+          "attributes": {
+          }
+        },
+        "$procmux$92_CMP": {
+          "hide_name": 1,
+          "bits": [ 386 ],
+          "attributes": {
+          }
+        },
+        "$procmux$93_CMP": {
+          "hide_name": 1,
+          "bits": [ 387 ],
+          "attributes": {
+          }
+        },
+        "$procmux$94_CMP": {
+          "hide_name": 1,
+          "bits": [ 388 ],
+          "attributes": {
+          }
+        },
+        "A": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5, 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:1.35-1.36"
+          }
+        },
+        "Y": {
+          "hide_name": 0,
+          "bits": [ 16, 17, 18, 19, 20, 21, 22, 23 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:1.73-1.74"
+          }
+        },
+        "mode": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13, 14, 15 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/constmuldivmod.v:1.50-1.54"
+          }
+        }
+      }
+    }
+  }
+}

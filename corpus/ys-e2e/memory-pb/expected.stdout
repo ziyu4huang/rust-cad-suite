@@ -1,35 +1,129 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $../../../corpus-external/yosys-simple/memory.v:304$proc$430 in module memtest13.
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 15 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~1 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+     1/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:309$424_EN[26:0]$449
+     2/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:308$423_EN[26:0]$448
+     3/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:307$422_EN[26:0]$447
+     4/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:306$421_EN[26:0]$446
+     5/18: $1$mem2bits$\mem$../../../corpus-external/yosys-simple/memory.v:315$429[26:0]$460
+     6/18: $1$mem2bits$\mem$../../../corpus-external/yosys-simple/memory.v:314$428[26:0]$459
+     7/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_EN[26:0]$458
+     8/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_DATA[26:0]$457
+     9/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_ADDR[1:0]$456
+    10/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_EN[26:0]$455
+    11/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_DATA[26:0]$454
+    12/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_ADDR[1:0]$453
+    13/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_EN[26:0]$452
+    14/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_DATA[26:0]$451
+    15/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_ADDR[1:0]$450
+    16/18: $0\dout3[26:0]
+    17/18: $0\dout2[3:0]
+    18/18: $0\dout1[3:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\memtest13.\dout1' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$531' with positive edge clock.
+Creating register for signal `\memtest13.\dout2' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$532' with positive edge clock.
+Creating register for signal `\memtest13.\dout3' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$533' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:306$421_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$534' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:307$422_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$535' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:308$423_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$536' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:309$424_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$537' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_ADDR' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$538' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_DATA' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$539' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$540' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_ADDR' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$541' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_DATA' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$542' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$543' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_ADDR' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$544' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_DATA' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$545' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$546' with positive edge clock.
+Creating register for signal `\memtest13.$mem2bits$\mem$../../../corpus-external/yosys-simple/memory.v:314$428' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$547' with positive edge clock.
+Creating register for signal `\memtest13.$mem2bits$\mem$../../../corpus-external/yosys-simple/memory.v:315$429' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$548' with positive edge clock.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+Removing empty process `memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+Cleaned up 1 empty switch.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module memtest13.
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module memtest13...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === memtest13 ===
 
         +----------Local Count, excluding submodules.
         | 
-       79 wires
-     1544 wire bits
+      115 wires
+     1927 wire bits
        16 public wires
        92 public wire bits
        16 ports
        92 port bits
         1 memories
       108 memory bits
-        1 processes
-       15 cells
+       58 cells
         6   $add
+       18   $dff
         3   $memrd
+        7   $memwr_v2
+       18   $mux
         1   $shiftx
         2   $shl
         3   $sub
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.

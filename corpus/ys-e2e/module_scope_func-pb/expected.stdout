@@ -1,13 +1,64 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 15 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:43$proc$32'.
+Creating decoders for process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:38$proc$30'.
+Creating decoders for process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:21$proc$28'.
+Creating decoders for process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:40$proc$23'.
+Creating decoders for process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:35$proc$18'.
+Creating decoders for process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:18$proc$13'.
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\module_scope_func_top.\out9' from process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:43$proc$32'.
+No latch inferred for signal `\module_scope_func_top.\out6' from process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:38$proc$30'.
+No latch inferred for signal `\module_scope_func_top.\out3' from process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:21$proc$28'.
+No latch inferred for signal `\module_scope_func_top.\blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$7.$result' from process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:40$proc$23'.
+No latch inferred for signal `\module_scope_func_top.\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$4.$result' from process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:35$proc$18'.
+No latch inferred for signal `\module_scope_func_top.\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$2.$result' from process `\module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:18$proc$13'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:43$proc$32'.
+Removing empty process `module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:38$proc$30'.
+Removing empty process `module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:21$proc$28'.
+Removing empty process `module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:40$proc$23'.
+Removing empty process `module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:35$proc$18'.
+Removing empty process `module_scope_func_top.$../../../corpus-external/yosys-simple/module_scope_func.v:18$proc$13'.
+Cleaned up 0 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module module_scope_func_top.
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module module_scope_func_top...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === module_scope_func_top ===
 
@@ -19,12 +70,11 @@ Found and reported 0 problems.
       673 public wire bits
        10 ports
       289 port bits
-        6 processes
         3 cells
         2   $add
         1   $mul
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.

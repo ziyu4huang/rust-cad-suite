@@ -1,0 +1,82 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "top": {
+      "attributes": {
+      },
+      "ports": {
+        "d": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "q": {
+          "direction": "output",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "c": {
+          "direction": "input",
+          "bits": [ 6 ]
+        }
+      },
+      "cells": {
+        "$auto$proc_memwr.cc:46:proc_memwr$1": {
+          "hide_name": 1,
+          "type": "$memwr_v2",
+          "parameters": {
+            "ABITS": "00000000000000000000000000000001",
+            "CLK_ENABLE": "1",
+            "CLK_POLARITY": "1",
+            "MEMID": "\\m",
+            "PORTID": "00000000000000000000000000000000",
+            "PRIORITY_MASK": "",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "ADDR": "input",
+            "CLK": "input",
+            "DATA": "input",
+            "EN": "input"
+          },
+          "connections": {
+            "ADDR": [ 6 ],
+            "CLK": [ 6 ],
+            "DATA": [ 2, 3, 4, 5 ],
+            "EN": [ "1", "1", "1", "1" ]
+          }
+        }
+      },
+      "memories": {
+        "m": {
+          "hide_name": 0,
+          "attributes": {
+          },
+          "width": 4,
+          "start_offset": 0,
+          "size": 16
+        }
+      },
+      "netnames": {
+        "c": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+          }
+        },
+        "d": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+          }
+        },
+        "q": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+          }
+        }
+      }
+    }
+  }
+}

@@ -202,34 +202,6 @@ module \Multiplier_2D
     connect \B { \B [0] \B [0] \B [0] \B [0] }
     connect \Y $../../../corpus-external/yosys-simple/multiplier.v:87$and$9_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/multiplier.v:87.8-87.49"
-  process $../../../corpus-external/yosys-simple/multiplier.v:87$proc$8
-    assign { } { }
-    assign $0\PP[0][7:0] { 4'0000 $../../../corpus-external/yosys-simple/multiplier.v:87$and$9_Y }
-    sync always
-      update \PP[0] $0\PP[0][7:0]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/multiplier.v:99.12-99.46"
-  process $../../../corpus-external/yosys-simple/multiplier.v:99$proc$10
-    assign { } { }
-    assign $0\PP[1][7:0] { 2'00 \addPartialProduct[1].Cout \addPartialProduct[1].gS }
-    sync always
-      update \PP[1] $0\PP[1][7:0]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/multiplier.v:99.12-99.46"
-  process $../../../corpus-external/yosys-simple/multiplier.v:99$proc$11
-    assign { } { }
-    assign $0\PP[2][7:0] { 1'0 \addPartialProduct[2].Cout \addPartialProduct[2].gS }
-    sync always
-      update \PP[2] $0\PP[2][7:0]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/multiplier.v:99.12-99.46"
-  process $../../../corpus-external/yosys-simple/multiplier.v:99$proc$12
-    assign { } { }
-    assign $0\PP[3][7:0] { \addPartialProduct[3].Cout \addPartialProduct[3].gS }
-    sync always
-      update \PP[3] $0\PP[3][7:0]
-  end
   connect \P \PP[3]
   connect \addPartialProduct[1].gA { $../../../corpus-external/yosys-simple/multiplier.v:95$and$5_Y 1'0 }
   connect \addPartialProduct[1].gB \PP[0] [4:0]
@@ -237,6 +209,14 @@ module \Multiplier_2D
   connect \addPartialProduct[2].gB \PP[1] [5:0]
   connect \addPartialProduct[3].gA { $../../../corpus-external/yosys-simple/multiplier.v:95$and$7_Y 3'000 }
   connect \addPartialProduct[3].gB \PP[2] [6:0]
+  connect $0\PP[3][7:0] { \addPartialProduct[3].Cout \addPartialProduct[3].gS }
+  connect $0\PP[2][7:0] { 1'0 \addPartialProduct[2].Cout \addPartialProduct[2].gS }
+  connect $0\PP[1][7:0] { 2'00 \addPartialProduct[1].Cout \addPartialProduct[1].gS }
+  connect $0\PP[0][7:0] { 4'0000 $../../../corpus-external/yosys-simple/multiplier.v:87$and$9_Y }
+  connect \PP[3] { \addPartialProduct[3].Cout \addPartialProduct[3].gS }
+  connect \PP[2] { 1'0 \addPartialProduct[2].Cout \addPartialProduct[2].gS }
+  connect \PP[1] { 2'00 \addPartialProduct[1].Cout \addPartialProduct[1].gS }
+  connect \PP[0] { 4'0000 $../../../corpus-external/yosys-simple/multiplier.v:87$and$9_Y }
 end
 attribute \src "../../../corpus-external/yosys-simple/multiplier.v:109.1-128.10"
 attribute \hdlname "RippleCarryAdder"

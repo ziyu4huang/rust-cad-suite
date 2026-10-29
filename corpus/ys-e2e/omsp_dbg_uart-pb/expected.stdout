@@ -1,33 +1,83 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3 in module omsp_dbg_uart.
+Marked 1 switch rules as full_case in process $../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1 in module omsp_dbg_uart.
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 1 assignment to connection.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \dbg_rst in `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~2 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+     1/1: $0\uart_state[2:0]
+Creating decoders for process `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1'.
+     1/1: $1\uart_state_nxt[2:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\omsp_dbg_uart.\uart_state_nxt' from process `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\omsp_dbg_uart.\uart_state' using process `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+  created $adff cell `$procdff$16' with positive edge clock and positive level reset.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+Removing empty process `omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+Found and cleaned up 1 empty switch in `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1'.
+Removing empty process `omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1'.
+Cleaned up 2 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module omsp_dbg_uart.
+<suppressed ~2 debug messages>
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module omsp_dbg_uart...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === omsp_dbg_uart ===
 
         +----------Local Count, excluding submodules.
         | 
-       15 wires
-       27 wire bits
+       21 wires
+       37 wire bits
         7 public wires
        11 public wire bits
         4 ports
         4 port bits
-        2 processes
-        5 cells
+       10 cells
+        1   $adff
         1   $and
-        1   $eq
-        1   $mux
-        1   $ne
+        3   $eq
+        2   $mux
         1   $or
+        1   $pmux
+        1   $reduce_bool
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.

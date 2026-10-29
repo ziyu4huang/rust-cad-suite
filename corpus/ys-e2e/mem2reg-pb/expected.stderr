@@ -1,1 +1,0 @@
-ERROR: Module mem2reg_test6 contains processes, which are not supported by JSON backend (run `proc` first).

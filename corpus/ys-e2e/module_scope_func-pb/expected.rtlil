@@ -125,82 +125,40 @@ module \module_scope_func_top
     connect \B 2
     connect \Y $../../../corpus-external/yosys-simple/module_scope_func.v:27$mul$27_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/module_scope_func.v:18.19-18.45"
-  process $../../../corpus-external/yosys-simple/module_scope_func.v:18$proc$13
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$10.value[31:0]$16 { 31'0000000000000000000000000000000 \inp }
-    assign $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$10.$result[31:0]$15 $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$17_Y
-    assign $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$2.$result[31:0]$14 $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$17_Y
-    sync always
-      update \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$2.$result $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$2.$result[31:0]$14
-      update \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$10.$result 32'x
-      update \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$10.value 32'x
-  end
-  attribute \src "../../../corpus-external/yosys-simple/module_scope_func.v:35.23-35.49"
-  process $../../../corpus-external/yosys-simple/module_scope_func.v:35$proc$18
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$11.value[31:0]$21 { 31'0000000000000000000000000000000 \inp }
-    assign $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$11.$result[31:0]$20 $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$22_Y
-    assign $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$4.$result[31:0]$19 $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$22_Y
-    sync always
-      update \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$4.$result $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$4.$result[31:0]$19
-      update \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$11.$result 32'x
-      update \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$11.value 32'x
-  end
-  attribute \src "../../../corpus-external/yosys-simple/module_scope_func.v:40.23-40.27"
-  process $../../../corpus-external/yosys-simple/module_scope_func.v:40$proc$23
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$12.value[31:0]$26 { 31'0000000000000000000000000000000 \inp }
-    assign $0\blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$12.$result[31:0]$25 $../../../corpus-external/yosys-simple/module_scope_func.v:27$mul$27_Y
-    assign $0\blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$7.$result[31:0]$24 $../../../corpus-external/yosys-simple/module_scope_func.v:27$mul$27_Y
-    sync always
-      update \blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$7.$result $0\blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$7.$result[31:0]$24
-      update \blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$12.$result 32'x
-      update \blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$12.value 32'x
-  end
-  attribute \src "../../../corpus-external/yosys-simple/module_scope_func.v:21.12-21.12"
-  process $../../../corpus-external/yosys-simple/module_scope_func.v:21$proc$28
-    assign { } { }
-    assign { } { }
-    assign $0\send$func$../../../corpus-external/yosys-simple/module_scope_func.v:21$3.out[31:0]$29 55
-    assign $0\out3[31:0] 55
-    sync always
-      update \out3 $0\out3[31:0]
-      update \send$func$../../../corpus-external/yosys-simple/module_scope_func.v:21$3.out 32'x
-    sync init
-  end
-  attribute \src "../../../corpus-external/yosys-simple/module_scope_func.v:38.16-38.16"
-  process $../../../corpus-external/yosys-simple/module_scope_func.v:38$proc$30
-    assign { } { }
-    assign { } { }
-    assign $0\send$func$../../../corpus-external/yosys-simple/module_scope_func.v:38$6.out[31:0]$31 55
-    assign $0\out6[31:0] 55
-    sync always
-      update \out6 $0\out6[31:0]
-      update \send$func$../../../corpus-external/yosys-simple/module_scope_func.v:38$6.out 32'x
-    sync init
-  end
-  attribute \src "../../../corpus-external/yosys-simple/module_scope_func.v:43.16-43.16"
-  process $../../../corpus-external/yosys-simple/module_scope_func.v:43$proc$32
-    assign { } { }
-    assign { } { }
-    assign $0\blk.send$func$../../../corpus-external/yosys-simple/module_scope_func.v:43$9.out[31:0]$33 66
-    assign $0\out9[31:0] 66
-    sync always
-      update \out9 $0\out9[31:0]
-      update \blk.send$func$../../../corpus-external/yosys-simple/module_scope_func.v:43$9.out 32'x
-    sync init
-  end
   connect \out1 \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$2.$result
   connect \out2 11
   connect \out4 \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$4.$result
   connect \out5 21
   connect \out7 \blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$7.$result
   connect \out8 60
+  connect $0\out9[31:0] 66
+  connect $0\blk.send$func$../../../corpus-external/yosys-simple/module_scope_func.v:43$9.out[31:0]$33 66
+  connect $0\out6[31:0] 55
+  connect $0\send$func$../../../corpus-external/yosys-simple/module_scope_func.v:38$6.out[31:0]$31 55
+  connect $0\out3[31:0] 55
+  connect $0\send$func$../../../corpus-external/yosys-simple/module_scope_func.v:21$3.out[31:0]$29 55
+  connect $0\blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$7.$result[31:0]$24 $../../../corpus-external/yosys-simple/module_scope_func.v:27$mul$27_Y
+  connect $0\blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$12.$result[31:0]$25 $../../../corpus-external/yosys-simple/module_scope_func.v:27$mul$27_Y
+  connect $0\blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$12.value[31:0]$26 { 31'0000000000000000000000000000000 \inp }
+  connect $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$4.$result[31:0]$19 $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$22_Y
+  connect $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$11.$result[31:0]$20 $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$22_Y
+  connect $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$11.value[31:0]$21 { 31'0000000000000000000000000000000 \inp }
+  connect $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$2.$result[31:0]$14 $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$17_Y
+  connect $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$10.$result[31:0]$15 $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$17_Y
+  connect $0\incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$10.value[31:0]$16 { 31'0000000000000000000000000000000 \inp }
+  connect \out9 66
+  connect \blk.send$func$../../../corpus-external/yosys-simple/module_scope_func.v:43$9.out 32'x
+  connect \out6 55
+  connect \send$func$../../../corpus-external/yosys-simple/module_scope_func.v:38$6.out 32'x
+  connect \out3 55
+  connect \send$func$../../../corpus-external/yosys-simple/module_scope_func.v:21$3.out 32'x
+  connect \blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$7.$result $../../../corpus-external/yosys-simple/module_scope_func.v:27$mul$27_Y
+  connect \blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$12.$result 32'x
+  connect \blk.incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:40$12.value 32'x
+  connect \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$4.$result $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$22_Y
+  connect \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$11.$result 32'x
+  connect \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:35$11.value 32'x
+  connect \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$2.$result $../../../corpus-external/yosys-simple/module_scope_func.v:11$add$17_Y
+  connect \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$10.$result 32'x
+  connect \incr$func$../../../corpus-external/yosys-simple/module_scope_func.v:18$10.value 32'x
 end

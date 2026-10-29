@@ -1,0 +1,1270 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "const_fold_func_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/const_fold_func.v:1.1-61.10"
+      },
+      "ports": {
+        "inp": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "out1": {
+          "direction": "output",
+          "bits": [ 6, 7, 8, 9 ]
+        },
+        "out2": {
+          "direction": "output",
+          "bits": [ 10, 11, 12, 13 ]
+        },
+        "out3": {
+          "direction": "output",
+          "bits": [ 14, 15, 16, 17 ]
+        },
+        "out4": {
+          "direction": "output",
+          "bits": [ 18, 19, 20, 21 ]
+        },
+        "out5": {
+          "direction": "output",
+          "bits": [ "0", "1", "0", "1" ]
+        },
+        "out6": {
+          "direction": "output",
+          "bits": [ "0", "1", "0", 22 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:33$mul$55": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:33.14-33.27"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "B": [ "1", "0", "0", "0" ],
+            "Y": [ 14, 15, 16, 17 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:42$mul$107": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:42.18-42.56"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 23, 24, 25, 26 ],
+            "B": [ "1", "0", "0", "0" ],
+            "Y": [ 27, 28, 29, 30 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:42$mul$108": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:42.18-42.56"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 31, 32, 33, 34 ],
+            "B": [ 27, 28, 29, 30 ],
+            "Y": [ 35, 36, 37, 38 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:42$mul$109": {
+          "hide_name": 1,
+          "type": "$mul",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:42.18-42.56"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 39, 40, 41, 42 ],
+            "B": [ 35, 36, 37, 38 ],
+            "Y": [ 18, 19, 20, 21 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$100": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 31, 32, 33, 34 ],
+            "Y": [ 23, 24, 25, 26 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$106": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 23, 24, 25, 26 ],
+            "Y": [ 43, 44, 45, 46 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$33": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "Y": [ 47, 48, 49, 50 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$38": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 47, 48, 49, 50 ],
+            "Y": [ 6, 7, 8, 9 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$43": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "Y": [ 51, 52, 53, 54 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$50": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 51, 52, 53, 54 ],
+            "Y": [ 10, 11, 12, 13 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$60": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2, 3, 4, 5 ],
+            "Y": [ 39, 40, 41, 42 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$90": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 39, 40, 41, 42 ],
+            "Y": [ 31, 32, 33, 34 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:33$mul$55_Y": {
+          "hide_name": 1,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:33.14-33.27"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:42$mul$107_Y": {
+          "hide_name": 1,
+          "bits": [ 27, 28, 29, 30 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:42.18-42.56"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:42$mul$108_Y": {
+          "hide_name": 1,
+          "bits": [ 35, 36, 37, 38 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:42.18-42.56"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:42$mul$109_Y": {
+          "hide_name": 1,
+          "bits": [ 18, 19, 20, 21 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:42.18-42.56"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:52$mul$120_Y": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "1", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:52.18-52.56"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:52$mul$121_Y": {
+          "hide_name": 1,
+          "bits": [ "0", "1", "0", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:52.18-52.56"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$100_Y": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$106_Y": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$33_Y": {
+          "hide_name": 1,
+          "bits": [ 47, 48, 49, 50 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$38_Y": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$43_Y": {
+          "hide_name": 1,
+          "bits": [ 51, 52, 53, 54 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$50_Y": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$60_Y": {
+          "hide_name": 1,
+          "bits": [ 39, 40, 41, 42 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/const_fold_func.v:8$not$90_Y": {
+          "hide_name": 1,
+          "bits": [ 31, 32, 33, 34 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:8.10-8.14"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:13$13.$result[3:0]$48": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:57.16-57.20"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:13$13.inp[3:0]$49": {
+          "hide_name": 1,
+          "bits": [ 51, 52, 53, 54 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:57.16-57.20"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$18.$result[3:0]$65": {
+          "hide_name": 1,
+          "bits": [ 31, 32, 33, 34 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$18.inp[3:0]$66": {
+          "hide_name": 1,
+          "bits": [ 39, 40, 41, 42 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$20.$result[3:0]$69": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$20.inp[3:0]$70": {
+          "hide_name": 1,
+          "bits": [ 31, 32, 33, 34 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.$result[3:0]$73": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.inp[3:0]$74": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$1.$result[3:0]$30": {
+          "hide_name": 1,
+          "bits": [ 47, 48, 49, 50 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:56.21-56.25"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$10.$result[3:0]$36": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:56.16-56.20"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$10.inp[3:0]$37": {
+          "hide_name": 1,
+          "bits": [ 47, 48, 49, 50 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:56.16-56.20"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$2.$result[3:0]$35": {
+          "hide_name": 1,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:56.16-56.20"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$9.$result[3:0]$31": {
+          "hide_name": 1,
+          "bits": [ 47, 48, 49, 50 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:56.21-56.25"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$9.inp[3:0]$32": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:56.21-56.25"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$11.$result[3:0]$41": {
+          "hide_name": 1,
+          "bits": [ 51, 52, 53, 54 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:57.21-57.25"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$11.inp[3:0]$42": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:57.21-57.25"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$3.$result[3:0]$40": {
+          "hide_name": 1,
+          "bits": [ 51, 52, 53, 54 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:57.21-57.25"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$16.$result[3:0]$58": {
+          "hide_name": 1,
+          "bits": [ 39, 40, 41, 42 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.27-59.31"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$16.inp[3:0]$59": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.27-59.31"
+          }
+        },
+        "$0\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$6.$result[3:0]$57": {
+          "hide_name": 1,
+          "bits": [ 39, 40, 41, 42 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.27-59.31"
+          }
+        },
+        "$0\\help$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$12.$result[3:0]$46": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:57.16-57.20"
+          }
+        },
+        "$0\\help$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$12.inp[3:0]$47": {
+          "hide_name": 1,
+          "bits": [ 51, 52, 53, 54 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:57.16-57.20"
+          }
+        },
+        "$0\\help$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$4.$result[3:0]$45": {
+          "hide_name": 1,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:57.16-57.20"
+          }
+        },
+        "$0\\help_mul$func$../../../corpus-external/yosys-simple/const_fold_func.v:58$14.$result[3:0]$53": {
+          "hide_name": 1,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:58.16-58.24"
+          }
+        },
+        "$0\\help_mul$func$../../../corpus-external/yosys-simple/const_fold_func.v:58$14.inp[3:0]$54": {
+          "hide_name": 1,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:58.16-58.24"
+          }
+        },
+        "$0\\help_mul$func$../../../corpus-external/yosys-simple/const_fold_func.v:58$5.$result[3:0]$52": {
+          "hide_name": 1,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:58.16-58.24"
+          }
+        },
+        "$0\\out6[2:0]": {
+          "hide_name": 1,
+          "bits": [ "0", "1", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$0\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$19.$result[3:0]$67": {
+          "hide_name": 1,
+          "bits": [ 35, 36, 37, 38 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$19.base[3:0]$68": {
+          "hide_name": 1,
+          "bits": [ 31, 32, 33, 34 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$21.$result[3:0]$71": {
+          "hide_name": 1,
+          "bits": [ 27, 28, 29, 30 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$21.base[3:0]$72": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.$result[3:0]$75": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.base[3:0]$76": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$17.$result[3:0]$63": {
+          "hide_name": 1,
+          "bits": [ 18, 19, 20, 21 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$17.base[3:0]$64": {
+          "hide_name": 1,
+          "bits": [ 39, 40, 41, 42 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$7.$result[3:0]$62": {
+          "hide_name": 1,
+          "bits": [ 18, 19, 20, 21 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$0\\pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:52$26.$result[3:0]$113": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "1", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$0\\pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:52$28.$result[3:0]$114": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$0\\pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:60$24.$result[3:0]$112": {
+          "hide_name": 1,
+          "bits": [ "0", "1", "0", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$0\\pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:60$8.$result[3:0]$111": {
+          "hide_name": 1,
+          "bits": [ "0", "1", "0", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$1\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$18.$result[3:0]$78": {
+          "hide_name": 1,
+          "bits": [ 31, 32, 33, 34 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$18.inp[3:0]$79": {
+          "hide_name": 1,
+          "bits": [ 39, 40, 41, 42 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$20.$result[3:0]$82": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$20.inp[3:0]$83": {
+          "hide_name": 1,
+          "bits": [ 31, 32, 33, 34 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.$result[3:0]$86": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.inp[3:0]$87": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\out6[1:0]": {
+          "hide_name": 1,
+          "bits": [ "0", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$1\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$19.$result[3:0]$80": {
+          "hide_name": 1,
+          "bits": [ 35, 36, 37, 38 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$19.base[3:0]$81": {
+          "hide_name": 1,
+          "bits": [ 31, 32, 33, 34 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$21.$result[3:0]$84": {
+          "hide_name": 1,
+          "bits": [ 27, 28, 29, 30 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$21.base[3:0]$85": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.$result[3:0]$88": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.base[3:0]$89": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$17.$result[3:0]$77": {
+          "hide_name": 1,
+          "bits": [ 18, 19, 20, 21 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$1\\pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:52$26.$result[3:0]$116": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "1", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$1\\pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:52$28.$result[3:0]$117": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$1\\pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:60$24.$result[3:0]$115": {
+          "hide_name": 1,
+          "bits": [ "0", "1", "0", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$2\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$20.$result[3:0]$92": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$2\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$20.inp[3:0]$93": {
+          "hide_name": 1,
+          "bits": [ 31, 32, 33, 34 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$2\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.$result[3:0]$96": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$2\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.inp[3:0]$97": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$2\\out6[0:0]": {
+          "hide_name": 1,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$2\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$19.$result[3:0]$91": {
+          "hide_name": 1,
+          "bits": [ 35, 36, 37, 38 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$2\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$21.$result[3:0]$94": {
+          "hide_name": 1,
+          "bits": [ 27, 28, 29, 30 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$2\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$21.base[3:0]$95": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$2\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.$result[3:0]$98": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$2\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.base[3:0]$99": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$2\\pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:52$26.$result[3:0]$118": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "1", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$2\\pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:52$28.$result[3:0]$119": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:60.16-60.26"
+          }
+        },
+        "$3\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.$result[3:0]$102": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$3\\flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.inp[3:0]$103": {
+          "hide_name": 1,
+          "bits": [ 23, 24, 25, 26 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$3\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$21.$result[3:0]$101": {
+          "hide_name": 1,
+          "bits": [ 27, 28, 29, 30 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$3\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.$result[3:0]$104": {
+          "hide_name": 1,
+          "bits": [ "1", "0", "0", "0" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "$3\\pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.base[3:0]$105": {
+          "hide_name": 1,
+          "bits": [ 43, 44, 45, 46 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:59.16-59.26"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:13$13.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:13$13.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:7.15-7.18"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$18.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$18.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:7.15-7.18"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$20.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$20.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:7.15-7.18"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$22.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:7.15-7.18"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$1.$result": {
+          "hide_name": 0,
+          "bits": [ 47, 48, 49, 50 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$10.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$10.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:7.15-7.18"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$2.$result": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$9.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:56$9.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:7.15-7.18"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$11.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$11.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:7.15-7.18"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$3.$result": {
+          "hide_name": 0,
+          "bits": [ 51, 52, 53, 54 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$16.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$16.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:7.15-7.18"
+          }
+        },
+        "flip$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$6.$result": {
+          "hide_name": 0,
+          "bits": [ 39, 40, 41, 42 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:6.31-6.31"
+          }
+        },
+        "help$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$12.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:11.31-11.31"
+          }
+        },
+        "help$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$12.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:12.15-12.18"
+          }
+        },
+        "help$func$../../../corpus-external/yosys-simple/const_fold_func.v:57$4.$result": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:11.31-11.31"
+          }
+        },
+        "help_mul$func$../../../corpus-external/yosys-simple/const_fold_func.v:58$14.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:31.35-31.35"
+          }
+        },
+        "help_mul$func$../../../corpus-external/yosys-simple/const_fold_func.v:58$14.inp": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:32.15-32.18"
+          }
+        },
+        "help_mul$func$../../../corpus-external/yosys-simple/const_fold_func.v:58$5.$result": {
+          "hide_name": 0,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:31.35-31.35"
+          }
+        },
+        "inp": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:2.19-2.22"
+          }
+        },
+        "out1": {
+          "hide_name": 0,
+          "bits": [ 6, 7, 8, 9 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:3.20-3.24"
+          }
+        },
+        "out2": {
+          "hide_name": 0,
+          "bits": [ 10, 11, 12, 13 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:3.26-3.30"
+          }
+        },
+        "out3": {
+          "hide_name": 0,
+          "bits": [ 14, 15, 16, 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:3.32-3.36"
+          }
+        },
+        "out4": {
+          "hide_name": 0,
+          "bits": [ 18, 19, 20, 21 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:3.38-3.42"
+          }
+        },
+        "out5": {
+          "hide_name": 0,
+          "bits": [ "0", "1", "0", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:3.44-3.48"
+          }
+        },
+        "out6": {
+          "hide_name": 0,
+          "bits": [ "0", "1", "0", 22 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:4.19-4.23"
+          }
+        },
+        "pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$19.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:37.37-37.37"
+          }
+        },
+        "pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$19.base": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:38.15-38.19"
+          }
+        },
+        "pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$21.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:37.37-37.37"
+          }
+        },
+        "pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$21.base": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:38.15-38.19"
+          }
+        },
+        "pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:37.37-37.37"
+          }
+        },
+        "pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:42$23.base": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:38.15-38.19"
+          }
+        },
+        "pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$17.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:37.37-37.37"
+          }
+        },
+        "pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$17.base": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:38.15-38.19"
+          }
+        },
+        "pow_flip_a$func$../../../corpus-external/yosys-simple/const_fold_func.v:59$7.$result": {
+          "hide_name": 0,
+          "bits": [ 18, 19, 20, 21 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:37.37-37.37"
+          }
+        },
+        "pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:52$26.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:46.37-46.37"
+          }
+        },
+        "pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:52$28.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:46.37-46.37"
+          }
+        },
+        "pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:60$24.$result": {
+          "hide_name": 0,
+          "bits": [ "x", "x", "x", "x" ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:46.37-46.37"
+          }
+        },
+        "pow_flip_b$func$../../../corpus-external/yosys-simple/const_fold_func.v:60$8.$result": {
+          "hide_name": 0,
+          "bits": [ "0", "1", "0", "1" ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/const_fold_func.v:46.37-46.37"
+          }
+        }
+      }
+    }
+  }
+}

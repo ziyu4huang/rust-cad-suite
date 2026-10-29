@@ -1,13 +1,55 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 9 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:34$proc$20'.
+Creating decoders for process `\func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:24$proc$15'.
+Creating decoders for process `\func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:12$proc$10'.
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\func_width_scope_top.\blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$6.$result' from process `\func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:34$proc$20'.
+No latch inferred for signal `\func_width_scope_top.\blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$4.$result' from process `\func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:24$proc$15'.
+No latch inferred for signal `\func_width_scope_top.\func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$2.$result' from process `\func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:12$proc$10'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:34$proc$20'.
+Removing empty process `func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:24$proc$15'.
+Removing empty process `func_width_scope_top.$../../../corpus-external/yosys-simple/func_width_scope.v:12$proc$10'.
+Cleaned up 0 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module func_width_scope_top.
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module func_width_scope_top...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === func_width_scope_top ===
 
@@ -19,11 +61,10 @@ Found and reported 0 problems.
      2342 public wire bits
         3 ports
      2049 port bits
-        3 processes
         3 cells
         3   $not
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.

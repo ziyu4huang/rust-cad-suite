@@ -1,31 +1,125 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed 2 dead cases from process $../../../corpus-external/yosys-simple/subbytes.v:45$proc$5 in module subbytes_00.
+Marked 4 switch rules as full_case in process $../../../corpus-external/yosys-simple/subbytes.v:45$proc$5 in module subbytes_00.
+Marked 1 switch rules as full_case in process $../../../corpus-external/yosys-simple/subbytes.v:28$proc$3 in module subbytes_00.
+Removed a total of 2 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 23 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset in `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~4 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+     1/18: $2\data_reg_var[0][7:0]
+     2/18: $2\data_reg_var[3][7:0]
+     3/18: $2\data_reg_var[2][7:0]
+     4/18: $2\data_reg_var[1][7:0]
+     5/18: $1\data_reg_128[31:0] [15:8]
+     6/18: $1\data_reg_128[31:0] [7:0]
+     7/18: $1\data_reg_128[31:0] [23:16]
+     8/18: $1\data_reg_128[31:0] [31:24]
+     9/18: $1\next_state[1:0]
+    10/18: $1$mem2reg_wr$\data_reg_var$../../../corpus-external/yosys-simple/subbytes.v:72$2_DATA[7:0]$13
+    11/18: $1$mem2reg_wr$\data_reg_var$../../../corpus-external/yosys-simple/subbytes.v:72$2_ADDR[1:0]$12
+    12/18: $1\data_reg_var[3][7:0]
+    13/18: $1\data_reg_var[2][7:0]
+    14/18: $1\data_reg_var[1][7:0]
+    15/18: $1\data_reg_var[0][7:0]
+    16/18: $2\next_state[1:0]
+    17/18: $1\next_data_reg[31:0]
+    18/18: $1$mem2reg_rd$\data_array$../../../corpus-external/yosys-simple/subbytes.v:60$1_DATA[7:0]$10
+Creating decoders for process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+     1/3: $1\ready_o[0:0]
+     2/3: $1\state[1:0]
+     3/3: $1\data_reg[31:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\subbytes_00.\data_o' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\sbox_data_o' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\sbox_decrypt_o' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\next_state' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\next_data_reg' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\next_ready_o' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_i_var' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_array[0]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_array[1]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_array[2]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_array[3]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_reg_var[0]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_reg_var[1]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_reg_var[2]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_reg_var[3]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+Warning: Latch inferred for signal `\subbytes_00.\data_reg_128' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5': $auto$proc_dlatch.cc:559:proc_dlatch$102
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\subbytes_00.\ready_o' using process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+  created $adff cell `$procdff$107' with positive edge clock and positive level reset.
+Creating register for signal `\subbytes_00.\state' using process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+  created $adff cell `$procdff$112' with positive edge clock and positive level reset.
+Creating register for signal `\subbytes_00.\data_reg' using process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+  created $adff cell `$procdff$117' with positive edge clock and positive level reset.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 4 empty switches in `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+Removing empty process `subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+Removing empty process `subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+Cleaned up 4 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module subbytes_00.
+<suppressed ~23 debug messages>
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module subbytes_00...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === subbytes_00 ===
 
         +----------Local Count, excluding submodules.
         | 
-       73 wires
-      781 wire bits
+      144 wires
+     1013 wire bits
        25 public wires
       283 public wire bits
        10 ports
        86 port bits
-        2 processes
-        3 cells
+       46 cells
         1   $add
-        1   $logic_not
+        3   $adff
+        1   $dlatch
+       15   $eq
+        6   $logic_not
+       10   $mux
+        4   $not
+        5   $pmux
         1   $reduce_bool
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.
+
+Warnings: 1 unique messages, 1 total

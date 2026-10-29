@@ -12351,1130 +12351,330 @@ module \a23_barrel_shift_fpga_rotate
     connect \B $../../../corpus-external/yosys-simple/rotate.v:22$and$1279_Y
     connect \Y $../../../corpus-external/yosys-simple/rotate.v:21$or$1280_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$161
-    assign { } { }
-    assign $0\netgen[0].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$167_Y
-    sync always
-      update \netgen[0].out [0] $0\netgen[0].out[0:0]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$168
-    assign { } { }
-    assign $0\netgen[0].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$174_Y
-    sync always
-      update \netgen[0].out [1] $0\netgen[0].out[1:1]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$175
-    assign { } { }
-    assign $0\netgen[0].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$181_Y
-    sync always
-      update \netgen[0].out [2] $0\netgen[0].out[2:2]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$182
-    assign { } { }
-    assign $0\netgen[0].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$188_Y
-    sync always
-      update \netgen[0].out [3] $0\netgen[0].out[3:3]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$189
-    assign { } { }
-    assign $0\netgen[0].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$195_Y
-    sync always
-      update \netgen[0].out [4] $0\netgen[0].out[4:4]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$196
-    assign { } { }
-    assign $0\netgen[0].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$202_Y
-    sync always
-      update \netgen[0].out [5] $0\netgen[0].out[5:5]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$203
-    assign { } { }
-    assign $0\netgen[0].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$209_Y
-    sync always
-      update \netgen[0].out [6] $0\netgen[0].out[6:6]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$210
-    assign { } { }
-    assign $0\netgen[0].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$216_Y
-    sync always
-      update \netgen[0].out [7] $0\netgen[0].out[7:7]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$217
-    assign { } { }
-    assign $0\netgen[0].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$223_Y
-    sync always
-      update \netgen[0].out [8] $0\netgen[0].out[8:8]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$224
-    assign { } { }
-    assign $0\netgen[0].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$230_Y
-    sync always
-      update \netgen[0].out [9] $0\netgen[0].out[9:9]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$231
-    assign { } { }
-    assign $0\netgen[0].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$237_Y
-    sync always
-      update \netgen[0].out [10] $0\netgen[0].out[10:10]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$238
-    assign { } { }
-    assign $0\netgen[0].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$244_Y
-    sync always
-      update \netgen[0].out [11] $0\netgen[0].out[11:11]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$245
-    assign { } { }
-    assign $0\netgen[0].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$251_Y
-    sync always
-      update \netgen[0].out [12] $0\netgen[0].out[12:12]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$252
-    assign { } { }
-    assign $0\netgen[0].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$258_Y
-    sync always
-      update \netgen[0].out [13] $0\netgen[0].out[13:13]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$259
-    assign { } { }
-    assign $0\netgen[0].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$265_Y
-    sync always
-      update \netgen[0].out [14] $0\netgen[0].out[14:14]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$266
-    assign { } { }
-    assign $0\netgen[0].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$272_Y
-    sync always
-      update \netgen[0].out [15] $0\netgen[0].out[15:15]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$273
-    assign { } { }
-    assign $0\netgen[0].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$279_Y
-    sync always
-      update \netgen[0].out [16] $0\netgen[0].out[16:16]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$280
-    assign { } { }
-    assign $0\netgen[0].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$286_Y
-    sync always
-      update \netgen[0].out [17] $0\netgen[0].out[17:17]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$287
-    assign { } { }
-    assign $0\netgen[0].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$293_Y
-    sync always
-      update \netgen[0].out [18] $0\netgen[0].out[18:18]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$294
-    assign { } { }
-    assign $0\netgen[0].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$300_Y
-    sync always
-      update \netgen[0].out [19] $0\netgen[0].out[19:19]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$301
-    assign { } { }
-    assign $0\netgen[0].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$307_Y
-    sync always
-      update \netgen[0].out [20] $0\netgen[0].out[20:20]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$308
-    assign { } { }
-    assign $0\netgen[0].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$314_Y
-    sync always
-      update \netgen[0].out [21] $0\netgen[0].out[21:21]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$315
-    assign { } { }
-    assign $0\netgen[0].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$321_Y
-    sync always
-      update \netgen[0].out [22] $0\netgen[0].out[22:22]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$322
-    assign { } { }
-    assign $0\netgen[0].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$328_Y
-    sync always
-      update \netgen[0].out [23] $0\netgen[0].out[23:23]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$329
-    assign { } { }
-    assign $0\netgen[0].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$335_Y
-    sync always
-      update \netgen[0].out [24] $0\netgen[0].out[24:24]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$336
-    assign { } { }
-    assign $0\netgen[0].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$342_Y
-    sync always
-      update \netgen[0].out [25] $0\netgen[0].out[25:25]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$343
-    assign { } { }
-    assign $0\netgen[0].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$349_Y
-    sync always
-      update \netgen[0].out [26] $0\netgen[0].out[26:26]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$350
-    assign { } { }
-    assign $0\netgen[0].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$356_Y
-    sync always
-      update \netgen[0].out [27] $0\netgen[0].out[27:27]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$357
-    assign { } { }
-    assign $0\netgen[0].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$363_Y
-    sync always
-      update \netgen[0].out [28] $0\netgen[0].out[28:28]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$364
-    assign { } { }
-    assign $0\netgen[0].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$370_Y
-    sync always
-      update \netgen[0].out [29] $0\netgen[0].out[29:29]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$371
-    assign { } { }
-    assign $0\netgen[0].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$377_Y
-    sync always
-      update \netgen[0].out [30] $0\netgen[0].out[30:30]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$378
-    assign { } { }
-    assign $0\netgen[0].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$384_Y
-    sync always
-      update \netgen[0].out [31] $0\netgen[0].out[31:31]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$385
-    assign { } { }
-    assign $0\netgen[1].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$391_Y
-    sync always
-      update \netgen[1].out [0] $0\netgen[1].out[0:0]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$392
-    assign { } { }
-    assign $0\netgen[1].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$398_Y
-    sync always
-      update \netgen[1].out [1] $0\netgen[1].out[1:1]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$399
-    assign { } { }
-    assign $0\netgen[1].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$405_Y
-    sync always
-      update \netgen[1].out [2] $0\netgen[1].out[2:2]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$406
-    assign { } { }
-    assign $0\netgen[1].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$412_Y
-    sync always
-      update \netgen[1].out [3] $0\netgen[1].out[3:3]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$413
-    assign { } { }
-    assign $0\netgen[1].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$419_Y
-    sync always
-      update \netgen[1].out [4] $0\netgen[1].out[4:4]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$420
-    assign { } { }
-    assign $0\netgen[1].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$426_Y
-    sync always
-      update \netgen[1].out [5] $0\netgen[1].out[5:5]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$427
-    assign { } { }
-    assign $0\netgen[1].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$433_Y
-    sync always
-      update \netgen[1].out [6] $0\netgen[1].out[6:6]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$434
-    assign { } { }
-    assign $0\netgen[1].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$440_Y
-    sync always
-      update \netgen[1].out [7] $0\netgen[1].out[7:7]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$441
-    assign { } { }
-    assign $0\netgen[1].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$447_Y
-    sync always
-      update \netgen[1].out [8] $0\netgen[1].out[8:8]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$448
-    assign { } { }
-    assign $0\netgen[1].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$454_Y
-    sync always
-      update \netgen[1].out [9] $0\netgen[1].out[9:9]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$455
-    assign { } { }
-    assign $0\netgen[1].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$461_Y
-    sync always
-      update \netgen[1].out [10] $0\netgen[1].out[10:10]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$462
-    assign { } { }
-    assign $0\netgen[1].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$468_Y
-    sync always
-      update \netgen[1].out [11] $0\netgen[1].out[11:11]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$469
-    assign { } { }
-    assign $0\netgen[1].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$475_Y
-    sync always
-      update \netgen[1].out [12] $0\netgen[1].out[12:12]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$476
-    assign { } { }
-    assign $0\netgen[1].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$482_Y
-    sync always
-      update \netgen[1].out [13] $0\netgen[1].out[13:13]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$483
-    assign { } { }
-    assign $0\netgen[1].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$489_Y
-    sync always
-      update \netgen[1].out [14] $0\netgen[1].out[14:14]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$490
-    assign { } { }
-    assign $0\netgen[1].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$496_Y
-    sync always
-      update \netgen[1].out [15] $0\netgen[1].out[15:15]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$497
-    assign { } { }
-    assign $0\netgen[1].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$503_Y
-    sync always
-      update \netgen[1].out [16] $0\netgen[1].out[16:16]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$504
-    assign { } { }
-    assign $0\netgen[1].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$510_Y
-    sync always
-      update \netgen[1].out [17] $0\netgen[1].out[17:17]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$511
-    assign { } { }
-    assign $0\netgen[1].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$517_Y
-    sync always
-      update \netgen[1].out [18] $0\netgen[1].out[18:18]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$518
-    assign { } { }
-    assign $0\netgen[1].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$524_Y
-    sync always
-      update \netgen[1].out [19] $0\netgen[1].out[19:19]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$525
-    assign { } { }
-    assign $0\netgen[1].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$531_Y
-    sync always
-      update \netgen[1].out [20] $0\netgen[1].out[20:20]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$532
-    assign { } { }
-    assign $0\netgen[1].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$538_Y
-    sync always
-      update \netgen[1].out [21] $0\netgen[1].out[21:21]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$539
-    assign { } { }
-    assign $0\netgen[1].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$545_Y
-    sync always
-      update \netgen[1].out [22] $0\netgen[1].out[22:22]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$546
-    assign { } { }
-    assign $0\netgen[1].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$552_Y
-    sync always
-      update \netgen[1].out [23] $0\netgen[1].out[23:23]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$553
-    assign { } { }
-    assign $0\netgen[1].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$559_Y
-    sync always
-      update \netgen[1].out [24] $0\netgen[1].out[24:24]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$560
-    assign { } { }
-    assign $0\netgen[1].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$566_Y
-    sync always
-      update \netgen[1].out [25] $0\netgen[1].out[25:25]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$567
-    assign { } { }
-    assign $0\netgen[1].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$573_Y
-    sync always
-      update \netgen[1].out [26] $0\netgen[1].out[26:26]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$574
-    assign { } { }
-    assign $0\netgen[1].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$580_Y
-    sync always
-      update \netgen[1].out [27] $0\netgen[1].out[27:27]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$581
-    assign { } { }
-    assign $0\netgen[1].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$587_Y
-    sync always
-      update \netgen[1].out [28] $0\netgen[1].out[28:28]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$588
-    assign { } { }
-    assign $0\netgen[1].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$594_Y
-    sync always
-      update \netgen[1].out [29] $0\netgen[1].out[29:29]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$595
-    assign { } { }
-    assign $0\netgen[1].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$601_Y
-    sync always
-      update \netgen[1].out [30] $0\netgen[1].out[30:30]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$602
-    assign { } { }
-    assign $0\netgen[1].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$608_Y
-    sync always
-      update \netgen[1].out [31] $0\netgen[1].out[31:31]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$609
-    assign { } { }
-    assign $0\netgen[2].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$615_Y
-    sync always
-      update \netgen[2].out [0] $0\netgen[2].out[0:0]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$616
-    assign { } { }
-    assign $0\netgen[2].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$622_Y
-    sync always
-      update \netgen[2].out [1] $0\netgen[2].out[1:1]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$623
-    assign { } { }
-    assign $0\netgen[2].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$629_Y
-    sync always
-      update \netgen[2].out [2] $0\netgen[2].out[2:2]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$630
-    assign { } { }
-    assign $0\netgen[2].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$636_Y
-    sync always
-      update \netgen[2].out [3] $0\netgen[2].out[3:3]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$637
-    assign { } { }
-    assign $0\netgen[2].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$643_Y
-    sync always
-      update \netgen[2].out [4] $0\netgen[2].out[4:4]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$644
-    assign { } { }
-    assign $0\netgen[2].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$650_Y
-    sync always
-      update \netgen[2].out [5] $0\netgen[2].out[5:5]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$651
-    assign { } { }
-    assign $0\netgen[2].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$657_Y
-    sync always
-      update \netgen[2].out [6] $0\netgen[2].out[6:6]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$658
-    assign { } { }
-    assign $0\netgen[2].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$664_Y
-    sync always
-      update \netgen[2].out [7] $0\netgen[2].out[7:7]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$665
-    assign { } { }
-    assign $0\netgen[2].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$671_Y
-    sync always
-      update \netgen[2].out [8] $0\netgen[2].out[8:8]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$672
-    assign { } { }
-    assign $0\netgen[2].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$678_Y
-    sync always
-      update \netgen[2].out [9] $0\netgen[2].out[9:9]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$679
-    assign { } { }
-    assign $0\netgen[2].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$685_Y
-    sync always
-      update \netgen[2].out [10] $0\netgen[2].out[10:10]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$686
-    assign { } { }
-    assign $0\netgen[2].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$692_Y
-    sync always
-      update \netgen[2].out [11] $0\netgen[2].out[11:11]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$693
-    assign { } { }
-    assign $0\netgen[2].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$699_Y
-    sync always
-      update \netgen[2].out [12] $0\netgen[2].out[12:12]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$700
-    assign { } { }
-    assign $0\netgen[2].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$706_Y
-    sync always
-      update \netgen[2].out [13] $0\netgen[2].out[13:13]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$707
-    assign { } { }
-    assign $0\netgen[2].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$713_Y
-    sync always
-      update \netgen[2].out [14] $0\netgen[2].out[14:14]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$714
-    assign { } { }
-    assign $0\netgen[2].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$720_Y
-    sync always
-      update \netgen[2].out [15] $0\netgen[2].out[15:15]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$721
-    assign { } { }
-    assign $0\netgen[2].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$727_Y
-    sync always
-      update \netgen[2].out [16] $0\netgen[2].out[16:16]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$728
-    assign { } { }
-    assign $0\netgen[2].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$734_Y
-    sync always
-      update \netgen[2].out [17] $0\netgen[2].out[17:17]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$735
-    assign { } { }
-    assign $0\netgen[2].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$741_Y
-    sync always
-      update \netgen[2].out [18] $0\netgen[2].out[18:18]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$742
-    assign { } { }
-    assign $0\netgen[2].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$748_Y
-    sync always
-      update \netgen[2].out [19] $0\netgen[2].out[19:19]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$749
-    assign { } { }
-    assign $0\netgen[2].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$755_Y
-    sync always
-      update \netgen[2].out [20] $0\netgen[2].out[20:20]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$756
-    assign { } { }
-    assign $0\netgen[2].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$762_Y
-    sync always
-      update \netgen[2].out [21] $0\netgen[2].out[21:21]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$763
-    assign { } { }
-    assign $0\netgen[2].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$769_Y
-    sync always
-      update \netgen[2].out [22] $0\netgen[2].out[22:22]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$770
-    assign { } { }
-    assign $0\netgen[2].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$776_Y
-    sync always
-      update \netgen[2].out [23] $0\netgen[2].out[23:23]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$777
-    assign { } { }
-    assign $0\netgen[2].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$783_Y
-    sync always
-      update \netgen[2].out [24] $0\netgen[2].out[24:24]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$784
-    assign { } { }
-    assign $0\netgen[2].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$790_Y
-    sync always
-      update \netgen[2].out [25] $0\netgen[2].out[25:25]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$791
-    assign { } { }
-    assign $0\netgen[2].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$797_Y
-    sync always
-      update \netgen[2].out [26] $0\netgen[2].out[26:26]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$798
-    assign { } { }
-    assign $0\netgen[2].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$804_Y
-    sync always
-      update \netgen[2].out [27] $0\netgen[2].out[27:27]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$805
-    assign { } { }
-    assign $0\netgen[2].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$811_Y
-    sync always
-      update \netgen[2].out [28] $0\netgen[2].out[28:28]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$812
-    assign { } { }
-    assign $0\netgen[2].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$818_Y
-    sync always
-      update \netgen[2].out [29] $0\netgen[2].out[29:29]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$819
-    assign { } { }
-    assign $0\netgen[2].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$825_Y
-    sync always
-      update \netgen[2].out [30] $0\netgen[2].out[30:30]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$826
-    assign { } { }
-    assign $0\netgen[2].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$832_Y
-    sync always
-      update \netgen[2].out [31] $0\netgen[2].out[31:31]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$833
-    assign { } { }
-    assign $0\netgen[3].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$839_Y
-    sync always
-      update \netgen[3].out [0] $0\netgen[3].out[0:0]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$840
-    assign { } { }
-    assign $0\netgen[3].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$846_Y
-    sync always
-      update \netgen[3].out [1] $0\netgen[3].out[1:1]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$847
-    assign { } { }
-    assign $0\netgen[3].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$853_Y
-    sync always
-      update \netgen[3].out [2] $0\netgen[3].out[2:2]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$854
-    assign { } { }
-    assign $0\netgen[3].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$860_Y
-    sync always
-      update \netgen[3].out [3] $0\netgen[3].out[3:3]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$861
-    assign { } { }
-    assign $0\netgen[3].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$867_Y
-    sync always
-      update \netgen[3].out [4] $0\netgen[3].out[4:4]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$868
-    assign { } { }
-    assign $0\netgen[3].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$874_Y
-    sync always
-      update \netgen[3].out [5] $0\netgen[3].out[5:5]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$875
-    assign { } { }
-    assign $0\netgen[3].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$881_Y
-    sync always
-      update \netgen[3].out [6] $0\netgen[3].out[6:6]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$882
-    assign { } { }
-    assign $0\netgen[3].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$888_Y
-    sync always
-      update \netgen[3].out [7] $0\netgen[3].out[7:7]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$889
-    assign { } { }
-    assign $0\netgen[3].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$895_Y
-    sync always
-      update \netgen[3].out [8] $0\netgen[3].out[8:8]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$896
-    assign { } { }
-    assign $0\netgen[3].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$902_Y
-    sync always
-      update \netgen[3].out [9] $0\netgen[3].out[9:9]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$903
-    assign { } { }
-    assign $0\netgen[3].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$909_Y
-    sync always
-      update \netgen[3].out [10] $0\netgen[3].out[10:10]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$910
-    assign { } { }
-    assign $0\netgen[3].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$916_Y
-    sync always
-      update \netgen[3].out [11] $0\netgen[3].out[11:11]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$917
-    assign { } { }
-    assign $0\netgen[3].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$923_Y
-    sync always
-      update \netgen[3].out [12] $0\netgen[3].out[12:12]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$924
-    assign { } { }
-    assign $0\netgen[3].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$930_Y
-    sync always
-      update \netgen[3].out [13] $0\netgen[3].out[13:13]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$931
-    assign { } { }
-    assign $0\netgen[3].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$937_Y
-    sync always
-      update \netgen[3].out [14] $0\netgen[3].out[14:14]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$938
-    assign { } { }
-    assign $0\netgen[3].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$944_Y
-    sync always
-      update \netgen[3].out [15] $0\netgen[3].out[15:15]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$945
-    assign { } { }
-    assign $0\netgen[3].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$951_Y
-    sync always
-      update \netgen[3].out [16] $0\netgen[3].out[16:16]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$952
-    assign { } { }
-    assign $0\netgen[3].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$958_Y
-    sync always
-      update \netgen[3].out [17] $0\netgen[3].out[17:17]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$959
-    assign { } { }
-    assign $0\netgen[3].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$965_Y
-    sync always
-      update \netgen[3].out [18] $0\netgen[3].out[18:18]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$966
-    assign { } { }
-    assign $0\netgen[3].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$972_Y
-    sync always
-      update \netgen[3].out [19] $0\netgen[3].out[19:19]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$973
-    assign { } { }
-    assign $0\netgen[3].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$979_Y
-    sync always
-      update \netgen[3].out [20] $0\netgen[3].out[20:20]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$980
-    assign { } { }
-    assign $0\netgen[3].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$986_Y
-    sync always
-      update \netgen[3].out [21] $0\netgen[3].out[21:21]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$987
-    assign { } { }
-    assign $0\netgen[3].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$993_Y
-    sync always
-      update \netgen[3].out [22] $0\netgen[3].out[22:22]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$994
-    assign { } { }
-    assign $0\netgen[3].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$1000_Y
-    sync always
-      update \netgen[3].out [23] $0\netgen[3].out[23:23]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1001
-    assign { } { }
-    assign $0\netgen[3].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$1007_Y
-    sync always
-      update \netgen[3].out [24] $0\netgen[3].out[24:24]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1008
-    assign { } { }
-    assign $0\netgen[3].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$1014_Y
-    sync always
-      update \netgen[3].out [25] $0\netgen[3].out[25:25]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1015
-    assign { } { }
-    assign $0\netgen[3].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$1021_Y
-    sync always
-      update \netgen[3].out [26] $0\netgen[3].out[26:26]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1022
-    assign { } { }
-    assign $0\netgen[3].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$1028_Y
-    sync always
-      update \netgen[3].out [27] $0\netgen[3].out[27:27]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1029
-    assign { } { }
-    assign $0\netgen[3].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$1035_Y
-    sync always
-      update \netgen[3].out [28] $0\netgen[3].out[28:28]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1036
-    assign { } { }
-    assign $0\netgen[3].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$1042_Y
-    sync always
-      update \netgen[3].out [29] $0\netgen[3].out[29:29]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1043
-    assign { } { }
-    assign $0\netgen[3].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$1049_Y
-    sync always
-      update \netgen[3].out [30] $0\netgen[3].out[30:30]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1050
-    assign { } { }
-    assign $0\netgen[3].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$1056_Y
-    sync always
-      update \netgen[3].out [31] $0\netgen[3].out[31:31]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1057
-    assign { } { }
-    assign $0\netgen[4].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$1063_Y
-    sync always
-      update \netgen[4].out [0] $0\netgen[4].out[0:0]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1064
-    assign { } { }
-    assign $0\netgen[4].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$1070_Y
-    sync always
-      update \netgen[4].out [1] $0\netgen[4].out[1:1]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1071
-    assign { } { }
-    assign $0\netgen[4].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$1077_Y
-    sync always
-      update \netgen[4].out [2] $0\netgen[4].out[2:2]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1078
-    assign { } { }
-    assign $0\netgen[4].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$1084_Y
-    sync always
-      update \netgen[4].out [3] $0\netgen[4].out[3:3]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1085
-    assign { } { }
-    assign $0\netgen[4].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$1091_Y
-    sync always
-      update \netgen[4].out [4] $0\netgen[4].out[4:4]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1092
-    assign { } { }
-    assign $0\netgen[4].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$1098_Y
-    sync always
-      update \netgen[4].out [5] $0\netgen[4].out[5:5]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1099
-    assign { } { }
-    assign $0\netgen[4].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$1105_Y
-    sync always
-      update \netgen[4].out [6] $0\netgen[4].out[6:6]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1106
-    assign { } { }
-    assign $0\netgen[4].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$1112_Y
-    sync always
-      update \netgen[4].out [7] $0\netgen[4].out[7:7]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1113
-    assign { } { }
-    assign $0\netgen[4].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$1119_Y
-    sync always
-      update \netgen[4].out [8] $0\netgen[4].out[8:8]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1120
-    assign { } { }
-    assign $0\netgen[4].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$1126_Y
-    sync always
-      update \netgen[4].out [9] $0\netgen[4].out[9:9]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1127
-    assign { } { }
-    assign $0\netgen[4].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$1133_Y
-    sync always
-      update \netgen[4].out [10] $0\netgen[4].out[10:10]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1134
-    assign { } { }
-    assign $0\netgen[4].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$1140_Y
-    sync always
-      update \netgen[4].out [11] $0\netgen[4].out[11:11]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1141
-    assign { } { }
-    assign $0\netgen[4].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$1147_Y
-    sync always
-      update \netgen[4].out [12] $0\netgen[4].out[12:12]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1148
-    assign { } { }
-    assign $0\netgen[4].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$1154_Y
-    sync always
-      update \netgen[4].out [13] $0\netgen[4].out[13:13]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1155
-    assign { } { }
-    assign $0\netgen[4].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$1161_Y
-    sync always
-      update \netgen[4].out [14] $0\netgen[4].out[14:14]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1162
-    assign { } { }
-    assign $0\netgen[4].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$1168_Y
-    sync always
-      update \netgen[4].out [15] $0\netgen[4].out[15:15]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1169
-    assign { } { }
-    assign $0\netgen[4].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$1175_Y
-    sync always
-      update \netgen[4].out [16] $0\netgen[4].out[16:16]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1176
-    assign { } { }
-    assign $0\netgen[4].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$1182_Y
-    sync always
-      update \netgen[4].out [17] $0\netgen[4].out[17:17]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1183
-    assign { } { }
-    assign $0\netgen[4].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$1189_Y
-    sync always
-      update \netgen[4].out [18] $0\netgen[4].out[18:18]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1190
-    assign { } { }
-    assign $0\netgen[4].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$1196_Y
-    sync always
-      update \netgen[4].out [19] $0\netgen[4].out[19:19]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1197
-    assign { } { }
-    assign $0\netgen[4].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$1203_Y
-    sync always
-      update \netgen[4].out [20] $0\netgen[4].out[20:20]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1204
-    assign { } { }
-    assign $0\netgen[4].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$1210_Y
-    sync always
-      update \netgen[4].out [21] $0\netgen[4].out[21:21]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1211
-    assign { } { }
-    assign $0\netgen[4].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$1217_Y
-    sync always
-      update \netgen[4].out [22] $0\netgen[4].out[22:22]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1218
-    assign { } { }
-    assign $0\netgen[4].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$1224_Y
-    sync always
-      update \netgen[4].out [23] $0\netgen[4].out[23:23]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1225
-    assign { } { }
-    assign $0\netgen[4].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$1231_Y
-    sync always
-      update \netgen[4].out [24] $0\netgen[4].out[24:24]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1232
-    assign { } { }
-    assign $0\netgen[4].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$1238_Y
-    sync always
-      update \netgen[4].out [25] $0\netgen[4].out[25:25]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1239
-    assign { } { }
-    assign $0\netgen[4].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$1245_Y
-    sync always
-      update \netgen[4].out [26] $0\netgen[4].out[26:26]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1246
-    assign { } { }
-    assign $0\netgen[4].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$1252_Y
-    sync always
-      update \netgen[4].out [27] $0\netgen[4].out[27:27]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1253
-    assign { } { }
-    assign $0\netgen[4].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$1259_Y
-    sync always
-      update \netgen[4].out [28] $0\netgen[4].out[28:28]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1260
-    assign { } { }
-    assign $0\netgen[4].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$1266_Y
-    sync always
-      update \netgen[4].out [29] $0\netgen[4].out[29:29]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1267
-    assign { } { }
-    assign $0\netgen[4].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$1273_Y
-    sync always
-      update \netgen[4].out [30] $0\netgen[4].out[30:30]
-  end
-  attribute \src "../../../corpus-external/yosys-simple/rotate.v:20.25-22.89"
-  process $../../../corpus-external/yosys-simple/rotate.v:20$proc$1274
-    assign { } { }
-    assign $0\netgen[4].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$1280_Y
-    sync always
-      update \netgen[4].out [31] $0\netgen[4].out[31:31]
-  end
   connect \netgen[4].in \i_in
   connect \rot_prod \netgen[0].out
   connect \netgen[0].in \netgen[1].out
   connect \netgen[1].in \netgen[2].out
   connect \netgen[2].in \netgen[3].out
   connect \netgen[3].in \netgen[4].out
+  connect $0\netgen[4].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$1280_Y
+  connect $0\netgen[4].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$1273_Y
+  connect $0\netgen[4].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$1266_Y
+  connect $0\netgen[4].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$1259_Y
+  connect $0\netgen[4].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$1252_Y
+  connect $0\netgen[4].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$1245_Y
+  connect $0\netgen[4].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$1238_Y
+  connect $0\netgen[4].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$1231_Y
+  connect $0\netgen[4].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$1224_Y
+  connect $0\netgen[4].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$1217_Y
+  connect $0\netgen[4].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$1210_Y
+  connect $0\netgen[4].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$1203_Y
+  connect $0\netgen[4].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$1196_Y
+  connect $0\netgen[4].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$1189_Y
+  connect $0\netgen[4].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$1182_Y
+  connect $0\netgen[4].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$1175_Y
+  connect $0\netgen[4].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$1168_Y
+  connect $0\netgen[4].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$1161_Y
+  connect $0\netgen[4].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$1154_Y
+  connect $0\netgen[4].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$1147_Y
+  connect $0\netgen[4].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$1140_Y
+  connect $0\netgen[4].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$1133_Y
+  connect $0\netgen[4].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$1126_Y
+  connect $0\netgen[4].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$1119_Y
+  connect $0\netgen[4].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$1112_Y
+  connect $0\netgen[4].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$1105_Y
+  connect $0\netgen[4].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$1098_Y
+  connect $0\netgen[4].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$1091_Y
+  connect $0\netgen[4].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$1084_Y
+  connect $0\netgen[4].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$1077_Y
+  connect $0\netgen[4].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$1070_Y
+  connect $0\netgen[4].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$1063_Y
+  connect $0\netgen[3].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$1056_Y
+  connect $0\netgen[3].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$1049_Y
+  connect $0\netgen[3].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$1042_Y
+  connect $0\netgen[3].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$1035_Y
+  connect $0\netgen[3].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$1028_Y
+  connect $0\netgen[3].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$1021_Y
+  connect $0\netgen[3].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$1014_Y
+  connect $0\netgen[3].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$1007_Y
+  connect $0\netgen[3].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$1000_Y
+  connect $0\netgen[3].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$993_Y
+  connect $0\netgen[3].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$986_Y
+  connect $0\netgen[3].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$979_Y
+  connect $0\netgen[3].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$972_Y
+  connect $0\netgen[3].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$965_Y
+  connect $0\netgen[3].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$958_Y
+  connect $0\netgen[3].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$951_Y
+  connect $0\netgen[3].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$944_Y
+  connect $0\netgen[3].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$937_Y
+  connect $0\netgen[3].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$930_Y
+  connect $0\netgen[3].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$923_Y
+  connect $0\netgen[3].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$916_Y
+  connect $0\netgen[3].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$909_Y
+  connect $0\netgen[3].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$902_Y
+  connect $0\netgen[3].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$895_Y
+  connect $0\netgen[3].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$888_Y
+  connect $0\netgen[3].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$881_Y
+  connect $0\netgen[3].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$874_Y
+  connect $0\netgen[3].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$867_Y
+  connect $0\netgen[3].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$860_Y
+  connect $0\netgen[3].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$853_Y
+  connect $0\netgen[3].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$846_Y
+  connect $0\netgen[3].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$839_Y
+  connect $0\netgen[2].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$832_Y
+  connect $0\netgen[2].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$825_Y
+  connect $0\netgen[2].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$818_Y
+  connect $0\netgen[2].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$811_Y
+  connect $0\netgen[2].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$804_Y
+  connect $0\netgen[2].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$797_Y
+  connect $0\netgen[2].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$790_Y
+  connect $0\netgen[2].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$783_Y
+  connect $0\netgen[2].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$776_Y
+  connect $0\netgen[2].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$769_Y
+  connect $0\netgen[2].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$762_Y
+  connect $0\netgen[2].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$755_Y
+  connect $0\netgen[2].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$748_Y
+  connect $0\netgen[2].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$741_Y
+  connect $0\netgen[2].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$734_Y
+  connect $0\netgen[2].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$727_Y
+  connect $0\netgen[2].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$720_Y
+  connect $0\netgen[2].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$713_Y
+  connect $0\netgen[2].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$706_Y
+  connect $0\netgen[2].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$699_Y
+  connect $0\netgen[2].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$692_Y
+  connect $0\netgen[2].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$685_Y
+  connect $0\netgen[2].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$678_Y
+  connect $0\netgen[2].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$671_Y
+  connect $0\netgen[2].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$664_Y
+  connect $0\netgen[2].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$657_Y
+  connect $0\netgen[2].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$650_Y
+  connect $0\netgen[2].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$643_Y
+  connect $0\netgen[2].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$636_Y
+  connect $0\netgen[2].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$629_Y
+  connect $0\netgen[2].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$622_Y
+  connect $0\netgen[2].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$615_Y
+  connect $0\netgen[1].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$608_Y
+  connect $0\netgen[1].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$601_Y
+  connect $0\netgen[1].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$594_Y
+  connect $0\netgen[1].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$587_Y
+  connect $0\netgen[1].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$580_Y
+  connect $0\netgen[1].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$573_Y
+  connect $0\netgen[1].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$566_Y
+  connect $0\netgen[1].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$559_Y
+  connect $0\netgen[1].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$552_Y
+  connect $0\netgen[1].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$545_Y
+  connect $0\netgen[1].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$538_Y
+  connect $0\netgen[1].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$531_Y
+  connect $0\netgen[1].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$524_Y
+  connect $0\netgen[1].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$517_Y
+  connect $0\netgen[1].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$510_Y
+  connect $0\netgen[1].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$503_Y
+  connect $0\netgen[1].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$496_Y
+  connect $0\netgen[1].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$489_Y
+  connect $0\netgen[1].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$482_Y
+  connect $0\netgen[1].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$475_Y
+  connect $0\netgen[1].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$468_Y
+  connect $0\netgen[1].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$461_Y
+  connect $0\netgen[1].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$454_Y
+  connect $0\netgen[1].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$447_Y
+  connect $0\netgen[1].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$440_Y
+  connect $0\netgen[1].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$433_Y
+  connect $0\netgen[1].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$426_Y
+  connect $0\netgen[1].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$419_Y
+  connect $0\netgen[1].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$412_Y
+  connect $0\netgen[1].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$405_Y
+  connect $0\netgen[1].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$398_Y
+  connect $0\netgen[1].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$391_Y
+  connect $0\netgen[0].out[31:31] $../../../corpus-external/yosys-simple/rotate.v:21$or$384_Y
+  connect $0\netgen[0].out[30:30] $../../../corpus-external/yosys-simple/rotate.v:21$or$377_Y
+  connect $0\netgen[0].out[29:29] $../../../corpus-external/yosys-simple/rotate.v:21$or$370_Y
+  connect $0\netgen[0].out[28:28] $../../../corpus-external/yosys-simple/rotate.v:21$or$363_Y
+  connect $0\netgen[0].out[27:27] $../../../corpus-external/yosys-simple/rotate.v:21$or$356_Y
+  connect $0\netgen[0].out[26:26] $../../../corpus-external/yosys-simple/rotate.v:21$or$349_Y
+  connect $0\netgen[0].out[25:25] $../../../corpus-external/yosys-simple/rotate.v:21$or$342_Y
+  connect $0\netgen[0].out[24:24] $../../../corpus-external/yosys-simple/rotate.v:21$or$335_Y
+  connect $0\netgen[0].out[23:23] $../../../corpus-external/yosys-simple/rotate.v:21$or$328_Y
+  connect $0\netgen[0].out[22:22] $../../../corpus-external/yosys-simple/rotate.v:21$or$321_Y
+  connect $0\netgen[0].out[21:21] $../../../corpus-external/yosys-simple/rotate.v:21$or$314_Y
+  connect $0\netgen[0].out[20:20] $../../../corpus-external/yosys-simple/rotate.v:21$or$307_Y
+  connect $0\netgen[0].out[19:19] $../../../corpus-external/yosys-simple/rotate.v:21$or$300_Y
+  connect $0\netgen[0].out[18:18] $../../../corpus-external/yosys-simple/rotate.v:21$or$293_Y
+  connect $0\netgen[0].out[17:17] $../../../corpus-external/yosys-simple/rotate.v:21$or$286_Y
+  connect $0\netgen[0].out[16:16] $../../../corpus-external/yosys-simple/rotate.v:21$or$279_Y
+  connect $0\netgen[0].out[15:15] $../../../corpus-external/yosys-simple/rotate.v:21$or$272_Y
+  connect $0\netgen[0].out[14:14] $../../../corpus-external/yosys-simple/rotate.v:21$or$265_Y
+  connect $0\netgen[0].out[13:13] $../../../corpus-external/yosys-simple/rotate.v:21$or$258_Y
+  connect $0\netgen[0].out[12:12] $../../../corpus-external/yosys-simple/rotate.v:21$or$251_Y
+  connect $0\netgen[0].out[11:11] $../../../corpus-external/yosys-simple/rotate.v:21$or$244_Y
+  connect $0\netgen[0].out[10:10] $../../../corpus-external/yosys-simple/rotate.v:21$or$237_Y
+  connect $0\netgen[0].out[9:9] $../../../corpus-external/yosys-simple/rotate.v:21$or$230_Y
+  connect $0\netgen[0].out[8:8] $../../../corpus-external/yosys-simple/rotate.v:21$or$223_Y
+  connect $0\netgen[0].out[7:7] $../../../corpus-external/yosys-simple/rotate.v:21$or$216_Y
+  connect $0\netgen[0].out[6:6] $../../../corpus-external/yosys-simple/rotate.v:21$or$209_Y
+  connect $0\netgen[0].out[5:5] $../../../corpus-external/yosys-simple/rotate.v:21$or$202_Y
+  connect $0\netgen[0].out[4:4] $../../../corpus-external/yosys-simple/rotate.v:21$or$195_Y
+  connect $0\netgen[0].out[3:3] $../../../corpus-external/yosys-simple/rotate.v:21$or$188_Y
+  connect $0\netgen[0].out[2:2] $../../../corpus-external/yosys-simple/rotate.v:21$or$181_Y
+  connect $0\netgen[0].out[1:1] $../../../corpus-external/yosys-simple/rotate.v:21$or$174_Y
+  connect $0\netgen[0].out[0:0] $../../../corpus-external/yosys-simple/rotate.v:21$or$167_Y
+  connect \netgen[4].out [31] $../../../corpus-external/yosys-simple/rotate.v:21$or$1280_Y
+  connect \netgen[4].out [30] $../../../corpus-external/yosys-simple/rotate.v:21$or$1273_Y
+  connect \netgen[4].out [29] $../../../corpus-external/yosys-simple/rotate.v:21$or$1266_Y
+  connect \netgen[4].out [28] $../../../corpus-external/yosys-simple/rotate.v:21$or$1259_Y
+  connect \netgen[4].out [27] $../../../corpus-external/yosys-simple/rotate.v:21$or$1252_Y
+  connect \netgen[4].out [26] $../../../corpus-external/yosys-simple/rotate.v:21$or$1245_Y
+  connect \netgen[4].out [25] $../../../corpus-external/yosys-simple/rotate.v:21$or$1238_Y
+  connect \netgen[4].out [24] $../../../corpus-external/yosys-simple/rotate.v:21$or$1231_Y
+  connect \netgen[4].out [23] $../../../corpus-external/yosys-simple/rotate.v:21$or$1224_Y
+  connect \netgen[4].out [22] $../../../corpus-external/yosys-simple/rotate.v:21$or$1217_Y
+  connect \netgen[4].out [21] $../../../corpus-external/yosys-simple/rotate.v:21$or$1210_Y
+  connect \netgen[4].out [20] $../../../corpus-external/yosys-simple/rotate.v:21$or$1203_Y
+  connect \netgen[4].out [19] $../../../corpus-external/yosys-simple/rotate.v:21$or$1196_Y
+  connect \netgen[4].out [18] $../../../corpus-external/yosys-simple/rotate.v:21$or$1189_Y
+  connect \netgen[4].out [17] $../../../corpus-external/yosys-simple/rotate.v:21$or$1182_Y
+  connect \netgen[4].out [16] $../../../corpus-external/yosys-simple/rotate.v:21$or$1175_Y
+  connect \netgen[4].out [15] $../../../corpus-external/yosys-simple/rotate.v:21$or$1168_Y
+  connect \netgen[4].out [14] $../../../corpus-external/yosys-simple/rotate.v:21$or$1161_Y
+  connect \netgen[4].out [13] $../../../corpus-external/yosys-simple/rotate.v:21$or$1154_Y
+  connect \netgen[4].out [12] $../../../corpus-external/yosys-simple/rotate.v:21$or$1147_Y
+  connect \netgen[4].out [11] $../../../corpus-external/yosys-simple/rotate.v:21$or$1140_Y
+  connect \netgen[4].out [10] $../../../corpus-external/yosys-simple/rotate.v:21$or$1133_Y
+  connect \netgen[4].out [9] $../../../corpus-external/yosys-simple/rotate.v:21$or$1126_Y
+  connect \netgen[4].out [8] $../../../corpus-external/yosys-simple/rotate.v:21$or$1119_Y
+  connect \netgen[4].out [7] $../../../corpus-external/yosys-simple/rotate.v:21$or$1112_Y
+  connect \netgen[4].out [6] $../../../corpus-external/yosys-simple/rotate.v:21$or$1105_Y
+  connect \netgen[4].out [5] $../../../corpus-external/yosys-simple/rotate.v:21$or$1098_Y
+  connect \netgen[4].out [4] $../../../corpus-external/yosys-simple/rotate.v:21$or$1091_Y
+  connect \netgen[4].out [3] $../../../corpus-external/yosys-simple/rotate.v:21$or$1084_Y
+  connect \netgen[4].out [2] $../../../corpus-external/yosys-simple/rotate.v:21$or$1077_Y
+  connect \netgen[4].out [1] $../../../corpus-external/yosys-simple/rotate.v:21$or$1070_Y
+  connect \netgen[4].out [0] $../../../corpus-external/yosys-simple/rotate.v:21$or$1063_Y
+  connect \netgen[3].out [31] $../../../corpus-external/yosys-simple/rotate.v:21$or$1056_Y
+  connect \netgen[3].out [30] $../../../corpus-external/yosys-simple/rotate.v:21$or$1049_Y
+  connect \netgen[3].out [29] $../../../corpus-external/yosys-simple/rotate.v:21$or$1042_Y
+  connect \netgen[3].out [28] $../../../corpus-external/yosys-simple/rotate.v:21$or$1035_Y
+  connect \netgen[3].out [27] $../../../corpus-external/yosys-simple/rotate.v:21$or$1028_Y
+  connect \netgen[3].out [26] $../../../corpus-external/yosys-simple/rotate.v:21$or$1021_Y
+  connect \netgen[3].out [25] $../../../corpus-external/yosys-simple/rotate.v:21$or$1014_Y
+  connect \netgen[3].out [24] $../../../corpus-external/yosys-simple/rotate.v:21$or$1007_Y
+  connect \netgen[3].out [23] $../../../corpus-external/yosys-simple/rotate.v:21$or$1000_Y
+  connect \netgen[3].out [22] $../../../corpus-external/yosys-simple/rotate.v:21$or$993_Y
+  connect \netgen[3].out [21] $../../../corpus-external/yosys-simple/rotate.v:21$or$986_Y
+  connect \netgen[3].out [20] $../../../corpus-external/yosys-simple/rotate.v:21$or$979_Y
+  connect \netgen[3].out [19] $../../../corpus-external/yosys-simple/rotate.v:21$or$972_Y
+  connect \netgen[3].out [18] $../../../corpus-external/yosys-simple/rotate.v:21$or$965_Y
+  connect \netgen[3].out [17] $../../../corpus-external/yosys-simple/rotate.v:21$or$958_Y
+  connect \netgen[3].out [16] $../../../corpus-external/yosys-simple/rotate.v:21$or$951_Y
+  connect \netgen[3].out [15] $../../../corpus-external/yosys-simple/rotate.v:21$or$944_Y
+  connect \netgen[3].out [14] $../../../corpus-external/yosys-simple/rotate.v:21$or$937_Y
+  connect \netgen[3].out [13] $../../../corpus-external/yosys-simple/rotate.v:21$or$930_Y
+  connect \netgen[3].out [12] $../../../corpus-external/yosys-simple/rotate.v:21$or$923_Y
+  connect \netgen[3].out [11] $../../../corpus-external/yosys-simple/rotate.v:21$or$916_Y
+  connect \netgen[3].out [10] $../../../corpus-external/yosys-simple/rotate.v:21$or$909_Y
+  connect \netgen[3].out [9] $../../../corpus-external/yosys-simple/rotate.v:21$or$902_Y
+  connect \netgen[3].out [8] $../../../corpus-external/yosys-simple/rotate.v:21$or$895_Y
+  connect \netgen[3].out [7] $../../../corpus-external/yosys-simple/rotate.v:21$or$888_Y
+  connect \netgen[3].out [6] $../../../corpus-external/yosys-simple/rotate.v:21$or$881_Y
+  connect \netgen[3].out [5] $../../../corpus-external/yosys-simple/rotate.v:21$or$874_Y
+  connect \netgen[3].out [4] $../../../corpus-external/yosys-simple/rotate.v:21$or$867_Y
+  connect \netgen[3].out [3] $../../../corpus-external/yosys-simple/rotate.v:21$or$860_Y
+  connect \netgen[3].out [2] $../../../corpus-external/yosys-simple/rotate.v:21$or$853_Y
+  connect \netgen[3].out [1] $../../../corpus-external/yosys-simple/rotate.v:21$or$846_Y
+  connect \netgen[3].out [0] $../../../corpus-external/yosys-simple/rotate.v:21$or$839_Y
+  connect \netgen[2].out [31] $../../../corpus-external/yosys-simple/rotate.v:21$or$832_Y
+  connect \netgen[2].out [30] $../../../corpus-external/yosys-simple/rotate.v:21$or$825_Y
+  connect \netgen[2].out [29] $../../../corpus-external/yosys-simple/rotate.v:21$or$818_Y
+  connect \netgen[2].out [28] $../../../corpus-external/yosys-simple/rotate.v:21$or$811_Y
+  connect \netgen[2].out [27] $../../../corpus-external/yosys-simple/rotate.v:21$or$804_Y
+  connect \netgen[2].out [26] $../../../corpus-external/yosys-simple/rotate.v:21$or$797_Y
+  connect \netgen[2].out [25] $../../../corpus-external/yosys-simple/rotate.v:21$or$790_Y
+  connect \netgen[2].out [24] $../../../corpus-external/yosys-simple/rotate.v:21$or$783_Y
+  connect \netgen[2].out [23] $../../../corpus-external/yosys-simple/rotate.v:21$or$776_Y
+  connect \netgen[2].out [22] $../../../corpus-external/yosys-simple/rotate.v:21$or$769_Y
+  connect \netgen[2].out [21] $../../../corpus-external/yosys-simple/rotate.v:21$or$762_Y
+  connect \netgen[2].out [20] $../../../corpus-external/yosys-simple/rotate.v:21$or$755_Y
+  connect \netgen[2].out [19] $../../../corpus-external/yosys-simple/rotate.v:21$or$748_Y
+  connect \netgen[2].out [18] $../../../corpus-external/yosys-simple/rotate.v:21$or$741_Y
+  connect \netgen[2].out [17] $../../../corpus-external/yosys-simple/rotate.v:21$or$734_Y
+  connect \netgen[2].out [16] $../../../corpus-external/yosys-simple/rotate.v:21$or$727_Y
+  connect \netgen[2].out [15] $../../../corpus-external/yosys-simple/rotate.v:21$or$720_Y
+  connect \netgen[2].out [14] $../../../corpus-external/yosys-simple/rotate.v:21$or$713_Y
+  connect \netgen[2].out [13] $../../../corpus-external/yosys-simple/rotate.v:21$or$706_Y
+  connect \netgen[2].out [12] $../../../corpus-external/yosys-simple/rotate.v:21$or$699_Y
+  connect \netgen[2].out [11] $../../../corpus-external/yosys-simple/rotate.v:21$or$692_Y
+  connect \netgen[2].out [10] $../../../corpus-external/yosys-simple/rotate.v:21$or$685_Y
+  connect \netgen[2].out [9] $../../../corpus-external/yosys-simple/rotate.v:21$or$678_Y
+  connect \netgen[2].out [8] $../../../corpus-external/yosys-simple/rotate.v:21$or$671_Y
+  connect \netgen[2].out [7] $../../../corpus-external/yosys-simple/rotate.v:21$or$664_Y
+  connect \netgen[2].out [6] $../../../corpus-external/yosys-simple/rotate.v:21$or$657_Y
+  connect \netgen[2].out [5] $../../../corpus-external/yosys-simple/rotate.v:21$or$650_Y
+  connect \netgen[2].out [4] $../../../corpus-external/yosys-simple/rotate.v:21$or$643_Y
+  connect \netgen[2].out [3] $../../../corpus-external/yosys-simple/rotate.v:21$or$636_Y
+  connect \netgen[2].out [2] $../../../corpus-external/yosys-simple/rotate.v:21$or$629_Y
+  connect \netgen[2].out [1] $../../../corpus-external/yosys-simple/rotate.v:21$or$622_Y
+  connect \netgen[2].out [0] $../../../corpus-external/yosys-simple/rotate.v:21$or$615_Y
+  connect \netgen[1].out [31] $../../../corpus-external/yosys-simple/rotate.v:21$or$608_Y
+  connect \netgen[1].out [30] $../../../corpus-external/yosys-simple/rotate.v:21$or$601_Y
+  connect \netgen[1].out [29] $../../../corpus-external/yosys-simple/rotate.v:21$or$594_Y
+  connect \netgen[1].out [28] $../../../corpus-external/yosys-simple/rotate.v:21$or$587_Y
+  connect \netgen[1].out [27] $../../../corpus-external/yosys-simple/rotate.v:21$or$580_Y
+  connect \netgen[1].out [26] $../../../corpus-external/yosys-simple/rotate.v:21$or$573_Y
+  connect \netgen[1].out [25] $../../../corpus-external/yosys-simple/rotate.v:21$or$566_Y
+  connect \netgen[1].out [24] $../../../corpus-external/yosys-simple/rotate.v:21$or$559_Y
+  connect \netgen[1].out [23] $../../../corpus-external/yosys-simple/rotate.v:21$or$552_Y
+  connect \netgen[1].out [22] $../../../corpus-external/yosys-simple/rotate.v:21$or$545_Y
+  connect \netgen[1].out [21] $../../../corpus-external/yosys-simple/rotate.v:21$or$538_Y
+  connect \netgen[1].out [20] $../../../corpus-external/yosys-simple/rotate.v:21$or$531_Y
+  connect \netgen[1].out [19] $../../../corpus-external/yosys-simple/rotate.v:21$or$524_Y
+  connect \netgen[1].out [18] $../../../corpus-external/yosys-simple/rotate.v:21$or$517_Y
+  connect \netgen[1].out [17] $../../../corpus-external/yosys-simple/rotate.v:21$or$510_Y
+  connect \netgen[1].out [16] $../../../corpus-external/yosys-simple/rotate.v:21$or$503_Y
+  connect \netgen[1].out [15] $../../../corpus-external/yosys-simple/rotate.v:21$or$496_Y
+  connect \netgen[1].out [14] $../../../corpus-external/yosys-simple/rotate.v:21$or$489_Y
+  connect \netgen[1].out [13] $../../../corpus-external/yosys-simple/rotate.v:21$or$482_Y
+  connect \netgen[1].out [12] $../../../corpus-external/yosys-simple/rotate.v:21$or$475_Y
+  connect \netgen[1].out [11] $../../../corpus-external/yosys-simple/rotate.v:21$or$468_Y
+  connect \netgen[1].out [10] $../../../corpus-external/yosys-simple/rotate.v:21$or$461_Y
+  connect \netgen[1].out [9] $../../../corpus-external/yosys-simple/rotate.v:21$or$454_Y
+  connect \netgen[1].out [8] $../../../corpus-external/yosys-simple/rotate.v:21$or$447_Y
+  connect \netgen[1].out [7] $../../../corpus-external/yosys-simple/rotate.v:21$or$440_Y
+  connect \netgen[1].out [6] $../../../corpus-external/yosys-simple/rotate.v:21$or$433_Y
+  connect \netgen[1].out [5] $../../../corpus-external/yosys-simple/rotate.v:21$or$426_Y
+  connect \netgen[1].out [4] $../../../corpus-external/yosys-simple/rotate.v:21$or$419_Y
+  connect \netgen[1].out [3] $../../../corpus-external/yosys-simple/rotate.v:21$or$412_Y
+  connect \netgen[1].out [2] $../../../corpus-external/yosys-simple/rotate.v:21$or$405_Y
+  connect \netgen[1].out [1] $../../../corpus-external/yosys-simple/rotate.v:21$or$398_Y
+  connect \netgen[1].out [0] $../../../corpus-external/yosys-simple/rotate.v:21$or$391_Y
+  connect \netgen[0].out [31] $../../../corpus-external/yosys-simple/rotate.v:21$or$384_Y
+  connect \netgen[0].out [30] $../../../corpus-external/yosys-simple/rotate.v:21$or$377_Y
+  connect \netgen[0].out [29] $../../../corpus-external/yosys-simple/rotate.v:21$or$370_Y
+  connect \netgen[0].out [28] $../../../corpus-external/yosys-simple/rotate.v:21$or$363_Y
+  connect \netgen[0].out [27] $../../../corpus-external/yosys-simple/rotate.v:21$or$356_Y
+  connect \netgen[0].out [26] $../../../corpus-external/yosys-simple/rotate.v:21$or$349_Y
+  connect \netgen[0].out [25] $../../../corpus-external/yosys-simple/rotate.v:21$or$342_Y
+  connect \netgen[0].out [24] $../../../corpus-external/yosys-simple/rotate.v:21$or$335_Y
+  connect \netgen[0].out [23] $../../../corpus-external/yosys-simple/rotate.v:21$or$328_Y
+  connect \netgen[0].out [22] $../../../corpus-external/yosys-simple/rotate.v:21$or$321_Y
+  connect \netgen[0].out [21] $../../../corpus-external/yosys-simple/rotate.v:21$or$314_Y
+  connect \netgen[0].out [20] $../../../corpus-external/yosys-simple/rotate.v:21$or$307_Y
+  connect \netgen[0].out [19] $../../../corpus-external/yosys-simple/rotate.v:21$or$300_Y
+  connect \netgen[0].out [18] $../../../corpus-external/yosys-simple/rotate.v:21$or$293_Y
+  connect \netgen[0].out [17] $../../../corpus-external/yosys-simple/rotate.v:21$or$286_Y
+  connect \netgen[0].out [16] $../../../corpus-external/yosys-simple/rotate.v:21$or$279_Y
+  connect \netgen[0].out [15] $../../../corpus-external/yosys-simple/rotate.v:21$or$272_Y
+  connect \netgen[0].out [14] $../../../corpus-external/yosys-simple/rotate.v:21$or$265_Y
+  connect \netgen[0].out [13] $../../../corpus-external/yosys-simple/rotate.v:21$or$258_Y
+  connect \netgen[0].out [12] $../../../corpus-external/yosys-simple/rotate.v:21$or$251_Y
+  connect \netgen[0].out [11] $../../../corpus-external/yosys-simple/rotate.v:21$or$244_Y
+  connect \netgen[0].out [10] $../../../corpus-external/yosys-simple/rotate.v:21$or$237_Y
+  connect \netgen[0].out [9] $../../../corpus-external/yosys-simple/rotate.v:21$or$230_Y
+  connect \netgen[0].out [8] $../../../corpus-external/yosys-simple/rotate.v:21$or$223_Y
+  connect \netgen[0].out [7] $../../../corpus-external/yosys-simple/rotate.v:21$or$216_Y
+  connect \netgen[0].out [6] $../../../corpus-external/yosys-simple/rotate.v:21$or$209_Y
+  connect \netgen[0].out [5] $../../../corpus-external/yosys-simple/rotate.v:21$or$202_Y
+  connect \netgen[0].out [4] $../../../corpus-external/yosys-simple/rotate.v:21$or$195_Y
+  connect \netgen[0].out [3] $../../../corpus-external/yosys-simple/rotate.v:21$or$188_Y
+  connect \netgen[0].out [2] $../../../corpus-external/yosys-simple/rotate.v:21$or$181_Y
+  connect \netgen[0].out [1] $../../../corpus-external/yosys-simple/rotate.v:21$or$174_Y
+  connect \netgen[0].out [0] $../../../corpus-external/yosys-simple/rotate.v:21$or$167_Y
 end

@@ -84,548 +84,74 @@ module \uut_forgen01
     parameter \A_WIDTH 32
     parameter \B_WIDTH 5
     parameter \Y_WIDTH 1
-    connect \A \lut
+    connect \A 32'10100000100010100010100010101100
     connect \B \a
     connect \Y $../../../corpus-external/yosys-simple/forgen01.v:21$shiftx$3_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/forgen01.v:12.8-12.8"
-  process $../../../corpus-external/yosys-simple/forgen01.v:12$proc$4
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [0] 1'0
-    assign { } { }
-    assign $0\lut[31:0] [1] 1'0
-    assign { } { }
-    assign $0\lut[31:0] [2] 1'1
-    assign { } { }
-    assign $0\lut[31:0] [3] 1'1
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [4] $1\lut[4:4]
-    assign { } { }
-    assign $0\lut[31:0] [5] 1'1
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [6] $2\lut[6:6]
-    assign { } { }
-    assign $0\lut[31:0] [7] 1'1
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [8] $3\lut[8:8]
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [9] $4\lut[9:9]
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [10] $5\lut[10:10]
-    assign { } { }
-    assign $0\lut[31:0] [11] 1'1
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [12] $7\lut[12:12]
-    assign { } { }
-    assign $0\lut[31:0] [13] 1'1
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [14] $8\lut[14:14]
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [15] $9\lut[15:15]
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [16] $11\lut[16:16]
-    assign { } { }
-    assign $0\lut[31:0] [17] 1'1
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [18] $13\lut[18:18]
-    assign { } { }
-    assign $0\lut[31:0] [19] 1'1
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [20] $15\lut[20:20]
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [21] $16\lut[21:21]
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [22] $17\lut[22:22]
-    assign { } { }
-    assign $0\lut[31:0] [23] 1'1
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [24] $20\lut[24:24]
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [25] $21\lut[25:25]
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [26] $22\lut[26:26]
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [27] $23\lut[27:27]
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [28] $25\lut[28:28]
-    assign { } { }
-    assign $0\lut[31:0] [29] 1'1
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\lut[31:0] [30] $28\lut[30:30]
-    assign { } { }
-    assign $0\lut[31:0] [31] 1'1
-    assign $0\j[31:0] 6
-    assign $0\i[31:0] 32
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $1\lut[4:4] 1'0
-      case 
-        assign $1\lut[4:4] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $2\lut[6:6] 1'0
-      case 
-        assign $2\lut[6:6] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $3\lut[8:8] 1'0
-      case 
-        assign $3\lut[8:8] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $4\lut[9:9] 1'0
-      case 
-        assign $4\lut[9:9] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $5\lut[10:10] 1'0
-      case 
-        assign $5\lut[10:10] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $6\lut[12:12] 1'0
-      case 
-        assign $6\lut[12:12] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $7\lut[12:12] 1'0
-      case 
-        assign $7\lut[12:12] $6\lut[12:12]
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $8\lut[14:14] 1'0
-      case 
-        assign $8\lut[14:14] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $9\lut[15:15] 1'0
-      case 
-        assign $9\lut[15:15] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $10\lut[16:16] 1'0
-      case 
-        assign $10\lut[16:16] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $11\lut[16:16] 1'0
-      case 
-        assign $11\lut[16:16] $10\lut[16:16]
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $12\lut[18:18] 1'0
-      case 
-        assign $12\lut[18:18] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $13\lut[18:18] 1'0
-      case 
-        assign $13\lut[18:18] $12\lut[18:18]
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $14\lut[20:20] 1'0
-      case 
-        assign $14\lut[20:20] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $15\lut[20:20] 1'0
-      case 
-        assign $15\lut[20:20] $14\lut[20:20]
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $16\lut[21:21] 1'0
-      case 
-        assign $16\lut[21:21] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $17\lut[22:22] 1'0
-      case 
-        assign $17\lut[22:22] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $18\lut[24:24] 1'0
-      case 
-        assign $18\lut[24:24] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $19\lut[24:24] 1'0
-      case 
-        assign $19\lut[24:24] $18\lut[24:24]
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $20\lut[24:24] 1'0
-      case 
-        assign $20\lut[24:24] $19\lut[24:24]
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $21\lut[25:25] 1'0
-      case 
-        assign $21\lut[25:25] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $22\lut[26:26] 1'0
-      case 
-        assign $22\lut[26:26] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $23\lut[27:27] 1'0
-      case 
-        assign $23\lut[27:27] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $24\lut[28:28] 1'0
-      case 
-        assign $24\lut[28:28] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $25\lut[28:28] 1'0
-      case 
-        assign $25\lut[28:28] $24\lut[28:28]
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $26\lut[30:30] 1'0
-      case 
-        assign $26\lut[30:30] 1'1
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $27\lut[30:30] 1'0
-      case 
-        assign $27\lut[30:30] $26\lut[30:30]
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.8-16.18"
-      case 1'1
-        assign { } { }
-        assign $28\lut[30:30] 1'0
-      case 
-        assign $28\lut[30:30] $27\lut[30:30]
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    attribute \src "../../../corpus-external/yosys-simple/forgen01.v:16.4-17.16"
-    switch 1'0
-      case 
-    end
-    sync always
-      update \i $0\i[31:0]
-      update \lut $0\lut[31:0]
-      update \j $0\j[31:0]
-  end
   connect \y $../../../corpus-external/yosys-simple/forgen01.v:21$shiftx$3_Y
+  connect $28\lut[30:30] 1'0
+  connect $27\lut[30:30] 1'0
+  connect $26\lut[30:30] 1'0
+  connect $25\lut[28:28] 1'0
+  connect $24\lut[28:28] 1'0
+  connect $23\lut[27:27] 1'0
+  connect $22\lut[26:26] 1'0
+  connect $21\lut[25:25] 1'0
+  connect $20\lut[24:24] 1'0
+  connect $19\lut[24:24] 1'0
+  connect $18\lut[24:24] 1'0
+  connect $17\lut[22:22] 1'0
+  connect $16\lut[21:21] 1'0
+  connect $15\lut[20:20] 1'0
+  connect $14\lut[20:20] 1'0
+  connect $13\lut[18:18] 1'0
+  connect $12\lut[18:18] 1'0
+  connect $11\lut[16:16] 1'0
+  connect $10\lut[16:16] 1'0
+  connect $9\lut[15:15] 1'0
+  connect $8\lut[14:14] 1'0
+  connect $7\lut[12:12] 1'0
+  connect $6\lut[12:12] 1'0
+  connect $5\lut[10:10] 1'0
+  connect $4\lut[9:9] 1'0
+  connect $3\lut[8:8] 1'0
+  connect $2\lut[6:6] 1'0
+  connect $1\lut[4:4] 1'0
+  connect $0\i[31:0] 32
+  connect $0\j[31:0] 6
+  connect $0\lut[31:0] [31] 1'1
+  connect $0\lut[31:0] [30] $28\lut[30:30]
+  connect $0\lut[31:0] [29] 1'1
+  connect $0\lut[31:0] [28] $25\lut[28:28]
+  connect $0\lut[31:0] [27] $23\lut[27:27]
+  connect $0\lut[31:0] [26] $22\lut[26:26]
+  connect $0\lut[31:0] [25] $21\lut[25:25]
+  connect $0\lut[31:0] [24] $20\lut[24:24]
+  connect $0\lut[31:0] [23] 1'1
+  connect $0\lut[31:0] [22] $17\lut[22:22]
+  connect $0\lut[31:0] [21] $16\lut[21:21]
+  connect $0\lut[31:0] [20] $15\lut[20:20]
+  connect $0\lut[31:0] [19] 1'1
+  connect $0\lut[31:0] [18] $13\lut[18:18]
+  connect $0\lut[31:0] [17] 1'1
+  connect $0\lut[31:0] [16] $11\lut[16:16]
+  connect $0\lut[31:0] [15] $9\lut[15:15]
+  connect $0\lut[31:0] [14] $8\lut[14:14]
+  connect $0\lut[31:0] [13] 1'1
+  connect $0\lut[31:0] [12] $7\lut[12:12]
+  connect $0\lut[31:0] [11] 1'1
+  connect $0\lut[31:0] [10] $5\lut[10:10]
+  connect $0\lut[31:0] [9] $4\lut[9:9]
+  connect $0\lut[31:0] [8] $3\lut[8:8]
+  connect $0\lut[31:0] [7] 1'1
+  connect $0\lut[31:0] [6] $2\lut[6:6]
+  connect $0\lut[31:0] [5] 1'1
+  connect $0\lut[31:0] [4] $1\lut[4:4]
+  connect $0\lut[31:0] [3] 1'1
+  connect $0\lut[31:0] [2] 1'1
+  connect $0\lut[31:0] [1] 1'0
+  connect $0\lut[31:0] [0] 1'0
+  connect \i 32
+  connect \lut 32'10100000100010100010100010101100
+  connect \j 6
 end

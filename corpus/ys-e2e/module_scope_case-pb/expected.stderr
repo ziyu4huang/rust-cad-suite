@@ -1,1 +1,0 @@
-ERROR: Module module_scope_case_top contains processes, which are not supported by JSON backend (run `proc` first).

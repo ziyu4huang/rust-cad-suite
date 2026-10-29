@@ -43,29 +43,18 @@ module \mem2reg_test6
     connect \B \din [2]
     connect \Y $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/mem2reg.v:104.9-115.12"
-  process $../../../corpus-external/yosys-simple/mem2reg.v:104$proc$49
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\din_array[0][1:0] \din [1:0]
-    assign $0\din_array[1][1:0] \din [3:2]
-    assign { } { }
-    assign $0\dout_array[1][1:0] \din [3:2]
-    assign $0$splitcmplxassign$../../../corpus-external/yosys-simple/mem2reg.v:111$48[1:0]$50 $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y
-    assign $0\dout_array[0][1:0] [0] $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y [0]
-    assign $0\dout_array[0][1:0] [1] $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y [1]
-    assign $0\dout[3:0] [1:0] $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y
-    assign $0\dout[3:0] [3:2] \din [3:2]
-    sync always
-      update \dout $0\dout[3:0]
-      update $splitcmplxassign$../../../corpus-external/yosys-simple/mem2reg.v:111$48 2'x
-      update \din_array[0] $0\din_array[0][1:0]
-      update \din_array[1] $0\din_array[1][1:0]
-      update \dout_array[0] $0\dout_array[0][1:0]
-      update \dout_array[1] $0\dout_array[1][1:0]
-  end
+  connect $0\dout[3:0] [3:2] \din [3:2]
+  connect $0\dout[3:0] [1:0] $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y
+  connect $0\dout_array[0][1:0] [1] $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y [1]
+  connect $0\dout_array[0][1:0] [0] $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y [0]
+  connect $0$splitcmplxassign$../../../corpus-external/yosys-simple/mem2reg.v:111$48[1:0]$50 $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y
+  connect $0\dout_array[1][1:0] \din [3:2]
+  connect $0\din_array[1][1:0] \din [3:2]
+  connect $0\din_array[0][1:0] \din [1:0]
+  connect \dout { \din [3:2] $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y }
+  connect $splitcmplxassign$../../../corpus-external/yosys-simple/mem2reg.v:111$48 2'x
+  connect \din_array[0] \din [1:0]
+  connect \din_array[1] \din [3:2]
+  connect \dout_array[0] $../../../corpus-external/yosys-simple/mem2reg.v:111$add$51_Y
+  connect \dout_array[1] \din [3:2]
 end

@@ -1,0 +1,488 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "mem2reg_bounds_term_top": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:1.1-19.10"
+      },
+      "ports": {
+        "clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "sel": {
+          "direction": "input",
+          "bits": [ 3, 4 ]
+        },
+        "base": {
+          "direction": "input",
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ]
+        },
+        "line": {
+          "direction": "output",
+          "bits": [ 13, 14, 15, 16, 17, 18, 19, 20 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13$add$10": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13.43-13.57"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 21, 22, 23, 24, 25, 26, 27, 28 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13$add$12": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13.43-13.57"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 61, 62, 63, 64, 65, 66, 67, 68 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ]
+          }
+        },
+        "$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13$add$8": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000100000",
+            "Y_WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13.43-13.57"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 101, 102, 103, 104, 105, 106, 107, 108 ],
+            "B": [ "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "Y": [ 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140 ]
+          }
+        },
+        "$procdff$18": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:12.13-13.58"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 29, 30, 31, 32, 33, 34, 35, 36 ],
+            "Q": [ 61, 62, 63, 64, 65, 66, 67, 68 ]
+          }
+        },
+        "$procdff$19": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:12.13-13.58"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 109, 110, 111, 112, 113, 114, 115, 116 ],
+            "Q": [ 21, 22, 23, 24, 25, 26, 27, 28 ]
+          }
+        },
+        "$procdff$20": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:12.13-13.58"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 5, 6, 7, 8, 9, 10, 11, 12 ],
+            "Q": [ 101, 102, 103, 104, 105, 106, 107, 108 ]
+          }
+        },
+        "$procdff$21": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:17.5-18.25"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 141, 142, 143, 144, 145, 146, 147, 148 ],
+            "Q": [ 13, 14, 15, 16, 17, 18, 19, 20 ]
+          }
+        },
+        "$procdff$22": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000000010"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:17.5-18.25"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ "x", "x" ],
+            "Q": [ 149, 150 ]
+          }
+        },
+        "$procdff$23": {
+          "hide_name": 1,
+          "type": "$dff",
+          "parameters": {
+            "CLK_POLARITY": "1",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:17.5-18.25"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+            "Q": [ 151, 152, 153, 154, 155, 156, 157, 158 ]
+          }
+        },
+        "$procmux$14": {
+          "hide_name": 1,
+          "type": "$pmux",
+          "parameters": {
+            "S_WIDTH": "00000000000000000000000000000011",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18.16-18.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x", "x", "x", "x", "x", "x", "x", "x" ],
+            "B": [ 61, 62, 63, 64, 65, 66, 67, 68, 21, 22, 23, 24, 25, 26, 27, 28, 101, 102, 103, 104, 105, 106, 107, 108 ],
+            "S": [ 159, 160, 161 ],
+            "Y": [ 141, 142, 143, 144, 145, 146, 147, 148 ]
+          }
+        },
+        "$procmux$15_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18.16-18.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3, 4 ],
+            "B": [ "0", "1" ],
+            "Y": [ 159 ]
+          }
+        },
+        "$procmux$16_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18.16-18.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3, 4 ],
+            "B": [ "1", "0" ],
+            "Y": [ 160 ]
+          }
+        },
+        "$procmux$17_CMP0": {
+          "hide_name": 1,
+          "type": "$logic_not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000010",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18.16-18.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 3, 4 ],
+            "Y": [ 161 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13$add$10_Y": {
+          "hide_name": 1,
+          "bits": [ 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13.43-13.57"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13$add$12_Y": {
+          "hide_name": 1,
+          "bits": [ 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13.43-13.57"
+          }
+        },
+        "$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13$add$8_Y": {
+          "hide_name": 1,
+          "bits": [ 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:13.43-13.57"
+          }
+        },
+        "$0$mem2reg_rd$\\mem$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18$1_ADDR[1:0]$3": {
+          "hide_name": 1,
+          "bits": [ 3, 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:17.5-18.25"
+          }
+        },
+        "$0$mem2reg_rd$\\mem$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18$1_DATA[7:0]$4": {
+          "hide_name": 1,
+          "bits": [ 141, 142, 143, 144, 145, 146, 147, 148 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:17.5-18.25"
+          }
+        },
+        "$0\\line[7:0]": {
+          "hide_name": 1,
+          "bits": [ 141, 142, 143, 144, 145, 146, 147, 148 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:17.5-18.25"
+          }
+        },
+        "$0\\mem[0][7:0]": {
+          "hide_name": 1,
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:12.13-13.58"
+          }
+        },
+        "$0\\mem[1][7:0]": {
+          "hide_name": 1,
+          "bits": [ 109, 110, 111, 112, 113, 114, 115, 116 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:12.13-13.58"
+          }
+        },
+        "$0\\mem[2][7:0]": {
+          "hide_name": 1,
+          "bits": [ 29, 30, 31, 32, 33, 34, 35, 36 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:12.13-13.58"
+          }
+        },
+        "$1$mem2reg_rd$\\mem$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18$1_DATA[7:0]$5": {
+          "hide_name": 1,
+          "bits": [ 141, 142, 143, 144, 145, 146, 147, 148 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:17.5-18.25"
+          }
+        },
+        "$mem2reg_rd$\\mem$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18$1_ADDR": {
+          "hide_name": 1,
+          "bits": [ 149, 150 ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18.16-18.19"
+          }
+        },
+        "$mem2reg_rd$\\mem$../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18$1_DATA": {
+          "hide_name": 1,
+          "bits": [ 151, 152, 153, 154, 155, 156, 157, 158 ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:18.16-18.19"
+          }
+        },
+        "$procmux$14_Y": {
+          "hide_name": 1,
+          "bits": [ 141, 142, 143, 144, 145, 146, 147, 148 ],
+          "attributes": {
+          }
+        },
+        "$procmux$15_CMP": {
+          "hide_name": 1,
+          "bits": [ 159 ],
+          "attributes": {
+          }
+        },
+        "$procmux$16_CMP": {
+          "hide_name": 1,
+          "bits": [ 160 ],
+          "attributes": {
+          }
+        },
+        "$procmux$17_CMP": {
+          "hide_name": 1,
+          "bits": [ 161 ],
+          "attributes": {
+          }
+        },
+        "base": {
+          "hide_name": 0,
+          "bits": [ 5, 6, 7, 8, 9, 10, 11, 12 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:4.22-4.26"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:2.11-2.14"
+          }
+        },
+        "line": {
+          "hide_name": 0,
+          "bits": [ 13, 14, 15, 16, 17, 18, 19, 20 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:5.22-5.26"
+          }
+        },
+        "mem[0]": {
+          "hide_name": 0,
+          "bits": [ 101, 102, 103, 104, 105, 106, 107, 108 ],
+          "upto": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:7.15-7.18"
+          }
+        },
+        "mem[1]": {
+          "hide_name": 0,
+          "bits": [ 21, 22, 23, 24, 25, 26, 27, 28 ],
+          "upto": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:7.15-7.18"
+          }
+        },
+        "mem[2]": {
+          "hide_name": 0,
+          "bits": [ 61, 62, 63, 64, 65, 66, 67, 68 ],
+          "upto": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:7.15-7.18"
+          }
+        },
+        "sel": {
+          "hide_name": 0,
+          "bits": [ 3, 4 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem2reg_bounds_tern.v:3.22-3.25"
+          }
+        }
+      }
+    }
+  }
+}

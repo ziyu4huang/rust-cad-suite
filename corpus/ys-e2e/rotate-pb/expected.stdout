@@ -1,13 +1,526 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 160 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1274'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1267'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1260'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1253'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1246'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1239'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1232'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1225'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1218'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1211'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1204'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1197'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1190'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1183'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1176'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1169'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1162'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1155'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1148'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1141'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1134'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1127'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1120'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1113'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1106'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1099'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1092'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1085'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1078'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1071'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1064'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1057'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1050'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1043'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1036'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1029'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1022'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1015'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1008'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1001'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$994'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$987'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$980'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$973'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$966'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$959'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$952'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$945'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$938'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$931'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$924'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$917'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$910'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$903'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$896'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$889'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$882'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$875'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$868'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$861'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$854'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$847'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$840'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$833'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$826'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$819'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$812'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$805'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$798'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$791'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$784'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$777'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$770'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$763'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$756'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$749'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$742'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$735'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$728'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$721'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$714'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$707'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$700'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$693'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$686'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$679'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$672'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$665'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$658'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$651'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$644'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$637'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$630'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$623'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$616'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$609'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$602'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$595'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$588'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$581'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$574'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$567'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$560'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$553'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$546'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$539'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$532'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$525'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$518'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$511'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$504'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$497'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$490'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$483'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$476'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$469'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$462'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$455'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$448'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$441'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$434'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$427'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$420'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$413'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$406'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$399'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$392'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$385'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$378'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$371'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$364'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$357'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$350'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$343'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$336'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$329'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$322'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$315'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$308'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$301'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$294'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$287'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$280'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$273'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$266'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$259'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$252'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$245'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$238'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$231'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$224'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$217'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$210'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$203'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$196'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$189'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$182'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$175'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$168'.
+Creating decoders for process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$161'.
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [31]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1274'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [30]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1267'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [29]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1260'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [28]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1253'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [27]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1246'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [26]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1239'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [25]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1232'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [24]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1225'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [23]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1218'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [22]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1211'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [21]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1204'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [20]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1197'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [19]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1190'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [18]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1183'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [17]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1176'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [16]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1169'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [15]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1162'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [14]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1155'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [13]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1148'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [12]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1141'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [11]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1134'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [10]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1127'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [9]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1120'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [8]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1113'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [7]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1106'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [6]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1099'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [5]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1092'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [4]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1085'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [3]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1078'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [2]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1071'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [1]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1064'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[4].out [0]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1057'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [31]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1050'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [30]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1043'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [29]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1036'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [28]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1029'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [27]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1022'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [26]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1015'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [25]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1008'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [24]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1001'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [23]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$994'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [22]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$987'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [21]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$980'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [20]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$973'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [19]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$966'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [18]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$959'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [17]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$952'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [16]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$945'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [15]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$938'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [14]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$931'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [13]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$924'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [12]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$917'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [11]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$910'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [10]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$903'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [9]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$896'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [8]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$889'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [7]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$882'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [6]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$875'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [5]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$868'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [4]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$861'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [3]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$854'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [2]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$847'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [1]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$840'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[3].out [0]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$833'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [31]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$826'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [30]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$819'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [29]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$812'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [28]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$805'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [27]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$798'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [26]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$791'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [25]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$784'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [24]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$777'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [23]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$770'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [22]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$763'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [21]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$756'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [20]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$749'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [19]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$742'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [18]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$735'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [17]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$728'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [16]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$721'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [15]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$714'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [14]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$707'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [13]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$700'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [12]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$693'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [11]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$686'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [10]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$679'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [9]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$672'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [8]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$665'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [7]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$658'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [6]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$651'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [5]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$644'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [4]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$637'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [3]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$630'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [2]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$623'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [1]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$616'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[2].out [0]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$609'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [31]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$602'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [30]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$595'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [29]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$588'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [28]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$581'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [27]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$574'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [26]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$567'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [25]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$560'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [24]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$553'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [23]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$546'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [22]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$539'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [21]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$532'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [20]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$525'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [19]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$518'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [18]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$511'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [17]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$504'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [16]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$497'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [15]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$490'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [14]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$483'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [13]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$476'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [12]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$469'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [11]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$462'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [10]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$455'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [9]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$448'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [8]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$441'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [7]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$434'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [6]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$427'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [5]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$420'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [4]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$413'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [3]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$406'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [2]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$399'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [1]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$392'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[1].out [0]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$385'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [31]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$378'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [30]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$371'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [29]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$364'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [28]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$357'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [27]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$350'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [26]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$343'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [25]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$336'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [24]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$329'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [23]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$322'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [22]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$315'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [21]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$308'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [20]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$301'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [19]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$294'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [18]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$287'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [17]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$280'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [16]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$273'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [15]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$266'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [14]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$259'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [13]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$252'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [12]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$245'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [11]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$238'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [10]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$231'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [9]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$224'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [8]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$217'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [7]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$210'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [6]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$203'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [5]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$196'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [4]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$189'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [3]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$182'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [2]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$175'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [1]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$168'.
+No latch inferred for signal `\a23_barrel_shift_fpga_rotate.\netgen[0].out [0]' from process `\a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$161'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1274'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1267'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1260'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1253'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1246'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1239'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1232'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1225'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1218'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1211'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1204'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1197'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1190'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1183'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1176'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1169'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1162'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1155'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1148'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1141'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1134'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1127'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1120'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1113'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1106'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1099'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1092'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1085'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1078'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1071'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1064'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1057'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1050'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1043'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1036'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1029'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1022'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1015'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1008'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$1001'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$994'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$987'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$980'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$973'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$966'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$959'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$952'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$945'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$938'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$931'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$924'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$917'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$910'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$903'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$896'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$889'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$882'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$875'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$868'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$861'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$854'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$847'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$840'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$833'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$826'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$819'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$812'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$805'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$798'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$791'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$784'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$777'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$770'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$763'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$756'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$749'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$742'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$735'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$728'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$721'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$714'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$707'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$700'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$693'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$686'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$679'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$672'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$665'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$658'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$651'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$644'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$637'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$630'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$623'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$616'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$609'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$602'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$595'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$588'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$581'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$574'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$567'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$560'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$553'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$546'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$539'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$532'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$525'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$518'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$511'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$504'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$497'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$490'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$483'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$476'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$469'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$462'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$455'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$448'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$441'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$434'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$427'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$420'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$413'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$406'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$399'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$392'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$385'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$378'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$371'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$364'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$357'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$350'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$343'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$336'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$329'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$322'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$315'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$308'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$301'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$294'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$287'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$280'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$273'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$266'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$259'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$252'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$245'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$238'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$231'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$224'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$217'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$210'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$203'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$196'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$189'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$182'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$175'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$168'.
+Removing empty process `a23_barrel_shift_fpga_rotate.$../../../corpus-external/yosys-simple/rotate.v:20$proc$161'.
+Cleaned up 0 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module a23_barrel_shift_fpga_rotate.
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module a23_barrel_shift_fpga_rotate...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === a23_barrel_shift_fpga_rotate ===
 
@@ -19,14 +532,13 @@ Found and reported 0 problems.
       390 public wire bits
         4 ports
        70 port bits
-      160 processes
       960 cells
       320   $and
       160   $not
       160   $or
       320   $xor
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.

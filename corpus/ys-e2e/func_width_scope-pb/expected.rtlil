@@ -94,45 +94,6 @@ module \func_width_scope_top
     connect \A { \inp \inp \inp \inp \inp \inp \inp }
     connect \Y $../../../corpus-external/yosys-simple/func_width_scope.v:29$not$24_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/func_width_scope.v:12.14-12.19"
-  process $../../../corpus-external/yosys-simple/func_width_scope.v:12$proc$10
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$7.inp[4:0]$13 { \inp \inp \inp \inp \inp }
-    assign $0\func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$7.$result[4:0]$12 $../../../corpus-external/yosys-simple/func_width_scope.v:7$not$14_Y
-    assign $0\func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$2.$result[4:0]$11 $../../../corpus-external/yosys-simple/func_width_scope.v:7$not$14_Y
-    sync always
-      update \func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$2.$result $0\func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$2.$result[4:0]$11
-      update \func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$7.$result 5'x
-      update \func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$7.inp 5'x
-  end
-  attribute \src "../../../corpus-external/yosys-simple/func_width_scope.v:24.16-24.21"
-  process $../../../corpus-external/yosys-simple/func_width_scope.v:24$proc$15
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$8.inp[5:0]$18 { \inp \inp \inp \inp \inp \inp }
-    assign $0\blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$8.$result[5:0]$17 $../../../corpus-external/yosys-simple/func_width_scope.v:19$not$19_Y
-    assign $0\blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$4.$result[5:0]$16 $../../../corpus-external/yosys-simple/func_width_scope.v:19$not$19_Y
-    sync always
-      update \blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$4.$result $0\blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$4.$result[5:0]$16
-      update \blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$8.$result 6'x
-      update \blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$8.inp 6'x
-  end
-  attribute \src "../../../corpus-external/yosys-simple/func_width_scope.v:34.16-34.21"
-  process $../../../corpus-external/yosys-simple/func_width_scope.v:34$proc$20
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$9.inp[6:0]$23 { \inp \inp \inp \inp \inp \inp \inp }
-    assign $0\blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$9.$result[6:0]$22 $../../../corpus-external/yosys-simple/func_width_scope.v:29$not$24_Y
-    assign $0\blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$6.$result[6:0]$21 $../../../corpus-external/yosys-simple/func_width_scope.v:29$not$24_Y
-    sync always
-      update \blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$6.$result $0\blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$6.$result[6:0]$21
-      update \blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$9.$result 7'x
-      update \blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$9.inp 7'x
-  end
   connect \xc 31'1111111111111111111111111111111
   connect \xn \func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$2.$result
   connect \out1 { 801'000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000 \xc 1'0 \blk.yc 1'0 \blk.zc }
@@ -141,4 +102,22 @@ module \func_width_scope_top
   connect \blk.yn \blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$4.$result
   connect \blk.zc 127'1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
   connect \blk.zn \blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$6.$result
+  connect $0\blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$6.$result[6:0]$21 $../../../corpus-external/yosys-simple/func_width_scope.v:29$not$24_Y
+  connect $0\blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$9.$result[6:0]$22 $../../../corpus-external/yosys-simple/func_width_scope.v:29$not$24_Y
+  connect $0\blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$9.inp[6:0]$23 { \inp \inp \inp \inp \inp \inp \inp }
+  connect $0\blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$4.$result[5:0]$16 $../../../corpus-external/yosys-simple/func_width_scope.v:19$not$19_Y
+  connect $0\blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$8.$result[5:0]$17 $../../../corpus-external/yosys-simple/func_width_scope.v:19$not$19_Y
+  connect $0\blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$8.inp[5:0]$18 { \inp \inp \inp \inp \inp \inp }
+  connect $0\func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$2.$result[4:0]$11 $../../../corpus-external/yosys-simple/func_width_scope.v:7$not$14_Y
+  connect $0\func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$7.$result[4:0]$12 $../../../corpus-external/yosys-simple/func_width_scope.v:7$not$14_Y
+  connect $0\func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$7.inp[4:0]$13 { \inp \inp \inp \inp \inp }
+  connect \blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$6.$result $../../../corpus-external/yosys-simple/func_width_scope.v:29$not$24_Y
+  connect \blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$9.$result 7'x
+  connect \blk.func3$func$../../../corpus-external/yosys-simple/func_width_scope.v:34$9.inp 7'x
+  connect \blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$4.$result $../../../corpus-external/yosys-simple/func_width_scope.v:19$not$19_Y
+  connect \blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$8.$result 6'x
+  connect \blk.func2$func$../../../corpus-external/yosys-simple/func_width_scope.v:24$8.inp 6'x
+  connect \func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$2.$result $../../../corpus-external/yosys-simple/func_width_scope.v:7$not$14_Y
+  connect \func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$7.$result 5'x
+  connect \func1$func$../../../corpus-external/yosys-simple/func_width_scope.v:12$7.inp 5'x
 end

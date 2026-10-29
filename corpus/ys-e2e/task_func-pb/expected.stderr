@@ -1,1 +1,0 @@
-ERROR: Module task_func_test05 contains processes, which are not supported by JSON backend (run `proc` first).

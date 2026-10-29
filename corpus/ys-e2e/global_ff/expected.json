@@ -1,0 +1,52 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "top": {
+      "attributes": {
+      },
+      "ports": {
+        "d": {
+          "direction": "input",
+          "bits": [ 2, 3, 4, 5 ]
+        },
+        "q": {
+          "direction": "output",
+          "bits": [ 2, 3, 4, 5 ]
+        }
+      },
+      "cells": {
+        "$procdff$1": {
+          "hide_name": 1,
+          "type": "$ff",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "D": "input",
+            "Q": "output"
+          },
+          "connections": {
+            "D": [ 2, 3, 4, 5 ],
+            "Q": [ 2, 3, 4, 5 ]
+          }
+        }
+      },
+      "netnames": {
+        "d": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+          }
+        },
+        "q": {
+          "hide_name": 0,
+          "bits": [ 2, 3, 4, 5 ],
+          "attributes": {
+          }
+        }
+      }
+    }
+  }
+}

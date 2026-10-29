@@ -1,34 +1,124 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 5 switch rules as full_case in process $../../../corpus-external/yosys-simple/loops.v:31$proc$1 in module aes.
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 9 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~5 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+     1/34: $4\next_addroundkey_round[3:0]
+     2/34: $4\next_addroundkey_ready_o[0:0]
+     3/34: $4\next_addroundkey_data_reg[3:0]
+     4/34: $4\round_data_var[3:0]
+     5/34: $4\round_key_var[3:0]
+     6/34: $4\data_var[3:0]
+     7/34: $3\keysched_round_i[3:0]
+     8/34: $3\keysched_start_i[0:0]
+     9/34: $4\keysched_last_key_i[3:0]
+    10/34: $3\next_addroundkey_round[3:0]
+    11/34: $3\round_key_var[3:0]
+    12/34: $3\data_var[3:0]
+    13/34: $3\next_addroundkey_ready_o[0:0]
+    14/34: $3\round_data_var[3:0]
+    15/34: $3\next_addroundkey_data_reg[3:0]
+    16/34: $2\next_addroundkey_round[3:0]
+    17/34: $2\keysched_round_i[3:0]
+    18/34: $2\keysched_start_i[0:0]
+    19/34: $3\keysched_last_key_i[3:0]
+    20/34: $2\round_key_var[3:0]
+    21/34: $2\data_var[3:0]
+    22/34: $2\next_addroundkey_ready_o[0:0]
+    23/34: $2\round_data_var[3:0]
+    24/34: $2\next_addroundkey_data_reg[3:0]
+    25/34: $1\next_addroundkey_ready_o[0:0]
+    26/34: $1\next_addroundkey_data_reg[3:0]
+    27/34: $1\round_data_var[3:0]
+    28/34: $1\round_key_var[3:0]
+    29/34: $1\data_var[3:0]
+    30/34: $1\keysched_start_i[0:0]
+    31/34: $1\next_addroundkey_round[3:0]
+    32/34: $1\keysched_round_i[3:0]
+    33/34: $2\keysched_last_key_i[3:0]
+    34/34: $1\keysched_last_key_i[3:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\aes.\keysched_last_key_i' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\keysched_round_i' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\next_addroundkey_data_reg' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\next_addroundkey_round' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\round_data_var' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\keysched_start_i' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\next_addroundkey_ready_o' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+Warning: Latch inferred for signal `\aes.\data_var' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1': $auto$proc_dlatch.cc:559:proc_dlatch$308
+Warning: Latch inferred for signal `\aes.\round_key_var' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1': $auto$proc_dlatch.cc:559:proc_dlatch$311
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 5 empty switches in `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+Removing empty process `aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+Cleaned up 5 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module aes.
+<suppressed ~41 debug messages>
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module aes...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === aes ===
 
         +----------Local Count, excluding submodules.
         | 
-       75 wires
-      284 wire bits
+      261 wires
+      659 wire bits
        17 public wires
        56 public wire bits
        15 ports
        48 port bits
-        1 processes
-       15 cells
+       88 cells
         2   $add
-        4   $eq
+        3   $and
+        2   $dlatch
+        2   $eq
         4   $logic_and
+        2   $logic_not
         1   $logic_or
-        2   $ne
+       60   $mux
+        1   $ne
+        6   $not
+        1   $reduce_bool
+        2   $reduce_or
         2   $xor
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.
+
+Warnings: 2 unique messages, 2 total

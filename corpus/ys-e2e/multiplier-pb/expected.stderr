@@ -1,1 +1,0 @@
-ERROR: Module Multiplier_2D contains processes, which are not supported by JSON backend (run `proc` first).

@@ -18,7 +18,7 @@ module \string_format_top
     parameter \FORMAT "A: {168:> c}\n"
     parameter \ARGS_WIDTH 168
     connect \TRG { }
-    connect \EN $../../../corpus-external/yosys-simple/string_format.v:4$display$2_EN
+    connect \EN 1'1
     connect \ARGS 168'011100110110111101101101011001010111010001101000011010010110111001100111001000000110100101101110011101000110010101110010011001010111001101110100011010010110111001100111
   end
   attribute \src "../../../corpus-external/yosys-simple/string_format.v:5.3-5.27"
@@ -30,15 +30,9 @@ module \string_format_top
     parameter \FORMAT "B: {168:> c}\n"
     parameter \ARGS_WIDTH 168
     connect \TRG { }
-    connect \EN $../../../corpus-external/yosys-simple/string_format.v:5$display$3_EN
+    connect \EN 1'1
     connect \ARGS 168'011100110110111101101101011001010111010001101000011010010110111001100111001000000110100101101110011101000110010101110010011001010111001101110100011010010110111001100111
   end
-  attribute \src "../../../corpus-external/yosys-simple/string_format.v:3.9-3.9"
-  process $../../../corpus-external/yosys-simple/string_format.v:3$proc$1
-    assign $../../../corpus-external/yosys-simple/string_format.v:4$display$2_EN 1'0
-    assign $../../../corpus-external/yosys-simple/string_format.v:4$display$2_EN 1'1
-    assign $../../../corpus-external/yosys-simple/string_format.v:5$display$3_EN 1'0
-    assign $../../../corpus-external/yosys-simple/string_format.v:5$display$3_EN 1'1
-    sync always
-  end
+  connect $../../../corpus-external/yosys-simple/string_format.v:5$display$3_EN 1'1
+  connect $../../../corpus-external/yosys-simple/string_format.v:4$display$2_EN 1'1
 end

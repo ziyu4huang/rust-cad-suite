@@ -1,33 +1,134 @@
--- Running command `read_rtlil case.il; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+-- Running command `read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
 
 1. Executing RTLIL frontend.
 Input filename: case.il
 
-2. Executing CHECK pass (checking for obvious problems).
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed 1 dead cases from process $../../../corpus-external/yosys-simple/sincos.v:45$proc$1 in module d.
+Marked 6 switch rules as full_case in process $../../../corpus-external/yosys-simple/sincos.v:45$proc$1 in module d.
+Removed a total of 1 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 8 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset in `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 1 switch.
+<suppressed ~4 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+     1/30: $4\DESIGN_PROCESSOR.state[0:0]
+     2/30: $4\DESIGN_PROCESSOR.i[4:0]
+     3/30: $4\DESIGN_PROCESSOR.z[19:0]
+     4/30: $4\DESIGN_PROCESSOR.y[19:0]
+     5/30: $4\DESIGN_PROCESSOR.x[19:0]
+     6/30: $3\DESIGN_PROCESSOR.dz[19:0]
+     7/30: $3\DESIGN_PROCESSOR.state[0:0]
+     8/30: $3\DESIGN_PROCESSOR.i[4:0]
+     9/30: $3\DESIGN_PROCESSOR.z[19:0]
+    10/30: $3\DESIGN_PROCESSOR.y[19:0]
+    11/30: $3\DESIGN_PROCESSOR.x[19:0]
+    12/30: $2\DESIGN_PROCESSOR.z[19:0]
+    13/30: $2\DESIGN_PROCESSOR.x[19:0]
+    14/30: $2\DESIGN_PROCESSOR.y[19:0]
+    15/30: $2\DESIGN_PROCESSOR.state[0:0]
+    16/30: $2\DESIGN_PROCESSOR.i[4:0]
+    17/30: $2\DESIGN_PROCESSOR.dy[19:0]
+    18/30: $2\DESIGN_PROCESSOR.dx[19:0]
+    19/30: $2\DESIGN_PROCESSOR.dz[19:0]
+    20/30: $1\DESIGN_PROCESSOR.z[19:0]
+    21/30: $1\DESIGN_PROCESSOR.x[19:0]
+    22/30: $1\DESIGN_PROCESSOR.y[19:0]
+    23/30: $1\DESIGN_PROCESSOR.dy[19:0]
+    24/30: $1\DESIGN_PROCESSOR.dx[19:0]
+    25/30: $1\DESIGN_PROCESSOR.dz[19:0]
+    26/30: $1\DESIGN_PROCESSOR.state[0:0]
+    27/30: $1\DESIGN_PROCESSOR.i[4:0]
+    28/30: $0\done[0:0]
+    29/30: $0\sin_z0[19:0]
+    30/30: $0\cos_z0[19:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\d.\cos_z0' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$120' with positive edge clock and positive level reset.
+Creating register for signal `\d.\sin_z0' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$123' with positive edge clock and positive level reset.
+Creating register for signal `\d.\done' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$126' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.i' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$129' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.state' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$132' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.dz' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $dff cell `$procdff$137' with positive edge clock.
+Creating register for signal `\d.\DESIGN_PROCESSOR.dx' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $dff cell `$procdff$142' with positive edge clock.
+Creating register for signal `\d.\DESIGN_PROCESSOR.dy' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $dff cell `$procdff$147' with positive edge clock.
+Creating register for signal `\d.\DESIGN_PROCESSOR.y' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$150' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.x' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$153' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.z' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$156' with positive edge clock and positive level reset.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 5 empty switches in `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+Removing empty process `d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+Cleaned up 5 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module d.
+<suppressed ~30 debug messages>
+
+3. Executing CHECK pass (checking for obvious problems).
 Checking module d...
 Found and reported 0 problems.
 
-3. Printing statistics.
+4. Printing statistics.
 
 === d ===
 
         +----------Local Count, excluding submodules.
         | 
-       64 wires
-      955 wire bits
+      160 wires
+     1584 wire bits
        15 public wires
       190 public wire bits
         7 ports
        64 port bits
-        1 processes
-       11 cells
+        1 memories
+      640 memory bits
+       77 cells
         4   $add
+        8   $adff
+        3   $dff
         1   $eq
         1   $ge
+        1   $meminit
+        1   $memrd_v2
+       30   $mux
+       14   $not
+        9   $pmux
         2   $sshr
         3   $sub
 
-4. Executing RTLIL backend.
+5. Executing RTLIL backend.
 Output filename: expected.rtlil
 
-5. Executing JSON backend.
+6. Executing JSON backend.

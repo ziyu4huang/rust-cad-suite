@@ -122,107 +122,39 @@ module \func_recurse_top
     connect \B $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$26
     connect \Y $../../../corpus-external/yosys-simple/func_recurse.v:10$mul$36_Y
   end
-  attribute \src "../../../corpus-external/yosys-simple/func_recurse.v:23.16-23.21"
-  process $../../../corpus-external/yosys-simple/func_recurse.v:23$proc$9
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign { } { }
-    assign $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.base[3:0]$12 \inp
-    assign { } { }
-    assign $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$11 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$19
-    assign $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$13 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$20
-    assign $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base[3:0]$14 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base[3:0]$21
-    assign $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$15 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$22
-    assign $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$16 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$23
-    assign $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$17 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$24
-    assign $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$18 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$25
-    assign $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$1.$result[3:0]$10 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$19
-    attribute \src "../../../corpus-external/yosys-simple/func_recurse.v:9.4-10.41"
-    switch 1'1
-    attribute \src "../../../corpus-external/yosys-simple/func_recurse.v:9.8-9.15"
-      case 1'1
-        assign { } { }
-        assign { } { }
-        assign { } { }
-        assign { } { }
-        assign { } { }
-        assign { } { }
-        assign { } { }
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base[3:0]$21 \inp
-        assign { } { }
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$20 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$26
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$22 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$27
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$23 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$28
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$24 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$29
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$25 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$30
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$19 $../../../corpus-external/yosys-simple/func_recurse.v:10$mul$36_Y
-        attribute \src "../../../corpus-external/yosys-simple/func_recurse.v:9.4-10.41"
-        switch 1'1
-        attribute \src "../../../corpus-external/yosys-simple/func_recurse.v:9.8-9.15"
-          case 1'1
-            assign { } { }
-            assign { } { }
-            assign { } { }
-            assign { } { }
-            assign { } { }
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$28 \inp
-            assign { } { }
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$27 $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$31
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$29 $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$32
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$30 $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$33
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$26 $../../../corpus-external/yosys-simple/func_recurse.v:10$mul$35_Y
-            attribute \src "../../../corpus-external/yosys-simple/func_recurse.v:9.4-10.41"
-            switch 1'1
-            attribute \src "../../../corpus-external/yosys-simple/func_recurse.v:9.8-9.15"
-              case 1'1
-                assign { } { }
-                assign { } { }
-                assign { } { }
-                assign $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$33 \inp
-                assign $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$32 4'0001
-                assign $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$31 $../../../corpus-external/yosys-simple/func_recurse.v:10$mul$34_Y
-                attribute \src "../../../corpus-external/yosys-simple/func_recurse.v:9.4-10.41"
-                switch 1'0
-                  case 
-                end
-              case 
-                assign $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$31 4'0001
-                assign $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$32 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result
-                assign $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$33 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base
-            end
-          case 
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$26 4'0001
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$27 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$28 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$29 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result
-            assign $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$30 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base
-        end
-      case 
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$19 4'0001
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$20 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base[3:0]$21 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$22 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$23 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$24 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result
-        assign $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$25 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base
-    end
-    sync always
-      update \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$1.$result $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$1.$result[3:0]$10
-      update \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result 4'x
-      update \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.base 4'x
-      update \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result 4'x
-      update \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base 4'x
-      update \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result 4'x
-      update \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base 4'x
-      update \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result 4'x
-      update \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base 4'x
-  end
   connect \out1 \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$1.$result
   connect \out2 4'0100
+  connect $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$31 $../../../corpus-external/yosys-simple/func_recurse.v:10$mul$34_Y
+  connect $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$32 4'0001
+  connect $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$33 \inp
+  connect $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$26 $../../../corpus-external/yosys-simple/func_recurse.v:10$mul$35_Y
+  connect $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$30 $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$33
+  connect $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$29 $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$32
+  connect $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$27 $3\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$31
+  connect $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$28 \inp
+  connect $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$19 $../../../corpus-external/yosys-simple/func_recurse.v:10$mul$36_Y
+  connect $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$25 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$30
+  connect $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$24 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$29
+  connect $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$23 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$28
+  connect $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$22 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$27
+  connect $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$20 $2\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$26
+  connect $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base[3:0]$21 \inp
+  connect $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$1.$result[3:0]$10 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$19
+  connect $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$18 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base[3:0]$25
+  connect $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$17 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result[3:0]$24
+  connect $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$16 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base[3:0]$23
+  connect $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$15 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result[3:0]$22
+  connect $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base[3:0]$14 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base[3:0]$21
+  connect $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$13 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result[3:0]$20
+  connect $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$11 $1\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result[3:0]$19
+  connect $0\pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.base[3:0]$12 \inp
+  connect \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$1.$result $../../../corpus-external/yosys-simple/func_recurse.v:10$mul$36_Y
+  connect \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.$result 4'x
+  connect \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:23$5.base 4'x
+  connect \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.$result 4'x
+  connect \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$6.base 4'x
+  connect \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.$result 4'x
+  connect \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$7.base 4'x
+  connect \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.$result 4'x
+  connect \pow_a$func$../../../corpus-external/yosys-simple/func_recurse.v:10$8.base 4'x
 end
