@@ -27,7 +27,7 @@
 | `riv-difftest` | riv 差分 harness(dev-only):`--e2e --corpus`(正規化+看門狗+ledger 判定)與 iv 臂(case.json enforced/pending)**按 corpus 路徑尾段選臂**;UNLEDGERED/DRIFT 文字訊號,執法在 regress grep | 無 lib(子程序驅動兩 bin) | —(自建) | 7 單測(正規化敵意 fixture/看門狗/DECL 兩形/臂選擇);regress 兩臂精確數基線 |
 
 | `ry-ir` | RTLIL 對象模型+行導向 lexer/遞迴下降 parser+`write_rtlil -readable` 打印機(ADR-0010 IR 主權層;twines/$priv@/parameter real=Y1 硬錯) | **0** | yosys kernel/rtlil_{frontend,backend} | roundtrip 閘 55 例 oracle .il byte-exact(含 P-bearing 層) |
-| `ry-cli` | bin `ryosys`:兩層 registry(`-H` 普查 306 條=登記層 stub 298+實現層 8[M0 五命令+M1 增 hierarchy/read_json,M1-d 增 simplemap],Y0..Y3)+`-p` 尾分號切分契約+check/stat/write_json 移植面(dict/pool 逆插入序契約;boxed 模組靜默跳過;M1-c 組合環=celledges.cc 全 dispatch+參與條件;M1-d simplemap=mapper 家族+FfData slice/emit+hashlib swap-and-pop 序;wand/wor 多驅動解析=hierarchy.cc:1364-1481 段+1485/1524/1526/1517 二進制行號錨) | ry-ir | yosys driver+passes/cmds+backends/json | cli_contract 22 測;ys-e2e 402/402 四件套+LIVE ys=402/402 |
+| `ry-cli` | bin `ryosys`:兩層 registry(`-H` 普查 306 條=登記層 stub 286+實現層 20[M0 五命令+M1 增 hierarchy/read_json/simplemap,M2 增 proc 家族 11+opt_expr -keepdc],Y0..Y3)+`-p` 尾分號切分契約+check/stat/write_json 移植面(dict/pool 逆插入序契約;boxed 模組靜默跳過;M1-c 組合環=celledges.cc 全 dispatch+參與條件;M1-d simplemap=mapper 家族+FfData slice/emit+hashlib swap-and-pop 序;wand/wor 多驅動解析=hierarchy.cc:1364-1481 段+1485/1524/1526/1517 二進制行號錨) | ry-ir | yosys driver+passes/cmds+backends/json | cli_contract 22 測;ys-e2e 402/402 四件套+LIVE ys=402/402 |
 | `ry-difftest` | ryosys oracle 差分 harness(dev-only):`--record` 全量兩層錄制+`--corpus` 四件套對拍(exit/stdout 歸一化/stderr 逐字/rtlil/json);歸一化敵意 fixture 單測釘死 | 無(子程序驅動) | —(自建) | 7 單測+regress「ryosys」塊精確數 402/402(M1 弧末=M0 層+87 -hier+87 -rj+87 -sm) |
 ## 語言能力 ↔ 里程碑 ↔ 證據 case
 
@@ -122,6 +122,7 @@
 | D-ys3 | write_rtlil 默認形 | twines 壓縮形輸出成功 | Y1 硬錯,只承諾 `-readable` | M0 只釘傳統全名形 | cli_contract write_rtlil_default_form_is_y1 |
 | D-ys4 | 檢查器路徑 | check 錯誤內嵌 `__FILE__` 構建路徑 | 若入 golden,歸一化剝 `/work/_builds/…` 段 | 同 D-ys1 | (預防性登記;M0 語料未觸發) |
 | D-ys5 | check 組合環警告的**環起點旋轉** | 環內節點序依 0.70+179 內部序(interning/hash),8 探針實測:同名集 {x,y}→恆 x 起、{a,b}→恆 b 起、{aa,zz}→隨宣告朝向翻轉——v0.70 clone 的 TopoSort(std::map 節點序)+check.cc 無法推導 | 我方輸出同一環的**正確內容**(cell/edge/wire/source 行)但起點旋轉可能不同 | M1-c ✅(2026-10-27 補完,第二輪):偵測+內容實現=check.cc 參與條件+celledges.cc 全 dispatch(ff 無 D→Q 邊/arith 精確邊/detail_costly fallback);環 fixture 不入 SUMMARY 語料(避免以非 byte-exact golden 假綠);完整旋轉復刻=需建模二進制內部序,後置 | 本輪 8 探針掃描(a/b,c/d,x/y,m/n,b/a,y/x,aa/zz,zz/aa)+loop2not/loop3and/loopsrc 三 golden 錄製實證 |
+| D-ys6 | 空設計 stat/check/hierarchy(2026-10-28 對抗審 finding) | 空設計(無 read_* 先行)下 `stat`/`check`/`hierarchy` 均 rc=0 成功:stat 印 `1. Printing statistics.`、check 印 `Executing CHECK pass`+`Found and reported 0 problems.`、stderr 0 字節(2026-10-28 兩端探針實錄) | rc=1+自創 `ERROR: No design object available (run 'read_rtlil' first) while executing command `<cmd>'`(main.rs:174 `{cmd}` 通形+:306 hierarchy 字面形)——文案 clone v0.70 全樹 grep 零命中=ryosys 自創,oracle 無此錯誤路徑 | 登記在案先於繼續(AGENTS 10.5);語料 402 例全部先 read_rtlil、golden 面不觸,非 M1/M2 驗收阻塞;修復(空設計對齊 oracle rc=0 形+fixture)後置——觸碰 stat/check/hierarchy 契約面的弧同輪順帶修(D-ys3 同款後置形) | 兩端探針:oracle rc=0×3+stderr 0B vs ryosys rc=1×3+逐字 ERROR;`grep -rn "No design object available" vendor-reference/yosys/`=0;本行落檔前 REGISTRY/RYOSYS-MVP/PROVENANCE 對該文案 rg 查空 exit=1(登記欠賬本體,本行即清償) |
 
 ## Incident register(工具鏈開發事故;五欄制)
 

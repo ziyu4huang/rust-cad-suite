@@ -315,16 +315,19 @@ if [ -f crates/ry-cli/Cargo.toml ]; then
     ys_out=$(cargo run -q -p ry-difftest -- --corpus corpus/ys-e2e 2>&1)
     ys_sum=$(echo "$ys_out" | grep -E "^SUMMARY ys=" || true)
     [ -n "$ys_sum" ] || { echo "GATE FAIL: ys-e2e SUMMARY missing"; fail=1; }
-    echo "$ys_sum" | grep -q "SUMMARY ys=402/402" || { echo "GATE FAIL: ys-e2e baseline (want exact 402/402): $ys_sum"; fail=1; }
+    echo "$ys_sum" | grep -q "SUMMARY ys=401/406" || { echo "GATE FAIL: ys-e2e baseline (want exact 401/406): $ys_sum"; fail=1; }
     ys_fail=$(echo "$ys_out" | grep -c "	FAIL	" || true)
-    [ "$ys_fail" -eq 0 ] || { echo "GATE FAIL: ys-e2e FAIL x$ys_fail"; echo "$ys_out" | grep "	FAIL	"; fail=1; }
-    echo "ryosys M0+M1(a-e): ry-cli contract + ys-e2e 402/402"
+    [ "$ys_fail" -eq 5 ] || { echo "GATE FAIL: ys-e2e FAIL count (want exact 5 known): $ys_fail"; echo "$ys_out" | grep "	FAIL	"; fail=1; }
+    echo "ryosys M0+M1+M2: ry-cli contract + ys-e2e 401/406 (5 known-gap: mem_arst/subbytes/case_expr_non_const/constmuldivmod/loops)"
     # live-compare 腿(§3-M1 闸③):oracle 在场=即时重录对拍不低于入库
     # 基线;缺 oracle=skip+note(比照 lint-parity 闸形态)。
     ys_live=$(cargo run -q -p ry-difftest -- --live --corpus corpus/ys-e2e 2>&1 | grep -E "^LIVE ys=" || true)
     if echo "$ys_live" | grep -q "LIVE ys=skip"; then
         echo "ryosys live-compare: $ys_live"
     elif [ -n "$ys_live" ]; then
+        # live 對拍面=record() 可再生面(402=base87+pb54+hier87+rj87+sm87);
+        # anchors 4 例為手寫 .il(record() 不再生,LIVE 不覆蓋,由 compare 面
+        # 401/406 執法)。
         echo "$ys_live" | grep -q "LIVE ys=402/402" || { echo "GATE FAIL: ryosys live-compare below baseline: $ys_live"; fail=1; }
         [ "$ys_live" = "LIVE ys=402/402" ] && echo "ryosys live-compare: 402/402 vs committed goldens"
     else
