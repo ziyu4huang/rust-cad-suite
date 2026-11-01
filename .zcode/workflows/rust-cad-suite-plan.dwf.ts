@@ -1,7 +1,7 @@
 /* zcode-workflow
 description: 通用自我改進規劃工作流:每 run 依當前 context 盤點候選弧,走 設計→可證偽實驗→獨立對抗審→實作→機械閘(build
-  零警告/cargo test/regress 全閘)→帳務提交,可連跑多輪並把教訓反饋下一輪。subagent 全走 GLM-5.3 $max(Pro
-  MAX,非 Flash)。
+  零警告/cargo test/regress 全閘)→帳務提交,可連跑多輪並把教訓反饋下一輪。subagent 模型隨 run 級 subagent_model/GUI
+  設置,metadata 不構成運行時約束(2026-10-30 實測 GLM-5.3-Flash)。
 whenToUse: 要讓 rust-cad-suite 自主推進一輪(或 N 輪)完整開發弧時:選題、實證、審查、實作、過閘、提交一次到位。工作樹必須乾淨。
 args:
   focus:
@@ -23,7 +23,7 @@ args:
 // rust-cad-suite 自我改進工作流(通用規劃器,ADR-0009 體系)
 // 每 run = N 輪完整弧:盤點 context → 設計(選弧+方案)→ 實驗(可證偽探針)
 // → 判定(獨立對抗審)→ 實作 → 機械閘(build/test/regress)→ 帳務提交 → 反饋下一輪。
-// 全部 subagent 走 run 級 subagent_model(Pro MAX)。
+// 全部 subagent 走 run 級 subagent_model 設置(隨設置,metadata 非硬約束)。
 
 interface DigestItem {
   /** 領域或弧名,例如「U-3 CLI 面收編」或「效能 R10」。 */
