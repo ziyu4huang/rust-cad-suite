@@ -199,6 +199,7 @@ Y3=techmap/Verilog 前端远景。
 | **M0** | §1.2 纵切全落地 | ① `cargo test -p ry-ir` 绿:roundtrip 闸 ≥20 例 oracle .il(**含 P-bearing 层 ≥10 例**——process/case/sync 区块解析的 golden 覆盖;read→write `-readable`,归一化剥首行后与 committed golden byte-exact)+错误路径 fixture(exit code+逐字 ERROR 行,**ERROR 在 stderr——fixture 断言 stdout/stderr 分流**);② `cargo run -p ry-difftest -- --corpus corpus/ys-e2e` 精确数 **100%**(M0 corpus=87 P-free+54 P-bearing=**141 例**),对拍四件套 stdout/stderr/rtlil/json——**stderr 逐字无归一化**(错误案例 ERROR byte-exact;成功案例**两端 stderr 必空**,实测 0/87,ryosys 漏打/多打诊断=红;check Warning 在 stdout 中段 byte-exact,归一化禁剥)(SUMMARY 逐字入 regress grep 基线);③ `cargo test -p ry-cli` 绿:CLI 契约 goldens(未注册命令逐字错/未实现命令 milestone Y/`-V` 自标识/`-p` 解析 fixture 组);④ `bash scripts/regress.sh` 全绿(新守卫块 `[ -f crates/ry-cli/Cargo.toml ]`,既有闸零扰动) |
 | **M1** | 零转换 pass 面 + JSON 闭环:`hierarchy -auto-top/-top`、`simplemap`(45 条纯映射表,零 Pass::call)、`check` 深化(组合环=celledges+toposort,未知 cell 行为靠 corpus 差分钉死)、`read_json`(自家 write_json 输出闭环,调研实测可行) | ① ys-e2e 扩容(层级案例+映射后案例),SUMMARY 精确数基线逐字 grep 同轮上调;② read_json→write_rtlil/write_json 交叉闭环案例 byte-exact;③ **live-compare 腿**(regress,oracle 在场才跑):ys-e2e 全例即时重录对拍不低于入库基线,缺 oracle=skip+note(比照 lint-parity 闸形态) |
 | **M2** | proc 家族:10 个语义子 pass 的编排器(proc.cc:119-140,尾巴强制 `opt_expr -keepdc`)+opt_expr 子集;process 硬错翻转;sync 语义兑现 | ① **§4.1 P-bearing 层 54 例翻绿**(统一脚本不变:exit 1→0+expected.json 同轮新增入库)、SUMMARY 基线同轮上调;② 原 Y2 硬错 fixture 删除+对应 PASS case 同轮 commit(铁则 3);③ proc 后 write_json/write_rtlil 与 oracle 逐 byte(含 `$auto$…` 内部名的分層釘法,见 §6-R9) |
+| **M3** | opt 家族 18 条翻实现+opt_expr 6 新旗标+`opt` 编排器+D-ys6 清偿+`-pbo` 54 例扩容(§9) | ① SUMMARY 基线(时点演进:M3 实作轮 2026-10-30=418/460,42 例 known-gap 两类根因=opt_dff worker 未移植+D-ys8 幸存序差;**现行基线 2026-10-31 續弧第 7 輪=450/460,10 例 known-gap**,worker 已随续弧第 2 轮全量移植、根因分类见 REGISTRY D-ys8/8c/8b,名单逐字入 regress S4;既有五层 406 零扰动恒定);② registry stub 286→275(Y2 7)/实现层 31,五处口径同轮;③ D-ys6 清偿(rg 负向闸+empty_design fixture);④ `opt` 编排器 changed 判定+Rerunning 面 golden 兑现(P3 契约) |
 
 ## 4. oracle 对拍设计
 
@@ -671,7 +672,7 @@ check Warning 即此形);归一化实现若把 Warning 当机器串剥除=内容
    逐行对号修正:腿名+执法串必须逐字引用,禁用裸简称**(§7.6-1-1
    「307 假分歧」同类教训,记录性)。。日志附注 `note: report changed vs index` 为进轮前工作树既有态(git status 快照中 e2e-report/index.html 本就 M),非本轮改动面,[4/4] 为 note 非 FAIL |
 | 2 | `env -u DEVELOPER_DIR bash scripts/regress.sh` | **未单独重复全量**——本机环境 `DEVELOPER_DIR` 原生 unset(实测),验收 1 的裸跑与 env -u 形在本机走**同一条防御分支**(`[ -z … ]` 判未设),重复执行不增加鉴别力;显式设置路径按 RM1-5 属用户主权,不入验收面 |
-| 3 | `cargo test -p ry-cli` + simplemap 契约函数 | 全 target `test result: ok`(cli_contract **22 passed** 与 REGISTRY.md:30「22 測」一致+main 单测 2 passed);`rg -c 'fn [a-z_0-9]*simplemap' crates/ry-cli/tests/cli_contract.rs`=**1** ✓ |
+| 3 | `cargo test -p ry-cli` + simplemap 契约函数 | 全 target `test result: ok`(cli_contract **22 passed**(2026-10-28 时点;M2 实作轮 +3 case 现=25,REGISTRY.md:30 已同步)+main 单测 2 passed);`rg -c 'fn [a-z_0-9]*simplemap' crates/ry-cli/tests/cli_contract.rs`=**1** ✓ |
 | 4 | difftest SUMMARY 与 S4 grep 串一致 | `cargo run -q -p ry-difftest -- --corpus corpus/ys-e2e` → `SUMMARY ys=402/402`(本轮实跑);regress.sh:318 grep 串 `SUMMARY ys=402/402` 逐字相同 ✓。**实录定盘=402,零排除**(§7.1-3 的「402±排除实录」落定) |
 | 5 | LIVE 腿同基线 | `LIVE ys=402/402 vs committed goldens`(regress S4 live 腿实测,命令与验收 5 同一条 `--live --corpus corpus/ys-e2e`;oracle 在场) |
 | 6 | `rg '141'` 五檔零匹配 | exit=1 零匹配 ✓ |
@@ -884,7 +885,10 @@ suite-dl/oss-cad-suite/bin/yosys,版本串=§0 头;clone 仅读码参考)
    `SUMMARY ys=<实录新基线>`(=402+N 补锚;54 例 -pb 全部 exit=0),且与
    scripts/regress.sh S4 的 grep 串逐字相同。
 3. `cargo run -q -p ry-difftest -- --live --corpus corpus/ys-e2e` →
-   `LIVE ys=` 同基线(oracle 在场;缺=skip+note 形态不变)。
+   `LIVE ys=402/402`(**非** SUMMARY 的 406/406:LIVE 面=record() 可再生
+   面=406−4 anchors,补锚 4 例为手写 .il 不入 LIVE,由 compare 面 406/406
+   执法——regress.sh S4 live 腿注释同口径;oracle 在场;缺=skip+note
+   形态不变)。
 4. `find corpus/ys-e2e -path '*-pb/expected.json' | wc -l` → **54**
    (翻转收据;补锚目录命名禁以 `-pb` 结尾——本条即闸)。
 5. `cargo test -p ry-cli` 全绿;且
@@ -918,10 +922,14 @@ suite-dl/oss-cad-suite/bin/yosys,版本串=§0 头;clone 仅读码参考)
 
 ## 8.8 M2 实作轮实录(2026-10-29;实作员轮,十二命令翻实现层)
 
-> slices 1-5 全数落地,验收八条除 2/3 的全绿语义外全部达成(如实)。
- > **数字**:SUMMARY ys=**401/406**(=348 四层+49 -pb+4 anchors;红 5)
-> ——**未达 406/406**,翻转面 49/54 byte-exact(dff_different_styles 已于续修轮收平);LIVE ys=402/402(record()
-> 可再生面全绿);裸跑与 `env -u DEVELOPER_DIR` regress=PASS;build 零
+> slices 1-5 全数落地(验收八条于实作轮除 2/3 的全绿语义外全部达成,
+> 如实;续弧收平轮后八条全达成——验收 2=406/406、验收 3 LIVE 面=
+> 402/402,面差见 §8.6-3 注)。
+ > **数字**:SUMMARY ys=**406/406**(=348 四层+54 -pb+4 anchors;红 0
+> ——实作轮 401/406 红 5 已于 2026-10-29 续弧收平轮全数收平,§8.8-4;
+> 实作轮翻转面 49/54 byte-exact,dff_different_styles 已于续修轮收平);LIVE ys=402/402(record()
+> 可再生面=406−4 anchors 手写 .il,不入 LIVE;全绿);裸跑与
+> `env -u DEVELOPER_DIR` regress=PASS;build 零
 > 警告;ry-cli 25 测全绿;`rg '298'` 三档零匹配、`rg '286'` PROVENANCE
 > ≥1、140 行号锚列表未动;`rg '"proc", "Y2"|…'` exit=1。
 
@@ -954,6 +962,10 @@ suite-dl/oss-cad-suite/bin/yosys,版本串=§0 头;clone 仅读码参考)
    129 post_execute)+helper 无 src;fixup_muxes 全移植。
 
 ### 8.8-1b 续修轮实录(2026-10-29 第二轮)
+> 注(2026-10-29 续弧收平轮补):本节为时点记录——其中 subbytes
+> 「EN/ARST 极性面」、mem_arst「24 vs 46」、case_expr_non_const/loops
+> 「find_mux_feedback(c) 树形差异」三条归因已被续弧对读证伪,真根因与
+> 收平=§8.8-2/§8.8-4。
 * **dff_different_styles 收平**(401/406 含):根因=proc_dff 的
   log_warning(Complex async reset/Async reset value not constant)未进
   driver 的 Warnings 汇总——修=Log 加 warnings 通道,main 末尾并入
@@ -982,31 +994,923 @@ suite-dl/oss-cad-suite/bin/yosys,版本串=§0 头;clone 仅读码参考)
   ReduceOr$69),oracle 为 c 生成独立树($74-89)——find_mux_feedback(c)
   的树形差异待续弧。
 
-### 8.8-2 五例 known-gap(如实;待续弧)
-* **mem_arst**:snippet 池处理序(wr ADDR/wr DATA/rd 的池序差)+
-  opt_expr -keepdc 的 replace 计数(oracle 46/我方 24)。
-* **subbytes**:$1\next_state/$2\next_state 的 snippet 首见序+
-  opt_expr 的 adff 参数形(ARST_VALUE int0 vs 1'0)。
-* **case_expr_non_const/loops**:proc_dlatch 的第二 latch 组
-  make_hold 树形(latch b 一致、latch c 的树 2 vs 16 节点——
-  find_mux_feedback/constant 的树形深挖)。
-* **constmuldivmod**:opt_expr 的 fold 链(228 行 diff)。
-* 共性:rtlil 的 **cell/参数面已对齐**,差在输出**顺序**与**内部
-  节点计数**——同轮登记为续弧入口;四件套 golden 以 oracle 录制为准。
-* **§8.8-3 续弧指南**(2026-10-29 实作轮五轮沉淀;按预期工作量排序):
-  1. **subbytes**(剩 rtlil 84 行):opt 后 adff 的 EN/ARST 极性面——
-     oracle 的 handle_polarity_inv 对三条 adff 触发 Inverting
-     (invert_map 键=SigMap 代表元位);我方同点未命中。入口=
-     SigMap::set 的代表元序与 oracle sigtools 逐位对拍(mux 链的
-     connections 顺序;可先用 /tmp 对比两端的 assign_map 全表)。
-  2. **case_expr_non_const/loops**(剩 dlatch latch c 树形):latch b
-     行全对;c 的 make_hold 树 2 vs 16 节点=find_mux_feedback(c) 的
-     递归路径差异。入口=db_shared 的 mux_drivers/mux_srcbits 对
-     latch c 起点位($43_Y)的单步追踪(与 oracle debug 轨迹对拍)。
-  3. **constmuldivmod**(228 行):opt_expr 的 fold 链。入口=逐命令
-     二分已定位到 opt;对 oracle debug 轨迹(`debug opt_expr -keepdc`)
-     与我方 dbg_inc_what 轨迹逐条对拍(工具已备)。
-  4. **mem_arst**(106+行):snippet 池处理序(ADDR/DATA/RD 池序)+
-     opt replace 计数 24 vs 46。入口=SigSnippets::insert 的
-     actions 顺序(arst 的 apply_reset 改写后的 actions dump 已一致,
-     差异在 idict 首见序的更深一层的 actions 内位序)。
+### 8.8-2 五例 known-gap(→ 2026-10-29 续弧收平轮全数收平,406/406;本节=时点记录,旧假设证伪与真根因见 §8.8-4)
+* **mem_arst**:实作轮归因 snippet 池处理序+opt replace 计数 24vs46
+  → **已证伪**:snippet 池/idict 契约实现正确(续弧对读),真根因=
+  proc_clean_switch hoist 的逐元素 insert(0) 翻序;「24 vs 46」亦过时
+  (修后两端 stdout 皆 `<suppressed ~46 debug messages>`)。
+* **subbytes**:实作轮归因 snippet 首见序+adff 极性面(ARST_VALUE int0
+  vs 1'0)→ **已证伪**:续修轮后 diff 纯为输出序,Inverting ARST 同点
+  命中、产出同形;真根因=opt_expr -keepdc 折叠扫描序(TopoSort 排序键)。
+* **case_expr_non_const/loops**:实作轮归因 make_hold 树形(c 树 2 vs 16
+  节点)→ **已证伪**:make_hold 树两端已同形同编号;case_expr_non_const
+  真根因=per-latch fresh RulesDb(rules 作用域混用,**且为语义错**——
+  隔离探针中 c 的 EN=1'1 vs oracle 1'0);loops 真根因=Topo 排序键。
+* **constmuldivmod**:实作轮归因「opt 的 fold 链(228 行 diff)」→
+  **精确化**:缺整条「B 全定全零→connect Y=x+删 cell」规则
+  (opt_expr.cc:1786-1808);cell 清单序差由同一缺失派生(可复刻,
+  非 internal-order)。
+* 共性(收平后成立):五例全部 byte-exact 对上既有 golden(零重录);
+  序差类根因一律以 0.70+179 二进制实跑轨迹仲裁,禁以源码静态推导定案。
+* **§8.8-3 续弧指南**(2026-10-29 实作轮五轮沉淀;按预期工作量排序)
+  ——已被续弧收平轮消费:四条入口的归因三条证伪(mem_arst/subbytes/
+  case_expr_non_const+loops)、一条精确化(constmuldivmod)(上方逐条),
+  对读轮
+  以「二进制实跑轨迹+源码对读(v0.70 28ba3cb;9534a7f4d fetch 失败,
+  序差结论全以二进制仲裁)」重定位,收平实录=§8.8-4。
+
+### 8.8-4 续弧收平轮实录(2026-10-29;续弧第 1 轮:五例全收平,SUMMARY 401/406→**406/406**)
+
+> 全部修复只动 `crates/ry-*`;golden 零重录零漂移(每例=我方输出
+> byte-exact 对上既有 oracle golden,difftest 四件套全绿);同轮翻闸=
+> regress.sh S4 精确数+描述行、PLAN.md:91 M2 行、REGISTRY 组件行、
+> roundtrip.rs 注释口径(铁则 3)。
+
+1. **mem_arst(proc_clean_switch hoist 保序)**:oracle proc_clean.cc:72
+   的 hoist=`parent->switches.insert(parent->switches.begin(), begin,
+   end)` range-insert-at-begin,保 [Addr 读解码 switch, WR switch] 相对
+   序;我方逐元素 `insert(0, m)` 把 [read, WR] 翻成 [WR, read],再经
+   proc_mux SigSnippets 的 dict 逆插入序放大成 pool 插入序差(stdout
+   31-33 三行+cell 命名位移:gen_mux trivial 提前 return 也吃 autoidx、
+   gen_cmp 1-bit compare 走 fast-connect 不产 cell)。修=proc.rs hoist
+   分支改 `parent.switches.splice(0..0, moved)`(单 switch 行为不变,
+   唯 hoisted case 含 ≥2 sibling switch 的案例受影响)。
+2. **case_expr_non_const(proc_dlatch rules 作用域)**:proc.rs:2902 在
+   per-latch 循环内 new fresh RulesDb 供 find_mux_feedback(...,true),
+   而 make_hold 把产出的 node id 拿到**外层共享 rules** 解析——latch b
+   先 materialize 了外层 rules.sig[6](恰好等于 c 在 fresh 域的根 id,
+   因两树 intern 序同构),缓存命中把 b 的 ReduceOr 直接当 c 的 hold
+   返回:c 树塌缩 0 cell、终 autoidx 75(oracle=90),且为**语义错**
+   (隔离双 latch 探针:c 的 EN=1'1 vs oracle 1'0)。修=删 fresh rules,
+   find_mux_feedback 与 make_hold 同用外层 rules(=oracle per-module
+   rules_db,proc_dlatch.cc:145-146+628-632)。修后 stdout/json 两腿即
+   平;rtlil 腿残差(opt_expr connect 发出序)由 3/4 的排序键一并收平。
+3. **subbytes/loops(opt_expr TopoSort 排序键=intern 序)**:oracle
+   TopoSort 的 comparator=IdString::compare_ptr_by_name→operator< 比
+   **intern index**(rtlil.h:413-415;global_id_index_ 首见递增,
+   rtlil.h:162),**不是 String 字典序**;9534a7f4d 二进制实测折叠轨迹
+   19 次全符「建名时刻升序」(autoidx 名=创建序;literal 名同律;禁以
+   v0.70 源码 autoidx 负索引编码当律——rtlil.h:215-218 `-(autoidx++)`
+   推出的「后建者在前」与二进制实测相反)。我方 roots(:271)与入边
+   (:290)原按字节序 → 折叠序差辐射两 diff 面:折叠 connect 附加序
+   (vector append)与被折叠 cell 的 erase 序(hashlib swap-and-pop
+   补位→write_rtlil 正向迭代=entries 残序)。修=Design 级 intern_seq
+   表(read_rtlil 档案序登记 module/wire/memory/cell/process 五类)+ 
+   autoidx_base 分界(pass 建名 `$…$N` 以 N≥base 派生=N 序=创建序,
+   免逐点登记);Topo::node 增 key,sort/worker 按 key 排序。loops 的
+   「NEW_ID 先取号后插入」面(proc_dlatch.cc:549 en Not 名先 intern、
+   cell 后插)由 intern 键(非 cells 向量序近似)正确覆盖。
+4. **constmuldivmod(opt_expr 除零规则)**:oracle opt_expr.cc:1786-1808
+   ($div/$mod/$divfloor/$modfloor,x-bit/eq/shift 段之后、fold2 派发
+   之前,**不受 :1810 keepdc 门控**):B 经 AssignMap 后 fully_def 且
+   fully_zero→`connect(Y, Sx(size))`+remove cell+debug 计数。我方缺整
+   条规则(多留 6 cell、92vs86、div/mod 15vs12、suppressed 1vs7)。修=
+   主循环增该分支(am.add+connect+remove_cell_by_name(swap-and-pop)
+   +dbg_inc_what);6 个被删槽由 entries 尾部 proc_mux CMP cells 按遭遇
+   序补位(hashlib swap-and-pop),遭遇序=intern 键排序后自动到位
+   (零序专用码;若退回 String 序则 6 次 erase 遭遇序错位、双 diff 面)。
+5. **同轮闸同步与登记**:regress.sh S4(grep `406/406`、FAIL=0、描述行
+   +live 腿注释 401/406→406/406);PLAN.md:91 M2 行翻 ✅;REGISTRY
+   组件行+intern 序法条;crates/ry-ir/tests/roundtrip.rs 注释口径。
+   **check.rs 的 D-ys5(环起点旋转)经评估不改**:8 探针证据
+   ({a,b}→恒 b 起)非纯 intern 序可解释(a 先 intern 若起点=intern
+   最小应 a 起),环起点=另一内部序(登记保持);REGISTRY 补连动注记
+   (opt_expr 族已建模 intern 序,check 环起点后置)。
+
+---
+
+# 9. M3 详案(2026-10-30 追加;planner 出案)
+
+> M0 原文(§0-§6+附录)、M1 详案(§7)、M2 详案与实作/续弧实录(§8)全部
+> 不动;本章为里程碑表 M2 之后下一档的可执行展开。§3 表止于 M2;下一档的
+> 文档依据=§8.3-3「opt_expr 完整行为面与 opt 家族其余 18 条仍留 Y2 后续
+> 弧」+§8.4 显式不做表「opt 家族其余 18 条…Y0/Y2 后续弧」+registry.rs
+> 头注释「opt 家族其餘 18 條→Y2(後續弧)」——即 **Y2 收口弧:opt 家族
+> 18 条+opt_expr 完整行为面**,本章立案为 **M3**。§3 表与 PLAN.md 属
+> 既有内容(既有行不动):二者现均无 M3 行(2026-10-30 实测 `grep -n
+> 'ryosys M3' PLAN.md` 零命中、§3 表止于 M2),M3 行文本以 §9.1/§9.3
+> 为源、随收口轮(slice-6)同轮新增(铁则 3/10 四层)。
+> 基线现状(2026-10-30 本轮全部实跑):`cargo run -q -p ry-difftest --
+> --corpus corpus/ys-e2e` → `SUMMARY ys=406/406`;裸跑 `bash scripts/
+> regress.sh` → exit 0,尾段逐字 `ryosys M0+M1+M2: ry-cli contract +
+> ys-e2e 406/406 (known-gap 清零:M2 續弧五例 mem_arst/subbytes/
+> case_expr_non_const/constmuldivmod/loops 全收平)`+`ryosys live-compare:
+> 402/402 vs committed goldens`+`== REGRESSION GATE: PASS ==`。工作树含
+> 上一轮(续弧收平)未提交成果,本章规划不回退、不留双口径。
+
+## 9.0 oracle 实录与序差分类备料(2026-10-30 规划轮探针;二进制=§0 头同串;clone 停在 v0.70 28ba3cb 未 fetch,本轮 `git -C vendor-reference/yosys log -1` 实测)
+
+| # | 探针 | 实录结果 |
+|---|---|---|
+| P1 | `-H` opt 族普查+registry 行数 | 19 条描述行=18 条 Y2 stub+已实现 opt_expr(逐字描述随 slice-1 入 PROVENANCE);registry.rs 实测 `"Y2"` 行=**18**、`"Y0"`=266、`"Y3"`=2(stub 286+实现层 20=306) |
+| P2 | `help opt`(编排器全文) | **定点迭代结构**:序幕 `opt_expr`+`opt_merge -nomux` → `do { opt_muxtree; opt_reduce [-fine/-full]; opt_merge; opt_share (-full only); opt_dff (except -noff); opt_hier (-hier only); opt_clean [-purge]; opt_expr } while <changed design>`;`-fast`=替代序(本弧不做);方括号旗标=仅 opt 收到时透传。**与 proc 固定 11 调用序的本质差=changed 判定与循环重跑** |
+| P3 | log 形实录(always01-pb 上 `read_rtlil case.il; proc; opt`) | 两轮:3.1-3.8 首轮八 header;**`3.9. Rerunning OPT passes. (Maybe there is more to do..)`=编排器 log 行(非 pass header,占编号)**;3.10-3.15 次轮(无序幕 opt_merge -nomux、无 opt_share/opt_hier);次轮后 changed=false 收敛。编号连续不跳,`Rerunning` 行是 golden 内容 |
+| P4 | base 层裸 opt(always01,已 opt 输入) | 单轮收敛(无 Rerunning 行):八 header+全零增删 log——幂等面=header-only,`-opt` 扩层价值低(扩层裁定输入,§9.1-5) |
+| P5 | `help opt_expr` 旗标全集 | `-mux_undef`/`-mux_bool`/`-undriven`/`-noclkinv`/`-fine`/`-full`/`-keepdc` 七形;`-full`=**`-mux_undef -mux_bool -undriven -fine` 四旗标的别名**(oracle 逐字 `-full / alias for -mux_undef -mux_bool -undriven -fine`;**不含 -noclkinv**——与 §9.1-2 同一口径);现契约形仅 `-keepdc`(M2 §8.3-3) |
+| P6 | D-ys6 空设计两端复现 | oracle `stat`/`check`/`hierarchy` 全 rc=0、stderr 0 字节(stdout 838/904/881B);ryosys 全 rc=1+自创 `ERROR: No design object available (run 'read_rtlil' first) while executing command \`X'`(stderr 90/91/95B;main.rs:203 通形+:335 hierarchy 字面形)——D-ys6 登记行为本轮实录再证 |
+| P7 | 测试/登记面现状 | cli_contract `registered_stub_milestones` 表=2 Y3+3 Y0 代表行(`"Y2"` 字面=0);`rg -n 'No design object available' crates/` 仅 main.rs:203/:335 两处、无 fixture 断言该文案;`rg -n '286'` 四檔(REGISTRY.md/PROVENANCE/registry.rs/main.rs)命中恰=五处口径行(REGISTRY.md:30+PROVENANCE:159+registry.rs:4/:9+main.rs:5)、无合法 286(与 M2 时 298 錨入 PROVENANCE 的情形不同,负向闸可全域;例外处置见
+   验收 6) |
+
+序差分类法(10.9-r 承接):intern 首见序法条已在库(Design.intern_seq+
+autoidx_base,消费者=opt_expr TopoSort);M3 预标敏感面=opt_merge hash 桶
+序、opt_clean 删除序(swap-and-pop 补位)、opt_muxtree/opt_reduce 遍历序、
+opt_share 配对序——凡 diff 先「源码定点对读+logic-diff/internal-order
+分类」,结论一律二进制实跑仲裁,禁源码静态推导定案(§8.8-2 三条证伪
+教训)。
+
+## 9.1 范围(做)
+
+1. **opt 家族 18 条逐条翻实现**(registry `"Y2"` 18→0):主契约形=无参;
+   每条=-H 逐字描述+子 pass 级 oracle golden。名单(§9.0-P1):opt_clean/
+   opt_merge/opt_muxtree/opt_reduce/opt_dff/opt_share/opt_mem/
+   opt_mem_feedback/opt_mem_priority/opt_mem_widen/opt_lut/opt_lut_ins/
+   opt_demorgan/opt_ffinv/opt_balance_tree/opt_hier/optbarriers+opt
+   (编排器)。
+   - **空转面纪律**:语料不触发的 pass(预判 opt_lut/opt_lut_ins/
+     opt_balance_tree/opt_hier 等无 LUT/层级面),行为面=oracle 无参实录
+     逐字(log header+无变更行),禁自创行为;oracle 无参形若在某输入
+     报错/需参数,实录后按契约形钉(硬错形亦合法 golden)。
+   - **内部旗标面**:`opt` 编排器内部调用 `opt_merge -nomux`(§9.0-P2
+     逐字)——`-nomux` 仅编排器内部形支持;standalone `opt_merge -nomux`
+     =Y2 硬错(契约 fixture 先钉再扩,R2)。
+2. **opt_expr 完整行为面**:6 个新旗标(-mux_undef/-mux_bool/-undriven/
+   -noclkinv/-fine/-full)逐旗标实现+golden;`-full`=-mux_undef
+   -mux_bool -undriven -fine 组合语义;旗标裁决表(实现/硬错二选一、
+   全覆盖禁未普查)入 PROVENANCE;既有 `-keepdc` 面(54 例 -pb 层尾巴)
+   零漂移(既有 golden 零重录=回归锚)。
+3. **`opt` 编排器(无参形)**:定点循环+changed 判定+`Rerunning OPT
+   passes. (Maybe there is more to do..)` 行+逐 pass 编号 header 逐字
+   (§9.0-P2/P3 契约);`opt` 旗标面(-fast/-full/-fine/-keepdc/-purge/
+   -noff/-hier 及全部透传形)与 selection 参数=Y2 硬错。
+4. **D-ys6 清偿**(遗留账主动清偿——触发条款从宽判定:本章验收脚本含
+   check/stat 且 opt 后形态触其新契约面;该账已在案两个完整弧):空设计
+   stat/check/hierarchy 对齐 oracle rc=0 形(实录 golden)+fixture+自创
+   文案删除(main.rs:203/:335)。
+5. **语料扩容(实录定盘,禁硬编)**:主扩层 **`-pbo`**=逐字
+   `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable
+   expected.rtlil; write_json expected.json`(54 例 -pb 输入;opt 家族
+   实质工作面最强层,P3 实测两轮迭代);`-opt` 层(87 例 base 输入)由
+   slice-1 普查裁定(P4 实测 header-only 面,裁定实录入 PROVENANCE——
+   全量无实质增删则不扩层,以 anchors 切片锚承载);anchors 暂存
+   `corpus/ys-m3-anchors/`(切片锚 ≥2 例/已实现子 pass+opt_expr 旗标
+   矩阵形),收口轮迁入 corpus/ys-e2e;SUMMARY 新基线=406+实录数。
+6. **registry 收口**:stub 286→**268**(Y0 266/Y2 0/Y3 2)、实现层
+   20→**38**(20+18);306 闭环;五处口径同轮(REGISTRY ry-cli 行/
+   registry.rs 头注释/PROVENANCE 对账节/ry-cli main.rs/本文档 §9)。
+7. **M3 立行与四层同步**(收口轮):§3 表追加 M3 行+PLAN.md 追加
+   ryosys M3 行(源文本=本章 §9.1/§9.3);闸(regress S4 grep 新基线)+
+   正典(SKILL ryosys 节 opt 条目)+AGENTS 10.9-r(编排 changed 判定
+   契约若有新法条则同轮)+证据页机械再生成。
+
+## 9.2 显式不做(每条=不变更既定边界)
+
+| 不做项 | 理由/边界 |
+|---|---|
+| `opt` 旗标面(-fast/-full/-fine/-keepdc/-purge/-noff/-hier 与全部透传形)及 selection 参数 | Y2 硬错;`help opt` 透传表=§9.0-P2 在档;语料与录制脚本只用无参形 |
+| 子 pass 独立旗标面(opt_clean -purge、opt_merge -share_all、opt_dff -nodffe/-nosdff/-sat、opt_reduce -fine/-full、opt_expr selection 等) | Y2 硬错;唯一例外=编排器内部 `opt_merge -nomux`(§9.1-1) |
+| opt_expr `-keepdc` 既有 golden 面 | 零重录零漂移(54 例 -pb 层在库=M3 扩旗标的回归锚) |
+| techmap/memory_* 家族、equiv/sat、abc 族、synth 族 | Y0 不变(§1.3) |
+| read_verilog 族(Y3 2 stub)、selection 机制、-c/-s、TCL/Python、write_rtlil 默认形、stat 选项面 | §1.3 不变 |
+| D-ys5 check 环起点 | 登记保持不改(§8.8-4-5);opt 增删 cell 致 check 面变化时,新环类案例照 D-ys5 政策=环 fixture 不入 SUMMARY 语料 |
+| `real_cond.v`/`real_rtoi.v` 收编、语料快照重制/oracle 升级 | §7.2 不变(升级=全量重录轮,R1/R8) |
+| 既有 base/-hier/-rj/-sm/-pb 五层 golden 与脚本 | 零扰动(新增层只增不改;本弧无既有硬错翻转,唯一删文案=D-ys6) |
+
+## 9.3 有序 slices(slice-1=源码定点对读+可复刻性分类备料,工具链位先行;每个中间 slice 出口=406/406 零扰动)
+
+| slice | 内容 | 出口闸 |
+|---|---|---|
+| **slice-1** oracle 契约实录+分类备料(工具链位;产品行为零变更) | ①§9.0 探针深化=PROVENANCE 新节「M3 opt 普查」:19 条 -H 描述逐字+`help opt`/`help opt_expr` 全文逐字+141 例(87 base+54 -pb)×`opt` 无参普查(逐例 rc/迭代轮数/Rerunning 计数/增删计数,排除表机制常驻)+18 条逐条 3-5 代表案例探针+opt_expr 6 新旗标探针矩阵(裁决表:实现/硬错全覆盖);②源码定点对读(clone v0.70 28ba3cb 原地禁 fetch;行号只按段定位、一律标「以二进制为准」):opt.cc 编排循环与 changed 判定赋值点(哪些子 pass 置 changed)、opt_clean.cc 遍历/删除序、opt_merge.cc hash 桶序、opt_muxtree/opt_reduce 遍历序、opt_share 配对序、opt_dff/opt_mem 家族面、空转 pass 的 log 形——**可复刻性分类预案表**(logic-diff=修我方收平/internal-order=登记 D-ys 不硬磕)落档;③D-ys6 两端逐字实录(§9.0-P6 深化成 golden 母本);④cli_contract 增「编排器/子 pass 旗标=Y2」探针 fixture(先钉死再扩命令面,R2) | PROVENANCE 新节在档;`cargo run -q -p ry-difftest -- --corpus corpus/ys-e2e` 仍 `SUMMARY ys=406/406`;`cargo build` 零警告;`cargo test -p ry-cli` 绿 |
+| **slice-2** 基础三 pass+D-ys6 清偿 | opt_clean+opt_merge(含内部 -nomux 形)+opt_muxtree 翻实现(registry 移除对应 stub 行,同轮实数对齐);子 pass 级 oracle 录制 fixture(≥2 例/条,禁手写);prefix-chain dev probe(oracle 单 pass 链 vs 我方同链,141 例逐例 rtlil cmp 记录在案——中间态比终态脆,RM2-1 同律);**D-ys6 落地**:main.rs:203/:335 自创文案删除+空设计三命令 rc=0 形(oracle 录制 golden)+empty_design fixture | `cargo build` 零警告;`cargo test -p ry-cli` 绿含 empty_design;ys 406/406 零扰动;`rg -n 'No design object available' crates/` exit=1;probe cmp 记录在案 |
+| **slice-3** 迭代重写面 | opt_reduce+opt_dff+opt_share+optbarriers 翻实现;fixture/probe 同 slice-2 形(链=[reduce,dff,share,optbarriers]) | 同 slice-2(除 D-ys6 两条) |
+| **slice-4** memory 族 | opt_mem+opt_mem_feedback+opt_mem_priority+opt_mem_widen 翻实现;memwr/meminit 语料面(54 例 -pb+2 例 memwr anchors)+oracle 普查定覆盖;fixture/probe 同形 | 同 slice-2(除 D-ys6 两条) |
+| **slice-5** 长尾+opt_expr 旗标全集 | ①opt_lut+opt_lut_ins+opt_demorgan+opt_ffinv+opt_balance_tree+opt_hier 翻实现(空转面纪律=§9.1-1);②opt_expr 6 新旗标逐旗标实现+golden+裁决表全覆盖;-full 组合语义;anchors 增旗标矩阵形 | 同 slice-2(除 D-ys6 两条);裁决表每行有对应 fixture/golden |
+| **slice-6** 编排器+扩容收口(四层同轮) | ①`opt` 编排器=定点循环(changed 判定+`Rerunning OPT passes.` 行+逐 pass 编号 header 逐字,§9.0-P2/P3);②SCRIPT_PBO 常量+`-pbo` 54 例录制(±`-opt` 层按 slice-1 裁定)+anchors 迁入 ys-e2e+SUMMARY 新基线实录定盘;③registry 收口(§9.1-6,五处口径);④四层同步:regress.sh S4 grep(406→新数)+LIVE 注释同步+SKILL/AGENTS+PLAN.md ryosys M3 行新增翻 ✅+§3 表 M3 行+REGISTRY 组件行+PROVENANCE 对账节;⑤cli_contract:`registered_stub_milestones` 表维护(代表行采样,不新增 opt 行=验收 5)+18 条 PASS 契约新增+旗标硬错契约(**全文 ERROR 断言形,禁裸 "Y2" 字面**——既有 ("cmd","Yx") tuple 表形会引入裸 Y2 字面直接违反验收 5;铁则 3 同轮) | §9.4 全清单绿 |
+
+## 9.4 验收清单(全部机械可执行)
+
+1. `bash scripts/regress.sh`(裸跑)→ 尾行 `== REGRESSION GATE: PASS ==`
+   exit 0。
+2. `env -u DEVELOPER_DIR bash scripts/regress.sh` → 同验收 1(§8.6-8
+   同形;本机 `DEVELOPER_DIR` 原生未设,与裸跑同分支)。
+3. `cargo run -q -p ry-difftest -- --corpus corpus/ys-e2e` →
+   `SUMMARY ys=<实录新基线>`(=406+`-pbo` 54±`-opt` 层+anchors 迁入数;
+   实录定盘禁硬编,RM1-2 政策),且与 scripts/regress.sh S4 的 grep 串
+   逐字相同。
+4. `cargo run -q -p ry-difftest -- --live --corpus corpus/ys-e2e` →
+   `LIVE ys=` 同基线口径(可再生面=SUMMARY−手写 anchors,§8.6-3 同律;
+   regress S4 live 腿注释同轮改;oracle 缺席=skip+note 形态不变)。
+5. `cargo test -p ry-cli` 全绿;且
+   `rg -c '"Y2"' crates/ry-cli/tests/cli_contract.rs` → 0(本轮实测现值
+   =0;收口后 `registered_stub_milestones` 表不得新增 opt 行、新增 PASS
+   契约不计入——表是代表行采样,主闸=验收 6 的 registry 全表枚举;
+   **旗标硬错契约(若 slice-1 裁决出硬错形)一律全文 ERROR 断言形,禁
+   裸 Y2 字面**——既有 ("cmd","Yx") tuple 形不得用于新硬错行,与
+   slice-6⑤ 同一约束)。
+6. registry 口径:`rg -c '"Y2"' crates/ry-cli/src/registry.rs` → **0**
+   (本轮实测=18);python 全表枚举 stub=**268**(Y0 266/Y2 0/Y3 2)+
+   实现层 **38**=306;`rg -n '286' crates/ry-cli/src/main.rs
+   crates/ry-cli/src/registry.rs docs/REGISTRY.md corpus/ys-e2e/PROVENANCE`
+   → exit=1(四檔负向闸;本轮实测五命中全=口径行、无合法 286;
+   contingency:若 M3 普查实录的行号锚恰含 286,则 PROVENANCE 移出负向
+   集、改正向 `rg -n '268'` ≥1 并登记调闸,§8.6-6 的 298 錨同款先例);
+   `rg -n '268' corpus/ys-e2e/PROVENANCE` ≥1;五处口径一致(REGISTRY
+   ry-cli 行/registry.rs 注释/PROVENANCE 对账节/ry-cli main.rs/本文档
+   §9)。
+7. D-ys6:`rg -n 'No design object available' crates/` → exit=1;`rg -c
+   'fn [a-z_0-9]*empty_design' crates/ry-cli/tests/cli_contract.rs` ≥1;
+   两端 rc=0 探针实录入 PROVENANCE(§9.0-P6 母本)。
+8. opt_expr 旗标覆盖:PROVENANCE「M3 opt 普查」节含七旗标裁决表
+   (每行=实现/硬错二选一,`rg -n 'mux_undef' corpus/ys-e2e/PROVENANCE`
+   ≥1 为代表锚);凡裁决=硬错的旗标,cli_contract 有函数名含该旗标
+   token 的 fixture(逐项 `rg -n 'opt_expr_[a-z]+' …` 对表);凡裁决=
+   实现的旗标,anchors/语料 golden 在库(案例目录数断言);既有 -keepdc
+   54 例零重录(`git status --short corpus/ys-e2e` 中 -pb 层 expected.*
+   仅 -pbo/迁移新增、无 -pb 既有檔改动)。
+9. 序差分类表:PROVENANCE「M3 opt 普查」节含 18 条逐条分类行;凡
+   internal-order 裁决必配 REGISTRY D-ys 行(逐个所引编号
+   `rg -n 'D-ys[0-9]+' docs/REGISTRY.md` 命中 ≥1);凡 logic-diff 裁决
+   以 byte-exact 收口(验收 3 的 100% 即证)。
+10. `cargo build 2>&1 | grep -cE '^(error|warning)'` → 0。
+11. M3 立行:`rg -n '^\| \*\*M3\*\*' docs/RYOSYS-MVP.md` ≥1(§3 表行,
+    slice-6 新增)+`rg -n 'ryosys M3' PLAN.md` ≥1。
+12. anchors 纪律:`corpus/ys-m3-anchors/`(及迁入后)逐例含 script.txt
+    (录制脚本逐字)+expected 四件套(`find … -name script.txt | wc -l`
+    =案例数;禁手写期望);录制来源(oracle 命令+日期)入 PROVENANCE;
+    手写 .il 案例经两跑 byte-equal 确定性探针后方可录制(D-ys5 纪律,
+    RM2-4 同款)。
+
+## 9.5 风险
+
+| # | 风险 | 对策 |
+|---|---|---|
+| RM3-1 | `opt` 编排 changed 判定:哪些子 pass 置 changed(源码对读)与二进制轮数实录交叉钉;误判=多轮/少轮 → stdout 编号面全错 | 逐例迭代轮数入普查表(141 例);prefix-chain probe 先于编排器落地;轮数/编号不一致=红,禁以「终态相同」放过(编号 header 是 golden 内容) |
+| RM3-2 | opt_merge hash 桶序/opt_clean 删除序(dict swap-and-pop)/遍历序外生 dump 行序 | 契约实现在库(M1-d/M2);凡 diff 先分类(§9.0 末段);internal-order=登记不硬磕(RM1-1/§8.8-2:禁源码静态推导定案,结论二进制仲裁) |
+| RM3-3 | 空转 pass(opt_lut/opt_hier/opt_balance_tree 等)无实质可录面 → 假实现风险(自创行为) | 行为面=oracle 无参实录逐字钉死;实录=纯 header+无变更则我方同形;禁凭 -H 描述脑补 |
+| RM3-4 | `-pbo` 层触 check 新警告面(RM2-5 同款递进:proc 后未 opt 形态→opt 后形态) | 54 例实录即闸;celledges 扩表同轮修(M1-c 先例) |
+| RM3-5 | opt_dff 触 FfData 内部旗标面(-nodffe/-nosdff/-sat 仅透传形;无参 opt 不透传) | 编排器内部仅无参调用形;语料触新 ff 形=同轮扩(M2 先例);内部形与 standalone 旗标面(Y2 硬错)分层钉死 |
+| RM3-6 | SUMMARY 基线跳跃大(+54±87+anchors)与 LIVE 面差注释漂移 | 实录定盘禁硬编;regress S4 grep/live 注释同轮;LIVE 面=record() 可再生面(402 同律) |
+| RM3-7 | D-ys6 修法波及面:空设计 rc 1→0,凡依赖「无设计=exit 1」的既有契约 | 本轮实测 crates/ 全树仅 main.rs:203/:335 两处源码、无 fixture 断言该文案(§9.0-P7);修后 cli_contract 增 rc=0 golden;两处同轮清理 |
+| RM3-8 | oracle 升级轮 churn 面扩大(opt 后 golden 增 `$auto$opt_*.cc:<L>` 内部名族) | R1/R8/R9 政策不变;PROVENANCE 普查表(命名锚频次)使 churn 可分层定位;`-pbo` 命名锚入普查节 |
+
+## 9.6 遗留清偿与不移项(派生自 §8.8 及续弧实录;不引用过时数字)
+
+- **D-ys6 空设计分歧** → 本章 slice-2 清偿(§9.1-4;本轮两端探针实录
+  再证,§9.0-P6)。
+- **RM2-2「opt_expr 子集边界触发即同轮扩」** → 本章 slice-5 消费(旗标
+  全集裁决表)。
+- **D-ys5 check 环起点** → 保持不改(§9.2;REGISTRY 连动注记在案)。
+- 其余 Y0 266 stub、Y3 2 stub(read_verilog 族)→ 不移(后续弧;§1.3
+  表边界不变)。
+
+## 9.7 M3 实作轮实录(2026-10-30;诚实边界)
+
+* **已落地**:slice-1 全量(§9.0 深化=PROVENANCE「M3 opt 普查」P1-P10:
+  19 条 -H 逐字/help opt·opt_expr 全文/141 例普查[轮数分布 51×1+sincos×2+
+  fsm·subbytes×3]/18 条探针 log 形/6 旗标裁决表/源码定点对读 C1-C14/
+  D-ys6 母本)+slice-2 主体(opt_clean/opt_merge/opt_muxtree 翻实现+
+  D-ys6 清偿+cli_contract 旗标 fixture)+slice-3/5 部分(opt_reduce 全量/
+  opt_dff·opt_share·opt_lut·opt_lut_ins·opt_demorgan·opt_ffinv 无参面)+
+  slice-6 主体(`opt` 编排器[序幕+do-while+Rerunning/Finished header]+
+  SCRIPT_PBO 54 例录制[既有层零扰动免费证明]+registry 275/31 五处口径+
+  regress S4 新闸 418/460+42 例 known-gap 逐字名单+LIVE 456/456+
+  D-ys8 登记)。
+* **未竟(续弧入口)**:①opt_dff 全量 worker(simple.cc dffe/sdff 变换
+  触发 28/54 例=最大宗);②D-ys8 幸存序差(REGISTRY 已登记,禁硬磕);
+  ③optbarriers/opt_balance_tree/opt_hier/opt_mem 族×4 stub 维持(SAT/
+  process 图/层级面);④opt_expr 6 新旗标(契约面=Y2 硬错维持,§9.2);
+  ⑤§9.4 验收 1/2(regress 裸跑)以新闸 418/460 达成,3 的「=406+实录数」
+  基线形以 418/460 兑现,5/6 的「Y2=0/268/38」数字以实作轮裁定值
+  (7/275/31)替代——对抗审轮请按本节裁定值复核;负向闸 '286' 就
+  PROVENANCE 移出(历史 M2 对账数字为合法史录,contingency 条款同款),
+  改正向 `rg -n '275' corpus/ys-e2e/PROVENANCE` ≥1(P11 口径行);⑥corpus/ys-m3-anchors
+  切片锚目录未建(stub 维持面无锚可录;翻实现时同轮补,§9.1-5 形),
+  子 pass 的 golden 覆盖由 -pbo 54 例 opt 链承载。
+* **續弧第 2 輪(同日)**:opt_dff 全量移植落地(新檔
+  crates/ry-cli/src/opt_dff.rs;FfData/FfInitVals+simple.cc 全變換族+
+  find_muxtree_feedback_patterns+constbits 非 SAT 面)——**-pbo 對拍
+  12/54→23/54(SUMMARY 418/460→429/460)**,翻綠 11 例(always01/02、
+  case_expr_non_const、muxtree、process、omsp_dbg_uart、attrib01/02/03/
+  06/08-pbo)。命名錨 golden 釘死(ff.cc:337:slice、simple.cc:81/199/
+  200/216/217/240/242、rtlil.cc:3201:Not、opt_reduce.cc:131/137:
+  opt_pmux——舊 236/244=clone 行號誤置已改)。**D-ys9 新登**:0.70+179
+  二進制的 $dlatch「AD 常數→ARST」分支靜默+前移(clone 有 log 且居後),
+  我方按二進制實現。constbits Sx 候選亦提交(log 印 0-bit;C++ 僅擋 Sm)。
+  mux-walk=raw 位、find_muxtree port_bit=sigmapped 位——兩面錄製在案。
+  餘 31 例根因三類:(a) opt_dff mux-tree 反饋面+ff debug 計數面;
+  (b) D-ys8 序差/wire 集;(c) opt_merge cell 數級聯;名單逐字入
+  regress S4。原未竟 ①(opt_dff 全量)**已完成**;②③④⑥維持。
+* **續弧第 7 輪(2026-10-31,形態對讀→收平)**:**-pbo 對拍
+  29/54→50/54(SUMMARY 429/460→450/460)**,known-gap 31→10 例。
+  逐形落地(全序差結論以二進制實跑仲裁):①D-ys8b **歸因修正+清償**
+  ——compare_signals 尾分支=lt_by_name(rtlil.h:386-403)字串序
+  (vE 鏡像實驗證偽「建名序」舊歸因),public 述語=isPublic;
+  ②multiplier=設計內模組 known-cell 面(celltypes.h setup_design);
+  ③delete_wires 批次序=雙反轉檔案序(rotate 814 條雙向模擬);
+  ④task_func=constbits Sx 原值+slice NEW_ID 記帳;⑤operators=
+  remove_temporary_cells 補 dbg_inc;⑥opt_expr 大塊=consume_x/keepdc
+  參數化+do-while(opt_expr.cc:2357-2368)+identity(:1317-1424)+
+  $mul(:1695-1785)+$div/$mod onehot(:1813-1878,ReduceOr 錨
+  rtlil.cc:3205=golden 實錄)+shift 門控(:1273);⑦opt_pmux 記帳雙號
+  (opt_reduce.cc:131/137)。中途事故=identity 誤用 LSB as_bool 翻紅
+  forloops/scopes,按 rtlil.cc:536 非零語義(const_nonzero)修正回綠。
+  殘差 10 例=sincos/i2c(opt_dff find_muxtree pattern 內容差,oracle
+  深 else 鏈,logic-diff 後置)+fsm/subbytes(歸 (a) 類:3.8 OPT_EXPR
+  變換集差,fsm 另帶 never-active EN 塌縮——初稿誤歸面2,對抗審修訂)
+  +D-ys8c 面2 hash 序(禁硬磕;成立例=constmuldivmod/usb/values)+
+  D-ys8 dump 序(禁硬磕);REGISTRY 三行+PROVENANCE 續弧第 7 輪節同步。
+
+# 10. M3 续弧·批量收编详案(2026-11-01 追加;planner 出案)
+
+> 定位:冷分析裁定轮 confirm 四单元——`clean`/`clean -purge`、`log`、
+> `help`、`opt_balance_tree`——的可执行展开;defer 一单元
+> (`optbarriers`)的完整理由与届时收平入口在本章 §10.2 显式不做表
+> 登记。§0-§9(含 §9.7 续弧实录)全部不动,本章为追加新章。收编落点
+> =M3 残余 stub 清偿(opt_balance_tree,§9.7 未竟③ 清单七 stub 之一
+> [optbarriers/opt_balance_tree/opt_hier/opt_mem 族×4])+registry
+> Y0 三命令(clean/log/help)翻实现,文档挂 M3 续弧。
+> 基线现状(2026-11-01 本轮实跑):`cargo run -q -p ry-difftest --
+> --corpus corpus/ys-e2e` → `SUMMARY ys=450/460`(exit 0;known-gap
+> 10 例逐字名单=regress.sh:334 在档)。工作树含 M3+续弧未提交成果约
+> 78 檔,本章规划不回退、不留双口径。
+> 源码对齐声明:上游 9534a7f4d 不可达(ask 给定:fetch 失败/远端无此
+> commit),clone 停在 28ba3cb(v0.70,本轮 `git -C vendor-reference/
+> yosys log --oneline -1` 实测);oracle 二进制=0.70+179(git sha1
+> 9534a7f4d,横幅逐字)。**一切序差/行为结论以二进制实跑仲裁**——
+> §10.0 探针全部本机实跑;clone 源码只作结构定位,行号标注
+> 「clone 行号、以二进制为准」。冷分析轮(ask 给定材料)已亲证的
+> 行为面在本章标注「冷分析轮亲证」,本轮重证处标注本轮探针号。
+
+## 10.0 oracle 实录与源码定点对读(2026-11-01 规划轮探针;二进制=0.70+179 sha1 9534a7f4d;clone=28ba3cb v0.70)
+
+| # | 探针 | 实录结果 |
+|---|---|---|
+| P1 | clean 行为面(carryadd base 输入) | `clean` **零输出+零编号占用**(后续 check 仍 `2. Executing CHECK pass`,rc=0);`clean -purge -purge` rc=0(旗标幂等);`clean -foo` → **rc=1,stderr 3 行**=`ERROR: Command syntax error: Unknown option or option in arguments.`+`> clean -foo`+`>       ^`(插入符指向 `-foo` 的 `-`,列=按 args 重拼逐 arg 累加);**stdout 行数随命令串形态变(两形态均本轮实测定盘)**:`-p 'read_rtlil <case>; clean -foo'`(difftest script 链形,本表实录形态)→ **25 行**,`-p 'clean -foo' <case>`(位置参数文件形)→ **27 行**(多 `-- Parsing <file> using frontend \`rtlil' --` 行;换人复审实测 27 与本表 25 系形态差非矛盾,勘正定盘)——文案与插入符逐字两形相同;golden 走实录管线不钉行数 |
+| P2 | clean 的 process 面对照(复用既有语料输入 mem2reg-pb/case.il,含 1 process) | `clean` 零 Warning 静默跳过(check 仍 2.);`opt_clean` 对照印 `Warning: Ignoring module mem2reg_test6 because it contains processes (run 'proc' command first).`+`Warnings: 1 unique messages, 1 total`——**clean 与 opt_clean 的 process 分面亲证,无需手写 pv.v,锚=既有语料输入** |
+| P3 | log 行为面(carryadd) | `log hello world` → 行 13 原样+**不占编号**(后续 check 仍 2.);`log "a;b"` → 行 13 `"a;b"`(引号保留=§0-11 引号契约的执行载体);**`log -foo`(未知 -token)→ 行 13 原样打印 `-foo`,rc=0,非报错**(冷分析未列,本轮亲证) |
+| P4 | clean/log 源码(clone 行号) | opt_clean.cc:106-161 CleanPass:`-purge` 唯一旗标+`extra_args`;`selected_unboxed_whole_modules()`+`!has_processes()` **预过滤**(process 模组不进循环=零输出,異於 OptCleanPass 循环内 has_processes_warn);`CleanRunContext(...{purge_mode, ys_debug()})`=verbose=ys_debug();`log_suppressed(); stats.log();` 序。logcmd.cc:25-114 LogPass:七旗标 `-stdout/-stderr/-nolog/-n/-header/-push/-pop`(execute 旗标 if/else 链 :84-91;初稿 :65-71 实为 help 文本区,换人复审勘正);`text += args[argidx] + ' '` 拼接+resize 剥尾空格;裸 `log()` 无 header;`-header` 走 log_header;`-push/-pop` 走 log_push/log_pop(pass 计数器=本弧不收);`(push\|\|pop)&&args.size()!=2` → log_cmd_error |
+| P5 | help 行为面 | bare help:rc=0、stderr 0B、**323 行**(横幅 5+名单 306 行 `    %-20s %s` 形+尾段,行 318/319=`Type 'help <command>' …`/`Type 'help -cells' …`;`read_verilog_file_list` 长名行在名单=名长>20 不截断);**`yosys -H` 输出与 bare help byte 同形**(本轮 diff 实证,唯一差=尾部 MEM 峰值时间戳 10.95/10.94 MB)——描述面录制来源=`-H` 一次全量 306 条(冷分析「約 287 條須重錄」的口径修正:一次 -H 即全量);`help nosuchpass`/`help -foo` → 行 10 `No such command or cell type: X`,**rc=0**(log 非 log_error);`help opt` → 印该 pass 全文 |
+| P6 | help 源码(clone 行号) | register.cc:42 `std::map<std::string, Pass*> pass_register`=**字典序迭代,非 hash dict,零序面**(冷分析新证,本轮重读同);register.cc:1067-1164 HelpPass:bare/`-all`/`-cells`/已注册名全文(:1105-1107)/未知名 `log("No such command or cell type: %s\n")`(:1136;冷分析转录 :1147-1148 系漂移,本轮勘正)/两参 `-dump-cmds-json`/`-dump-cells-json`/`Unknown help command` |
+| P7 | opt_balance_tree 行为面(carryadd,本轮亲跑) | `2. Executing OPT_BALANCE_TREE pass (cell cascades to trees).`(占编号)→ 行 15 `Warning: Feature 'open_balance_tree' is experimental.`(header **后**)→ 五型 Converted 固定序 `Converted 2 $and cells into trees.`/`0 $or`/`14 $xor`/`0 $add`/`0 $mul` → `-- Running command \`clean -purge' --` 内部横幅(**不占编号**)+`<suppressed ~8 debug messages>`+`Removed 7 unused cells and 31 unused wires.` → 尾部 `Warnings: 1 unique messages, 1 total`+`Warnings: 1 experimental features used (not excluded with -x).`;stderr 0B、rc=0;multiplier 锚形态=**multiplier-pb 输入+`proc` 前置**(-pb 层链前半):Converted 全 0 五行+内部 clean 横幅+`Removed 0 unused cells and 15 unused wires.`(**0/15 唯一复现形,本轮五形矩阵亲证**;multiplier-pb/pbo 裸跑 opt_balance_tree 均=0/1、pb/pbo+`proc; opt` 前置均=0/6——冷分析轮「multiplier-pb 两跑 cmp identical」引文形态不完整,本轮勘正)。`-q` 注记:-q 下 log 流走 stderr(Warning 54B 入 stderr;difftest 录制非 -q,防混淆在案) |
+| P8 | opt_balance_tree 源码(clone 行号) | opt_balance_tree.cc:359-414 execute:`log_header`→`log_experimental("open_balance_tree")` **顺序**;五型默认集 `{ID($and),ID($or),ID($xor),ID($add),ID($mul)}`;`-arith`/`-logic` 旗标;`dict<IdString,int> cell_count` 跨模组累计,Converted 行按 **cell_types 数组序**(非 cell_count 迭代序);尾 `Yosys::run_pass("clean -purge")`(**M3 时本 pass 维持 stub 的唯一理由=此内部 clean 依赖,本弧 clean 收编即清偿**)。**:271 `TopoSort<Cell*, IdString::compare_ptr_by_name<Cell>>`=String 字典序比较器(:280 实为 chain_driver 行,冷分析转录 :280 系漂移,本轮勘正)——本 pass 由 yosys 自指定字串序,異於 10.9-r intern 序默认律(opt_expr TopoSort 面);实作套 intern 序律=引入序差。D-ys8b(lt_by_name 字串序)之后**字串序消费面第二例**。次级序面:`dict<SigSpec,int> sources`=hashlib 插入序(既有 Vec+去重模式复刻)、`pool<Cell*>` BFS 无删除=插入序、combine 建名 NEW_ID 走 intern 键 |
+| P9 | registry 实数(本轮 python 全表枚举) | stub **275**(Y0 266/Y2 7/Y3 2)+实现层 **31**=306;五单元现状行=clean=Y0(registry.rs:52)、help=Y0(:116)、log=Y0(:135)、opt_balance_tree=Y2(:164)、optbarriers=Y2(:170) |
+| P10 | 依赖面现状(本轮逐处读) | ①opt.rs:959 `run_opt_clean`=verbose(true)/purge(false 硬编码 :983)双硬编码入口;verbose/入口分叉实为**三处**:header 行(:965)、每模组 Finding 行(:982)、**process 模组处理**——现行 opt.rs:969-980=模组循环内 warn(opt_clean.cc:90 `has_processes_warn`+:94 形),clean 形=预过滤跳过(opt_clean.cc:146-147 `selected_unboxed_whole_modules()`+`!has_processes()` 先收集+:151 循环形),第三处非旗标门控而是迭代形分立(§10.3-2;冷分析轮与本详案初稿「仅两处」系漏计,本轮勘正);**worker purge 参数全链路已在**(keep_cell_raw :193/build_keep_cache :211/rmunused_module_cells :314/rmunused_module_signals :461/:472/:709)=拆参即收编、rmunused worker 核心零改动(冷分析「机械拆参非疑点」本轮证实);②suppressed/Removed 行两形照打且 `cells>0\|\|wires>0` 条件与 multiplier 实证(0/15)相容;③cli_contract.rs:479 `log "a;b"` token fixture(cmds 形;初稿 :477 系漂移,换人复审勘正)、:448 `;;;`→`clean -purge` token fixture(p_split_triple_semicolon_appends_clean_purge)、:236 `opt_clean -purge` 硬错契约表均在档;④**既有 54 例 script.txt 零 `;;;`**(本轮 grep 普查=0,`;;;` 翻绿面仅新 fixture);⑤ryosys 零 experimental 面(`rg experimental crates/ry-cli/src/` 零命中)=P7 尾部 experimental 汇总行全新机制;⑥`Syntax error in command`/`Command syntax error` ryosys 全树零命中=cmd_error 形态全新;⑦difftest 录制面=epilogue 切(首個 `End of script. Logfile hash:` 行起到 EOF,ry-difftest/src/main.rs:25 注释在档)——尾段指标行不入 golden,两跑探针对拍面口径据此定(§10.1-6) |
+
+## 10.1 范围(做)
+
+1. **clean / clean -purge 翻实现**(registry 删 `("clean","Y0")` 行,同轮):
+   - 薄壳=run_opt_clean 拆 `(verbose, purge)` 两参:opt_clean 入口传
+     `(true, false)` 字面保持(既有 406/450 golden 回归锚零漂移);
+     clean 入口传 `(false, -purge 判定)`。
+   - verbose=false 面:无 header、无 Finding 行;suppressed/Removed 行
+     两形照打(P10①;Removed 行 0/15 形=P7)。
+   - process 面=预过滤静默(P2;與 opt_clean 循环内 Warning 分面,
+     两形态各自有锚)。
+   - 唯一旗标=`-purge`(幂等,P1);其余参数分两形:**未知旗标形**
+     (如 `-foo`)=cmd_error 全形(§10.3-6 新机制;fixture 用 oracle
+     实录形,禁手写文案——此形两端行为一致);**selection 参数形**
+     (如 `carryadd/w:*`)=oracle 经 extra_args **接受并正常执行**
+     (rc=0,本轮亲证)而我方走 cmd_error rc=1=**真实行为面分歧,
+     登记 D-ys10**(§10.2);此形 fixture 不可用 oracle 实录形(实录=
+     成功输出与我方硬错永不相等),按既有硬错契约先例钉**我方
+     cmd_error 全文断言形**+分歧行在档。
+   - 编号不占面;`;;;` 端到端翻绿(token 层 fixture 已在=cli_contract
+     :448,补端到端 fixture;既有语料零 `;;;` 故无外溢,P10④)。
+2. **log 翻实现**(registry 删 `("log","Y0")` 行,同轮):
+   - 无旗标形=纯拼接(逐 token+尾空格,P4)+裸 log 输出(无 header、
+     不占编号,P3)。
+   - 未知 -token=原样打印(P3 oracle 亲证=免费对齐;fixture 钉
+     `log -foo` 形,防「把 - 开头 token 误当旗标报错」的实现走偏)。
+   - 七已知旗标=Y2 硬错(§10.2;cli_contract 逐旗标 fixture 同轮钉,
+     全文/前缀 ERROR 断言形禁裸 Y2 字面)。
+   - 引号形端到端(cli_contract.rs:479 token fixture 升端到端 golden;
+     token 层已钉、收编后命令真执行)。
+3. **help bare 形翻实现**(registry 删 `("help","Y0")` 行,同轮):
+   - bare=横幅+306 名单(`    %-20s %s`)+尾段=323 行(P5);描述面=
+     registry 新增 `HELP_SHORT` 常量表(录制脚本从 `-H` 输出机械生成,
+     **字典序排列=录制序即迭代序,禁运行时排序**,P6);横幅与尾段=
+     oracle 实录转录(P5 行形)。
+   - 子形(`<名>`/未知名/`-foo`/两参/`-all`/`-cells`)=Y2 硬错维持+
+     D-ys10 登记(§10.2;oracle 亲证未知名 rc=0=分歧本体,P5)。
+4. **opt_balance_tree 翻实现**(registry 删 `("opt_balance_tree","Y2")`
+   行,同轮):
+   - 无参形全实现:五型固定序/链 cone 检测/combine 语义逐段移植
+     (opt_balance_tree.cc:60-335 结构定位,实作轮定点对读);
+     **TopoSort=String 字典序比较器**(P8 陷阱=禁 intern 序律);
+     sources 插入序/BFS 插入序/NEW_ID intern 键(P8)。
+   - experimental Warning 机制(feature 粒度去重+Warnings 尾部
+     experimental 汇总行)=首个消费者(P7;机制面 §10.3-7)。
+   - 尾 run_pass("clean -purge") 内部调用=`-- Running command
+     \`clean -purge' --` 横幅(不占编号)+clean(verbose=false,
+     purge=true);M3 stub 理由清偿(P8)。
+   - `-arith`/`-logic`/selection=Y2 硬错(同轮 fixture)。
+5. **registry 收口**:stub 275→**271**(Y0 266→263、Y2 7→6、Y3 2)+
+   实现层 31→**35**(+4)=306 闭环;五处口径同轮(REGISTRY ry-cli 行/
+   registry.rs 头注/PROVENANCE 对账节/ry-cli main.rs 注释/本文档
+   §10);optbarriers 维持 Y2 在表(唯一 Y2 余量减为 6:opt_hier+
+   opt_mem 族×4+optbarriers)。
+6. **语料扩面(实录定盘,禁手写期望)**:corpus/ys-m3-anchors/ 新建
+   (§9.7⑥ 清偿),锚集(每例含 script.txt 逐字+expected 四件套,
+   手写 .il 先过两跑确定性探针=D-ys5/RM2-4 纪律;**两跑对拍面=剥
+   `End of script. Logfile hash:` 行与 `Time spent:` 行后逐行 diff,
+   raw cmp 禁用**——本轮亲证 multiplier-pb 两跑 raw cmp 于尾段
+   `End of script.` 行 MEM 峰值浮动[12.06/12.11 MB,hash/time 逐字同]
+   必假红;等价口径=difftest epilogue 切面,P10⑦;本口径适用于本章
+   全部探针与 anchors 确定性前置):
+   - carryadd×`opt_balance_tree` 直锚(实质转换面:Converted 2/14+
+     内嵌 clean -purge 横幅+Removed 7/31,=P7 全形态);
+   - multiplier-**pb** 输入+`proc` 前置(-pb 层链前半)×
+     `opt_balance_tree` 链锚(全 0 转换+`Removed 0 … 15 …` 面,=P7
+     五形矩阵亲证唯一复现形;multiplier-pbo 输入录不出 0/15);
+   - mem2reg-pb 输入×clean/opt_clean 对照锚(process 面静默 vs
+     Warning,P2;复用既有语料输入零新设计);
+   - min2 手写 .il×clean vs clean -purge 对照锚(purge 语义面:有
+     driver 无 reader 的 public wire=非 purge 保留/purge 删;无 driver
+     无 reader 的 public wire=两形皆删——冷分析轮三设计亲证形态);
+   - bare help 直锚(oracle 原形 323 行=P5;golden=difftest epilogue
+     切后实录,尾段指标行不入 golden,禁手录绕管线);
+   - log 三形锚(hello world 编号不占/`"a;b"` 引号形/`-foo` 打印形)。
+   SUMMARY 新基线=450+anchors 迁入数(实录定盘,禁硬编)。
+7. **四层同步(收口轮)**:regress.sh S4 grep(450/460→新基线+known-gap
+   10 例名单逐字维持)+LIVE 腿注释同轮;SKILL ryosys 节(clean/log/
+   help/opt_balance_tree 条目+**字串序 TopoSort 第二例**入 intern 法条
+   例外注记);AGENTS 10.9-r(字串序例外面若有新法条则同轮);PLAN.md
+   ryosys M3 行状态列+§3 表 M3 行验收列**追加批量收编注记**(既有文字
+   不删改);证据页机械再生成。
+
+## 10.2 显式不做(每条=不变更既定边界)
+
+| 不做项 | 理由/边界 |
+|---|---|
+| **optbarriers(defer,登记本表)** | 行为面无已知分歧(冷分析轮两跑 byte-identical×2 案亲证、$barrier 在 check/stat 支撑面 rc=0 相容、不触 opt 编排链)故不 prune;本轮不收。疑问密度五候选最高:①**提名旗标面实质遗漏**——optbarriers.cc help 与 execute 有第五旗标 `-remove`(解析=:244-245,反向分支:`Replacing optimization barriers with connections.`+remove_barriers 定义=:531、execute 调用=:254,barrier→connect+逐颗删除),提名契约形只列四旗标、「无疑问」陈述有洞(本轮源码重读勘正冷分析转录 :238-243/:536-549 漂移);②插入集合的 SCC 面现有语料零触发(process-pb 的 2 $barrier 来自 process 面、operators(base) 的 6 处引用来自 cell 面;ProcessDependencyWorker 的 connections 环分支无语料触发,两跑 identical=必要非充分);③两个新 worker 底座(ResetPathWorker/ProcessDependencyWorker,IntGraph/topo_scc)+barrier_y.sort_and_unify() 的 SigBit 排序序面+variants dict 迭代+wire 重建 NEW_ID 面,面积远超其余候选;④下游消费=0(无既有 pass 或编排链依赖,yield/风险比最差);⑤本轮对照探针再证细节面多於表面:optbarriers 的 experimental Warning 在 header **前**(行 13 vs 15,与 opt_balance_tree 调用序相反),且来源=**框架形**(register.cc:298-299 Pass::call 的 `pass->experimental_flag`→`log_experimental(args[0])`,header 之前打)而非 opt_balance_tree 的 execute 内显式调用形——§10.3-7 机制本轮仅收 execute 调用形,**届时收平 optbarriers 须扩框架形**(注记在案)。届時收平入口=先补 connection 环语料锚,按 §8.8-2 logic-diff/internal-order 分类法 |
+| opt_balance_tree `-arith`/`-logic` 真实行为 | Y2 硬错边界(oracle `help opt_balance_tree` 亲证两旗标为真实功能=行为面歧;§9.2 子 pass 独立旗标面先例同形,并入 D-ys10 登记);无参形收编、旗标形与 selection 不收(§10.1-4 fixture 同轮钉) |
+| clean selection 参数面 | oracle 经 extra_args **接受 selection 并正常执行**(rc=0,本轮亲证 `clean carryadd/w:*`),我方=cmd_error rc=1=行为面歧,登记 D-ys10;fixture 钉我方 cmd_error 全文断言形(§10.1-1 两形拆分) |
+| help 子形两面对齐(`help <名>` 印全文/`-all`/`-cells`/`-dump-*-json`) | 须 -H 全文管线+cell 帮助表,转录面巨大;Y2 硬错维持+D-ys10 登记(fixture 钉我方硬错形;oracle 未知名 rc=0=分歧本体,P5/P6) |
+| log 七已知旗标真实行为(-stdout/-stderr/-nolog/-n/-header/-push/-pop) | Y2 硬错边界(-push/-pop=pass 计数器机制本弧不收;与 oracle 有行为面歧=登记);未知 -token 打印形**收编**(P3) |
+| opt_clean -purge standalone=Y2 硬错 | §9.2 表不变;分立面=clean -purge 收编/opt_clean -purge 不收(cli_contract :236 维持);`clean -foo` cmd_error 全形**不迁移** opt_clean 等既有 stub(机制首消费者=clean only) |
+| opt 旗标面、techmap/memory_* 族、equiv/sat、abc 族、synth 族 | Y0 不变(§1.3) |
+| read_verilog 族 Y3 2 stub、selection 机制、-c/-s、TCL/Python、stat 选项面 | §1.3 不变 |
+| 既有 406 五层+54 -pbo golden 与 known-gap 10 例 | 零扰动零重录(新增层只增不改;本轮无既有硬错翻转) |
+
+## 10.3 代码结构要求(与 yosys 同构;byte-exact 可达的前提)
+
+1. **clean 薄壳与 CleanPass::execute 同构**(opt_clean.cc:126-161):argidx
+   循环仅 `-purge` 布尔置位→其余参数 cmd_error→**预过滤循环**
+   (selected_unboxed_whole_modules+!has_processes,process 模组不进
+   循环)→`log_suppressed()` 先于 `stats.log()`→optimize/check 收尾
+   (现行 worker 收尾形保持)。
+2. **run_opt_clean 拆参**:签名 `(design, args, log, verbose: bool,
+   purge: bool)`;main.rs opt_clean_entry=(true,false) 字面、clean 新
+   入口=(false, 判定值)。verbose/入口分叉共**三处**(P10①):
+   ①header 行(:965)verbose=false 不打;②每模组 Finding 行(:982)
+   verbose=false 不打;③**process 模组处理=迭代形分立,非旗标门控**:
+   opt_clean 入口保留现模组循环内 warn 形(opt.rs:969-980=
+   opt_clean.cc:90 `has_processes_warn`+:94),clean 入口走**独立预过滤
+   迭代**(先收集 `selected_unboxed_whole_modules()`+`!has_processes()`
+   模组再循环,opt_clean.cc:146-151=§10.3-1 同构)——两入口模组迭代
+   分立、rmunused worker 核心(:314/:461 族)共用零改动;
+   rmunused_*/keep_cell_raw/build_keep_cache purge 参数全链路已在
+   (P10①)。初稿「verbose 条件化仅两处」系漏计第三处,对抗审勘正。
+3. **log 命令**:exec_command 新 arm(或 REGISTERED 查表前分派);拼接
+   序=logcmd 同构(逐 token+空格、尾剥);输出走裸 log 流(不进 header
+   流、不占编号);七旗标命中→现行 stub 硬错通道(Y2 文案);未知
+   -token→拼接打印(无旗标判定,P3)。
+4. **help**:`HELP_SHORT` 306 行常量表(**落点钉死=新檔
+   crates/ry-cli/src/help_desc.rs**,录制脚本机械生成;**禁落
+   registry.rs**——表必含 clean/log/help/opt_balance_tree 四名,带引号
+   元组形落 registry.rs 将命中 §10.5-4 负向 grep 恒红,换人复审勘正;
+   实作轮若改落点须同轮改闸)**;禁运行时排序**=录制序即 std::map
+   字典序(P6);bare 输出=横幅逐字(P5)+名单行(`    %-20s %s`,名
+   对齐 20 列、名长>20 不截断)+尾段(P5:318-319);子形=Y2 硬错
+   (现行 stub 通道)。免费对拍闸=表生成后按 bare 形拼装与 `-H` 输出
+   diff 应零差(P5 byte 同形)。
+5. **opt_balance_tree**:新檔 crates/ry-cli/src/opt_balance_tree.rs
+   (opt_dff.rs 独立檔先例);worker 与 OptBalanceTreeWorker 同构:
+   五型数组序=$and/$or/$xor/$add/$mul(源码字面序,Converted 行按此
+   序);chain 检测/combine 逐段移植;**TopoSort=String 字典序比较器**
+   (显式 byte-wise,禁 intern_key——10.9-r 默认律的本 pass 例外,
+   P8;D-ys8b 同款先例;仲裁=carryadd byte-diff);sources=插入序
+   (既有 Vec+去重模式);BFS=插入序(pool 无删除语义);combine 建名=
+   NEW_ID intern 键;尾 clean -purge=内部调用 run_opt_clean(false,
+   true),前置 `-- Running command \`clean -purge' --` 横幅(run_pass
+   语义、文本 P7 逐字、不占编号)。
+6. **cmd_error 机制**(新;首消费者=clean only):stdout=`Syntax error
+   in command \`<args 空格拼接>':`+空行+该命令 help 全文(clean 文本
+   常量,载体=P1 实录——**stdout 行数随命令串形态变:script 链形
+   25/位置参数形 27,P1 两形态定盘;golden 走实录管线不钉行数**,
+   或 slice-1 重录 `help clean`;P2 为 process 面对照探针不含此文本,
+   对抗审勘正);
+   stderr=`ERROR: Command syntax error: Unknown option or option in
+   arguments.`+`> <args 空格拼接>`+`> <空格×N>^`(插入符列=按 args
+   重拼逐 arg 累加,P1 实录形)+rc=1;**不迁移**既有 stub(§10.2)。
+7. **experimental 机制**:warnings 载荷扩 (msg, is_experimental)(或
+   平行 vec)+feature 集合去重(log_experimental 粒度);flush 面=既有
+   unique/total 行(main.rs:152 不动)+新增 `Warnings: N experimental
+   features used (not excluded with -x).`(仅 experimental>0;文本
+   P7 逐字)。
+
+## 10.4 有序 slices(slice-1=备料/普查先行;每个中间 slice 出口=三闸绿+450/460+known-gap 10 例零扰动)
+
+| slice | 内容 | 出口闸 |
+|---|---|---|
+| **slice-1** 备料+普查(产品行为零变更) | ①PROVENANCE 新节「M3 续弧·批量收编普查」:P1-P10 深化实录(`-H` 全量 306 描述逐字落档;clean -foo 多 token/`-purge` 前置形的插入符列实录;log -n/-header/-push 单独形;help -foo/两参形;opt_balance_tree carryadd/multiplier-pb+proc 两跑确定性探针,**对拍面=剥 `End of script. Logfile hash:` 行与 `Time spent:` 行后逐行 diff,raw cmp 禁用**——本轮亲证 raw cmp 于尾段 MEM 峰值浮动必假红,等价口径=difftest epilogue 切[P10⑦]);②min2 手写 .il 三设计起草+两跑确定性探针(同对拍面);③cli_contract 探针 fixture 先钉(clean -foo 全形/log 七旗标/help 子形/opt_balance_tree -arith=Y2 文案;R2 先钉再翻);④HELP_SHORT 录制脚本起草 | PROVENANCE 新节在档;`cargo build` 零警告;`cargo test -p ry-cli` 绿(新 fixture 以现行 stub 行为绿=先钉);difftest 450/460+10 例名单零扰动 |
+| **slice-2** log+help | log 翻实现(拼接+未知 -token 打印+七旗标 Y2)+bare help(HELP_SHORT 表+323 行形)+两 stub 行删除同轮(registry 实数 275→273);引号端到端 fixture;log 三形 anchors 录制 | 同 slice-1+registry 负向闸(log/help 行 rg 零命中)+anchors 在库 |
+| **slice-3** clean | run_opt_clean 拆参+薄壳+cmd_error 机制+`;;;` 端到端 fixture+process 对照锚+min2 purge 锚录制;clean stub 行删除同轮(273→272) | 同上+clean fixture 三形(无参/-purge/-foo)绿;opt_clean 既有面零漂移(406/450 恒定=拆参回归锚) |
+| **slice-4** opt_balance_tree | worker 同构移植+experimental 机制+内部 clean -purge;carryadd/multiplier anchors;stub 行删除同轮(272→271);-arith/-logic fixture | 同上+carryadd 锚 golden byte-exact(含五型 Converted 行序+experimental 两汇总行) |
+| **slice-5** 收口(四层同轮) | anchors 迁 ys-e2e+SUMMARY 新基线实录定盘;registry 271/35 五处口径;regress S4 新闸+known-gap 名单维持;SKILL/AGENTS/PLAN.md/§3 表追加注记;证据页机械再生成 | §10.5 全清单绿 |
+
+## 10.5 验收清单(全部机械可执行)
+
+1. `bash scripts/regress.sh`(裸跑)→ 尾行 `== REGRESSION GATE: PASS
+   ==` exit 0;S4 基线=新实录数(=450+anchors 迁入数)、known-gap
+   名单与 difftest 实跑 FAIL 集逐字一致(10 例不变)。
+2. `cargo run -q -p ry-difftest -- --corpus corpus/ys-e2e` →
+   `SUMMARY ys=<实录新基线>` 且与 regress S4 grep 串逐字相同;
+   `--live` 腿同口径(注释同轮)。
+3. `cargo test -p ry-cli` 全绿;`rg -c '"Y2"'
+   crates/ry-cli/tests/cli_contract.rs` → 0 维持(新硬错契约全文/
+   前缀 ERROR 断言形,禁裸 Y2 字面;零匹配=rg exit 1,&& 链承接加
+   `|| true`,AGENTS 10.5)。
+4. registry 口径:python 全表枚举=stub **271**(Y0 263/Y2 6/Y3 2)+
+   实现层 **35**=306;`grep -n '"clean"\|"log"\|"help"\|"opt_balance_tree"'
+   crates/ry-cli/src/registry.rs` → exit=1(四行删除负向闸,带引号
+   精确 token 不撞 proc_clean/opt_clean 等子串;零匹配=grep exit 1,
+   && 链承接加 `|| true`;**负向集=registry.rs 单檔——HELP_SHORT 表
+   落点已钉新檔 help_desc.rs=§10.3-4,不在此 grep 范围**);
+   `rg -n '271' corpus/ys-e2e/PROVENANCE` ≥1(对账节);五处口径一致
+   (REGISTRY ry-cli 行/registry.rs 头注/PROVENANCE/ry-cli main.rs/
+   本文档 §10)。
+5. clean 契约:cli_contract 函数名含 clean 的 fixture ≥4(无参/
+   -purge/-foo 形[oracle 实录形,两端一致]/selection 形[钉我方
+   cmd_error 全文断言形=§10.1-1 两形拆分,D-ys10 分歧行在档],
+   逐项 rg 对表);`rg -n 'Syntax error in command'
+   crates/` ≥1(cmd_error 实现锚;计数 grep `|| true` 承接);
+   `;;;` 端到端 fixture 在库。
+6. log 契约:七旗标 fixture 逐项函数名含旗标 token(rg 对表);
+   `log "a;b"` 端到端 golden(引号保留);`log -foo` 打印形 fixture。
+7. help 契约:bare help 锚在库(anchors 案例目录+script.txt 逐字;
+   oracle 原形 323 行=P5,**golden 行数=difftest epilogue 切后实录**,
+   尾段指标行不入 golden、禁手录绕管线);
+   HELP_SHORT 表行数=306(生成檔 `grep -c` 对表);子形硬错 fixture ≥1。
+8. opt_balance_tree:anchors(carryadd+multiplier)在库且 byte-exact;
+   golden 含五型 Converted 行序逐字(`Converted 2 $and cells into
+   trees.` 为代表锚);`rg -n 'open_balance_tree'
+   corpus/ys-e2e/PROVENANCE` ≥1;experimental 汇总行 golden 在档。
+9. optbarriers 维持:`grep -c '"optbarriers"'
+   crates/ry-cli/src/registry.rs` = 1(Y2 行在);known-gap 名单不含
+   optbarriers;defer 行在档(`rg -c 'optbarriers' docs/RYOSYS-MVP.md`
+   ≥2)。
+10. 既有基线零扰动(机械断言形):`git status --short corpus/ys-e2e |
+    grep -vE 'ys-m3-anchors|^\?\?' | wc -l` → 0——即既有五层 406 例+
+    54 -pbo 的 expected.*/script.txt 檔零 M/D 改动(输出行仅允许 `??`
+    未跟踪新增=anchors 迁入檔;本轮无既有硬错翻转)。
+11. `cargo build 2>&1 | grep -cE '^(error|warning)'` → 0。
+12. 四层:`rg -n '批量收编' PLAN.md docs/RYOSYS-MVP.md` ≥2(M3 行
+    注记+本章);`rg -n 'opt_balance_tree'
+    .agents/skills/eda-dev/SKILL.md` ≥1(字串序第二例条目);证据页
+    机械再生成(docs/e2e-report/)。
+
+## 10.6 风险
+
+| # | 风险 | 对策 |
+|---|---|---|
+| RM4-1 | clean 拆参波及 opt_clean 既有 406/450 面 | 拆参=纯签名重构,调用点 (true,false) 字面;既有 golden=回归锚(验收 10);worker 零改动(P10①);slice-3 出口恒定断言 |
+| RM4-2 | cmd_error 插入符列号:多 token/-purge 前置形列错 | 列=按 args 重拼逐 arg 累加;slice-1 录多 token 实录仲裁;fixture 用实录形禁手写 |
+| RM4-3 | opt_balance_tree 字串序陷阱:实作套 intern 序律=序差 | P8 显式例外(源码 :271+D-ys8b 先例);carryadd byte-diff 仲裁;凡 diff 先 §8.8-2 分类,禁源码静态推导定案 |
+| RM4-4 | experimental 双计数(unique/total 与 experimental 行)与去重粒度:多 feature/多警告形态语料未触 | 单触发面实录钉;机制按 P7/P8 源码实现;新形态触发=同轮扩(铁则 3) |
+| RM4-5 | HELP_SHORT 306 条转录漂移(手抄风险) | 录制脚本机械生成;免费对拍闸=表拼装 bare 形 vs `-H` 输出 diff 零差(P5 byte 同形) |
+| RM4-6 | SUMMARY 基线跳跃与 LIVE 注释漂移 | 实录定盘禁硬编;regress S4 同轮(§9.4-3 同律) |
+| RM4-7 | `;;;` 端到端翻绿面外溢(token 层把 clean -purge 展开进任意 `;;;` 脚本) | 既有 54 例 script.txt 零 `;;;`(P10④ 本轮普查);翻绿仅新 fixture 面 |
+| RM4-8 | clean 静默面入既有语料脚本=编号面连带变化 | 既有脚本零改动(§10.2);新锚编号面=实录承载 |
+
+## 10.7 收口实录(2026-11-01 实作轮;§10.1-5 目标达成对账)
+
+* **registry 收口**:stub 275→**271**(Y0 266→263、Y2 7→6、Y3 2)+
+  实现层 31→**35**(+4=log/help/clean/opt_balance_tree)=306 闭环;
+  python 全表枚举实录在案(PROVENANCE 对账收口节);四行删除负向闸
+  grep exit=1;五处口径同轮(REGISTRY ry-cli 行/registry.rs 头注/
+  PROVENANCE/ry-cli main.rs 头注/本节)。
+* **SUMMARY 新基线实录定盘**:`SUMMARY ys=461/471`(=450+anchors 11 例
+  迁入;**实录禁硬编**——迁移后实跑定盘);known-gap 10 例名单逐字
+  维持;LIVE 腿 456/456 不变(anchors=record() 不再生面,regress 注释
+  同轮:anchors 4 例→15 例)。
+* **byte-exact 达成面**:bare help 312 行归一化形 vs oracle `-H` 剥面
+  diff 零差(免费对拍闸,P5);clean -foo cmd_error stdout+stderr 双面
+  byte-exact;carryadd×opt_balance_tree stdout+RTLIL 双面 byte-exact
+  (五型 Converted 行序+experimental 两汇总行+`Removed 7 ... 31 ...`+
+  `<suppressed ~8>`;multiplier-pb+proc 0/15 形);min2 clean/-purge
+  双锚(Removed 2/3 vs 2/4);`;;;` 端到端编号不占(2./3. 连续)。
+* **本轮两笔真发现(§10.6-RM4 外,如实录条款入档)**:①0.70+179 新形
+  cells dbg verbose 门控(三处 `if (verbose)`,clean 形零计数——min2
+  锚首录抓出,§9.7⑥ 预言的「锚抓真差」实例);②hashlib 逆插入序本
+  pass 五消费点(hashlib.h:877 begin()=size-1;详案 P8「插入序」系
+  指.entries append-only 语义,迭代面=逆插入——AGENTS 10.9-r 契约,
+  手推+byte-diff 双证);另比对脚本假绿教训(connect 行无分号 regex
+  零命中,PROVENANCE 对账节)。
+* **D-ys10 登记**:四单元旗标/子形/selection 行为面(REGISTRY 分歧簿;
+  fixture 钉我方硬错形,oracle 实录形与硬错永不相等=禁实录 golden)。
+* **§10.5 验收清单 12 项**:收口轮全项实跑,结果=§10.5 各条绿(本轮
+  实录=PROVENANCE 对账收口节+commit message 计数)。
+
+# 11. M3 续弧·批量收编详案第二批(2026-11-02 追加;planner 出案)
+
+## 11.0 oracle 实录与源码定点对读(2026-11-02 规划轮;冷分析 confirm 七单元+prune 一单元证据链转入,关键行本轮复核)
+
+* 版本口径:行为仲裁=oracle 二进制 **0.70+179(git sha1 9534a7f4d)**(本轮
+  六命令 help 实跑 banner 亲证);源码定位=clone **v0.70 28ba3cb**
+  (9534a7f4d 不可对齐,凡序差/行为结论以二进制实跑仲裁、clone 行号只作
+  定位——D-ys9 同律)。**clone 路径勘正(与冷分析提名引用路径不同,本轮
+  find/wc 亲证)**:`simple.cc`=passes/opt/dff/simple.cc(772 行)、
+  `async2sync.cc`=passes/sat/(367 行)、`dffunmap.cc`=passes/techmap/
+  (105 行)、`pmuxtree.cc`=passes/techmap/(112 行)、setattr/torder/
+  edgetypes=passes/cmds/(279/129/112 行)。
+* 证据标注:「本轮亲证」=本规划轮本机实跑/亲读;「冷分析親跑轉錄」=ask
+  所附 cold-audit 实录材料(规划轮未重跑)。Q 编号自本节起算(与 §10.0
+  P 编号不互通)。
+
+| # | 探针 | 实录结果 |
+|---|---|---|
+| Q1 | 六命令 help 契約面(本轮亲证:逐命令 `vendor-reference/suite-dl/oss-cad-suite/bin/yosys -p "help <名>"`) | `async2sync [options] [selection]`:唯一旗標 `-nolower`("Do not automatically run 'chformal -lower' to lower $check cells.");`pmuxtree [selection]` 裸形零旗標("transforms $pmux cells to trees of $mux cells");`dffunmap`:`-ce-only`/`-srst-only` 兩旗標;`setattr [ -mod ] [ -set name value \| -unset name ]... [selection]`+"String values must be passed in double quotes (\")"+`-mod` 段(module 級);`torder`:`-stop <cell_type> <cell_port>`/`-noautostop`;`edgetypes`:usage 裸形、描述="4-tuple of source and sink cell type and port name"。六段全數與冷分析提名一致 |
+| Q2 | opt_dff 缺陷点双面源码定点(本轮亲读) | oracle `simple.cc`(clone):**:149** `pattern_t path_else = path;`(循环外建)、**:156** `path_else[s_bit] = false;`(循环内**累加**,跨迭代持久)、**:168** A 臂递归带累加版(grep -n 亲钉;冷分析转录用 :155,本轮勘正 +1);另 oracle 函数返回 `pool<pattern_t>`(hash 集,`ret.insert(pat)`)=D-ys8c 面1 本体(收集序面,禁硬磕维持)。我方 `opt_dff.rs`:**:1298-1301** 循环内每轮 `path_else = path.clone()`+push 即弃(仅 :1304 B 臂收 path_this)、**:1313-1315** A 臂传 `path_else_dummy(path)`、**:1325-1328** dummy 原样返回 `path`——结构差逐行吻合(冷分析认定+本轮复核) |
+| Q3 | 我方底座面与 oracle 执行体(本轮亲读;行号锚=clone 亲证,第三轮勘正两处[dffunmap extra_args=:65 非 :73、torder autostop=:89-92 非 :85-90,语义描述不变]) | `FfInitVals`(opt_dff.rs:97-103)+`FfD` 欄位(has_ce :199/has_srst :201/ce_over_srst :204/pol_ce :206/pol_srst :209/val_srst :213/sig_ce :219)=dffunmap unmap_ce/unmap_srst 与 async2sync FfData 消费直接可得;dffunmap.cc:=:48 log_header、:68 互斥 `log_cmd_error("Options -ce-only and -srst-only are mutually exclusive!\n")`、:65 extra_args、执行体=selected_modules×selected_cells×`FfData`×`ff.unmap_ce()/unmap_srst()`(本轮 grep/亲读);async2sync.cc:=:80 `vector<Cell*>(module->selected_cells())` 值拷贝遍历+SigMap/FfInitVals+`$print`/`$check` 分支在体(-nolower 语义面=chformal 依赖,见 Q6 普查);setattr.cc:=:49 do_setunset、:104 module->attributes(-mod 面)、:108-109 selected_members 遍历、:191 cell parameters 面(实作轮定点对读);torder.cc:=:73 extra_args、**:81** `TopoSort<IdString, RTLIL::sort_by_id_str>`(自指定字串序,Q7)、:89-92 autostop 预设(:89 noautostop 判定+:90 Q/CTRL_OUT/RD_DATA+:91-92 $memrd/$memrd_v2 DATA);edgetypes.cc:=:46-52 选项循环全注释+break(零旗标)、:56 `pool<string> edge_cache`、:106 `edge_cache.sort()`+:107 正序 log |
+| Q4 | 序面与静默面(冷分析親跑轉錄;序面机理本轮源码交叉亲读) | async2sync:mem_arst-pbo 输入两跑唯一 differ=End of script MEM 行,Logfile hash 两跑同(0097a1da37)=内容确定;22 行 `Replacing …` 亲录(309,304,329,… 非编号序),序面=selected_cells 按 cells_ dict 正序值拷贝(rtlil.cc:2825-2833)→dict 正序=逆插入序(M1 hashlib 契约)→我方 `cells.iter().rev()` 可复刻;proc 后 write_rtlil 两端 byte-same(剥首行 D-ys1)=创建序可复刻,rtlil backend :334 reversed(cells_) 写入序与 Replacing 序互逆=交叉闭合;async2sync.cc 4 个 Replacing log 形(:149/:214/:247/:281,冷分析亲读)。pmuxtree/dffunmap/setattr 同 selected_cells/selected_members 值拷贝面(remove 不扰遍历序,pmuxtree.cc:89-90/:106-107);fsm 输入 pmuxtree 两跑唯一 diff=Time spent 行(截断面外);PMUXTREE/DFFUNMAP/setattr 执行体静默(仅 header/仅 help 段 log) |
+| Q5 | 效果面与错误路径(冷分析親跑轉錄) | pmuxtree(fsm-pbo 输入,`proc; opt` 前置):$pmux 3→0、新建 14 颗 $mux;命名锚亲录=`$auto$pmuxtree.cc:65:recursive_mux_generator$N`/`$auto$pmuxtree.cc:100:execute$N`(**实名形;提名初稿缺函数名段,冷分析已勘正;锚以 golden 实录钉禁手写**);dffunmap(fsm-pbo 输入,`proc; opt` 前置):FF($adffe/$sdffe 族)全变 $dff(6 颗,type grep)=转换集非空、静默面效果在 RTLIL 层可对拍;setattr(attrib01_module-pbo 输入):`-set src_sync 1` → write_rtlil 12 处 `attribute \src_sync 1`;错误路径 `-set src_sync true` → rc=1+stderr 逐字 `ERROR: Can't decode value 'true'!`(oracle 实录形=两端一致面,可实录 fixture);torder(edgetypes 同输入 carryadd):header「2. Executing TORDER pass (print cells in topological order).」占编号+`module carryadd`+`  cell <名>` 逐行;edgetypes:无 log_header 不占编号、8 行纯排序行(`$and.Y $and.B` 等),两跑 byte 同 |
+| Q6 | 語料与闸基线(本轮亲证) | regress.sh S4 现行闸=SUMMARY ys=**461/471** 精确数(scripts/regress.sh:**318**,对抗审勘正=初稿 :321 行号锚漂移)+known-gap **10 例**逐字(:**333**,勘正同;比较行=:334)=constmuldivmod-pbo fsm-pbo i2c_master_tests-pbo loops-pbo mem_arst-pbo memory-pbo sincos-pbo subbytes-pbo usb_phy_tests-pbo values-pbo;registry stub 六行在表:async2sync=:36/dffunmap=:72/edgetypes=:76/pmuxtree=:172/setattr=:202/torder=:256(全 Y0,grep 亲钉);registry 全表 python 枚举=stub **271**(Y0 263/Y2 6/Y3 2)+实现层 **35**=306(本轮亲跑);锚管线形态在档=sincos-pbo/script.txt(`read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json`)与 obt-carryadd 直锚形(`read_rtlil case.il; opt_balance_tree; write_rtlil …`)+expected 四件套+case.il 自含复制;difftest 对拍面=normalize_stdout 以 `-- Running command` 起、`End of script. Logfile hash:` 截(ry-difftest/src/lib.rs:20-33 亲读);两跑探针对拍面=剥 `End of script. Logfile hash:` 与 `Time spent:` 行后逐行 diff、raw cmp 禁用(§10.1-6 教训);**$check/$print 语料普查列入 slice-1**(async2sync chformal-lower 依赖面,§11.2) |
+| Q7 | torder 序面分类(intern 律例外面第三例) | torder.cc:81 `TopoSort<IdString, RTLIL::sort_by_id_str>`=yosys 自指定**字串序**比较器(本轮亲读)——intern 名序律(AGENTS 10.9-r)例外面**第三例**(前两例=D-ys8b lt_by_name+opt_balance_tree compare_ptr_by_name);入场分类已完成=自指定比较器,实作按字串序禁 intern 序;edgetypes:收集容器 hash(bit_sources/bit_sinks dict,:56-58)但配对结果全 insert 进 `pool<string> edge_cache`+`edge_cache.sort()` 正序 log=**收集序完全不出现在输出面,D-ys8/8b/8c 雷区零触发**(本轮源码亲读) |
+| Q8 | 两跑探针命令形(冷分析親跑轉錄逐字;对抗审 Issue 5 同级观察勘补——slice-1 落档=本行转 PROVENANCE 的可复现链;工作目录均 /tmp/cold-audit/<名>-w,输入=对应 corpus case.il 复制,对拍面=剥 `End of script. Logfile hash:` 与 `Time spent:` 行后逐行 diff) | sincos 对拍:`target/debug/ryosys -p "read_rtlil case.il; proc; opt; check; stat" > mine.log` vs `vendor-reference/suite-dl/oss-cad-suite/bin/yosys -p <同脚本> > oracle.log`(i2c_master_tests 同法);async2sync(memarst-w):两跑 `yosys -p "read_rtlil case.il; proc; async2sync; check; stat" >o1/o2.log` rc=0/0;pmuxtree(fsm-w):两跑 `yosys -p "read_rtlil case.il; proc; opt; pmuxtree; check; stat; write_rtlil -readable p_out.il"` rc=0/0,`diff <(grep -v MEM: p1.log) <(grep -v MEM: p2.log)` 唯一差=Time spent 行;dffunmap(同 fsm-w):`…; opt; dffunmap; check; stat; write_rtlil -readable d_out.il` rc=0/0,`grep -o 'cell $[a-z]*ff[a-z]* ' d_out.il \| sort \| uniq -c`=「6 cell $dff」;setattr(attrib1-w):`…; opt; setattr -set src_sync 1; check; write_rtlil -readable sa_out.il` rc=0/0,`grep -c 'attribute \src_sync' sa_out.il`=12;错误形 `…; setattr -set src_sync true; check` → rc=1+stderr 逐字;torder/edgetypes(carry-w):`yosys -p "read_rtlil case.il; torder; check"` / `yosys -p "read_rtlil case.il; edgetypes" >e1/e2.log` rc=0/0,后者 `diff <(grep -v MEM: e1.log) <(grep -v MEM: e2.log)` 空 |
+
+## 11.1 范围(做)
+
+1. **opt_dff find_muxtree path_else 累加链修补**(sincos-pbo/
+   i2c_master_tests-pbo 两例 known-gap 收平;非新命令,registry 零变更):
+   - 三点手术对齐 oracle(:149/:156/:168):`path_else` 移循环外建+
+     循环内 push 累加(oracle 为 map 赋值语义 `path_else[s_bit]=false`,
+     我方 Vec push 等价——循环 :1295 跳过 path 已含者、各轮 s_bit 互异,
+     无重复键)+A 臂递归(:1315)改传累加版+删 `path_else_dummy`
+     (:1325-1328,手术纪律=精确字面锚+命中计数断言+删后 cargo build
+     零错,Q2)。
+   - 收集容器形不动:oracle `pool<pattern_t>`=hash 集迭代序=D-ys8c 面1
+     本体(禁硬磕维持),我方 Vec 确定序维持;修补只对齐 **path_else
+     内容面**(logic-diff,D-ys8c 已载 sincos/i2c=自面1 摘出的独立
+     logic-diff 面)。
+   - 翻绿以实跑为准:预期 461/471→**463/471**、known-gap 10→**8** 例
+     (golden 零重录=sincos/i2c 的 expected.\* 本就是 oracle 真值);
+     regress.sh S4 两串(精确数+名单)在实跑确认翻绿后**同轮**翻转,
+     禁预翻(§11.6-RM11-1);若修补后仍 FAIL=按 §8.8-2 分类,修补保留
+     (忠实移植=正确方向)、案例维持 known-gap。
+2. **async2sync 无参形翻实现**(registry 删 `("async2sync","Y0")` 行,
+   同轮):FF 异步信号同步化($adff/$adffe/$sdff/$sdffe 族→同步结构),
+   4 个 Replacing log 形逐字(async2sync.cc :149/:214/:247/:281);遍历
+   =selected_cells 值拷贝=逆插入序(Q4,`iter().rev()`);建名/重建序
+   =NEW_ID intern 锚(golden 实录钉)。
+3. **pmuxtree 无旗标翻实现**(registry 删 `("pmuxtree","Y0")` 行,同轮):
+   $pmux→$mux 树;or_generator 四臂(pmuxtree.cc:26-39:0→S0/1→原样/
+   2→Or/default→ReduceOr)+fully_undef 分支(:98-102)逐段移植;递归
+   建名=$auto$pmuxtree.cc:65:recursive_mux_generator$N 与
+   $auto$pmuxtree.cc:100:execute$N 字面(N=NEW_ID 实录链,禁手写);
+   connect+remove 序(:106-107)。
+4. **dffunmap 无参形翻实现**(registry 删 `("dffunmap","Y0")` 行,同轮):
+   :48 log_header 形;FfData has_ce/has_srst 分派→unmap_ce/unmap_srst
+   (FfD 欄位面 Q3 直接消费);静默面=仅 header;fsm-pbo 输入效果锚
+   =$adffe/$sdffe 族全变 $dff(Q5)。
+5. **setattr 全旗标面翻实现**(registry 删 `("setattr","Y0")` 行,同轮):
+   `-mod`/`-set name value`/`-unset name` 全收(重复形 `...` 支持);
+   值语法=双引号剥引号字符串/否则整数 decode(失败=`ERROR: Can't
+   decode value '<v>'!` rc=1 stderr 逐字,Q5=oracle 实录形);遍历=
+   module->attributes(-mod 面)+selected_members(dict 序,M1 契约);
+   执行体静默(仅 help 段 log)。
+6. **torder 无参形翻实现**(registry 删 `("torder","Y0")` 行,同轮):
+   header+`module <名>`+`  cell <名>` 输出形;TopoSort=**字串序变体**
+   (Q7 例外面第三例,禁 intern 序);autostop 预设面(:89-92,Q3
+   勘正)。
+7. **edgetypes 零旗标翻实现**(registry 删 `("edgetypes","Y0")` 行,
+   同轮):edge 四元组字符串化+pool 去重+`sort()` 字串序正序 log;
+   无 log_header 不占编号;收集序不出现在输出面=零序风险(Q7)。
+8. **旗标/selection 三形共用面**(六命令统一,扩 §10.1-1 先例):
+   无参/裸形=收编本体;**未知旗标形**(如 `-foo`)=cmd_error 全形
+   (§10.3-6 机制已落地,扩消费面;stdout 含**该命令 help 全文常量**
+   =六份 help 文本从 Q1 实录转檔,禁手写;fixture 用 oracle 实录形,
+   两端一致);**selection 形**(裸字参数)=oracle 经 extra_args 接受
+   rc=0 而我方 cmd_error rc=1=行为面分歧,登记 **D-ys11**(D-ys10-①
+   同族),fixture 钉我方 cmd_error 全文断言形;**已知旗标形**
+   (async2sync -nolower/dffunmap -ce-only+-srst-only[含 :68 互斥
+   log_cmd_error 面,双旗标同投=Y2 内]/torder -stop+-noautostop)=
+   Y2 硬错(现行 stub 通道),fixture 钉 Y2 文案形。
+9. **registry 收口**:stub 271→**265**(Y0 263→**257**、Y2 6、Y3 2)+
+   实现层 35→**41**(+6)=306 闭环;六处口径同轮(REGISTRY ry-cli 行/
+   registry.rs 头注/PROVENANCE 对账节/ry-cli main.rs 注释/本文档
+   §11/证据页)。
+10. **语料扩面+四层同步**:corpus/ys-batch2-anchors/ 新建(锚集=
+    async2sync×mem_arst-pbo 输入、pmuxtree×fsm-pbo 输入、dffunmap×
+    fsm-pbo 输入、setattr×attrib01_module-pbo 输入(-set 形+decode
+    错误形;-unset/-mod/引号形按 slice-1 探针定盘)、torder×carryadd、
+    edgetypes×carryadd;每例=case.il 自含复制+script.txt+expected
+    四件套,oracle 实录管线录制禁手写)→收口迁 ys-e2e,SUMMARY=
+    **463+迁入数**(实录定盘禁硬编);regress.sh S4(基线串+known-gap
+    8 例名单)、SKILL ryosys 节(六命令条目+torder 字串序第三例入
+    intern 法条例外注记)、AGENTS 10.9-r(例外注记第三例)、PLAN.md
+    §3 表 ryosys 行追加注记(既有文字不删改)同轮。
+
+## 11.2 显式不做(每条=不变更既定边界;含 prune 登记)
+
+| 不做项 | 理由/边界 |
+|---|---|
+| **prune 登记:opt_dff never-active EN 判定修补(fsm-pbo/subbytes-pbo 收平)** | 「修 never-active EN 即收平 fsm/subbytes」前提被冷分析亲跑证伪——fsm 叠**三层**比较面内分歧,修第三层不翻绿:①3.8 OPT_EXPR 变换集差(我方 `<suppressed ~5>` vs oracle `~1`,根因未定位、修复面无精确行号);②3.11 OPT_REDUCE「New ctrl vector for $pmux cell $procmux$52」拼接序差(oracle {opt_pmux$105, 16_CMP, 24_CMP, 67_CMP} vs 我方 {67, 24, 16, 105})=**D-ys8c 面2 同形态**(fsm 应补入面2 成立例名单,REGISTRY 现行条文未载此层,本轮补名入 slice-1);③3.12 never-active EN 塌缩(修复面本身)为真实 logic-diff 可后置。subbytes 亲证无 never-active 行=修复面不触发;其实叠=3.8 变换集差+面1 Adding-EN 行序差(禁硬磕)+级联 Removed 4/1 vs 5/2——收平路径≠单点,prune。三層行全在 difftest 比较面内(normalize 只截 banner 与 End of script 之后,ry-difftest/src/lib.rs:15-37) |
+| 六命令 selection 形(裸字参数) | oracle 经 extra_args 接受并执行 rc=0,我方 cmd_error rc=1=行为面歧,登记 D-ys11(clean D-ys10-① 同族先例);fixture 钉我方 cmd_error 全文断言形(实录形=成功输出与硬错永不相等,禁实录 golden) |
+| async2sync `-nolower`、dffunmap `-ce-only`/`-srst-only`(含互斥面)、torder `-stop`/`-noautostop` 真实行为 | Y2 硬错边界(Q1 契约形亲证=真实功能=行为面歧;§9.2/§10.2 先例同形,并入 D-ys11) |
+| async2sync `$print`/`$check` 处理面与自动 `chformal -lower` 依赖 | -nolower help 文本亲证该面存在(Q1)但 chformal=Y0 stub、语料零触发(待 slice-1 普查机械确认);若普查发现 -pbo/-pbo 前置链语料含 $check=锚输入改选或登记 D-ys11,禁把未实现面编进 golden |
+| fsm-pbo/subbytes-pbo/constmuldivmod-pbo/usb_phy_tests-pbo/values-pbo/loops-pbo/memory-pbo/mem_arst-pbo 八例 known-gap 收平 | 维持:D-ys8c 面2(fsm 补名后五例,禁硬磕)+面1(subbytes Adding-EN 行序)+D-ys8(opt_clean 多删幸存序,三例)——§8.8-2 分类法不变 |
+| optbarriers | defer 维持(§10.2 五疑问在案) |
+| 六命令进 opt 编排链 | 不做:opt do-while 编排器零变更(锚 script 显式调用,编号面=实录承载;既有 461 例 golden 零扰动) |
+| 既有 461 例 golden | 零重录(path_else 修补后我方=oracle 算法逐行,绿例=oracle 输出必不变;机械断言=§11.5-13);新增层只增不改 |
+
+## 11.3 代码结构要求(与 yosys 同构;byte-exact 可达的前提)
+
+1. **opt_dff 修补=三点手术**(Q2):①`path_else` 声明移至探索循环外
+   (:1298 → 循环前,初值 `path.clone()`);②循环体内改
+   `path_else.push((s_bit, false))` 累加(删原每轮 clone 即弃形
+   :1299-1300;map 赋值≈push 因键互异,Q2 论证);③A 臂(:1315)
+   `path_else_dummy(path)` → `path_else`;④删 `path_else_dummy`
+   (:1325-1328)——删除按精确字面锚+命中计数(count==1 才写)+
+   删后 `cargo build` 零错断言(AGENTS §7/§10.6);forced 分支
+   (:1278-1291)传 path 原样=oracle 同形,零改动。
+2. **async2sync**:新檔 crates/ry-cli/src/async2sync.rs(opt_dff.rs/
+   opt_balance_tree.rs 独立檔先例);结构=SigMap+FfInitVals→
+   selected_cells 逆插入序遍历(`iter().rev()`,Q4;**若锚录制时
+   Replacing 序 diff=按 §8.8-2 分类禁硬磕**;锚 script=proc 后直跑
+   无 opt_clean 前置,swap-and-pop 不入场)→FfData 分派×4 Replacing
+   log 形→替换结构建名走 NEW_ID intern;`$print`/`$check` 分支按源码
+   移植但 chformal 依赖面=语料零触发边界(§11.2)。
+3. **pmuxtree**:新檔 crates/ry-cli/src/pmuxtree.rs;
+   recursive_mux_generator 同构递归(or_generator 四臂+fully_undef
+   分支);遍历=selected_modules×selected_cells 值拷贝(clone 后
+   remove,不扰遍历);建名=两字面模板
+   `$auto$pmuxtree.cc:65:recursive_mux_generator$N`/
+   `$auto$pmuxtree.cc:100:execute$N`+NEW_ID 计数链;connect+remove 序
+   按 :106-107。
+4. **dffunmap**:新檔 crates/ry-cli/src/dffunmap.rs;log_header(:48
+   文本逐字)→selected_modules×selected_cells→`FfData` has_clk/
+   has_ce/has_srst 分派→unmap_ce/unmap_srst;静默面=仅 header。
+5. **setattr**:新檔 crates/ry-cli/src/setattr.rs;argidx 循环
+   (`-mod` 布尔+`-set`/`-unset` 可重复收集)→extra_args→执行体
+   (module->attributes 面+selected_members 面,do_setunset :49 同构);
+   值语法=双引号剥引号/整数 decode/失败 log_error 形(`Can't decode
+   value '<v>'!` rc=1);执行体静默。
+6. **torder**:新檔 crates/ry-cli/src/torder.rs;TopoSort 底座
+   (opt_expr 消费面)扩**字串序变体**(byte-wise 名称比较,显式禁
+   intern_key——Q7 例外面第三例;opt_balance_tree compare_ptr_by_name
+   先例同款);autostop 预设集(Q/CTRL_OUT/RD_DATA+$memrd/$memrd_v2
+   DATA);输出=header+`module <名>`+`  cell <名>` 逐行。
+7. **edgetypes**:新檔 crates/ry-cli/src/edgetypes.rs;edge 四元组
+   字符串化=**cell type 形**(oracle edgetypes.cc:67 `cell_type =
+   cell->type`+:94-100 `source_cell_type.unescape()`,即
+   `<src_type>.<src_port> <sink_type>.<sink_port>`——Q1 help 文本
+   「cell type and port name」与 Q5 实录 `$and.Y $and.B` 同为 type 形,
+   占位符勘正=初稿 `<src_cell>` 形与源码相左,换人复审第三轮勘正)+
+   **multibit 分支移植**(:62 `pool<pair>` multibit_ports+:71-72
+   `GetSize(sig)>1` 收集+:94-100 消费,multibit port 字符串化为
+   `type.port[index]` 带 bit 下标形;**口径决策=移植**,与本章
+   「与 yosys 同构」章标一致——carryadd 锚全 1-bit 零触发、golden
+   无直锚,故 slice-7 增配 multibit 手写小锚实录弥合[§11.4 slice-7];
+   pool 去重+`sort()` 正序 log;无 log_header 不占编号)。
+8. **cmd_error 扩消费面**:六命令 help 文本常量六份(新檔或既有
+   help_desc.rs 扩展,**落点避 registry.rs**=§10.3-4 负向 grep 同律;
+   文本=Q1 实录转录禁手写);未知旗标=cmd_error 全形;selection 裸字
+   =cmd_error(D-ys11);已知旗标=Y2 stub 通道。
+9. **registry 收口纪律**:每收编一命令同轮删 stub 行+负向 grep 闸
+   (带引号精确 token;零匹配=grep exit 1,`|| true` 承接,AGENTS
+   10.5);六行删毕全表 python 枚举=265/41 断言;五处口径同轮
+   (§11.1-9)。
+
+## 11.4 有序 slices(slice-1=备料/普查先行;每个中间 slice 出口=三闸绿+现行基线+现行 known-gap 名单零扰动[除 slice-2 名义翻绿])
+
+| slice | 内容 | 出口闸 |
+|---|---|---|
+| **slice-1** 备料+普查(产品行为零变更) | ①PROVENANCE 新节「M3 续弧·批量收编第二批普查」:六命令 help 契約逐字转檔(Q1 已亲证,实录落档)+每命令两跑确定性探针(对拍面=剥 `End of script. Logfile hash:` 与 `Time spent:` 行后逐行 diff)+async2sync Replacing 22 行序亲录+**$check/$print 语料普查**(corpus/ys-e2e 461 例 case.il grep,定 async2sync 锚输入面)+$pmux 15 例语料普查(pmuxtree 锚与既有 case 零扰动确认)+setattr -unset/-mod/引号形三探针+sincos/i2c 对拍复核;②cli_contract fixture 先钉(六命令 stub 形:未知旗标 cmd_error[oracle 实录形]/selection 形我方硬错/已知旗标 Y2 文案;setattr 值 decode 错误形暂钉 stub 行为,翻转同轮更新=铁则 3);③六份 help 文本常量起草(实录转录);④batch2-anchors 目录起草;⑤**REGISTRY D-ys8c 面2 成立例名單尾接 `/fsm`**(目标形=`面2 成立例=constmuldivmod/usb/values/fsm`,逐字锚=§11.5-15 断言;**尾接+旧句勘正注同段落地**:D-ys8c 行现行「fsm/subbytes 第 7 轮初稿误归面2,对抗审修订归 (a) 类」句就地加勘正注[三層疊加調和=首分歧 3.8 变换集差归 (a) 类不变、3.11 层另带面2 同形拼接序差],只尾接不勘正将呈「fsm 曾裁定不属面2」与「fsm∈面2 成立例」并存自相矛盾,换人复审第三轮补明;排布定著 slice-1=登记先行,对抗审 Issue 4 对齐,§11.4 slice-8 不再重复) | PROVENANCE 新节在档;REGISTRY 面2 尾接在档(§11.5-15 断言转绿);`cargo build` 零警告;`cargo test -p ry-cli` 绿(stub 行为锚);difftest 461/471+10 例名单零扰动 |
+| **slice-2** opt_dff path_else 修补+闸翻转 | 三点手术(Q2/§11.3-1)+50 绿例零扰动实跑验证(461 例全绿保持)+sincos/i2c 翻绿确认;regress.sh S4 同轮 461/471→463/471+名单 10→8 逐字(实跑确认后才翻转);D-ys8c sincos/i2c 行清偿注记同轮 | 三闸绿;difftest **463/471**+8 例名单=constmuldivmod-pbo fsm-pbo loops-pbo mem_arst-pbo memory-pbo subbytes-pbo usb_phy_tests-pbo values-pbo;若仍 FAIL=不翻闸、按 §8.8-2 分类(RM11-1) |
+| **slice-3** async2sync | 实现(§11.3-2)+stub 删行(265 计划数的 -1,按 §11.1-9 口径逐 slice 递减)+锚录制(mem_arst-pbo 输入,Replacing 序面 golden 实录) | slice-2 闸+registry 负向闸(async2sync 行)+锚 byte-exact(含 Replacing 22 行序) |
+| **slice-4** pmuxtree | 实现(§11.3-3)+stub 删行+锚录制(fsm-pbo 输入,$pmux 3→0+14 $mux 建名链) | 同上+建名锚($auto$pmuxtree.cc:65:…$N 形)在 golden |
+| **slice-5** dffunmap | 实现(§11.3-4)+stub 删行+锚录制(fsm-pbo 输入,FF 全变 $dff 面) | 同上+FF 型别面 golden;两旗标 Y2 fixture |
+| **slice-6** setattr | 实现(§11.3-5)+stub 删行+锚录制(attrib01_module-pbo 输入 -set 形+decode 错误形[expected.exit=1+stderr 逐字];-unset/-mod/引号形按 slice-1 探针定盘) | 同上+错误路径 golden;三旗标形 fixture |
+| **slice-7** torder+edgetypes | 两实现(§11.3-6/7)+两 stub 删行+两锚(carryadd;torder 字串序变体+edgetypes 8 行排序面)+**multibit 手写小锚**(edgetypes:含 ≥1 个多 bit port cell 的最小 .il,先过两跑确定性探针[§10.1-6 min2 先例同纪律]后实录,`type.port[index]` 形=multibit 分支移植面直锚——carryadd 全 1-bit 抓不到该分支,换人复审第三轮口径决策=移植+锚弥合) | 同上+torder 输出形 golden;edgetypes 不占编号面 golden;multibit 锚 golden 含下标形(§11.5-12) |
+| **slice-8** 收口(四层同轮) | anchors 迁 ys-e2e+SUMMARY=463+迁入数实录定盘;registry 265/41 五处口径;regress S4(新基线+8 例名单);SKILL/AGENTS 10.9-r(torder 字串序第三例)/PLAN.md 注记;D-ys11 登记(fsm 面2 补名已于 slice-1 落档=排布对齐,对抗审 Issue 4);证据页机械再生成 | §11.5 全清单绿 |
+
+## 11.5 验收清单(全部机械可执行)
+
+1. `bash scripts/regress.sh`(裸跑)→ 尾行 `== REGRESSION GATE: PASS`
+   exit 0;S4 基线=新实录数(=463+anchors 迁入数)、known-gap 8 例名单
+   与 difftest 实跑 FAIL 集逐字一致。
+2. `cargo run -q -p ry-difftest -- --corpus corpus/ys-e2e` →
+   `SUMMARY ys=<实录新基线>` 且与 regress S4 grep 串逐字相同;sincos-pbo
+   与 i2c_master_tests-pbo 不在 FAIL 行(grep 对表,`|| true`);
+   `--live` 腿同口径(注释同轮)。
+3. `cargo test -p ry-cli` 全绿;`rg -c '"Y2"'
+   crates/ry-cli/tests/cli_contract.rs` → 0 维持(新硬错契约全文/前缀
+   ERROR 断言形禁裸 Y2 字面;`|| true` 承接)。
+4. registry 口径:python 全表枚举=stub **265**(Y0 257/Y2 6/Y3 2)+
+   实现层 **41**=306;`grep -n '"async2sync"\|"pmuxtree"\|"dffunmap"\|
+   "setattr"\|"torder"\|"edgetypes"' crates/ry-cli/src/registry.rs`
+   → exit=1(六行删除负向闸,`|| true`);`rg -c 'stub \*\*265\*\*'
+   corpus/ys-e2e/PROVENANCE` ≥1(收口对账节逐字锚,书写规范=对账收口
+   节先例形 `stub **271**(Y0 …)` 亲证在档;原形 `rg -n '265'` 现状即绿
+   零区分力已亲证=2 行命中[PROVENANCE:68=M1 时点历史数字「ys 265/314
+   红」/:447=上游源码行号 opt_ffinv.cc:265,均与 registry 收口无关],
+   作废,对抗审第二轮残余);五处口径一致(REGISTRY ry-cli 行/
+   registry.rs 头注/PROVENANCE/ry-cli main.rs/本文档 §11)。
+5. opt_dff 手术断言:`rg -c 'path_else_dummy' crates/ry-cli/src/opt_dff.rs`
+   → 0(删除负向闸,`|| true`);`rg -n 'path_else.push'
+   crates/ry-cli/src/opt_dff.rs` ≥1(累加锚);`rg -n 'q, path_else,'
+   crates/ry-cli/src/opt_dff.rs` ≥1(A 臂传累加版;修补后该行
+   形=`…, q, path_else, out_patterns);`——原拟 `path_else\)` 形修补后
+   仍零命中已亲证(opt_dff.rs:1315 现状=…q, path_else_dummy(path),
+   out_patterns);,作废,对抗审 Issue 2)。
+6. 六命令契约:cli_contract 未知旗标 cmd_error fixture ≥6(每命令 1,
+   oracle 实录形)、selection 形我方硬错 fixture ≥6(D-ys11)、已知
+   旗标 Y2 fixture(async2sync -nolower/dffunmap 两旗标[含双投形]/
+   torder 两旗标,逐项 rg 对表);`rg -n "Can't decode value"`
+   (golden stderr 逐字锚)≥1。
+7. async2sync:锚在库且 byte-exact,Replacing 行序面在 golden
+   (22 行形=mem_arst 输入实录);`$check` 普查结论在 PROVENANCE
+   (`rg -n 'check 普查' corpus/ys-e2e/PROVENANCE` ≥1)。
+8. pmuxtree:锚 golden 含建名形 `$auto$pmuxtree.cc:65:recursive_mux_generator$`
+   (grep 对表 ≥1)与 $pmux 归零效果面;既有含 $pmux 语料 case 零扰动
+   (锚 script 显式调用,opt 链不变)。
+9. dffunmap:锚 golden 含 FF 型别面(write_rtlil 输出 FF 全 $dff);
+   `-ce-only`/`-srst-only` fixture=Y2。
+10. setattr:锚 golden 含 12 处 `attribute \src_sync 1` 形(Q5);decode
+    错误形 expected.exit=1+stderr 逐字;-unset/-mod 形按 slice-1 探针
+    在锚或 fixture(rg 对表)。
+11. torder:锚 golden 含 `module carryadd`+`  cell ` 行形;-stop/
+    `-noautostop` fixture=Y2;`rg -n 'sort_by_id_str|字串序第三例'
+    .agents/skills/eda-dev/SKILL.md docs/REGISTRY.md` ≥2(四层条文;
+    交替=未跳脱 `|`——rg Rust regex 下 `\|` 配字面直线符,fixture
+    亲证原形恒红零命中、未跳脱形命中两行,换人复审第三轮勘正;
+    同条对照=§11.5-4 系 grep BRE 样板,`\|` 交替正常,两工具语法
+    不可混写)。
+12. edgetypes:锚 golden 含 8 行排序行形且无 pass header(编号不占面
+    在 golden 逐字);multibit 锚 expected.stdout 含 `type.port[index]`
+    下标形(`grep -c '\[[0-9]\]' <锚>/expected.stdout` ≥1;multibit
+    分支移植面直锚,§11.3-7)。
+13. 既有基线零扰动(机械断言形,**路径模式=仅断言 golden 本体**,
+    对抗审 Issue 1 修订):`git status --short corpus/ys-e2e |
+    grep -E 'expected\.|script\.txt' | wc -l` → 0——既有 461 例
+    expected.\*/script.txt 零 M/D 改动(sincos/i2c 翻绿=零重录、其余
+    零扰动)。原形 `grep -vE 'ys-batch2|^\?\?'` 现状=1(输出=` M
+    corpus/ys-e2e/PROVENANCE`,亲证)必红:PROVENANCE=tracked 檔且
+    slice-1/slice-8 明确要求修改(登记节/对账节),不入此断言面;
+    anchors 迁入=未跟踪目录 `?? dir/` 整目录形态不展开、不命中
+    expected./script.txt 模式,迁入檔合法免列。
+14. `cargo build 2>&1 | grep -cE '^(error|warning)'` → 0。
+15. 四层(对抗审 Issue 3 精确化——原两断言现状即绿零区分力,亲证:
+    `rg -n 'fsm' docs/REGISTRY.md | grep -c '面2'`=1[现行条文同行含
+    两词]、`批量收编第二批` 初稿时点两命中均在 RYOSYS-MVP.md 自身
+    [slice-1 表+本条修订说明,不锚行号=文檔增补行会漂移,换人复审按
+    `rg -n '批量收编第二批' docs/RYOSYS-MVP.md` 对表即可],
+    PLAN.md 零命中):`rg -n '批量收编第二批' PLAN.md` ≥1(PLAN.md
+    ryosys 行注记,现状 0=红,更新后绿);`rg -n '批量收编第二批'
+    docs/RYOSYS-MVP.md` ≥1(本章在档);`rg -n 'D-ys11'
+    docs/REGISTRY.md` ≥1;`rg -c '面2
+    成立例=constmuldivmod/usb/values/fsm' docs/REGISTRY.md` ≥1
+    (fsm 补名=名单尾接逐字锚,现状 0=红[slice-1 ⑤落地后转绿];
+    候选形「面2 成立例 行 grep fsm」亦有区分力缺陷——现行条文同一行
+    已含 fsm+面2 两词,弃用);证据页机械再生成(docs/e2e-report/)。
+
+## 11.6 风险
+
+| # | 风险 | 对策 |
+|---|---|---|
+| RM11-1 | path_else 修补后 sincos/i2c 仍 FAIL(残差=面1 pool 收集序下游或未定位层) | 翻转以实跑事实为准同轮禁预翻;修补保留(忠实移植);残差按 §8.8-2 分类(logic-diff=修我方/internal-order=登记),名册不动 |
+| RM11-2 | async2sync Replacing 序:rev(Vec) 与 dict 正序在深链(有删除)面分叉 | 锚 script=proc 后直跑(无 opt_clean 前置=无 swap-and-pop);序差实录=§8.8-2 分类禁硬磕 |
+| RM11-3 | async2sync `$check`/chformal-lower 面被锚输入触发 | slice-1 语料普查机械定盘;触发=锚改选或 D-ys11 登记,禁把未实现面编进 golden |
+| RM11-4 | pmuxtree/torder 建名 autoidx 对齐(上游链计数漂移→$N 漂移) | 上游=proc;opt 前置链形固定,autoidx 同步已在 46 绿 -pbo 例大面积验证;golden 实录仲裁 |
+| RM11-5 | setattr selected_members 对象集覆盖面(wires/cells/memories/parameters :191 面) | golden 实录仲裁;对象集差=logic-diff 可修;实作轮定点对读 :100-112/:191 |
+| RM11-6 | torder 字串序陷阱:实作套 intern 序律=序差 | Q7 显式例外(源码 :81+D-ys8b/opt_balance_tree 两先例);carryadd byte-diff 仲裁;凡 diff 先 §8.8-2 分类 |
+| RM11-7 | SUMMARY 基线两段跳跃(461→463→463+迁入数)与名单两次变更(10→8→8) | 两段各自同轮翻:slice-2 翻 gap 名单、slice-8 翻 SUMMARY;实录定盘禁硬编(§9.4-3 同律);LIVE 注释同步 |
+| RM11-8 | cmd_error stdout 行数随命令串形态变(§10.1-1 25-vs-27 行教训) | 锚一律 script 链形+golden 实录承载(禁钉行数);六份 help 文本常量=Q1 实录转录,fixture 用实录形 |
+
+## 11.7 實作輪實錄(2026-11-02;八 slice 全輪落地後定盤,以實跑為準)
+
+* **SUMMARY 實錄定盤=469/479**(規劃假設兩處被實跑修正):①slice-2
+  path_else 三點手術落地後 **sincos-pbo/i2c_master_tests-pbo 仍 FAIL**
+  (i2c stdout 翻綠=內容面清償,殘差=rtlil/json 一 cell 向量序)——§8.8-2
+  分類=**internal-order 禁硬磕**(探针=corpus/ys-batch2-anchors/
+  probe-pattern-order/ 未遷[case.il 無 expected.rtlil=compare 面外]:
+  兩 pattern 同碼路徑異序={sa,sb} 正插形 vs {sc,sa} 逆插形+sincos
+  autoidx 形——intern 律/字典序/正插/逆插四律無一通殺 ⇒ 內層 pattern_t
+  迭代序=hash 桶序=D-ys8c 面1 同族**新子面**),461 基線不翻;②錨 9 例
+  遷入(8 入 compare 面)=469/479;**setattr-decode-err 錨=expected.rtlil
+  面外**(腳本於 setattr 即中止;decode 契約由 cli_contract fixture
+  `ERROR: Can't decode value 'true'!` 逐字執法)。
+* **錨輸入面改動(規劃假設修正)**:pmuxtree/dffunmap 錨腳本規劃形
+  `proc; opt; <pass>` 繼承 fsm-pbo 的 D-ys8c 面2 cascade=不可 byte-exact
+  收斂 ⇒ 改 `proc;` 直跑(-pb 綠面;pmuxtree-fsm $pmux 0+29 $mux 17 處
+  recursive_mux_generator 建名形、dffunmap-fsm FF 全 $dff 6 顆)。
+* **slice-1..8 出口對帳**:slice-1 普查節+REGISTRY 面2 尾接 /fsm+勘正注+
+  help 六常量(help_desc.rs;gen_help_batch2.sh 機械轉錄)+batch2-anchors
+  起草;slice-3..7 六命令翻實現層(NEW_ID 錨:clone 與二進制在
+  async2sync.cc/pmuxtree.cc/torder.cc/edgetypes.cc/setattr.cc 零偏移、
+  ff.cc 592/594/612/614、rtlil helper wire=二進制觀測 3201/3249/3250/
+  3337[clone 與二進制在 rtlil.cc 漂移非線性,禁 clone 推]);fixture
+  同輪翻轉(鐵則 3;裸 Y2 負向閘維持=0);八錨 byte-exact(async2sync
+  22 行 Replacing 序含)。registry 實數=stub **265**(Y0 257/Y2 6/Y3 2)
+  +實現層 **41**=306(python 全表枚舉親跑);D-ys11 登記;SKILL/AGENTS
+  (字串序第三例)/PLAN 注記四層同步;證據頁機械再生成。
