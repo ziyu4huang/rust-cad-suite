@@ -1,0 +1,219 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "attrib06_bar": {
+      "attributes": {
+        "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:1.1-12.10"
+      },
+      "ports": {
+        "clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "rst": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "inp_a": {
+          "direction": "input",
+          "bits": [ 4, 5, 6, 7, 8, 9, 10, 11 ]
+        },
+        "inp_b": {
+          "direction": "input",
+          "bits": [ 12, 13, 14, 15, 16, 17, 18, 19 ]
+        },
+        "out": {
+          "direction": "output",
+          "bits": [ 20, 21, 22, 23, 24, 25, 26, 27 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:10$add$2": {
+          "hide_name": 1,
+          "type": "$add",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000001000",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000001000",
+            "Y_WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "ripple_adder": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:10.21-10.53"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7, 8, 9, 10, 11 ],
+            "B": [ 12, 13, 14, 15, 16, 17, 18, 19 ],
+            "Y": [ 28, 29, 30, 31, 32, 33, 34, 35 ]
+          }
+        },
+        "$auto$ff.cc:337:slice$7": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000001",
+            "SRST_VALUE": "00000000",
+            "WIDTH": "00000000000000000000000000001000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:8.3-10.54"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 2 ],
+            "D": [ 28, 29, 30, 31, 32, 33, 34, 35 ],
+            "Q": [ 20, 21, 22, 23, 24, 25, 26, 27 ],
+            "SRST": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:10$add$2_Y": {
+          "hide_name": 1,
+          "bits": [ 28, 29, 30, 31, 32, 33, 34, 35 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:10.21-10.53"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:2.15-2.18"
+          }
+        },
+        "inp_a": {
+          "hide_name": 0,
+          "bits": [ 4, 5, 6, 7, 8, 9, 10, 11 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:4.21-4.26"
+          }
+        },
+        "inp_b": {
+          "hide_name": 0,
+          "bits": [ 12, 13, 14, 15, 16, 17, 18, 19 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:5.21-5.26"
+          }
+        },
+        "out": {
+          "hide_name": 0,
+          "bits": [ 20, 21, 22, 23, 24, 25, 26, 27 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:6.21-6.24"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:3.15-3.18"
+          }
+        }
+      }
+    },
+    "attrib06_foo": {
+      "attributes": {
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:14.1-22.10"
+      },
+      "ports": {
+        "clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "rst": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "inp_a": {
+          "direction": "input",
+          "bits": [ 4, 5, 6, 7, 8, 9, 10, 11 ]
+        },
+        "inp_b": {
+          "direction": "input",
+          "bits": [ 12, 13, 14, 15, 16, 17, 18, 19 ]
+        },
+        "out": {
+          "direction": "output",
+          "bits": [ 20, 21, 22, 23, 24, 25, 26, 27 ]
+        }
+      },
+      "cells": {
+        "bar_instance": {
+          "hide_name": 0,
+          "type": "attrib06_bar",
+          "parameters": {
+          },
+          "attributes": {
+            "module_not_derived": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:21.16-21.58"
+          },
+          "port_directions": {
+            "clk": "input",
+            "inp_a": "input",
+            "inp_b": "input",
+            "out": "output",
+            "rst": "input"
+          },
+          "connections": {
+            "clk": [ 2 ],
+            "inp_a": [ 4, 5, 6, 7, 8, 9, 10, 11 ],
+            "inp_b": [ 12, 13, 14, 15, 16, 17, 18, 19 ],
+            "out": [ 20, 21, 22, 23, 24, 25, 26, 27 ],
+            "rst": [ 3 ]
+          }
+        }
+      },
+      "netnames": {
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:15.15-15.18"
+          }
+        },
+        "inp_a": {
+          "hide_name": 0,
+          "bits": [ 4, 5, 6, 7, 8, 9, 10, 11 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:17.21-17.26"
+          }
+        },
+        "inp_b": {
+          "hide_name": 0,
+          "bits": [ 12, 13, 14, 15, 16, 17, 18, 19 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:18.21-18.26"
+          }
+        },
+        "out": {
+          "hide_name": 0,
+          "bits": [ 20, 21, 22, 23, 24, 25, 26, 27 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:19.21-19.24"
+          }
+        },
+        "rst": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/attrib06_operator_suffix.v:16.15-16.18"
+          }
+        }
+      }
+    }
+  }
+}

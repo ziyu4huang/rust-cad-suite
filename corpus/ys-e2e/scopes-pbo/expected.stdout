@@ -1,0 +1,142 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 17 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\scopes_test_01.\y' from process `\scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+No latch inferred for signal `\scopes_test_01.\x' from process `\scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+No latch inferred for signal `\scopes_test_01.\task_02$func$../../../corpus-external/yosys-simple/scopes.v:53$4.foo.x' from process `\scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+No latch inferred for signal `\scopes_test_01.\task_02$func$../../../corpus-external/yosys-simple/scopes.v:53$4.foo.z' from process `\scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+No latch inferred for signal `\scopes_test_01.\task_02$func$../../../corpus-external/yosys-simple/scopes.v:53$4.foo.bar.x' from process `\scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+No latch inferred for signal `\scopes_test_01.\foo.y' from process `\scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+No latch inferred for signal `\scopes_test_01.\func_01$func$../../../corpus-external/yosys-simple/scopes.v:60$5.blk.x' from process `\scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+No latch inferred for signal `\scopes_test_01.\func_02$func$../../../corpus-external/yosys-simple/scopes.v:61$6.blk.$result' from process `\scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `scopes_test_01.$../../../corpus-external/yosys-simple/scopes.v:49$proc$7'.
+Cleaned up 0 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module scopes_test_01.
+<suppressed ~1 debug messages>
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module scopes_test_01.
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\scopes_test_01'.
+Computing hashes of 10 cells of `\scopes_test_01'.
+Finding duplicate cells in `\scopes_test_01'.
+Removed a total of 0 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \scopes_test_01..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \scopes_test_01.
+Performed a total of 0 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\scopes_test_01'.
+Computing hashes of 10 cells of `\scopes_test_01'.
+Finding duplicate cells in `\scopes_test_01'.
+Removed a total of 0 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \scopes_test_01..
+Removed 0 unused cells and 25 unused wires.
+<suppressed ~1 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module scopes_test_01.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \scopes_test_01..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \scopes_test_01.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\scopes_test_01'.
+Computing hashes of 10 cells of `\scopes_test_01'.
+Finding duplicate cells in `\scopes_test_01'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \scopes_test_01..
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module scopes_test_01.
+
+3.16. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module scopes_test_01...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== scopes_test_01 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       21 wires
+      332 wire bits
+       15 public wires
+      204 public wire bits
+        3 ports
+       36 port bits
+       10 cells
+        4   $add
+        1   $mul
+        1   $neg
+        1   $not
+        1   $sub
+        2   $xor
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.

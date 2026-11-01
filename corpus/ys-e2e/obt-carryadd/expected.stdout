@@ -1,0 +1,24 @@
+-- Running command `read_rtlil case.il; opt_balance_tree; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing OPT_BALANCE_TREE pass (cell cascades to trees).
+Warning: Feature 'open_balance_tree' is experimental.
+Converted 2 $and cells into trees.
+Converted 0 $or cells into trees.
+Converted 14 $xor cells into trees.
+Converted 0 $add cells into trees.
+Converted 0 $mul cells into trees.
+
+-- Running command `clean -purge' --
+<suppressed ~8 debug messages>
+Removed 7 unused cells and 31 unused wires.
+
+3. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+4. Executing JSON backend.
+
+Warnings: 1 unique messages, 1 total
+Warnings: 1 experimental features used (not excluded with -x).

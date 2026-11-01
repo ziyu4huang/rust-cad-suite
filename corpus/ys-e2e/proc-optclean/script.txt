@@ -1,0 +1,1 @@
+read_rtlil case.il; opt_clean; write_rtlil -readable expected.rtlil

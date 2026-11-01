@@ -1,0 +1,16 @@
+-- Running command `read_rtlil case.il; clean -purge; check; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+Removed 2 unused cells and 4 unused wires.
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module min2c...
+Checking module min2b...
+Checking module min2a...
+Found and reported 0 problems.
+
+3. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+4. Executing JSON backend.

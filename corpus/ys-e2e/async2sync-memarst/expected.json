@@ -1,0 +1,4412 @@
+{
+  "creator": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+  "modules": {
+    "MyMem": {
+      "attributes": {
+        "dynports": "00000000000000000000000000000001",
+        "top": "00000000000000000000000000000001",
+        "src": "../../../corpus-external/yosys-simple/mem_arst.v:2.1-40.10"
+      },
+      "parameter_default_values": {
+        "AddrWidth": "00000000000000000000000000000100",
+        "DataWidth": "00000000000000000000000000000100"
+      },
+      "ports": {
+        "Reset_n_i": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "Clk_i": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "Addr_i": {
+          "direction": "input",
+          "bits": [ 4, 5, 6, 7 ]
+        },
+        "Data_i": {
+          "direction": "input",
+          "bits": [ 8, 9, 10, 11 ]
+        },
+        "Data_o": {
+          "direction": "output",
+          "bits": [ 12, 13, 14, 15 ]
+        },
+        "WR_i": {
+          "direction": "input",
+          "bits": [ 16 ]
+        }
+      },
+      "cells": {
+        "$../../../corpus-external/yosys-simple/mem_arst.v:22$logic_not$9": {
+          "hide_name": 1,
+          "type": "$logic_not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:22.9-22.19"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 17 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$351": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 18, 19, 20, 21 ],
+            "S": [ 2 ],
+            "Y": [ 22, 23, 24, 25 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$353": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 26, 27, 28, 29 ],
+            "S": [ 2 ],
+            "Y": [ 30, 31, 32, 33 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$355": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 34, 35, 36, 37 ],
+            "S": [ 2 ],
+            "Y": [ 38, 39, 40, 41 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$357": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 42, 43, 44, 45 ],
+            "S": [ 2 ],
+            "Y": [ 46, 47, 48, 49 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$359": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 50, 51, 52, 53 ],
+            "S": [ 2 ],
+            "Y": [ 54, 55, 56, 57 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$361": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 58, 59, 60, 61 ],
+            "S": [ 2 ],
+            "Y": [ 62, 63, 64, 65 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$363": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 66, 67, 68, 69 ],
+            "S": [ 2 ],
+            "Y": [ 70, 71, 72, 73 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$365": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x", "x", "x", "x" ],
+            "B": [ 74, 75, 76, 77 ],
+            "S": [ 2 ],
+            "Y": [ 78, 79, 80, 81 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$367": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 82, 83, 84, 85 ],
+            "S": [ 2 ],
+            "Y": [ 86, 87, 88, 89 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$369": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 90, 91, 92, 93 ],
+            "S": [ 2 ],
+            "Y": [ 94, 95, 96, 97 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$371": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 98, 99, 100, 101 ],
+            "S": [ 2 ],
+            "Y": [ 102, 103, 104, 105 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$373": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 106, 107, 108, 109 ],
+            "S": [ 2 ],
+            "Y": [ 110, 111, 112, 113 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$375": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x", "x", "x", "x" ],
+            "B": [ 114, 115, 116, 117 ],
+            "S": [ 2 ],
+            "Y": [ 118, 119, 120, 121 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$377": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 122, 123, 124, 125 ],
+            "S": [ 2 ],
+            "Y": [ 126, 127, 128, 129 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$379": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 130, 131, 132, 133 ],
+            "S": [ 2 ],
+            "Y": [ 134, 135, 136, 137 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$381": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 138, 139, 140, 141 ],
+            "S": [ 2 ],
+            "Y": [ 142, 143, 144, 145 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$383": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x", "x", "x", "x" ],
+            "B": [ 146, 147, 148, 149 ],
+            "S": [ 2 ],
+            "Y": [ 150, 151, 152, 153 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$385": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 154, 155, 156, 157 ],
+            "S": [ 2 ],
+            "Y": [ 158, 159, 160, 161 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$387": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x", "x", "x", "x" ],
+            "B": [ 162, 163, 164, 165 ],
+            "S": [ 2 ],
+            "Y": [ 12, 13, 14, 15 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$389": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0" ],
+            "B": [ 166, 167, 168, 169 ],
+            "S": [ 2 ],
+            "Y": [ 170, 171, 172, 173 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$391": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "0", "0", "0", "0", "1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0" ],
+            "B": [ 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205 ],
+            "S": [ 2 ],
+            "Y": [ 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237 ]
+          }
+        },
+        "$auto$async2sync.cc:262:execute$393": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x", "x", "x", "x" ],
+            "B": [ 238, 239, 240, 241 ],
+            "S": [ 2 ],
+            "Y": [ 242, 243, 244, 245 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$240": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 246 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$245": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 247 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$250": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 248 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$255": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 249 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$260": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 250 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$265": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 251 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$270": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 252 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$275": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 253 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$280": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 254 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$285": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 255 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$290": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 256 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$295": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 257 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$300": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 258 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$305": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 259 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$310": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 260 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$315": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 261 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$320": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 262 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$325": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 263 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$330": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 264 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$335": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 265 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$340": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 266 ]
+          }
+        },
+        "$auto$proc_dff.cc:221:proc_dff$345": {
+          "hide_name": 1,
+          "type": "$not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000001",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 2 ],
+            "Y": [ 267 ]
+          }
+        },
+        "$procdff$244": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "00000000000000000000000000010000",
+            "WIDTH": "00000000000000000000000000100000"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237 ],
+            "Q": [ 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$249": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "xxxx",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 268, 269, 270, 271 ],
+            "Q": [ 162, 163, 164, 165 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$254": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 272, 273, 274, 275 ],
+            "Q": [ 154, 155, 156, 157 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$259": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 276, 277, 278, 279 ],
+            "Q": [ 138, 139, 140, 141 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$264": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 280, 281, 282, 283 ],
+            "Q": [ 130, 131, 132, 133 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$269": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 284, 285, 286, 287 ],
+            "Q": [ 122, 123, 124, 125 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$274": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 288, 289, 290, 291 ],
+            "Q": [ 106, 107, 108, 109 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$279": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 292, 293, 294, 295 ],
+            "Q": [ 90, 91, 92, 93 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$284": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 296, 297, 298, 299 ],
+            "Q": [ 82, 83, 84, 85 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$289": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 300, 301, 302, 303 ],
+            "Q": [ 66, 67, 68, 69 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$294": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 304, 305, 306, 307 ],
+            "Q": [ 50, 51, 52, 53 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$299": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 308, 309, 310, 311 ],
+            "Q": [ 42, 43, 44, 45 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$304": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 312, 313, 314, 315 ],
+            "Q": [ 26, 27, 28, 29 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$309": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 316, 317, 318, 319 ],
+            "Q": [ 18, 19, 20, 21 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$314": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 320, 321, 322, 323 ],
+            "Q": [ 166, 167, 168, 169 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$319": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 324, 325, 326, 327 ],
+            "Q": [ 58, 59, 60, 61 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$324": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 328, 329, 330, 331 ],
+            "Q": [ 98, 99, 100, 101 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$329": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "0000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ 332, 333, 334, 335 ],
+            "Q": [ 34, 35, 36, 37 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$334": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "xxxx",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ "x", "x", "x", "x" ],
+            "Q": [ 74, 75, 76, 77 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$339": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "xxxx",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ "x", "x", "x", "x" ],
+            "Q": [ 114, 115, 116, 117 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$344": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "xxxx",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ "x", "x", "x", "x" ],
+            "Q": [ 146, 147, 148, 149 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procdff$349": {
+          "hide_name": 1,
+          "type": "$sdff",
+          "parameters": {
+            "CLK_POLARITY": "00000000000000000000000000000001",
+            "SRST_POLARITY": "00000000000000000000000000000000",
+            "SRST_VALUE": "xxxx",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          },
+          "port_directions": {
+            "CLK": "input",
+            "D": "input",
+            "Q": "output",
+            "SRST": "input"
+          },
+          "connections": {
+            "CLK": [ 3 ],
+            "D": [ "x", "x", "x", "x" ],
+            "Q": [ 238, 239, 240, 241 ],
+            "SRST": [ 2 ]
+          }
+        },
+        "$procmux$104": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 54, 55, 56, 57 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 336 ],
+            "Y": [ 337, 338, 339, 340 ]
+          }
+        },
+        "$procmux$105_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "0", "0", "1" ],
+            "Y": [ 336 ]
+          }
+        },
+        "$procmux$106": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 54, 55, 56, 57 ],
+            "B": [ 337, 338, 339, 340 ],
+            "S": [ 16 ],
+            "Y": [ 304, 305, 306, 307 ]
+          }
+        },
+        "$procmux$117": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 70, 71, 72, 73 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 341 ],
+            "Y": [ 342, 343, 344, 345 ]
+          }
+        },
+        "$procmux$118_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "1", "1", "0" ],
+            "Y": [ 341 ]
+          }
+        },
+        "$procmux$119": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 70, 71, 72, 73 ],
+            "B": [ 342, 343, 344, 345 ],
+            "S": [ 16 ],
+            "Y": [ 300, 301, 302, 303 ]
+          }
+        },
+        "$procmux$131": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 86, 87, 88, 89 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 346 ],
+            "Y": [ 347, 348, 349, 350 ]
+          }
+        },
+        "$procmux$132_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "1", "1", "0" ],
+            "Y": [ 346 ]
+          }
+        },
+        "$procmux$133": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 86, 87, 88, 89 ],
+            "B": [ 347, 348, 349, 350 ],
+            "S": [ 16 ],
+            "Y": [ 296, 297, 298, 299 ]
+          }
+        },
+        "$procmux$146": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 94, 95, 96, 97 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 351 ],
+            "Y": [ 352, 353, 354, 355 ]
+          }
+        },
+        "$procmux$147_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "0", "1", "0" ],
+            "Y": [ 351 ]
+          }
+        },
+        "$procmux$148": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 94, 95, 96, 97 ],
+            "B": [ 352, 353, 354, 355 ],
+            "S": [ 16 ],
+            "Y": [ 292, 293, 294, 295 ]
+          }
+        },
+        "$procmux$162": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 110, 111, 112, 113 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 356 ],
+            "Y": [ 357, 358, 359, 360 ]
+          }
+        },
+        "$procmux$163_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "0", "1", "0" ],
+            "Y": [ 356 ]
+          }
+        },
+        "$procmux$164": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 110, 111, 112, 113 ],
+            "B": [ 357, 358, 359, 360 ],
+            "S": [ 16 ],
+            "Y": [ 288, 289, 290, 291 ]
+          }
+        },
+        "$procmux$179": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 126, 127, 128, 129 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 361 ],
+            "Y": [ 362, 363, 364, 365 ]
+          }
+        },
+        "$procmux$18": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 150, 151, 152, 153 ],
+            "B": [ 4, 5, 6, 7 ],
+            "S": [ 16 ],
+            "Y": [ 366, 367, 368, 369 ]
+          }
+        },
+        "$procmux$180_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "1", "0", "0" ],
+            "Y": [ 361 ]
+          }
+        },
+        "$procmux$181": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 126, 127, 128, 129 ],
+            "B": [ 362, 363, 364, 365 ],
+            "S": [ 16 ],
+            "Y": [ 284, 285, 286, 287 ]
+          }
+        },
+        "$procmux$197": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 134, 135, 136, 137 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 370 ],
+            "Y": [ 371, 372, 373, 374 ]
+          }
+        },
+        "$procmux$198_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "1", "0", "0" ],
+            "Y": [ 370 ]
+          }
+        },
+        "$procmux$199": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 134, 135, 136, 137 ],
+            "B": [ 371, 372, 373, 374 ],
+            "S": [ 16 ],
+            "Y": [ 280, 281, 282, 283 ]
+          }
+        },
+        "$procmux$21": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 242, 243, 244, 245 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 16 ],
+            "Y": [ 375, 376, 377, 378 ]
+          }
+        },
+        "$procmux$216": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 142, 143, 144, 145 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 379 ],
+            "Y": [ 380, 381, 382, 383 ]
+          }
+        },
+        "$procmux$217_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "0", "0", "0" ],
+            "Y": [ 379 ]
+          }
+        },
+        "$procmux$218": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 142, 143, 144, 145 ],
+            "B": [ 380, 381, 382, 383 ],
+            "S": [ 16 ],
+            "Y": [ 276, 277, 278, 279 ]
+          }
+        },
+        "$procmux$23": {
+          "hide_name": 1,
+          "type": "$pmux",
+          "parameters": {
+            "S_WIDTH": "00000000000000000000000000010000",
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ "x", "x", "x", "x" ],
+            "B": [ 38, 39, 40, 41, 102, 103, 104, 105, 62, 63, 64, 65, 170, 171, 172, 173, 22, 23, 24, 25, 30, 31, 32, 33, 46, 47, 48, 49, 54, 55, 56, 57, 70, 71, 72, 73, 86, 87, 88, 89, 94, 95, 96, 97, 110, 111, 112, 113, 126, 127, 128, 129, 134, 135, 136, 137, 142, 143, 144, 145, 158, 159, 160, 161 ],
+            "S": [ 384, 385, 386, 387, 388, 389, 390, 391, 392, 393, 394, 395, 396, 397, 398, 399 ],
+            "Y": [ 268, 269, 270, 271 ]
+          }
+        },
+        "$procmux$236": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 158, 159, 160, 161 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 400 ],
+            "Y": [ 401, 402, 403, 404 ]
+          }
+        },
+        "$procmux$237_CMP0": {
+          "hide_name": 1,
+          "type": "$logic_not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "Y": [ 400 ]
+          }
+        },
+        "$procmux$238": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 158, 159, 160, 161 ],
+            "B": [ 401, 402, 403, 404 ],
+            "S": [ 16 ],
+            "Y": [ 272, 273, 274, 275 ]
+          }
+        },
+        "$procmux$24_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "1", "1", "1" ],
+            "Y": [ 384 ]
+          }
+        },
+        "$procmux$25_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "1", "1", "1" ],
+            "Y": [ 385 ]
+          }
+        },
+        "$procmux$26_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "0", "1", "1" ],
+            "Y": [ 386 ]
+          }
+        },
+        "$procmux$27_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "0", "1", "1" ],
+            "Y": [ 387 ]
+          }
+        },
+        "$procmux$28_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "1", "0", "1" ],
+            "Y": [ 388 ]
+          }
+        },
+        "$procmux$29_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "1", "0", "1" ],
+            "Y": [ 389 ]
+          }
+        },
+        "$procmux$30_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "0", "0", "1" ],
+            "Y": [ 390 ]
+          }
+        },
+        "$procmux$31_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "0", "0", "1" ],
+            "Y": [ 391 ]
+          }
+        },
+        "$procmux$32_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "1", "1", "0" ],
+            "Y": [ 392 ]
+          }
+        },
+        "$procmux$33_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "1", "1", "0" ],
+            "Y": [ 393 ]
+          }
+        },
+        "$procmux$34_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "0", "1", "0" ],
+            "Y": [ 394 ]
+          }
+        },
+        "$procmux$35_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "0", "1", "0" ],
+            "Y": [ 395 ]
+          }
+        },
+        "$procmux$36_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "1", "0", "0" ],
+            "Y": [ 396 ]
+          }
+        },
+        "$procmux$37_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "1", "0", "0" ],
+            "Y": [ 397 ]
+          }
+        },
+        "$procmux$38_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "0", "0", "0" ],
+            "Y": [ 398 ]
+          }
+        },
+        "$procmux$39_CMP0": {
+          "hide_name": 1,
+          "type": "$logic_not",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          },
+          "port_directions": {
+            "A": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "Y": [ 399 ]
+          }
+        },
+        "$procmux$41": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 38, 39, 40, 41 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 405 ],
+            "Y": [ 406, 407, 408, 409 ]
+          }
+        },
+        "$procmux$42_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "1", "1", "1" ],
+            "Y": [ 405 ]
+          }
+        },
+        "$procmux$43": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 38, 39, 40, 41 ],
+            "B": [ 406, 407, 408, 409 ],
+            "S": [ 16 ],
+            "Y": [ 332, 333, 334, 335 ]
+          }
+        },
+        "$procmux$47": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 102, 103, 104, 105 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 410 ],
+            "Y": [ 411, 412, 413, 414 ]
+          }
+        },
+        "$procmux$48_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "1", "1", "1" ],
+            "Y": [ 410 ]
+          }
+        },
+        "$procmux$49": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 102, 103, 104, 105 ],
+            "B": [ 411, 412, 413, 414 ],
+            "S": [ 16 ],
+            "Y": [ 328, 329, 330, 331 ]
+          }
+        },
+        "$procmux$54": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 62, 63, 64, 65 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 415 ],
+            "Y": [ 416, 417, 418, 419 ]
+          }
+        },
+        "$procmux$55_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "0", "1", "1" ],
+            "Y": [ 415 ]
+          }
+        },
+        "$procmux$56": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 62, 63, 64, 65 ],
+            "B": [ 416, 417, 418, 419 ],
+            "S": [ 16 ],
+            "Y": [ 324, 325, 326, 327 ]
+          }
+        },
+        "$procmux$62": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 170, 171, 172, 173 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 420 ],
+            "Y": [ 421, 422, 423, 424 ]
+          }
+        },
+        "$procmux$63_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "0", "1", "1" ],
+            "Y": [ 420 ]
+          }
+        },
+        "$procmux$64": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 170, 171, 172, 173 ],
+            "B": [ 421, 422, 423, 424 ],
+            "S": [ 16 ],
+            "Y": [ 320, 321, 322, 323 ]
+          }
+        },
+        "$procmux$71": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 22, 23, 24, 25 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 425 ],
+            "Y": [ 426, 427, 428, 429 ]
+          }
+        },
+        "$procmux$72_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "1", "0", "1" ],
+            "Y": [ 425 ]
+          }
+        },
+        "$procmux$73": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 22, 23, 24, 25 ],
+            "B": [ 426, 427, 428, 429 ],
+            "S": [ 16 ],
+            "Y": [ 316, 317, 318, 319 ]
+          }
+        },
+        "$procmux$81": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 30, 31, 32, 33 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 430 ],
+            "Y": [ 431, 432, 433, 434 ]
+          }
+        },
+        "$procmux$82_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "0", "1", "0", "1" ],
+            "Y": [ 430 ]
+          }
+        },
+        "$procmux$83": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 30, 31, 32, 33 ],
+            "B": [ 431, 432, 433, 434 ],
+            "S": [ 16 ],
+            "Y": [ 312, 313, 314, 315 ]
+          }
+        },
+        "$procmux$92": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 46, 47, 48, 49 ],
+            "B": [ 8, 9, 10, 11 ],
+            "S": [ 435 ],
+            "Y": [ 436, 437, 438, 439 ]
+          }
+        },
+        "$procmux$93_CMP0": {
+          "hide_name": 1,
+          "type": "$eq",
+          "parameters": {
+            "A_SIGNED": "00000000000000000000000000000000",
+            "A_WIDTH": "00000000000000000000000000000100",
+            "B_SIGNED": "00000000000000000000000000000000",
+            "B_WIDTH": "00000000000000000000000000000100",
+            "Y_WIDTH": "00000000000000000000000000000001"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4, 5, 6, 7 ],
+            "B": [ "1", "0", "0", "1" ],
+            "Y": [ 435 ]
+          }
+        },
+        "$procmux$94": {
+          "hide_name": 1,
+          "type": "$mux",
+          "parameters": {
+            "WIDTH": "00000000000000000000000000000100"
+          },
+          "attributes": {
+            "full_case": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:33.11-33.15|../../../corpus-external/yosys-simple/mem_arst.v:33.7-36.10"
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "S": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 46, 47, 48, 49 ],
+            "B": [ 436, 437, 438, 439 ],
+            "S": [ 16 ],
+            "Y": [ 308, 309, 310, 311 ]
+          }
+        }
+      },
+      "netnames": {
+        "$../../../corpus-external/yosys-simple/mem_arst.v:22$logic_not$9_Y": {
+          "hide_name": 1,
+          "bits": [ 17 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:22.9-22.19"
+          }
+        },
+        "$0$mem2reg_rd$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_ADDR[3:0]$5": {
+          "hide_name": 1,
+          "bits": [ 4, 5, 6, 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0$mem2reg_rd$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_DATA[3:0]$6": {
+          "hide_name": 1,
+          "bits": [ 268, 269, 270, 271 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0$mem2reg_wr$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_ADDR[3:0]$7": {
+          "hide_name": 1,
+          "bits": [ 366, 367, 368, 369 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0$mem2reg_wr$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_DATA[3:0]$8": {
+          "hide_name": 1,
+          "bits": [ 375, 376, 377, 378 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Data_o[3:0]": {
+          "hide_name": 1,
+          "bits": [ 268, 269, 270, 271 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[0][3:0]": {
+          "hide_name": 1,
+          "bits": [ 272, 273, 274, 275 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[10][3:0]": {
+          "hide_name": 1,
+          "bits": [ 312, 313, 314, 315 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[11][3:0]": {
+          "hide_name": 1,
+          "bits": [ 316, 317, 318, 319 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[12][3:0]": {
+          "hide_name": 1,
+          "bits": [ 320, 321, 322, 323 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[13][3:0]": {
+          "hide_name": 1,
+          "bits": [ 324, 325, 326, 327 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[14][3:0]": {
+          "hide_name": 1,
+          "bits": [ 328, 329, 330, 331 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[15][3:0]": {
+          "hide_name": 1,
+          "bits": [ 332, 333, 334, 335 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[1][3:0]": {
+          "hide_name": 1,
+          "bits": [ 276, 277, 278, 279 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[2][3:0]": {
+          "hide_name": 1,
+          "bits": [ 280, 281, 282, 283 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[3][3:0]": {
+          "hide_name": 1,
+          "bits": [ 284, 285, 286, 287 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[4][3:0]": {
+          "hide_name": 1,
+          "bits": [ 288, 289, 290, 291 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[5][3:0]": {
+          "hide_name": 1,
+          "bits": [ 292, 293, 294, 295 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[6][3:0]": {
+          "hide_name": 1,
+          "bits": [ 296, 297, 298, 299 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[7][3:0]": {
+          "hide_name": 1,
+          "bits": [ 300, 301, 302, 303 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[8][3:0]": {
+          "hide_name": 1,
+          "bits": [ 304, 305, 306, 307 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\Mem[9][3:0]": {
+          "hide_name": 1,
+          "bits": [ 308, 309, 310, 311 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$0\\i[31:0]": {
+          "hide_name": 1,
+          "bits": [ 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$1$mem2reg_rd$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_ADDR[3:0]$10": {
+          "hide_name": 1,
+          "bits": [ 4, 5, 6, 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$1$mem2reg_rd$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_DATA[3:0]$11": {
+          "hide_name": 1,
+          "bits": [ 268, 269, 270, 271 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$1$mem2reg_wr$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_ADDR[3:0]$12": {
+          "hide_name": 1,
+          "bits": [ 366, 367, 368, 369 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$1$mem2reg_wr$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_DATA[3:0]$13": {
+          "hide_name": 1,
+          "bits": [ 375, 376, 377, 378 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$1\\i[31:0]": {
+          "hide_name": 1,
+          "bits": [ 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$2$mem2reg_rd$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_DATA[3:0]$14": {
+          "hide_name": 1,
+          "bits": [ 268, 269, 270, 271 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$2$mem2reg_wr$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_ADDR[3:0]$15": {
+          "hide_name": 1,
+          "bits": [ 366, 367, 368, 369 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$2$mem2reg_wr$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_DATA[3:0]$16": {
+          "hide_name": 1,
+          "bits": [ 375, 376, 377, 378 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:20.3-38.6"
+          }
+        },
+        "$auto$async2sync.cc:253:execute$350": {
+          "hide_name": 1,
+          "bits": [ 18, 19, 20, 21 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$352": {
+          "hide_name": 1,
+          "bits": [ 26, 27, 28, 29 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$354": {
+          "hide_name": 1,
+          "bits": [ 34, 35, 36, 37 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$356": {
+          "hide_name": 1,
+          "bits": [ 42, 43, 44, 45 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$358": {
+          "hide_name": 1,
+          "bits": [ 50, 51, 52, 53 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$360": {
+          "hide_name": 1,
+          "bits": [ 58, 59, 60, 61 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$362": {
+          "hide_name": 1,
+          "bits": [ 66, 67, 68, 69 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$364": {
+          "hide_name": 1,
+          "bits": [ 74, 75, 76, 77 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$366": {
+          "hide_name": 1,
+          "bits": [ 82, 83, 84, 85 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$368": {
+          "hide_name": 1,
+          "bits": [ 90, 91, 92, 93 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$370": {
+          "hide_name": 1,
+          "bits": [ 98, 99, 100, 101 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$372": {
+          "hide_name": 1,
+          "bits": [ 106, 107, 108, 109 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$374": {
+          "hide_name": 1,
+          "bits": [ 114, 115, 116, 117 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$376": {
+          "hide_name": 1,
+          "bits": [ 122, 123, 124, 125 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$378": {
+          "hide_name": 1,
+          "bits": [ 130, 131, 132, 133 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$380": {
+          "hide_name": 1,
+          "bits": [ 138, 139, 140, 141 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$382": {
+          "hide_name": 1,
+          "bits": [ 146, 147, 148, 149 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$384": {
+          "hide_name": 1,
+          "bits": [ 154, 155, 156, 157 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$386": {
+          "hide_name": 1,
+          "bits": [ 162, 163, 164, 165 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$388": {
+          "hide_name": 1,
+          "bits": [ 166, 167, 168, 169 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$390": {
+          "hide_name": 1,
+          "bits": [ 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188, 189, 190, 191, 192, 193, 194, 195, 196, 197, 198, 199, 200, 201, 202, 203, 204, 205 ],
+          "attributes": {
+          }
+        },
+        "$auto$async2sync.cc:253:execute$392": {
+          "hide_name": 1,
+          "bits": [ 238, 239, 240, 241 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$241": {
+          "hide_name": 1,
+          "bits": [ 246 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$246": {
+          "hide_name": 1,
+          "bits": [ 247 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$251": {
+          "hide_name": 1,
+          "bits": [ 248 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$256": {
+          "hide_name": 1,
+          "bits": [ 249 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$261": {
+          "hide_name": 1,
+          "bits": [ 250 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$266": {
+          "hide_name": 1,
+          "bits": [ 251 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$271": {
+          "hide_name": 1,
+          "bits": [ 252 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$276": {
+          "hide_name": 1,
+          "bits": [ 253 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$281": {
+          "hide_name": 1,
+          "bits": [ 254 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$286": {
+          "hide_name": 1,
+          "bits": [ 255 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$291": {
+          "hide_name": 1,
+          "bits": [ 256 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$296": {
+          "hide_name": 1,
+          "bits": [ 257 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$301": {
+          "hide_name": 1,
+          "bits": [ 258 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$306": {
+          "hide_name": 1,
+          "bits": [ 259 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$311": {
+          "hide_name": 1,
+          "bits": [ 260 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$316": {
+          "hide_name": 1,
+          "bits": [ 261 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$321": {
+          "hide_name": 1,
+          "bits": [ 262 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$326": {
+          "hide_name": 1,
+          "bits": [ 263 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$331": {
+          "hide_name": 1,
+          "bits": [ 264 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$336": {
+          "hide_name": 1,
+          "bits": [ 265 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$341": {
+          "hide_name": 1,
+          "bits": [ 266 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3201:Not$346": {
+          "hide_name": 1,
+          "bits": [ 267 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$243": {
+          "hide_name": 1,
+          "bits": [ 246 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$248": {
+          "hide_name": 1,
+          "bits": [ 247 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$253": {
+          "hide_name": 1,
+          "bits": [ 248 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$258": {
+          "hide_name": 1,
+          "bits": [ 249 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$263": {
+          "hide_name": 1,
+          "bits": [ 250 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$268": {
+          "hide_name": 1,
+          "bits": [ 251 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$273": {
+          "hide_name": 1,
+          "bits": [ 252 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$278": {
+          "hide_name": 1,
+          "bits": [ 253 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$283": {
+          "hide_name": 1,
+          "bits": [ 254 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$288": {
+          "hide_name": 1,
+          "bits": [ 255 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$293": {
+          "hide_name": 1,
+          "bits": [ 256 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$298": {
+          "hide_name": 1,
+          "bits": [ 257 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$303": {
+          "hide_name": 1,
+          "bits": [ 258 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$308": {
+          "hide_name": 1,
+          "bits": [ 259 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$313": {
+          "hide_name": 1,
+          "bits": [ 260 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$318": {
+          "hide_name": 1,
+          "bits": [ 261 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$323": {
+          "hide_name": 1,
+          "bits": [ 262 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$328": {
+          "hide_name": 1,
+          "bits": [ 263 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$333": {
+          "hide_name": 1,
+          "bits": [ 264 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$338": {
+          "hide_name": 1,
+          "bits": [ 265 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$343": {
+          "hide_name": 1,
+          "bits": [ 266 ],
+          "attributes": {
+          }
+        },
+        "$auto$rtlil.cc:3205:ReduceOr$348": {
+          "hide_name": 1,
+          "bits": [ 267 ],
+          "attributes": {
+          }
+        },
+        "$mem2reg_rd$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_ADDR": {
+          "hide_name": 1,
+          "bits": [ 78, 79, 80, 81 ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          }
+        },
+        "$mem2reg_rd$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_DATA": {
+          "hide_name": 1,
+          "bits": [ 118, 119, 120, 121 ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:32.17-32.20"
+          }
+        },
+        "$mem2reg_wr$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_ADDR": {
+          "hide_name": 1,
+          "bits": [ 150, 151, 152, 153 ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          }
+        },
+        "$mem2reg_wr$\\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_DATA": {
+          "hide_name": 1,
+          "bits": [ 242, 243, 244, 245 ],
+          "attributes": {
+            "nosync": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:35.9-35.30"
+          }
+        },
+        "$procmux$104_Y": {
+          "hide_name": 1,
+          "bits": [ 337, 338, 339, 340 ],
+          "attributes": {
+          }
+        },
+        "$procmux$105_CMP": {
+          "hide_name": 1,
+          "bits": [ 336 ],
+          "attributes": {
+          }
+        },
+        "$procmux$106_Y": {
+          "hide_name": 1,
+          "bits": [ 304, 305, 306, 307 ],
+          "attributes": {
+          }
+        },
+        "$procmux$107_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$117_Y": {
+          "hide_name": 1,
+          "bits": [ 342, 343, 344, 345 ],
+          "attributes": {
+          }
+        },
+        "$procmux$118_CMP": {
+          "hide_name": 1,
+          "bits": [ 341 ],
+          "attributes": {
+          }
+        },
+        "$procmux$119_Y": {
+          "hide_name": 1,
+          "bits": [ 300, 301, 302, 303 ],
+          "attributes": {
+          }
+        },
+        "$procmux$120_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$131_Y": {
+          "hide_name": 1,
+          "bits": [ 347, 348, 349, 350 ],
+          "attributes": {
+          }
+        },
+        "$procmux$132_CMP": {
+          "hide_name": 1,
+          "bits": [ 346 ],
+          "attributes": {
+          }
+        },
+        "$procmux$133_Y": {
+          "hide_name": 1,
+          "bits": [ 296, 297, 298, 299 ],
+          "attributes": {
+          }
+        },
+        "$procmux$134_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$146_Y": {
+          "hide_name": 1,
+          "bits": [ 352, 353, 354, 355 ],
+          "attributes": {
+          }
+        },
+        "$procmux$147_CMP": {
+          "hide_name": 1,
+          "bits": [ 351 ],
+          "attributes": {
+          }
+        },
+        "$procmux$148_Y": {
+          "hide_name": 1,
+          "bits": [ 292, 293, 294, 295 ],
+          "attributes": {
+          }
+        },
+        "$procmux$149_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$162_Y": {
+          "hide_name": 1,
+          "bits": [ 357, 358, 359, 360 ],
+          "attributes": {
+          }
+        },
+        "$procmux$163_CMP": {
+          "hide_name": 1,
+          "bits": [ 356 ],
+          "attributes": {
+          }
+        },
+        "$procmux$164_Y": {
+          "hide_name": 1,
+          "bits": [ 288, 289, 290, 291 ],
+          "attributes": {
+          }
+        },
+        "$procmux$165_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$179_Y": {
+          "hide_name": 1,
+          "bits": [ 362, 363, 364, 365 ],
+          "attributes": {
+          }
+        },
+        "$procmux$180_CMP": {
+          "hide_name": 1,
+          "bits": [ 361 ],
+          "attributes": {
+          }
+        },
+        "$procmux$181_Y": {
+          "hide_name": 1,
+          "bits": [ 284, 285, 286, 287 ],
+          "attributes": {
+          }
+        },
+        "$procmux$182_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$18_Y": {
+          "hide_name": 1,
+          "bits": [ 366, 367, 368, 369 ],
+          "attributes": {
+          }
+        },
+        "$procmux$197_Y": {
+          "hide_name": 1,
+          "bits": [ 371, 372, 373, 374 ],
+          "attributes": {
+          }
+        },
+        "$procmux$198_CMP": {
+          "hide_name": 1,
+          "bits": [ 370 ],
+          "attributes": {
+          }
+        },
+        "$procmux$199_Y": {
+          "hide_name": 1,
+          "bits": [ 280, 281, 282, 283 ],
+          "attributes": {
+          }
+        },
+        "$procmux$19_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$200_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$216_Y": {
+          "hide_name": 1,
+          "bits": [ 380, 381, 382, 383 ],
+          "attributes": {
+          }
+        },
+        "$procmux$217_CMP": {
+          "hide_name": 1,
+          "bits": [ 379 ],
+          "attributes": {
+          }
+        },
+        "$procmux$218_Y": {
+          "hide_name": 1,
+          "bits": [ 276, 277, 278, 279 ],
+          "attributes": {
+          }
+        },
+        "$procmux$219_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$21_Y": {
+          "hide_name": 1,
+          "bits": [ 375, 376, 377, 378 ],
+          "attributes": {
+          }
+        },
+        "$procmux$22_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$236_Y": {
+          "hide_name": 1,
+          "bits": [ 401, 402, 403, 404 ],
+          "attributes": {
+          }
+        },
+        "$procmux$237_CMP": {
+          "hide_name": 1,
+          "bits": [ 400 ],
+          "attributes": {
+          }
+        },
+        "$procmux$238_Y": {
+          "hide_name": 1,
+          "bits": [ 272, 273, 274, 275 ],
+          "attributes": {
+          }
+        },
+        "$procmux$239_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$23_Y": {
+          "hide_name": 1,
+          "bits": [ 268, 269, 270, 271 ],
+          "attributes": {
+          }
+        },
+        "$procmux$24_CMP": {
+          "hide_name": 1,
+          "bits": [ 384 ],
+          "attributes": {
+          }
+        },
+        "$procmux$25_CMP": {
+          "hide_name": 1,
+          "bits": [ 385 ],
+          "attributes": {
+          }
+        },
+        "$procmux$26_CMP": {
+          "hide_name": 1,
+          "bits": [ 386 ],
+          "attributes": {
+          }
+        },
+        "$procmux$27_CMP": {
+          "hide_name": 1,
+          "bits": [ 387 ],
+          "attributes": {
+          }
+        },
+        "$procmux$28_CMP": {
+          "hide_name": 1,
+          "bits": [ 388 ],
+          "attributes": {
+          }
+        },
+        "$procmux$29_CMP": {
+          "hide_name": 1,
+          "bits": [ 389 ],
+          "attributes": {
+          }
+        },
+        "$procmux$30_CMP": {
+          "hide_name": 1,
+          "bits": [ 390 ],
+          "attributes": {
+          }
+        },
+        "$procmux$31_CMP": {
+          "hide_name": 1,
+          "bits": [ 391 ],
+          "attributes": {
+          }
+        },
+        "$procmux$32_CMP": {
+          "hide_name": 1,
+          "bits": [ 392 ],
+          "attributes": {
+          }
+        },
+        "$procmux$33_CMP": {
+          "hide_name": 1,
+          "bits": [ 393 ],
+          "attributes": {
+          }
+        },
+        "$procmux$34_CMP": {
+          "hide_name": 1,
+          "bits": [ 394 ],
+          "attributes": {
+          }
+        },
+        "$procmux$35_CMP": {
+          "hide_name": 1,
+          "bits": [ 395 ],
+          "attributes": {
+          }
+        },
+        "$procmux$36_CMP": {
+          "hide_name": 1,
+          "bits": [ 396 ],
+          "attributes": {
+          }
+        },
+        "$procmux$37_CMP": {
+          "hide_name": 1,
+          "bits": [ 397 ],
+          "attributes": {
+          }
+        },
+        "$procmux$38_CMP": {
+          "hide_name": 1,
+          "bits": [ 398 ],
+          "attributes": {
+          }
+        },
+        "$procmux$39_CMP": {
+          "hide_name": 1,
+          "bits": [ 399 ],
+          "attributes": {
+          }
+        },
+        "$procmux$41_Y": {
+          "hide_name": 1,
+          "bits": [ 406, 407, 408, 409 ],
+          "attributes": {
+          }
+        },
+        "$procmux$42_CMP": {
+          "hide_name": 1,
+          "bits": [ 405 ],
+          "attributes": {
+          }
+        },
+        "$procmux$43_Y": {
+          "hide_name": 1,
+          "bits": [ 332, 333, 334, 335 ],
+          "attributes": {
+          }
+        },
+        "$procmux$44_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$47_Y": {
+          "hide_name": 1,
+          "bits": [ 411, 412, 413, 414 ],
+          "attributes": {
+          }
+        },
+        "$procmux$48_CMP": {
+          "hide_name": 1,
+          "bits": [ 410 ],
+          "attributes": {
+          }
+        },
+        "$procmux$49_Y": {
+          "hide_name": 1,
+          "bits": [ 328, 329, 330, 331 ],
+          "attributes": {
+          }
+        },
+        "$procmux$50_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$54_Y": {
+          "hide_name": 1,
+          "bits": [ 416, 417, 418, 419 ],
+          "attributes": {
+          }
+        },
+        "$procmux$55_CMP": {
+          "hide_name": 1,
+          "bits": [ 415 ],
+          "attributes": {
+          }
+        },
+        "$procmux$56_Y": {
+          "hide_name": 1,
+          "bits": [ 324, 325, 326, 327 ],
+          "attributes": {
+          }
+        },
+        "$procmux$57_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$62_Y": {
+          "hide_name": 1,
+          "bits": [ 421, 422, 423, 424 ],
+          "attributes": {
+          }
+        },
+        "$procmux$63_CMP": {
+          "hide_name": 1,
+          "bits": [ 420 ],
+          "attributes": {
+          }
+        },
+        "$procmux$64_Y": {
+          "hide_name": 1,
+          "bits": [ 320, 321, 322, 323 ],
+          "attributes": {
+          }
+        },
+        "$procmux$65_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$71_Y": {
+          "hide_name": 1,
+          "bits": [ 426, 427, 428, 429 ],
+          "attributes": {
+          }
+        },
+        "$procmux$72_CMP": {
+          "hide_name": 1,
+          "bits": [ 425 ],
+          "attributes": {
+          }
+        },
+        "$procmux$73_Y": {
+          "hide_name": 1,
+          "bits": [ 316, 317, 318, 319 ],
+          "attributes": {
+          }
+        },
+        "$procmux$74_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$81_Y": {
+          "hide_name": 1,
+          "bits": [ 431, 432, 433, 434 ],
+          "attributes": {
+          }
+        },
+        "$procmux$82_CMP": {
+          "hide_name": 1,
+          "bits": [ 430 ],
+          "attributes": {
+          }
+        },
+        "$procmux$83_Y": {
+          "hide_name": 1,
+          "bits": [ 312, 313, 314, 315 ],
+          "attributes": {
+          }
+        },
+        "$procmux$84_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "$procmux$92_Y": {
+          "hide_name": 1,
+          "bits": [ 436, 437, 438, 439 ],
+          "attributes": {
+          }
+        },
+        "$procmux$93_CMP": {
+          "hide_name": 1,
+          "bits": [ 435 ],
+          "attributes": {
+          }
+        },
+        "$procmux$94_Y": {
+          "hide_name": 1,
+          "bits": [ 308, 309, 310, 311 ],
+          "attributes": {
+          }
+        },
+        "$procmux$95_CMP": {
+          "hide_name": 1,
+          "bits": [ 16 ],
+          "attributes": {
+          }
+        },
+        "Addr_i": {
+          "hide_name": 0,
+          "bits": [ 4, 5, 6, 7 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:8.26-8.32"
+          }
+        },
+        "Clk_i": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:7.26-7.31"
+          }
+        },
+        "Data_i": {
+          "hide_name": 0,
+          "bits": [ 8, 9, 10, 11 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:9.26-9.32"
+          }
+        },
+        "Data_o": {
+          "hide_name": 0,
+          "bits": [ 12, 13, 14, 15 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:10.30-10.36"
+          }
+        },
+        "Mem[0]": {
+          "hide_name": 0,
+          "bits": [ 158, 159, 160, 161 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[10]": {
+          "hide_name": 0,
+          "bits": [ 30, 31, 32, 33 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[11]": {
+          "hide_name": 0,
+          "bits": [ 22, 23, 24, 25 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[12]": {
+          "hide_name": 0,
+          "bits": [ 170, 171, 172, 173 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[13]": {
+          "hide_name": 0,
+          "bits": [ 62, 63, 64, 65 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[14]": {
+          "hide_name": 0,
+          "bits": [ 102, 103, 104, 105 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[15]": {
+          "hide_name": 0,
+          "bits": [ 38, 39, 40, 41 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[1]": {
+          "hide_name": 0,
+          "bits": [ 142, 143, 144, 145 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[2]": {
+          "hide_name": 0,
+          "bits": [ 134, 135, 136, 137 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[3]": {
+          "hide_name": 0,
+          "bits": [ 126, 127, 128, 129 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[4]": {
+          "hide_name": 0,
+          "bits": [ 110, 111, 112, 113 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[5]": {
+          "hide_name": 0,
+          "bits": [ 94, 95, 96, 97 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[6]": {
+          "hide_name": 0,
+          "bits": [ 86, 87, 88, 89 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[7]": {
+          "hide_name": 0,
+          "bits": [ 70, 71, 72, 73 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[8]": {
+          "hide_name": 0,
+          "bits": [ 54, 55, 56, 57 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Mem[9]": {
+          "hide_name": 0,
+          "bits": [ 46, 47, 48, 49 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:16.23-16.26"
+          }
+        },
+        "Reset_n_i": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "gentb_constant": "00000000000000000000000000000001",
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:6.26-6.35"
+          }
+        },
+        "WR_i": {
+          "hide_name": 0,
+          "bits": [ 16 ],
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:11.26-11.30"
+          }
+        },
+        "i": {
+          "hide_name": 0,
+          "bits": [ 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237 ],
+          "signed": 1,
+          "attributes": {
+            "src": "../../../corpus-external/yosys-simple/mem_arst.v:18.11-18.12"
+          }
+        }
+      }
+    }
+  }
+}

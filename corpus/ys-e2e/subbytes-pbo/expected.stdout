@@ -1,0 +1,287 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed 2 dead cases from process $../../../corpus-external/yosys-simple/subbytes.v:45$proc$5 in module subbytes_00.
+Marked 4 switch rules as full_case in process $../../../corpus-external/yosys-simple/subbytes.v:45$proc$5 in module subbytes_00.
+Marked 1 switch rules as full_case in process $../../../corpus-external/yosys-simple/subbytes.v:28$proc$3 in module subbytes_00.
+Removed a total of 2 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 23 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset in `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~4 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+     1/18: $2\data_reg_var[0][7:0]
+     2/18: $2\data_reg_var[3][7:0]
+     3/18: $2\data_reg_var[2][7:0]
+     4/18: $2\data_reg_var[1][7:0]
+     5/18: $1\data_reg_128[31:0] [15:8]
+     6/18: $1\data_reg_128[31:0] [7:0]
+     7/18: $1\data_reg_128[31:0] [23:16]
+     8/18: $1\data_reg_128[31:0] [31:24]
+     9/18: $1\next_state[1:0]
+    10/18: $1$mem2reg_wr$\data_reg_var$../../../corpus-external/yosys-simple/subbytes.v:72$2_DATA[7:0]$13
+    11/18: $1$mem2reg_wr$\data_reg_var$../../../corpus-external/yosys-simple/subbytes.v:72$2_ADDR[1:0]$12
+    12/18: $1\data_reg_var[3][7:0]
+    13/18: $1\data_reg_var[2][7:0]
+    14/18: $1\data_reg_var[1][7:0]
+    15/18: $1\data_reg_var[0][7:0]
+    16/18: $2\next_state[1:0]
+    17/18: $1\next_data_reg[31:0]
+    18/18: $1$mem2reg_rd$\data_array$../../../corpus-external/yosys-simple/subbytes.v:60$1_DATA[7:0]$10
+Creating decoders for process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+     1/3: $1\ready_o[0:0]
+     2/3: $1\state[1:0]
+     3/3: $1\data_reg[31:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\subbytes_00.\data_o' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\sbox_data_o' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\sbox_decrypt_o' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\next_state' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\next_data_reg' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\next_ready_o' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_i_var' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_array[0]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_array[1]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_array[2]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_array[3]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_reg_var[0]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_reg_var[1]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_reg_var[2]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+No latch inferred for signal `\subbytes_00.\data_reg_var[3]' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+Warning: Latch inferred for signal `\subbytes_00.\data_reg_128' from process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5': $auto$proc_dlatch.cc:559:proc_dlatch$102
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\subbytes_00.\ready_o' using process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+  created $adff cell `$procdff$107' with positive edge clock and positive level reset.
+Creating register for signal `\subbytes_00.\state' using process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+  created $adff cell `$procdff$112' with positive edge clock and positive level reset.
+Creating register for signal `\subbytes_00.\data_reg' using process `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+  created $adff cell `$procdff$117' with positive edge clock and positive level reset.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 4 empty switches in `\subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+Removing empty process `subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:45$proc$5'.
+Removing empty process `subbytes_00.$../../../corpus-external/yosys-simple/subbytes.v:28$proc$3'.
+Cleaned up 4 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module subbytes_00.
+<suppressed ~23 debug messages>
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module subbytes_00.
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\subbytes_00'.
+Computing hashes of 46 cells of `\subbytes_00'.
+Finding duplicate cells in `\subbytes_00'.
+Computing hashes of 28 cells of `\subbytes_00'.
+Finding duplicate cells in `\subbytes_00'.
+<suppressed ~54 debug messages>
+Removed a total of 18 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \subbytes_00..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 2/2 on $mux $procmux$84.
+    dead port 1/2 on $mux $procmux$78.
+    dead port 2/2 on $mux $procmux$78.
+    dead port 1/2 on $mux $procmux$75.
+    dead port 2/2 on $mux $procmux$75.
+    dead port 1/2 on $mux $procmux$72.
+    dead port 2/2 on $mux $procmux$72.
+    dead port 1/2 on $mux $procmux$69.
+    dead port 2/2 on $mux $procmux$69.
+    dead port 1/2 on $mux $procmux$66.
+    dead port 2/2 on $mux $procmux$66.
+    dead port 1/2 on $mux $procmux$63.
+    dead port 2/2 on $mux $procmux$63.
+Removed 13 multiplexer ports.
+<suppressed ~16 debug messages>
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \subbytes_00.
+    New ctrl vector for $pmux cell $procmux$31: $procmux$91_CMP
+    New ctrl vector for $pmux cell $procmux$39: $procmux$92_CMP
+    New ctrl vector for $pmux cell $procmux$23: $procmux$90_CMP
+    New ctrl vector for $pmux cell $procmux$15: $auto$opt_reduce.cc:137:opt_pmux$119
+  Optimizing cells in module \subbytes_00.
+Performed a total of 4 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\subbytes_00'.
+Computing hashes of 22 cells of `\subbytes_00'.
+Finding duplicate cells in `\subbytes_00'.
+Removed a total of 0 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$117 ($adff) from module subbytes_00 (D = { $2\data_reg_var[0][7:0] $2\data_reg_var[1][7:0] $2\data_reg_var[2][7:0] $2\data_reg_var[3][7:0] }, Q = \data_reg).
+Adding EN signal on $procdff$112 ($adff) from module subbytes_00 (D = $procmux$60_Y, Q = \state).
+Setting constant 0-bit at position 0 on $procdff$107 ($adff) from module subbytes_00.
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \subbytes_00..
+Removed 5 unused cells and 117 unused wires.
+<suppressed ~12 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module subbytes_00.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \subbytes_00..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~13 debug messages>
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \subbytes_00.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\subbytes_00'.
+Computing hashes of 17 cells of `\subbytes_00'.
+Finding duplicate cells in `\subbytes_00'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $auto$ff.cc:337:slice$120 ($adffe) from module subbytes_00 (D = \sbox_data_i, Q = \data_reg [7:0]).
+Adding EN signal on $auto$ff.cc:337:slice$120 ($adffe) from module subbytes_00 (D = \sbox_data_i, Q = \data_reg [15:8]).
+Adding EN signal on $auto$ff.cc:337:slice$120 ($adffe) from module subbytes_00 (D = \sbox_data_i, Q = \data_reg [23:16]).
+Adding EN signal on $auto$ff.cc:337:slice$120 ($adffe) from module subbytes_00 (D = \sbox_data_i, Q = \data_reg [31:24]).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \subbytes_00..
+Removed 4 unused cells and 1 unused wires.
+<suppressed ~5 debug messages>
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module subbytes_00.
+
+3.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \subbytes_00..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~5 debug messages>
+
+3.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \subbytes_00.
+Performed a total of 0 changes.
+
+3.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\subbytes_00'.
+Computing hashes of 25 cells of `\subbytes_00'.
+Finding duplicate cells in `\subbytes_00'.
+Computing hashes of 22 cells of `\subbytes_00'.
+Finding duplicate cells in `\subbytes_00'.
+<suppressed ~9 debug messages>
+Removed a total of 3 cells.
+
+3.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \subbytes_00..
+Removed 0 unused cells and 3 unused wires.
+<suppressed ~1 debug messages>
+
+3.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module subbytes_00.
+
+3.23. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.24. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \subbytes_00..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~5 debug messages>
+
+3.25. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \subbytes_00.
+Performed a total of 0 changes.
+
+3.26. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\subbytes_00'.
+Computing hashes of 22 cells of `\subbytes_00'.
+Finding duplicate cells in `\subbytes_00'.
+Removed a total of 0 cells.
+
+3.27. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.28. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \subbytes_00..
+
+3.29. Executing OPT_EXPR pass (perform const folding).
+Optimizing module subbytes_00.
+
+3.30. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module subbytes_00...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== subbytes_00 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       34 wires
+      234 wire bits
+       19 public wires
+      187 public wire bits
+       10 ports
+       86 port bits
+       22 cells
+        1   $add
+        5   $adffe
+        3   $eq
+        1   $logic_not
+        2   $mux
+        1   $ne
+        2   $not
+        1   $pmux
+        4   $reduce_and
+        1   $reduce_bool
+        1   $reduce_or
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.
+
+Warnings: 1 unique messages, 1 total

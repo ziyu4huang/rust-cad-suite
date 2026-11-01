@@ -249,3 +249,683 @@
     極位 `0'x`/`1'1`/`4'0000`/`7'10000` 等實測在場;init 塊 memwr(恆地址
     形)與 posedge memwr(信號地址形)兩族在庫;memory-pb 的 EN 極性常數
     寬逐行遞增(26 位→27 位)——priority_mask 的位寬承載面。
+
+## M3 opt 普查(2026-10-30 实作轮 slice-1;oracle 二进制=§0 头同串
+## vendor-reference/suite-dl/oss-cad-suite/bin/yosys;clone v0.70 28ba3cb
+## 原地禁 fetch,行号按段定位、一律以二进制实跑为准)
+
+### P1 `-H` opt 族 19 条描述逐字(实跑 `yosys -H` 抓取;18 stub+已实现 opt_expr)
+
+```
+opt                  perform simple optimizations
+opt_balance_tree     $and/$or/$xor/$add/$mul cascades to trees
+opt_clean            remove unused cells and wires
+opt_demorgan         Optimize reductions with DeMorgan equivalents
+opt_dff              perform DFF optimizations
+opt_expr             perform const folding and simple expression rewriting
+opt_ffinv            push inverters through FFs
+opt_hier             perform cross-boundary optimization
+opt_lut              optimize LUT cells
+opt_lut_ins          discard unused LUT inputs
+opt_mem              optimize memories
+opt_mem_feedback     convert memory read-to-write port feedback paths to write enables
+opt_mem_priority     remove priority relations between write ports that can never collide
+opt_mem_widen        optimize memories where all ports are wide
+opt_merge            consolidate identical cells
+opt_muxtree          eliminate dead trees in multiplexer trees
+opt_reduce           simplify large MUXes and AND/OR gates
+opt_share            merge mutually exclusive cells of the same type that share an input signal
+optbarriers          (experimental) insert optimization barriers
+```
+
+### P2 `help opt` 编排器全文逐字(实跑 `yosys -p "help opt"`;序幕+do-while 结构)
+
+```
+    opt [options] [selection]
+
+This pass calls all the other opt_* passes in a useful order. This performs
+a series of trivial optimizations and cleanups. This pass executes the other
+passes in the following order:
+
+    opt_expr [-mux_undef] [-mux_bool] [-undriven] [-noclkinv] [-fine] [-full] [-keepdc]
+    opt_merge [-share_all] -nomux
+
+    do
+        opt_muxtree
+        opt_reduce [-fine] [-full]
+        opt_merge [-share_all]
+        opt_share  (-full only)
+        opt_dff [-nodffe] [-nosdff] [-keepdc] [-sat]  (except when called with -noff)
+        opt_hier (-hier only)
+        opt_clean [-purge]
+        opt_expr [-mux_undef] [-mux_bool] [-undriven] [-noclkinv] [-fine] [-full] [-keepdc]
+    while <changed design>
+
+When called with -fast the following script is used instead:
+
+    do
+        opt_expr [-mux_undef] [-mux_bool] [-undriven] [-noclkinv] [-fine] [-full] [-keepdc]
+        opt_merge [-share_all]
+        opt_dff [-nodffe] [-nosdff] [-keepdc] [-sat]  (except when called with -noff)
+        opt_hier (-hier only)
+        opt_clean [-purge]
+    while <changed design in opt_dff>
+
+Note: Options in square brackets (such as [-keepdc]) are passed through to
+the opt_* commands when given to 'opt'.
+```
+
+### P3 `help opt_expr` 旗标全文逐字(实跑 `yosys -p "help opt_expr"`)
+
+```
+    opt_expr [options] [selection]
+
+This pass performs const folding on internal cell types with constant inputs.
+It also performs some simple expression rewriting.
+
+    -mux_undef
+        remove 'undef' inputs from $mux, $pmux and $_MUX_ cells
+
+    -mux_bool
+        replace $mux cells with inverters or buffers when possible
+
+    -undriven
+        replace undriven nets with undef (x) constants
+
+    -noclkinv
+        do not optimize clock inverters by changing FF types
+
+    -fine
+        perform fine-grain optimizations
+
+    -full
+        alias for -mux_undef -mux_bool -undriven -fine
+
+    -keepdc
+        some optimizations change the behavior of the circuit with respect to
+        don't-care bits. for example in 'a+0' a single x-bit in 'a' will cause
+        all result bits to be set to x. this behavior changes when 'a+0' is
+        replaced by 'a'. the -keepdc option disables all such optimizations.
+```
+
+### P4 `help opt_merge`(-nomux 内部形佐证)
+
+`-nomux` = "Do not merge MUX cells."(opt 编排器序幕 `opt_merge -nomux` 内部
+专用形;standalone 旗标面=Y2 硬错,§9.2)。opt_merge 对 `$mux`/`$pmux` 以
+`ct.cell_types.erase` 排除——我方实现按同名 cell 类型跳过面复刻。
+
+### P5 141 例(87 base+54 -pb)× `opt` 无参普查(逐例 rc/迭代轮数)
+
+命令形:base 层=`read_rtlil case.il; opt`;`-pb` 层=`read_rtlil case.il;
+proc; opt`(锚案例 edge_reject/global_ff/global_memwr/posedge_memwr 不在
+本层,不入表)。**rc=0 141/141、stderr 空 141/141**。迭代轮数分布:
+* base 层 87 例全数 **round_rerun=0**(单轮收敛;P4 同律=幂等面)。
+* `-pb` 层 54 例全数 rerun≥1:**51 例 rerun=1、sincos-pb rerun=2、
+  fsm-pb/subbytes-pb rerun=3**(逐例轮数=Rerunning 行计数,RM3-1 普查锚)。
+
+| 例 | 轮数 | 例 | 轮数 | 例 | 轮数 |
+|---|---|---|---|---|---|
+| aes_kexp128-pb | 1 | dff_init-pb | 1 | muxtree-pb | 1 |
+| always01-pb | 1 | dynslice-pb | 1 | omsp_dbg_uart-pb | 1 |
+| always02-pb | 1 | fiedler-cooley-pb | 1 | operators-pb | 1 |
+| always03-pb | 1 | forgen01-pb | 1 | process-pb | 1 |
+| arrays01-pb | 1 | forloops-pb | 1 | repwhile-pb | 1 |
+| attrib01_module-pb | 1 | fsm-pb | **3** | retime-pb | 1 |
+| attrib02_port_decl-pb | 1 | func_block-pb | 1 | rotate-pb | 1 |
+| attrib03_parameter-pb | 1 | func_recurse-pb | 1 | scopes-pb | 1 |
+| attrib04_net_var-pb | 1 | func_width_scope-pb | 1 | sign_part_assign-pb | 1 |
+| attrib06_operator_suffix-pb | 1 | graphtest-pb | 1 | sincos-pb | **2** |
+| attrib08_mod_inst-pb | 1 | i2c_master_tests-pb | 1 | string_format-pb | 1 |
+| attrib09_case-pb | 1 | loop_prefix_case-pb | 1 | subbytes-pb | **3** |
+| case_expr_const-pb | 1 | loops-pb | 1 | task_func-pb | 1 |
+| case_expr_non_const-pb | 1 | mem2reg-pb | 1 | usb_phy_tests-pb | 1 |
+| case_large-pb | 1 | mem2reg_bounds_tern-pb | 1 | values-pb | 1 |
+| const_branch_finish-pb | 1 | mem_arst-pb | 1 | (余 -pb 例) | 1 |
+| const_fold_func-pb | 1 | memory-pb | 1 | | |
+| constmuldivmod-pb | 1 | module_scope_case-pb | 1 | | |
+| dff_different_styles-pb | 1 | module_scope_func-pb | 1 | | |
+| multiplier-pb | 1 | | | | |
+
+### P6 18 条逐条代表案例探针(standalone 无参形;`proc; <pass>` 于 -pb 层)
+
+| pass | 代表案例(層) | rc | rtlil 效果 | log 形实录(区段) |
+|---|---|---|---|---|
+| opt_clean | always01-pb/memory-pb;always01、fsm(base) | 0 | memory-pb 有实质删除(17 cells/68 wires) | `Finding unused cells or wires in module \N..` 逐模組+`Removed N unused cells and M unused wires.` 一次+suppressed 计数;**含 process 模组跳过警告**(opt_clean.cc:90 `has_processes_warn`,rtlil.cc:2798:~`Warning: Ignoring module %s because it contains processes (run 'proc' command first).`) |
+| opt_merge | multiplier-pb/operators-pb 等 | 0 | operators-pb 删 17 cells | 逐模組 `Finding identical cells in module `%s'.`(名=raw 形带反引号)+每 hash 轮 `Computing hashes of %d cells of `%s'.`+`Finding duplicate cells in `%s'.`;末尾 `Removed a total of %d cells.` 一次;**log_suppressed 逐模組** |
+| opt_muxtree | muxtree-pb/fsm-pb | 0 | muxtree-pb 有 port 改写(Rerunning 主因之一) | 逐模組 `Running muxtree optimizer on module %s..`+`  Creating internal representation of mux trees.`+`  Evaluating internal representation of mux trees.`+逐 root `    Root of a mux tree: …`(debug 抑制)+`  Analyzing evaluation results.`+死 port `    dead port %d/%d on %s %s.`;末尾 `Removed %d multiplexer ports.`;**无 mux 模組 `  No muxes found in this module.`**;cell 级改写 `      Replacing known input bits on port %s of cell %s: %s -> %s`(debug 抑制形) |
+| opt_reduce | muxtree-pb/operators-pb | 0 | 同上(零变化) | 逐模組 `  Optimizing cells in module \N.`+末尾 `Performed a total of %d changes.` |
+| opt_dff | dff_different_styles-pb/mem_arst-pb;global_ff(锚) | 0 | 零(探针面) | 纯 header+suppressed;**无逐模組行** |
+| opt_share | memory-pb/muxtree-pb/fsm-pb | 0 | 零 | 纯 header(配对面在语料空转;内部 `clean -purge` 侧效=opt_balance_tree 专项) |
+| opt_mem | memory-pb/arrays01-pb | 0 | 零 | header+`Performed a total of %d transformations.` |
+| opt_mem_feedback | memory-pb/arrays01-pb | 0 | 零(feedback 路径未触) | header+逐 write port `  Analyzing %s.%s write port %d.`(mem 名 unescape 形) |
+| opt_mem_priority | memory-pb/arrays01-pb | 0 | **memory-pb 实质 6 transformations** | header+`Performed a total of %d transformations.` |
+| opt_mem_widen | arrays01-pb/memory-pb | 0 | 零 | header+`Performed a total of %d transformations.` |
+| opt_lut | operators-pb/muxtree-pb/fsm-pb;carryadd(base) | 0 | 零 | 纯 header(空转面=语料无 LUT cell) |
+| opt_lut_ins | 同上 4 例 | 0 | 零 | 纯 header(空转面同上) |
+| opt_demorgan | operators-pb/fsm-pb;operators(base) | 0 | 零 | header+**弃用警告** `Warning: Feature 'opt_demorgan' is deprecated and may be removed as soon as Yosys 0.72.`+逐 cell `Inspecting $reduce_and cell %s (%d inputs)`+`  %d / %d inputs are inverted, %s` |
+| opt_ffinv | dff_different_styles-pb/mem_arst-pb | 0 | 零 | header+`Discovering LUTs.` ×2(opt_ffinv.cc:207 一处、执行两轮)+`Pushed %d inverters.` |
+| opt_balance_tree | carryadd(base)/multiplier-pb/operators-pb | 0 | **rtlil 有差=内部 clean -purge 侧效**(multiplier-pb Removed 15 wires) | header+**实验警告** `Warning: Feature 'open_balance_tree' is experimental.`+逐型 `Converted %d $and cells into trees.`($and/$or/$xor/$add/$mul 五型)+**内部调用 `Yosys::run_pass("clean -purge")`**(opt_balance_tree.cc:410)→ log 含 `-- Running command \`clean -purge' --` 横幅+`Removed N unused cells and M unused wires.` |
+| opt_hier | hierarchy/attrib08_mod_inst/hierdefparam/always01(base) | 0 | hierarchy 例有实质替换 | header+逐模組替换行(hierarchy 例:`Substituting constant for 4 output bits of instance 'foo' (type '$paramod\submod…`)+suppressed |
+| optbarriers | process-pb;global_ff(锚) | 0 | **rtlil 有差(插 barrier)** | header+末尾 driver 警告彙总 `Warnings: 1 experimental features used (not excluded with -x).`(epilogue 区,归一化切除面) |
+
+### P7 opt_expr 6 新旗标探针矩阵与裁决表(命令形 `read_rtlil case.il; proc; opt_expr -FLAG` vs 无参基线 rtlil cmp)
+
+| 旗标 | 探针案例 | rtlil 效果 | 裁决 |
+|---|---|---|---|
+| -mux_undef | case_expr_non_const-pb / **values-pb** / dynslice-pb | values-pb **DIFF**(mux undef 输入移除);余 same | **硬错(续弧)**(裁决修正 2026-10-30 续弧:本轮未翻,维持旗标面=Y2 硬错;cli_contract fixture `opt_expr -mux_undef` 在档) |
+| -mux_bool | case_expr_const-pb / operators-pb | same | **硬错(续弧)**(同上;fixture 在档) |
+| -undriven | dynslice-pb / wreduce / global_ff | same | **硬错(续弧)**(同上;fixture 在档) |
+| -noclkinv | dff_different_styles-pb / mem_arst-pb | same | **硬错(续弧)**(同上;fixture 在档) |
+| -fine | **operators-pb** / **constmuldivmod-pb** / subbytes-pb | operators-pb+constmuldivmod-pb **DIFF** | **硬错(续弧)**(同上;fixture 在档) |
+| -full | **fsm-pb** / **memory-pb** / **subbytes-pb** | 全 DIFF(四旗标别名组合) | **硬错(续弧)**(=alias 组合;fixture `opt_expr -full` 在 proc_and_opt_expr_keepdc_flip_pass+opt_family_flag_y2_probes) |
+
+> **裁决表修正注记(2026-10-30 续弧第 2 轮)**:首轮此表裁决列记「实现」,
+> 但本轮实际面=6 旗标维持 Y2 硬错(预判面:opt_dff 全量占预算)——按
+> 「期望=oracle 实录、禁手写」纪律如实修正裁决列;翻实现+golden=续弧
+> 入口(§9.7 未竟④)。验收 8 对应:硬错裁决=fixture(本轮补齐 6 条
+> 旗标 token)、golden=无(如实缺口)。
+
+既有 `-keepdc` 契约形(M2)=零漂移回归锚(§9.2);七旗标全覆盖,**无硬错裁决行**
+——旗标硬错契约面收口于「opt 编排器旗标(-fast/-full/…透传形)+子 pass
+standalone 旗标」(P8/cli_contract fixture)。
+
+### P8 源码定点对读(clone 28ba3cb;行号按段定位、二进制实跑仲裁)+可复刻性分类预案表
+
+**opt.cc(全文 203 行)已读**:非 -fast 序幕=`opt_expr+args`+`opt_merge
+-nomux+args`;定点循环体=`opt_muxtree;opt_reduce+args;opt_merge+args;
+[opt_share(仅 -full)];[opt_dff(除 -noff)];[opt_hier(仅 -hier)];
+opt_clean+args;opt_expr+args`;changed 判定=scratchpad bool
+`opt.did_something`(opt.cc:160 unset/:163 判定/:189 Rerunning 行);
+循环后 `design->optimize();design->check()`(rtlil.cc:2726 Module::optimize
+=**空体**;rtlil.cc:1352 Design::check=**NDEBUG-only,Release 二进制=空操
+作**——可观测面=零,我方不实现);尾 header `Finished fast OPT passes.%s`
+(fast=空串,非 fast=` (There is nothing left to do.)`)。
+
+**did_something 置位点全表**(rg 'opt.did_something' passes/+kernel/):
+opt_muxtree.cc:638、opt_merge.cc:570(总量>0)、opt_mem.cc:220、opt_lut.cc:590/592、
+clean/inits.cc:132+clean/cells_temp.cc:100+clean/wires.cc:528+
+clean/cells_all.cc:315(opt_clean 族)、opt_ffinv.cc:265、opt_mem_feedback.cc:267、
+opt_mem_priority.cc:103、dff/opt_dff.cc:142、opt_hier.cc:475、opt_reduce.cc:663、
+opt_share.cc:554、opt_mem_widen.cc:102。**不置位**:opt_demorgan、opt_lut_ins、
+optbarriers、opt_balance_tree。**opt_expr 不在置位表**(自身不改 did_something)。
+
+| # | pass | 分类预案(二进制实跑仲裁前) | 依据 |
+|---|---|---|---|
+| C1 | opt_clean | **logic-diff=修我方收平**:删除集合=输出可达性,确定;删除序=sort_by_name_id(intern 序,cells_all.cc:307)——intern 序法条已在库(D-ys 律 10.9-r);connect/wires 序同 dict 契约 | clean/cells_all.cc:307/311-324、wires.cc:528 |
+| C2 | opt_merge | **logic-diff**:workers=1 路径(<2000 cells 全语料)桶序退化为索引序;keep=首见(min index)、remove=后见;重复对按 max(remove,keep)=remove 索引排序(opt_merge.cc:444-446);commutative hash 语义=精确 Eq 比较(哈希值不进 golden) | opt_merge.cc:140-400 |
+| C3 | opt_muxtree | **logic-diff 预判**(评估序=cell 索引序建表+root_muxes 序);knowledge 评估为纯函数;`Replacing known input bits` 行=debug 抑制面,非 byte 面 | opt_muxtree.cc:192-638 |
+| C4 | opt_reduce | **logic-diff 预判**(combine 遍历序=cell 索引) | opt_reduce.cc:637-663 |
+| C5 | opt_dff | **logic-diff 预判**(语料面=零变化+纯 header) | dff/opt_dff.cc:142 |
+| C6 | opt_share | **空转**(语料零命中;配对序风险仅未来语料) | opt_share.cc:554 |
+| C7 | opt_mem 族 | **logic-diff 预判**(priority=成对去除确定;feedback=分析行序=mem/wport 索引序) | opt_mem*.cc |
+| C8 | opt_lut/opt_lut_ins | **空转**(语料无 LUT;纯 header 面=oracle 实录逐字钉) | opt_lut.cc:545、opt_lut_ins.cc:48 |
+| C9 | opt_demorgan | **logic-diff 预判**(逐 cell inspect 行序=cell 索引序;零转换) | opt_demorgan.cc:188 |
+| C10 | opt_ffinv | **logic-diff 预判**(Discovering×2+Pushed 计数) | opt_ffinv.cc:207/266 |
+| C11 | opt_balance_tree | **logic-diff**(树平衡转换+内部 clean -purge 横幅;转换序=逐型五批) | opt_balance_tree.cc:377/410 |
+| C12 | opt_hier | **logic-diff 预判**(逐模組逐 instance 替换行) | opt_hier.cc:423/475 |
+| C13 | optbarriers | **logic-diff**(插 barrier cell=集合确定;非 opt 链成员) | cmds/optbarriers.cc:217 |
+| C14 | opt 编排器 | **logic-diff**:轮数=逐例普查(P5)+did_something 置位面(C1-C7)交叉钉;Rerunning/Finished=log_header 占编号 | opt.cc:81-198 |
+
+凡 C 行触 diff:先二进制实跑分类(logic-diff=修我方;internal-order=登记
+D-ys 不硬磕),禁源码静态推导定案(§8.8-2 教训)。
+
+### P9 D-ys6 空设计两端逐字实录(2026-10-30 母本;golden 录制于 slice-2)
+
+oracle(实跑,rc 全 0,stderr 全 0 字节):
+* `stat`:stdout 838B——`1. Printing statistics.` 后无任何统计段(空设计)。
+* `check`:stdout 904B——`1. Executing CHECK pass (checking for obvious
+  problems).`+`Found and reported 0 problems.`。
+* `hierarchy`:stdout 881B——header 后无 sub-header 层。
+* 其余实现层命令空设计形(rc 全 0):`proc`/`opt`/`simplemap`=零模組空转;
+  `write_rtlil -readable o.il`=仅 2 行头(`# Generated by …`+`autoidx 1`);
+  `write_json o.json`=`{"creator": …, "modules": {\n\n  }` 形。
+ryosys(现值,全 rc=1,自创文案=清偿对象):
+`ERROR: No design object available (run 'read_rtlil' first) while executing
+command \`X'`(X=stat/check/hierarchy;main.rs:203 通形+:335 hierarchy 字面形)。
+
+### P10 -pbo 层 golden 录制来源(2026-10-30,slice-6;录制常量=ry-difftest
+### SCRIPT_PBO,与 compare 同一常量)
+
+`read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable
+expected.rtlil; write_json expected.json`——54 例 -pb 输入,oracle 实跑
+录制(--record 管线扩层),禁手写;手写 .il 锚案例(ys-m3-anchors 迁入)
+经两跑 byte-equal 确定性探针后方可录制(§9.4-12)。
+
+### P11 -pbo 層錄製來源與 M3 實作輪實錄(2026-10-30,slice-6)
+
+* **錄製**:`cargo run -q -p ry-difftest -- --record --corpus corpus/ys-e2e`
+  (SCRIPT_PBO=§P10 逐字;錄得 pfree=87 pbearing=54 **pbo=54** total=195;
+  既有五層 golden 重錄**零位元組變化**=oracle 升級無語義漂移的免費證明,
+  git status 僅 PROVENANCE 修改+`-pbo/` 新增)。
+* **-pbo 對拍實測**(同日):`SUMMARY ys=418/460`;既有 406 全數 PASS
+  零擾動;-pbo 12/54 PASS、42 例 FAIL(golden=oracle 真實輸出,兩類根因):
+  1. **opt_dff worker 未移植**(simple.cc 772 行+constbits.cc:Adding SRST
+     signal/Adding EN signal 等變換在 28/54 例觸發)——stdout+rtlil+json 面;
+  2. **多刪 swap-and-pop 幸存序差**(集合相同、序不同):單相模擬四假設
+     (intern 正/逆×陣列正/逆)均不達 oracle 幸存序(loops-pb 二進制實跑
+     逐位對照在案;dict::element(n)=entries[size-1-n](hashlib.h:878)+
+     pool::sort 反向比較子(hashlib.h:834)已對讀入档)——**D-ys8 登記,
+     不硬磕**,修法候選=oracle 多輪 signals 迴圈+池序的完整復刻。
+* **prefix-chain probe**(slice-2 出口閘):141 例逐例 rtlil cmp,97/145
+  byte-exact(48 例敗=同一序差類;探針腳本 /tmp 棄,數入本節)。
+* **opt 全鏈 probe**(slice-6):141 例 `proc; opt` 對拍 97/145(修
+  mem_wren SigPool 常數位收斂 bug 後;28 例=opt_dff 類+序差類)。
+* **D-ys6 清償實錄**:空設計三命令兩端 rc/逐字 stderr 見 §P9;修後
+  `rg -n 'No design object available' crates/` exit=1、empty_design
+  fixture 在檔(cli_contract::empty_design_three_commands_rc0)。
+* **registry 口徑(2026-10-30 M3 後)**:stub **275**(Y0 266/Y2 7/Y3 2)
+  +實現層 **31**=306;五處口徑一致(REGISTRY ry-cli 行/registry.rs 頭注/
+  本節/ry-cli main.rs 頭注/RYOSYS-MVP §9.7)。歷史對賬數字(286=M2 時點
+  stub 數)為合法史錄保留於 M2 節——驗收負向閘 '286' 就 PROVENANCE 一檔
+  移出(ask 驗收 6 contingency 條款同款先例),改正向錨=本行 '275'。
+* **續弧第 2 輪實錄(2026-10-30,opt_dff 全量)**:opt_dff 全量 worker
+  移植落地(simple.cc optimize_sr/aload/arst/srst/ce/const_clk/d_eq_q+
+  try_merge_srst/try_merge_ce+find_muxtree_feedback_patterns+
+  make_patterns_logic/combine_resets+constbits 非 SAT 面+FfData/FfInitVals;
+  新檔 crates/ry-cli/src/opt_dff.rs)。新增命名錨=二進制 golden 釘:
+  ff.cc:337:slice(56)、simple.cc:81:create_not(3)、:199/200/216/217:
+  make_patterns_logic、:240/242:combine_resets、rtlil.cc:3201:Not、
+  opt_reduce.cc:131/137:opt_pmux(改錨:先前 236/244=clone 行號誤置)。
+  **行為面實錄(最小探针矩陣)**:①$dlatch 的 AD 全常數→ARST 分支在
+  0.70+179 二進制=靜默+前移(clone 有 log 且居後)——D-ys9 登記;②constbits
+  的 Sx 候選亦提交(log 印 0-bit、connect x;C++ 僅擋 Sm)——clone 同源可
+  推導;③try_merge 的 mux-walk 比較用 **raw 位**(無 assign_map)、
+  find_muxtree 的 port_bit 用 sigmapped 位——兩面不同,錄製在案。
+  **-pbo 對拍推進:12/54→23/54**(SUMMARY 418/460→**429/460**;翻綠 11 例=
+  always01/02、case_expr_non_const、muxtree、process、omsp_dbg_uart、
+  attrib01/02/03/06/08-pbo)。餘 31 例根因三類:(a) opt_dff mux-tree 反饋
+  面(find_muxtree 的 break_feedback 位面)與 ff debug 計數面;(b) D-ys8
+  序差/wire 集;(c) opt_merge cell 數級聯。
+* **續弧第 7 輪實錄(2026-10-31,形態對讀→收平 21 例)**:SUMMARY
+  429/460→**450/460**,known-gap 31→10 例。形態對讀結論(JSON 七形)
+  逐形落地,全序差結論以二進制實跑仲裁(oracle=0.70+179 sha1 9534a7f4d,
+  clone=v0.70 28ba3cb 源碼僅定位機制):
+  - **D-ys8b 清償(9 例)**:compare_signals 尾分支=lt_by_name
+    (rtlil.h:386-403 Substrings memcmp)**字串序**非 intern 序——vE 鏡像
+    實驗(case.il 檔案序 $0\counter 前、add$2_Y 後,oracle 存活=add$2_Y)
+    證偽第 5 輪「oracle 真序=建名序」歸因;opt.rs 尾分支改
+    n2.as_bytes()<n1.as_bytes()+public 述語改 isPublic
+    (rtlil.h:548,原誤用 check_public_name)。9 例兩腿翻綠+golden 零重錄。
+  - **multiplier-pbo 清償(logic-diff)**:設計內模組=known cell
+    (celltypes.h setup_design;exact 分支 promote),opt.rs exact_cells
+    /used-tracing 兩消費面擴「內建∨設計內模組」(同型先例 hierarchy.rs:
+    401-414);該例自 D-ys8 家族除名。
+  - **delete_wires 批次序清償(rotate-pbo)**:oracle 鏈 wire_at 逆掃→
+    pool→Module::remove 以 pool 迭代 erase(rtlil.cc:2933+hashlib.h:878
+    逆插入)=雙反轉→**檔案序升序**;Python 雙向模擬各釘一端(814 條
+    dump 序 byte-exact),opt.rs 排序鍵 usize::MAX-p→升序 p。
+  - **task_func-pbo 清償**:constbits commit 按候選 val 原形 connect
+    (Sx→1'x,constbits.cc:119)+remove_ff_bits 的 slice(keep) 每格無條件
+    +1 autoidx(ff.cc:336 NEW_ID;W.autoidx 進出場與 optimize_* 引用
+    遞增同步——attrib04/aes/always03 的 autoidx 尾差同根)。
+  - **operators-pbo 清償**:remove_temporary_cells 刪除循環補 dbg_inc
+    (cells_temp.cc:50-63 三消息形非 debug 下全走 suppressed;stdout 腿
+    1→5 對齊,整例翻綠)。
+  - **opt_expr 大塊(6 例+constmuldivmod 面)**:replace_const_cells 加
+    consume_x/keepdc 參數;run_opt_expr 改 oracle do-while
+    (opt_expr.cc:2357-2368);identity 塊(consume_x,:1317-1424;
+    is_one_or_minus_one :348 移植);!keepdc $mul 塊(:1695-1785 swap/
+    ×0/onehot→$shl/尾零剝除);$div/$mod onehot 2^n 族(:1813-1878,
+    truncating-divide→$sshr+floor 電路、truncating-modulo→bitmask/
+    符號電路;ReduceOr wire 錨=rtlil.cc:**3205** 由 golden 實錄,
+    clone=3249 行號不符);shift 塊門控=keepdc?fully_def:fully_const
+    (:1273);19 個 dbg_inc_what("?") 補塊文案串(調試面,計數面不變)。
+    **中途事故**:identity 判定誤用 sigops::const_as_bool(LSB 形)於多寬
+    常數→forloops/scopes 兩例翻紅;oracle Const::as_bool(rtlil.cc:536)=
+    任意位 S1 即真(非零語義),新增 const_nonzero 修正後兩例回綠。
+  - **opt_pmux 面3 清償(D-ys8c)**:建名記帳 cell=N/wire=N+1 每對
+    +2(opt_reduce.cc:131/:137;golden 錨=constmuldivmod cell$134→
+    wire$135)。
+  - **殘差 10 例分類(2026-10-31 對抗審修訂)**:sincos/i2c=opt_dff
+    find_muxtree_feedback_patterns 的 **pattern 內容差**(stage7 兩側
+    cell 集合全同+connect 序逐字同,單 pass opt_expr:oracle 折 2[
+    $ne$177→$reduce_bool+const_or]、我方 19;$ne$177 在 o5 輸入
+    A={107_CMP,\state} B=2'00 vs 我方 A=107_CMP B=1'1——oracle 深
+    else 鏈多收集 ctrl 鍵+組代表元經 sigmap(103_CMP→state) 別名;
+    logic-diff 面,入口=opt_dff.rs find 分支遍歷,後置);
+    **fsm/subbytes=3.8 OPT_EXPR 變換集差(logic-diff,歸 (a) 類——
+    初稿誤歸 D-ys8c 面2,對抗審修訂)**:本輪複跑實錄,3.1-3.7 兩端
+    逐字同(含 suppressed),fsm 首分歧=3.8 OPT_EXPR 我方
+    `<suppressed ~5>` vs golden `<suppressed ~1>`(面早於 opt_dff/
+    patterns 階段,拼接序機制無法解釋 suppressed 計數差),級聯
+    3.12 hashes 37 vs 39、3.13 我方「Handling never-active EN on
+    $auto$ff.cc:337:slice$88 ($sdffe)(connecting SRST instead)」
+    vs golden「Adding EN signal on slice$88 ($sdffe)」(never-active
+    邏輯面=續弧第 6 輪已點名的 dominant 面,初稿漏錄);subbytes 同形
+    (3.8 我方 +`<suppressed ~2>` golden 無行);D-ys8c 面2 成立例=
+    constmuldivmod/usb/values(首分歧=New ctrl vector 拼接序,實跑
+    在案);loops/memory/mem_arst=D-ys8 dump 序(stdout 綠,僅 rtlil/
+    json 腿;memory 兩側 cell 集合 29 格逐字同名實證,登記維持)。
+  - **交接注記(變更集邊界,換人複審補)**:`git diff HEAD`(tracked)
+    不含 M3 核心實作——main.rs 的 `mod opt;`/`mod opt_dff;` 依賴
+    **untracked** 的 crates/ry-cli/src/opt.rs(107KB)/opt_dff.rs(67KB);
+    同批 untracked 還有 .zcode/workflows/ryosys-gap-closure.dwf.ts 與
+    54 個 corpus/ys-e2e/*-pbo/ golden 目錄(四件套+script.txt)。「工作
+    樹呈現、弧內不 commit」是設計契約(fc57e55),接手者對帳/交接時
+    變更集=tracked diff+上列 untracked 路徑,漏掉 untracked 會得到
+    編譯失敗的樹(mod 解析不到)與不可能過 450/460 閘的語料面。
+* **續弧第 6 輪補記(2026-10-30)**:①opt_pmux 補 "New ctrl vector for
+  %s cell %s: %s" 行(fsm/usb 缺行類)+autoidx 接全局
+  (run_opt_reduce 原誤從 autoidx_base 起,已改 design.autoidx 起訖寫回)
+  ——fsm-pbo 行面收斂(3 行 New ctrl 出現),唯 autoidx 仍差 1
+  (oracle $78 起我方 $77 起);②autoidx 差 1 根因=fsm 的 $reduce_and
+  (opt_dff make_patterns_logic 建)在第二輪 opt_reduce 觸發 sort_and_unify
+  序變(oracle "New input vector" ×1 而我方 0)——patterns pool 的 hash
+  迭代序=二進制內部態,**D-ys8c 新登**(禁硬磕);③sincos 的 suppressed
+  計數差(19 vs 2)=find_muxtree eval debug 面,同類。
+* **續弧第 5 輪補記(2026-10-30,D-ys8b 機制實證)**:RY_DBG 分支探针
+  (compare_signals 全分支返回值+intern 鍵打印,attrib04_net_var-pbo)
+  實錄:update_assign_map 對 cand=$0\counter[7:0] vs cur=add_Y 落 intern
+  尾分支且 **k2=(0,7)<k1=(0,8)→promote**(16 次)——兩鍵出自 **case.il
+  文件序**(parser 登記 dump 序),oracle 真序=讀 verilog→proc 創建序
+  (add_Y 先建),dump 序≠創建序(swap-and-pop 擾動)→文件序代理失真。
+  **D-ys8b 機制閉環**:非「缺登記」而是「輸入無 ground truth 可登記」——
+  禁硬磕實錘,已知-GAP 名單執法。探针已全部拔除(cargo build 零警告)。
+* **續弧第 4 輪補記(2026-10-30,31 例殘差分類固化)**:逐例採樣三形
+  (本輪實跑):①attrib09_case-pbo=wire dump **順序**差($procmux$6_CMP/
+  $3_CMP 互換,集合相同)=D-ys8 純序面;②retime-pbo=wire **集**差
+  ($0\ff[7:0] 我方多留)=D-ys8b intern 序面;③multiplier-pbo=connect
+  形差(oracle `connect \Cout \Cout` 自連+`{\CC[6] \CC[0]}={\Cout
+  \Cin}` 拼接形 vs 我方 `\Cout=\CC[6]` 別名形)=opt_clean 別名物化與
+  opt_merge redirect 的交互面(同 D-ys8 家族)。三形皆落入已登記
+  D-ys8/8b 類,禁硬磕(§8.8-2 律);收平前置=intern 序全模型
+  (proc 臨時線登記+數字尾/非數字尾單一 intern 流),後置續弧。
+* **續弧第 3 輪補記(2026-10-30)**:①opt_expr 6 旗标裁决表修正——首轮
+  裁决列误记「实现」,实际面=维持 Y2 硬错,如实改判「硬错(续弧)」并补
+  6 条 cli_contract fixture(旗标 token 全覆盖,验收 8 对齐);②attrib04
+  wire 集面新探针=$0\counter[7:0] 留/删差,溯源=proc 临时线 intern 序
+  (D-ys8b 登记,同类不硬磕);③验收 5 复测=rg '"Y2"' cli_contract.rs=0。
+* **M3 實作輪範圍裁定**(誠實邊界):opt 家族 18 條中 11 條翻實現
+  (opt 編排器+opt_clean/opt_merge/opt_muxtree/opt_reduce/opt_dff 無參面/
+  opt_share 無參面/opt_lut/opt_lut_ins/opt_demorgan/opt_ffinv);
+  **未翻**(stub 維持):optbarriers(process 依賴圖重寫面)、
+  opt_balance_tree(內部 clean -purge 面)、opt_hier(跨層替換面)、
+  opt_mem 族×4(opt_mem_priority 需 QuickConeSat SAT 面)——觸發即
+  同輪擴(RM3-5 條款);opt_expr 6 新旗標維持旗標面=Y2 硬錯
+  (§9.2 契約形;-keepdc 既有 54 例 golden 零重錄零漂移)。
+
+## M3 续弧·批量收编普查(2026-11-01 实作轮 slice-1;oracle 二进制=0.70+179
+## git sha1 9534a7f4d 横幅逐字;clone 停 28ba3cb v0.70 原地禁 fetch,行号
+## 按 clone 定位、一切序差/行为结论以二进制实跑仲裁;详案=RYOSYS-MVP §10)
+
+四单元 clean/log/help/opt_balance_tree 可执行展开的备料轮(产品行为零
+变更),P1-P10 深化实录:
+
+* **P1 深化(clean -foo 形矩阵,carryadd base 本轮三形亲跑)**:
+  ①`clean -foo` 单 token(script 链形 `-p 'read_rtlil case.il; clean
+  -foo'`)→ rc=1、stderr 恰 3 行 `ERROR: Command syntax error: Unknown
+  option or option in arguments.`+`> clean -foo`+`>       ^`(插入符
+  指向 `-foo` 的 `-`,0-based 列 8=前缀 `> `2+error_pos 6);
+  ②`clean -purge -foo` 前置形 → 插入符列随 `-purge`(6 字符)累加,
+  `>              ^`=列 13;③`clean -foo -bar` 多 token → 插入符仍指
+  首个未知 token(列 6 不变),文案逐字同;④stdout 面=空行+`Syntax
+  error in command \`clean -foo':`+空行+clean help 全文(`    clean
+  [options] [selection]`+`This is identical to 'opt_clean', but less
+  verbose.`+;;/;;; 两段),cmd_error 机制源码=register.cc:174-192
+  (`log("\n")`+`Syntax error in command \`%s':`+help()+log_cmd_error
+  三行 stderr 形,`%*s^` 宽度=error_pos=Σ_{i<argidx}(len+1));
+  ⑤位置参数文件形 `-p 'clean -foo' case.il` → 27 行(多 `-- Parsing
+  \`case.il' using frontend \`rtlil' --` 行,与 P1 表 25/27 两形态定盘
+  复证);⑥`clean carryadd/w:*` selection 形 → **rc=0 正常执行**
+  (extra_args select=true 默认接受 selection,register.h:102——我方
+  cmd_error=真实行为面分歧,D-ys10);⑦`clean -purge -purge` 幂等 rc=0。
+* **P3 深化(log 七旗标单独形,carryadd base 本轮七形亲跑,全 rc=0)**:
+  `-stdout` → 输出体多一空行(空 log 串+换行);`-stderr` → stdout 零
+  新增(空写 stderr);`-nolog`/`-n` → stdout 零新增(nolog 模式抑制);
+  `-header` → spacer 后印 `2. `(空标题 log_header,占位计数器+1 不
+  占编号形);`-push`/`-pop` → 无可见输出(header 栈操作);`log hello
+  world` → `hello world` 原样+不占编号;`log "a;b"` → `"a;b"` 引号
+  保留;`log -foo` → `-foo` 原样打印 rc=0(P3 免费对齐复证)。
+* **P5 深化(help 子形,本轮六形亲跑,全 rc=0)**:`help nosuchpass`/
+  `help -foo` → `No such command or cell type: X`(log 非 error);
+  `help opt clean`/`help clean log` 两参形 → ``Unknown help command:
+  `opt clean'``(反引号包整 args 重拼);`help -all`/`help -cells` →
+  大输出(-all=全 pass 全文/-cells=cell 表);bare help=323 行 rc=0
+  stderr 0B;**-H 与 bare help 剥尾三行(End of script/Yosys 版本/
+  Time spent)后 diff 零差**(P5 byte 同形复证);行结构=空行+横幅 5+
+  版本行+空行+`-- Running command \`help' --`+空行+306 名单行
+  (`    %-20s %s`)+空行+`Type 'help <command>' for more information
+  on a command.`+`Type 'help -cells' for a list of all cell types.`+
+  空行+difftest epilogue 切点。**-H 全量 306 描述逐字落档**=
+  crates/ry-cli/src/help_desc.rs(scripts/gen_help_desc.sh 机械生成,
+  录制序=std::map 字典序禁运行时排序;clean/help/log/opt_balance_tree
+  四名描述在档:`remove unused cells and wires`/`display help
+  messages`/`print text and log files`/`$and/$or/$xor/$add/$mul
+  cascades to trees`)。
+* **P7 深化(opt_balance_tree 行为面,carryadd+multiplier-pb 两跑探针)**:
+  对拍面=剥 `End of script. Logfile hash:` 与 `Time spent:` 两行后逐行
+  diff(raw cmp 禁用,P10⑦ epilogue 切口径);①carryadd
+  `read_rtlil; opt_balance_tree` 两跑 **byte-equal**,全形=`2.
+  Executing OPT_BALANCE_TREE pass (cell cascades to trees).`→`Warning:
+  Feature 'open_balance_tree' is experimental.`(header 后)→五型
+  Converted 固定序 `Converted 2 $and cells into trees.`/`0 $or`/
+  `14 $xor`/`0 $add`/`0 $mul`→空行→`-- Running command \`clean
+  -purge' --`(内部横幅不占编号)→`<suppressed ~8 debug messages>`→
+  `Removed 7 unused cells and 31 unused wires.`→空行→`Warnings: 1
+  unique messages, 1 total`+`Warnings: 1 experimental features used
+  (not excluded with -x).`,stderr 0B rc=0;②multiplier-**pb** 输入+
+  `proc` 前置两跑 byte-equal,Converted 全 0 五行+`Removed 0 unused
+  cells and 15 unused wires.`(0/15 唯一复现形,P7 五形矩阵亲证)+
+  **无 suppressed 行**;③bare multiplier-pb(无 proc)→ `Removed 0
+  unused cells and 1 unused wires.`(0/1 形)。**suppressed 行=计数>0
+  才打**(carryadd 8 条/multiplier 0 条,CleanPass::execute 的
+  log_suppressed()+stats.log() 序=opt_clean.cc:156-157,行序=
+  suppressed 先于 Removed)。
+* **P8 深化(源码定点,clone 行号)**:opt_balance_tree.cc:359-414
+  execute=log_header→log_experimental("open_balance_tree") 顺序;五型
+  默认集 `{ID($and),ID($or),ID($xor),ID($add),ID($mul)}` 字面序=
+  Converted 行序;`-arith`={add,mul}/`-logic`={and,or,xor} 置换;
+  `design->selected_modules()` 逐模组 worker;尾 `Yosys::run_pass(
+  "clean -purge")`。worker(:41-335):is_right_type=Y_WIDTH>=自然宽
+  (add=max+1/mul=和/逻辑=max);chain_driver 查 sig_to_driver+input
+  port 守卫;BFS pool 层进(sinks 收集含「非 right_type 载荷→插起始
+  cell」特例);TopoSort=`IdString::compare_ptr_by_name<Cell>`(**String
+  字典序比较器**,本 pass 由 yosys 自指定串序=10.9-r intern 序律的
+  显式例外,D-ys8b 后第二例);sources=dict<SigSpec,int> **hashlib
+  插入序**(hashlib.h entries vector append-only 正向迭代=插入序、
+  erase=swap-and-pop,本轮源码重读仲裁——reach 多重性按序展开);
+  combine 建名 NEW_ID;尾接 connect(宽度截断+符号扩展段)。
+* **min2 手写 .il 三设计(purge 语义面,D-ys5/RM2-4 两跑纪律)**:
+  三模组单输入(min2a=public wire 有 driver 无 reader `\drv_no_read`
+  +有 driver 有 reader `\used`;min2b=public wire 无 driver 无 reader
+  `\orphan`;min2c=private wire `$priv_no_read` 有 driver 无 reader),
+  两跑(RTLIL write 面+stdout 面)均确定性 equal:clean → `Removed 2
+  unused cells and 3 unused wires.`(drv_no_read **保留**=非 purge
+  public 有 driver;删 orphan+$priv_no_read+第 3 条=used 的 alias 面);
+  clean -purge → `Removed 2 unused cells and 4 unused wires.`(差异恰
+  1=drv_no_read 删;**purge 额外把 used 折叠进 y 直连**=0.70+179 新
+  wires.cc:418 purge 分支「public 名仅 purge 模式或完全未用才删」+
+  update_assign_map 代表元选择,port wire 胜出——0.70 clone 无此重构,
+  行为以二进制为准);两形 golden=slice-3 录制锚。
+* **P9 复证(registry 实数,本轮 python 全表枚举)**:stub 275(Y0 266/
+  Y2 7/Y3 2)+实现层 31=306;五单元现状行=clean=Y0(registry.rs:52)/
+  help=Y0(:116)/log=Y0(:135)/opt_balance_tree=Y2(:164)/optbarriers=
+  Y2(:170)。收口目标=271(Y0 263/Y2 6/Y3 2)+35。
+* **cli_contract 先钉(R2)**:11 fixture 以现行 stub 形绿(clean 三形/
+  log 七旗标+未知 token/help 六子形/opt_balance_tree 三形),各 slice
+  翻转同轮更新断言(铁则 3)。
+
+### 對賬收口(M3 續弧批量收編 2026-11-01 收口輪)
+
+* **registry 實數(收口後 python 全表枚舉)**:stub **271**(Y0 263/Y2 6/
+  Y3 2)+實現層 **35**=306 閉環;四行刪除同輪(clean slice-3/log+help
+  slice-2/opt_balance_tree slice-4),負向閘=`grep -n '"clean"\|"log"\|
+  "help"\|"opt_balance_tree"' crates/ry-cli/src/registry.rs` exit=1。
+  五處口徑同步=REGISTRY ry-cli 行/registry.rs 頭注/本節/ry-cli main.rs
+  頭注/RYOSYS-MVP §10。
+* **SUMMARY 新基線實錄定盤**:`SUMMARY ys=461/471`(450+anchors 遷入
+  11 例;known-gap 10 例名單逐字維持);LIVE 腿=456/456 不變(anchors
+  手寫 .il=record() 不再生面)。anchors 15 例在庫(M2 四例+本弧 11:
+  log-bare/log-quoted/log-unknown-token/min2-clean/min2-purge/proc-clean/
+  proc-optclean/semicolon-end-to-end/clean-unknown-option/obt-carryadd/
+  obt-multiplier-proc)。
+* **本輪真發現兩筆(禁靜默條款如實入檔)**:①0.70+179 新形 cells dbg
+  **verbose 門控**(cells_temp.cc:44-61/cells_all.cc:313-315/inits.cc:
+  110-113 三處 `if (verbose)`;clean 形 verbose=false=零計數——min2 錨
+  首錄抓出我方無條件 dbg_inc 差 2 行;carryadd 的 `<suppressed ~8>`=
+  opt_balance_tree 建樹 log_debug 非 clean 面);②hashlib **逆插入序**
+  本 pass 五消費點(sources/sinks/BFS 載荷/consumed/sig_to_sink pool;
+  hashlib.h:877 `begin()=entries.size()-1`=range-for 逆插入——
+  AGENTS 10.9-r 契約,手推 y[1] 鏈實證:插入序 [c0,a1,b1] 逆迭代=
+  [b1,a1,c0]→leaf=(b1,a1)+combine=(leaf,c0) 與 oracle $73/$75 逐字
+  吻合;另參數面=A_SIGNED 拷參照原 Const+WIDTH=32 位 autoint)。
+* **工具面**:本次比對首輪 python 腳本因 RTLIL dump connect 行無分號
+  而 regex 零命中=假綠(16 cell 全報同),以修正 regex 重比抓出差異
+  ——比對腳本必須對「零命中=全同」形保持敵意(索引切片刪除同律,
+  AGENTS 10.6)。
+
+### M3 續弧·批量收編第二批普查(2026-11-02 規劃輪;RYOSYS-MVP §11.0 Q1..Q8 實錄轉檔+實作輪 slice-1 親跑複核)
+
+* **版本口徑**:行為仲裁=oracle 二進制 **0.70+179 (git sha1 9534a7f4d)**
+  (本輪 help banner 親證);源碼定位=clone v0.70 28ba3cb(路徑=§11.0
+  勘正形:passes/opt/dff/simple.cc、passes/sat/async2sync.cc、passes/
+  techmap/{dffunmap,pmuxtree}.cc、passes/cmds/{setattr,torder,edgetypes}.cc)。
+* **Q1 六命令 help 契約逐字轉檔**(本輪 `yosys -p "help <名>"` 親跑;
+  常量=help_desc.rs HELP_{ASYNC2SYNC,PMUXTREE,DFFUNMAP,SETATTR,TORDER,
+  EDGETYPES},機械轉錄生成器=scripts/gen_help_batch2.sh,禁手寫):
+  * `async2sync [options] [selection]`:唯一旗標 `-nolower`("Do not
+    automatically run 'chformal -lower' to lower $check cells.");header
+    形=`Executing ASYNC2SYNC pass.`(無括注)。
+  * `pmuxtree [selection]`:裸形零旗標;header=`Executing PMUXTREE pass.`。
+  * `dffunmap [options] [selection]`:`-ce-only`/`-srst-only` 兩旗標;
+    header=`Executing DFFUNMAP pass (unmap clock enable and synchronous
+    reset from FFs).`。
+  * `setattr [ -mod ] [ -set name value | -unset name ]... [selection]`
+    +"String values must be passed in double quotes (\")";**執行體零
+    header 不占編號**(sa1.log 親證:opt 3.x 後直跳 4. CHECK)。
+  * `torder [options] [selection]`:`-stop <cell_type> <cell_port>`/
+    `-noautostop`;header=`Executing TORDER pass (print cells in
+    topological order).`。
+  * `edgetypes [options] [selection]`:usage 裸形;描述="4-tuple of
+    source and sink cell type and port name";無 header 不占編號。
+* **兩跑確定性探針(七單元,對拍面=剝 `End of script. Logfile hash:` 與
+  `Time spent:` 行後逐行 diff;raw cmp 禁用=§10.1-6 同律)**:
+  * async2sync(mem_arst-pbo 輸入,`read_rtlil case.il; proc;
+    async2sync; check; stat`):兩跑 rc=0/0,stdout/stderr diff 空。
+  * pmuxtree(fsm-pbo 輸入,`read_rtlil case.il; proc; opt; pmuxtree;
+    check; stat; write_rtlil -readable p_out.il`):兩跑 rc=0/0 一致。
+  * dffunmap(fsm-pbo 輸入,`…; opt; dffunmap; check; stat;
+    write_rtlil -readable d_out.il`):兩跑 rc=0/0 一致;FF 效果面=
+    `grep -o 'cell \$[a-z]*ff[a-z]* '` 唯一=`6 cell $dff`(=$adffe/
+    $sdffe 族全變 $dff)。
+  * setattr(attrib01_module-pbo 輸入):`-set src_sync 1` rc=0、
+    write_rtlil `attribute \src_sync` **12 處**;decode 錯誤形
+    `-set src_sync true` rc=1+stderr 逐字 `ERROR: Can't decode value
+    'true'!`。
+  * torder(obt-carryadd 輸入):兩跑一致;40 行 `  cell <名>`+
+    `module carryadd` 行形。
+  * edgetypes(carryadd 輸入):兩跑一致;8 行純排序行(`$and.Y $and.B`
+    等)直接隨 `Input filename: case.il` 後、無 spacer 無 header。
+  * sincos/i2c(oracle 側兩跑):一致(我方對拍復核=現狀 known-gap
+    差異形在案:兩例 suppressed 計數差+make_patterns_logic 建名差/
+    opt 迴圈終止差,屬 slice-2 path_else 修補面)。
+* **async2sync Replacing 22 行序親錄**(mem_arst 輸入,序面=selected_
+  cells 值拷貝=cells_ dict 正序=逆插入序;golden 實錄釘禁手寫):
+  $procdff$309/304/329/299/294/319/289/334/284/279/324/274/339/269/264/
+  259/344/254/249/314/244/349(非編號序;log 形 4 種,§11.0 Q4)。
+* **$check/$print 語料普查(check 普查,本輪 grep corpus/ys-e2e 461 例
+  case.il)**:`cell $check` **零命中**(全域);`cell $print` 僅
+  string_format 族 6 檔(-pbo/-pb/-hier/-rj/-sm/主層)各 2 顆;六命令
+  錨輸入面(mem_arst-pbo/fsm-pbo/attrib01_module-pbo/obt-carryadd/
+  sincos-pbo/i2c_master_tests-pbo case.il)全零 $check/$print=chformal
+  -lower 依賴面語料零觸發(RM11-3 清償,async2sync 錨輸入不改選)。
+* **$pmux 語料普查(P-free 層 case.il=proc 後形;15 例)**:attrib09_
+  case/case_large/constmuldivmod/fiedler-cooley/fsm(3)/loop_prefix_
+  case/mem2reg_bounds_tern/mem_arst/module_scope_case/omsp_dbg_uart/
+  operators/sincos(6)/subbytes/usb_phy_tests(2)/values;既有語料
+  script 均不含 pmuxtree=既有 golden 零擾動(pmuxtree 錨 script 顯式
+  調用);fsm 前置面親證=`proc; opt` 後 $pmux 3+既有 $mux 7,pmuxtree
+  後 $pmux 0+$mux 14(新 7 recursive_mux_generator+2 reduce_or+2 not
+  +1 or=12 顆建名 cell,建名鏈親錄=`$auto$pmuxtree.cc:65:recursive_
+  mux_generator$N`(7)/`$auto$pmuxtree.cc:100:execute$N`(2,reduce_or)
+  /`$auto$pmuxtree.cc:101:execute$N`(2,not)/`$auto$pmuxtree.cc:35:or_
+  generator$N`(1,or))。
+* **setattr -unset/-mod/引號形三探针**(attrib01_module-pbo 輸入):
+  * `-unset whitebox`:rc=0 靜默(該案例無此屬性=不報錯);-unset 面
+    錨改用案例現存屬性定盤(attrib01 現存=src/module_not_derived/top)。
+  * `-mod -set top_level 1`:rc=0,write_rtlil 兩模組各 1 行
+    `attribute \top_level 1`(module 級面)。
+  * 引號形 `-set src_name "hello world"`:rc=0,字符串屬性形
+    `attribute \src_name "hello world"`(12 處)。
+* **錯誤路徑 oracle 實錄形(翻轉 slice 的 golden 依據;親跑)**:
+  * 未知旗標=cmd_error 全形:rc=1,stderr 三行(`ERROR: Command syntax
+    error: Unknown option or option in arguments.`+`> <串>`+`> 空格^`,
+    ^ 列=Σ_{i<argidx}(len+1));stdout=空行+header(**async2sync/
+    pmuxtree/torder/dffunmap 有 header 先印**;setattr/edgetypes 無
+    header)+`Syntax error in command `<串>':`+help 全文。
+  * dffunmap 雙投互斥=rc=1,stderr 逐字 `ERROR: Options -ce-only and
+    -srst-only are mutually exclusive!`(log_cmd_error 面,無 Syntax
+    塊)。
+  * selection 形=oracle 接受 rc=0(async2sync MyMem/* 親證)=D-ys11
+    行為面歧;fixture 钉我方 cmd_error 硬錯形(禁實錄 golden)。
+  * 空設計面:edgetypes 空跑 rc=0 零輸出;torder 空跑 rc=0 印 header
+    即止;async2sync/dffunmap 空跑 rc=0 印 header 即止。
+* **torder -stop 真實行為親證**(carryadd 輸入 `torder -stop $and Y`):
+  rc=0、cell 行集變(3 行缺)=真實功能=行為面歧(§11.2 邊界=Y2)。
+* **錨管線規劃(批量收編第二批 anchors;每例=case.il 自含複製+script.txt
+  +expected 四件套,oracle 實錄管線錄製)**:async2sync×mem_arst-pbo、
+  pmuxtree×fsm-pbo、dffunmap×fsm-pbo、setattr×attrib01_module-pbo
+  (-set 形+decode 錯誤形;-unset/-mod/引號形按本節探针定盤)、
+  torder×carryadd、edgetypes×carryadd+multibit 手寫小錨(§11.4
+  slice-7);錄製入 corpus/ys-batch2-anchors/起草,收口遷 ys-e2e。
+
+### slice-2 opt_dff path_else 修补+分类实录(2026-11-02 實作輪)
+
+* **三點手術落地**(opt_dff.rs;oracle simple.cc:149/:156/:168 逐點對齊):
+  循環外 `let mut path_else = path.clone();`+循環內
+  `path_else.push((s_bit, false))` 累加+**A 臂傳累加版**(:1321
+  `q, path_else,`)+`path_else_dummy` 刪除(rg 零命中)。cargo build
+  零警告;全倉 cargo test 綠;**461 既有綠例零擾動**
+  (`SUMMARY ys=461/471` 維持)。
+* **翻綠未達=RM11-1 分類軌**:sincos-pbo/i2c_master_tests-pbo 修補後
+  仍 FAIL(i2c stdout 已翻綠=內容面清償,殘差 rtlil/json 一 cell 向量
+  序;sincos 殘差 1 行+編號級聯);regress S4 **不翻**(461/471+10 例
+  名單維持,禁預翻條款)。
+* **§8.8-2 分類(二進制實跑仲裁)**:殘差=內序面非內容面。探针
+  probe-pattern-order(corpus/ys-batch2-anchors/,oracle 實錄 o.il 在
+  檔):兩 pattern 同碼路徑異序——{sa:1,sb:0} 印 `\A {\sa \sb}`
+  (正插形,intern [sb,sa] 證偽)、{sa:0,sc:0} 印 `\A {\sc \sa}`
+  (逆插形,正插 [sa,sc] 證偽);sincos {procmux$107_CMP,start}=autoidx
+  先於 parser(raw index 形,又與前兩點不符)。**四候選律無一通殺⇒
+  pattern_t 內迭代序=hash 桶序(內部態)**,與外層 patterns_t pool hash
+  迭代序(D-ys8c 面1)同族——**internal-order=登記維持禁硬磕**,
+  我方 Vec DFS 確定序維持,兩例維持 known-gap。
+
+### 對賬收口(批量收編第二批 2026-11-02 收口輪)
+
+* **registry 實數(收口後 python 全表枚舉)**:stub **265**(Y0 257/Y2 6/
+  Y3 2)+實現層 **41**=306 閉環;六行刪除同輪(async2sync slice-3/pmuxtree
+  slice-4/dffunmap slice-5/setattr slice-6/torder+edgetypes slice-7),
+  負向閘=`grep -n '"async2sync"\|"pmuxtree"\|"dffunmap"\|"setattr"\|
+  "torder"\|"edgetypes"' crates/ry-cli/src/registry.rs` exit=1。五處口徑
+  同步=REGISTRY ry-cli 行/registry.rs 頭注/本節/ry-cli main.rs 頭注/
+  RYOSYS-MVP §11。
+* **SUMMARY 新基線實錄定盤**:`SUMMARY ys=469/479`(461+批量收編第二批
+  anchors 9 例遷入,其中 8 例入 compare 面;**setattr-decode-err 錨=
+  expected.rtlil 面外**(腳本於 setattr 即中止,write_rtlil 未達=
+  compare() 案件判定跳過,decode 契約由 cli_contract fixture 逐字執法
+  `ERROR: Can't decode value 'true'!`+rc=1+stdout 橫幅無 spacer 形));
+  known-gap 10 例名單逐字維持=constmuldivmod-pbo fsm-pbo i2c_master_
+  tests-pbo loops-pbo mem_arst-pbo memory-pbo sincos-pbo subbytes-pbo
+  usb_phy_tests-pbo values-pbo;LIVE 腿=456/456 不變(anchors 手寫 .il
+  =record() 不再生面)。
+* **錨面改動實錄(規劃輪假設的一處修正,禁硬磕原則)**:pmuxtree/dffunmap
+  錨的 `proc; opt` 前置鏈繼承 fsm-pbo 的 **D-ys8c 面2**分歧(opt_pmux New
+  ctrl vector 拼接序,cascade 到 wire 命名)=該鏈形不可 byte-exact 收斂
+  ⇒ 錨腳本改 `proc;` 直跑(-pb 層=綠面,pmuxtree-fsm/dffunmap-fsm 兩端
+  收斂親證 byte-exact;oracle 探針與我方雙跑在檔)。$pmux 效果面改以
+  proc 鏈形定盤:pmuxtree 後 $pmux 0+29 $mux(17 處 recursive_mux_
+  generator 建名形);dffunmap 後 FF 全 $dff(6 顆)。
+* **slice-2 清償分類再錄**(RM11-1 分類軌,詳見前節):sincos/i2c 內容
+  面=opt_dff path_else 三點手術清償(i2c stdout 翻綠),殘差=D-ys8c 面1
+  同族 hash 內部態(**內層 pattern_t 迭代序=新子面**,探针=
+  corpus/ys-batch2-anchors/probe-pattern-order/ 未遷,四律無一通殺=
+  hash 桶序),兩例維持 known-gap,regress S4 不翻 461→463(規劃輪
+  假設數被實跑證偽,以實錄 469/479 定盤)。
+* **六命令新語料契約形(全部錨+fixture 雙承載)**:未知旗標=cmd_error
+  全形(stderr 三行+stdout header[有 header 面] +Syntax 塊+help 全文);
+  selection 裸字=cmd_error(D-ys11);已知旗標 Y2 文案(async2sync
+  -nolower/dffunmap -ce-only/-srst-only[雙投=Y2 內]/torder -stop
+  [-noautostop);setattr decode 錯誤形=stderr 逐字;bare 形空設計面:
+  async2sync/pmuxtree/dffunmap/torder=header 即止 rc=0,setattr/
+  edgetypes=零 header 橫幅+spacer rc=0。

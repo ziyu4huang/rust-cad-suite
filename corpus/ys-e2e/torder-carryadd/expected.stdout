@@ -1,0 +1,73 @@
+-- Running command `read_rtlil case.il; torder; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing TORDER pass (print cells in topological order).
+module carryadd
+  cell $../../../corpus-external/yosys-simple/carryadd.v:14$and$1
+  cell $../../../corpus-external/yosys-simple/carryadd.v:14$xor$2
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$10
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$3
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$4
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$5
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$6
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$11
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$15
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$9
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$12
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$16
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$17
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$21
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$18
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$22
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$23
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$27
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$24
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$28
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$29
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$33
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$30
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$34
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$and$35
+  cell $../../../corpus-external/yosys-simple/carryadd.v:16$or$36
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$13
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$14
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$19
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$20
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$25
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$26
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$31
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$32
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$37
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$38
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$43
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$44
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$7
+  cell $../../../corpus-external/yosys-simple/carryadd.v:17$xor$8
+
+3. Executing CHECK pass (checking for obvious problems).
+Checking module carryadd...
+Found and reported 0 problems.
+
+4. Printing statistics.
+
+=== carryadd ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       59 wires
+       80 wire bits
+       34 public wires
+       55 public wire bits
+        3 ports
+       24 port bits
+       40 cells
+       13   $and
+       12   $or
+       15   $xor
+
+5. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+6. Executing JSON backend.

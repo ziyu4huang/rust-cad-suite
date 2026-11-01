@@ -1,0 +1,12 @@
+-- Running command `read_rtlil case.il; opt_clean; write_rtlil -readable expected.rtlil' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing OPT_CLEAN pass (remove unused cells and wires).
+Warning: Ignoring module mem2reg_test6 because it contains processes (run 'proc' command first).
+
+3. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+Warnings: 1 unique messages, 1 total

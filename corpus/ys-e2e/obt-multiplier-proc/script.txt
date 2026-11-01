@@ -1,0 +1,1 @@
+read_rtlil case.il; proc; opt_balance_tree; write_rtlil -readable expected.rtlil; write_json expected.json

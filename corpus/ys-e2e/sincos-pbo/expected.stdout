@@ -1,0 +1,266 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed 1 dead cases from process $../../../corpus-external/yosys-simple/sincos.v:45$proc$1 in module d.
+Marked 6 switch rules as full_case in process $../../../corpus-external/yosys-simple/sincos.v:45$proc$1 in module d.
+Removed a total of 1 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 8 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \reset in `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 1 switch.
+<suppressed ~4 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+     1/30: $4\DESIGN_PROCESSOR.state[0:0]
+     2/30: $4\DESIGN_PROCESSOR.i[4:0]
+     3/30: $4\DESIGN_PROCESSOR.z[19:0]
+     4/30: $4\DESIGN_PROCESSOR.y[19:0]
+     5/30: $4\DESIGN_PROCESSOR.x[19:0]
+     6/30: $3\DESIGN_PROCESSOR.dz[19:0]
+     7/30: $3\DESIGN_PROCESSOR.state[0:0]
+     8/30: $3\DESIGN_PROCESSOR.i[4:0]
+     9/30: $3\DESIGN_PROCESSOR.z[19:0]
+    10/30: $3\DESIGN_PROCESSOR.y[19:0]
+    11/30: $3\DESIGN_PROCESSOR.x[19:0]
+    12/30: $2\DESIGN_PROCESSOR.z[19:0]
+    13/30: $2\DESIGN_PROCESSOR.x[19:0]
+    14/30: $2\DESIGN_PROCESSOR.y[19:0]
+    15/30: $2\DESIGN_PROCESSOR.state[0:0]
+    16/30: $2\DESIGN_PROCESSOR.i[4:0]
+    17/30: $2\DESIGN_PROCESSOR.dy[19:0]
+    18/30: $2\DESIGN_PROCESSOR.dx[19:0]
+    19/30: $2\DESIGN_PROCESSOR.dz[19:0]
+    20/30: $1\DESIGN_PROCESSOR.z[19:0]
+    21/30: $1\DESIGN_PROCESSOR.x[19:0]
+    22/30: $1\DESIGN_PROCESSOR.y[19:0]
+    23/30: $1\DESIGN_PROCESSOR.dy[19:0]
+    24/30: $1\DESIGN_PROCESSOR.dx[19:0]
+    25/30: $1\DESIGN_PROCESSOR.dz[19:0]
+    26/30: $1\DESIGN_PROCESSOR.state[0:0]
+    27/30: $1\DESIGN_PROCESSOR.i[4:0]
+    28/30: $0\done[0:0]
+    29/30: $0\sin_z0[19:0]
+    30/30: $0\cos_z0[19:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\d.\cos_z0' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$120' with positive edge clock and positive level reset.
+Creating register for signal `\d.\sin_z0' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$123' with positive edge clock and positive level reset.
+Creating register for signal `\d.\done' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$126' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.i' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$129' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.state' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$132' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.dz' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $dff cell `$procdff$137' with positive edge clock.
+Creating register for signal `\d.\DESIGN_PROCESSOR.dx' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $dff cell `$procdff$142' with positive edge clock.
+Creating register for signal `\d.\DESIGN_PROCESSOR.dy' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $dff cell `$procdff$147' with positive edge clock.
+Creating register for signal `\d.\DESIGN_PROCESSOR.y' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$150' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.x' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$153' with positive edge clock and positive level reset.
+Creating register for signal `\d.\DESIGN_PROCESSOR.z' using process `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+  created $adff cell `$procdff$156' with positive edge clock and positive level reset.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 5 empty switches in `\d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+Removing empty process `d.$../../../corpus-external/yosys-simple/sincos.v:45$proc$1'.
+Cleaned up 5 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module d.
+<suppressed ~30 debug messages>
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module d.
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\d'.
+Computing hashes of 77 cells of `\d'.
+Finding duplicate cells in `\d'.
+Computing hashes of 64 cells of `\d'.
+Finding duplicate cells in `\d'.
+<suppressed ~39 debug messages>
+Removed a total of 13 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \d..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+      Replacing known input bits on port A of cell $procmux$18: \DESIGN_PROCESSOR.state -> 1'1
+      Replacing known input bits on port A of cell $procmux$47: \DESIGN_PROCESSOR.state -> 1'0
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$73.
+    dead port 1/2 on $mux $procmux$67.
+    dead port 1/2 on $mux $procmux$61.
+    dead port 1/2 on $mux $procmux$55.
+    dead port 1/2 on $mux $procmux$49.
+    dead port 2/2 on $mux $procmux$40.
+    dead port 2/2 on $mux $procmux$35.
+    dead port 2/2 on $mux $procmux$30.
+    dead port 2/2 on $mux $procmux$25.
+    dead port 2/2 on $mux $procmux$20.
+Removed 10 multiplexer ports.
+<suppressed ~61 debug messages>
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \d.
+Performed a total of 0 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\d'.
+Computing hashes of 54 cells of `\d'.
+Finding duplicate cells in `\d'.
+Removed a total of 0 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$147 ($dff) from module d (D = $procmux$90_Y, Q = \DESIGN_PROCESSOR.dy).
+Adding EN signal on $procdff$120 ($adff) from module d (D = $4\DESIGN_PROCESSOR.x[19:0], Q = \cos_z0).
+Adding EN signal on $procdff$123 ($adff) from module d (D = $4\DESIGN_PROCESSOR.y[19:0], Q = \sin_z0).
+Adding EN signal on $procdff$153 ($adff) from module d (D = $procmux$78_Y, Q = \DESIGN_PROCESSOR.x).
+Adding EN signal on $procdff$126 ($adff) from module d (D = $procmux$102_Y, Q = \done).
+Adding EN signal on $procdff$156 ($adff) from module d (D = $procmux$75_Y, Q = \DESIGN_PROCESSOR.z).
+Adding EN signal on $procdff$142 ($dff) from module d (D = $procmux$93_Y, Q = \DESIGN_PROCESSOR.dx).
+Adding EN signal on $procdff$129 ($adff) from module d (D = $procmux$87_Y, Q = \DESIGN_PROCESSOR.i).
+Adding EN signal on $procdff$150 ($adff) from module d (D = $procmux$81_Y, Q = \DESIGN_PROCESSOR.y).
+Adding EN signal on $procdff$137 ($dff) from module d (D = $procmux$96_Y, Q = \DESIGN_PROCESSOR.dz).
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \d..
+Removed 22 unused cells and 125 unused wires.
+<suppressed ~26 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module d.
+<suppressed ~2 debug messages>
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \d..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~28 debug messages>
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \d.
+    New input vector for $reduce_and cell $auto$simple.cc:217:make_patterns_logic$181: { $auto$simple.cc:199:make_patterns_logic$178 $auto$simple.cc:199:make_patterns_logic$174 }
+  Optimizing cells in module \d.
+Performed a total of 1 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\d'.
+Computing hashes of 52 cells of `\d'.
+Finding duplicate cells in `\d'.
+Computing hashes of 47 cells of `\d'.
+Finding duplicate cells in `\d'.
+<suppressed ~15 debug messages>
+Removed a total of 5 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \d..
+Removed 0 unused cells and 6 unused wires.
+<suppressed ~1 debug messages>
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module d.
+
+3.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \d..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~28 debug messages>
+
+3.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \d.
+Performed a total of 0 changes.
+
+3.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\d'.
+Computing hashes of 47 cells of `\d'.
+Finding duplicate cells in `\d'.
+Removed a total of 0 cells.
+
+3.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \d..
+
+3.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module d.
+
+3.23. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module d...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== d ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       50 wires
+      572 wire bits
+       12 public wires
+      130 public wire bits
+        7 ports
+       64 port bits
+        1 memories
+      640 memory bits
+       47 cells
+        4   $add
+        1   $adff
+        7   $adffe
+        1   $eq
+        1   $ge
+        1   $meminit
+        1   $memrd_v2
+       13   $mux
+        3   $ne
+        1   $not
+        6   $pmux
+        3   $reduce_and
+        2   $sshr
+        3   $sub
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.

@@ -1,0 +1,1 @@
+read_rtlil case.il; clean -foo

@@ -1,0 +1,304 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 3 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\dynslice.$../../../corpus-external/yosys-simple/dynslice.v:8$proc$3'.
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\dynslice.\dout' using process `\dynslice.$../../../corpus-external/yosys-simple/dynslice.v:8$proc$3'.
+  created $dff cell `$procdff$15' with positive edge clock.
+Creating register for signal `\dynslice.$bitselwrite$pos$../../../corpus-external/yosys-simple/dynslice.v:10$1' using process `\dynslice.$../../../corpus-external/yosys-simple/dynslice.v:8$proc$3'.
+  created $dff cell `$procdff$16' with positive edge clock.
+Creating register for signal `\dynslice.$lookahead\dout$2' using process `\dynslice.$../../../corpus-external/yosys-simple/dynslice.v:8$proc$3'.
+  created $dff cell `$procdff$17' with positive edge clock.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `dynslice.$../../../corpus-external/yosys-simple/dynslice.v:8$proc$3'.
+Cleaned up 0 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module dynslice.
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module dynslice.
+<suppressed ~1 debug messages>
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\dynslice'.
+Computing hashes of 12 cells of `\dynslice'.
+Finding duplicate cells in `\dynslice'.
+Computing hashes of 11 cells of `\dynslice'.
+Finding duplicate cells in `\dynslice'.
+<suppressed ~3 debug messages>
+Removed a total of 1 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \dynslice..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \dynslice.
+Performed a total of 0 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\dynslice'.
+Computing hashes of 11 cells of `\dynslice'.
+Finding duplicate cells in `\dynslice'.
+Removed a total of 0 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+Setting constant 0-bit at position 0 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 1 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 2 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 3 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 4 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 5 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 6 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 7 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 8 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 9 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 10 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 11 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 12 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 13 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 14 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 15 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 16 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 17 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 18 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 19 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 20 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 21 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 22 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 23 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 24 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 25 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 26 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 27 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 28 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 29 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 30 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 31 on $procdff$16 ($dff) from module dynslice.
+Setting constant 0-bit at position 0 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 1 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 2 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 3 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 4 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 5 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 6 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 7 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 8 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 9 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 10 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 11 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 12 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 13 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 14 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 15 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 16 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 17 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 18 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 19 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 20 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 21 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 22 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 23 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 24 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 25 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 26 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 27 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 28 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 29 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 30 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 31 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 32 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 33 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 34 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 35 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 36 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 37 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 38 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 39 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 40 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 41 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 42 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 43 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 44 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 45 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 46 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 47 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 48 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 49 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 50 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 51 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 52 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 53 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 54 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 55 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 56 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 57 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 58 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 59 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 60 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 61 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 62 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 63 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 64 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 65 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 66 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 67 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 68 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 69 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 70 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 71 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 72 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 73 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 74 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 75 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 76 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 77 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 78 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 79 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 80 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 81 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 82 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 83 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 84 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 85 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 86 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 87 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 88 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 89 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 90 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 91 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 92 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 93 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 94 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 95 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 96 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 97 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 98 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 99 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 100 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 101 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 102 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 103 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 104 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 105 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 106 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 107 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 108 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 109 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 110 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 111 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 112 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 113 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 114 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 115 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 116 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 117 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 118 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 119 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 120 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 121 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 122 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 123 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 124 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 125 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 126 on $procdff$17 ($dff) from module dynslice.
+Setting constant 0-bit at position 127 on $procdff$17 ($dff) from module dynslice.
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \dynslice..
+Removed 0 unused cells and 7 unused wires.
+<suppressed ~2 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module dynslice.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \dynslice..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \dynslice.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\dynslice'.
+Computing hashes of 8 cells of `\dynslice'.
+Finding duplicate cells in `\dynslice'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \dynslice..
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module dynslice.
+
+3.16. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module dynslice...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== dynslice ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       12 wires
+      864 wire bits
+        5 public wires
+      159 public wire bits
+        5 ports
+      159 port bits
+        8 cells
+        1   $and
+        1   $dff
+        1   $mul
+        1   $neg
+        1   $not
+        1   $or
+        2   $shift
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.

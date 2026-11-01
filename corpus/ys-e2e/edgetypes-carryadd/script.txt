@@ -1,0 +1,1 @@
+read_rtlil case.il; edgetypes; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json

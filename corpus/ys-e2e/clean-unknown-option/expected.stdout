@@ -1,0 +1,16 @@
+-- Running command `read_rtlil case.il; clean -foo' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+Syntax error in command `clean -foo':
+
+    clean [options] [selection]
+
+This is identical to 'opt_clean', but less verbose.
+
+When commands are separated using the ';;' token, this command will be executed
+between the commands.
+
+When commands are separated using the ';;;' token, this command will be executed
+in -purge mode between the commands.

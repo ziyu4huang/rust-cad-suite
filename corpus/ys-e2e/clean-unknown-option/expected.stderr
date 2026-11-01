@@ -1,0 +1,3 @@
+ERROR: Command syntax error: Unknown option or option in arguments.
+> clean -foo
+>       ^

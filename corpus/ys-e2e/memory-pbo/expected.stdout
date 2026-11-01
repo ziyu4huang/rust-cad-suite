@@ -1,0 +1,293 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $../../../corpus-external/yosys-simple/memory.v:304$proc$430 in module memtest13.
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 15 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~1 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+     1/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:309$424_EN[26:0]$449
+     2/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:308$423_EN[26:0]$448
+     3/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:307$422_EN[26:0]$447
+     4/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:306$421_EN[26:0]$446
+     5/18: $1$mem2bits$\mem$../../../corpus-external/yosys-simple/memory.v:315$429[26:0]$460
+     6/18: $1$mem2bits$\mem$../../../corpus-external/yosys-simple/memory.v:314$428[26:0]$459
+     7/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_EN[26:0]$458
+     8/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_DATA[26:0]$457
+     9/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_ADDR[1:0]$456
+    10/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_EN[26:0]$455
+    11/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_DATA[26:0]$454
+    12/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_ADDR[1:0]$453
+    13/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_EN[26:0]$452
+    14/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_DATA[26:0]$451
+    15/18: $1$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_ADDR[1:0]$450
+    16/18: $0\dout3[26:0]
+    17/18: $0\dout2[3:0]
+    18/18: $0\dout1[3:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\memtest13.\dout1' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$531' with positive edge clock.
+Creating register for signal `\memtest13.\dout2' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$532' with positive edge clock.
+Creating register for signal `\memtest13.\dout3' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$533' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:306$421_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$534' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:307$422_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$535' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:308$423_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$536' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:309$424_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$537' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_ADDR' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$538' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_DATA' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$539' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:311$425_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$540' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_ADDR' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$541' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_DATA' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$542' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:312$426_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$543' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_ADDR' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$544' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_DATA' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$545' with positive edge clock.
+Creating register for signal `\memtest13.$memwr$\mem$../../../corpus-external/yosys-simple/memory.v:313$427_EN' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$546' with positive edge clock.
+Creating register for signal `\memtest13.$mem2bits$\mem$../../../corpus-external/yosys-simple/memory.v:314$428' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$547' with positive edge clock.
+Creating register for signal `\memtest13.$mem2bits$\mem$../../../corpus-external/yosys-simple/memory.v:315$429' using process `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+  created $dff cell `$procdff$548' with positive edge clock.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+Removing empty process `memtest13.$../../../corpus-external/yosys-simple/memory.v:304$proc$430'.
+Cleaned up 1 empty switch.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module memtest13.
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module memtest13.
+<suppressed ~3 debug messages>
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\memtest13'.
+Computing hashes of 58 cells of `\memtest13'.
+Finding duplicate cells in `\memtest13'.
+Computing hashes of 56 cells of `\memtest13'.
+Finding duplicate cells in `\memtest13'.
+Computing hashes of 55 cells of `\memtest13'.
+Finding duplicate cells in `\memtest13'.
+Computing hashes of 54 cells of `\memtest13'.
+Finding duplicate cells in `\memtest13'.
+<suppressed ~12 debug messages>
+Removed a total of 4 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \memtest13..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$493.
+    dead port 2/2 on $mux $procmux$493.
+    dead port 1/2 on $mux $procmux$490.
+    dead port 2/2 on $mux $procmux$490.
+Removed 4 multiplexer ports.
+<suppressed ~32 debug messages>
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \memtest13.
+    Consolidated identical input bits for $mux cell $procmux$514:
+      Old ports: A=27'111111111111111111111111111, B=27'000000000000000000000000000, Y=$procmux$514_Y
+      New ports: A=1'1, B=1'0, Y=$procmux$514_Y [0]
+      New connections: $procmux$514_Y [26:1] = { $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] $procmux$514_Y [0] }
+    Consolidated identical input bits for $mux cell $procmux$505:
+      Old ports: A=27'000000000000000001111000000, B=27'000000000000000000000000000, Y=$procmux$505_Y
+      New ports: A=1'1, B=1'0, Y=$procmux$505_Y [6]
+      New connections: { $procmux$505_Y [26:7] $procmux$505_Y [5:0] } = { 17'00000000000000000 $procmux$505_Y [6] $procmux$505_Y [6] $procmux$505_Y [6] 6'000000 }
+    Consolidated identical input bits for $mux cell $procmux$487:
+      Old ports: A=27'000000000000000000000000000, B=27'111111111111111111111111111, Y=$procmux$487_Y
+      New ports: A=1'0, B=1'1, Y=$procmux$487_Y [0]
+      New connections: $procmux$487_Y [26:1] = { $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] $procmux$487_Y [0] }
+    Consolidated identical input bits for $mux cell $procmux$484:
+      Old ports: A=27'000000000000000000000000000, B=27'111111111111111111111111111, Y=$procmux$484_Y
+      New ports: A=1'0, B=1'1, Y=$procmux$484_Y [0]
+      New connections: $procmux$484_Y [26:1] = { $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] $procmux$484_Y [0] }
+    Consolidated identical input bits for $mux cell $procmux$481:
+      Old ports: A=27'000000000000000000000000000, B=27'111111111111111111111111111, Y=$procmux$481_Y
+      New ports: A=1'0, B=1'1, Y=$procmux$481_Y [0]
+      New connections: $procmux$481_Y [26:1] = { $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] $procmux$481_Y [0] }
+    Consolidated identical input bits for $mux cell $procmux$478:
+      Old ports: A=27'000000000000000000000000000, B=27'111111111111111111111111111, Y=$procmux$478_Y
+      New ports: A=1'0, B=1'1, Y=$procmux$478_Y [0]
+      New connections: $procmux$478_Y [26:1] = { $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] $procmux$478_Y [0] }
+  Optimizing cells in module \memtest13.
+Performed a total of 6 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\memtest13'.
+Computing hashes of 52 cells of `\memtest13'.
+Finding duplicate cells in `\memtest13'.
+Computing hashes of 48 cells of `\memtest13'.
+Finding duplicate cells in `\memtest13'.
+Computing hashes of 45 cells of `\memtest13'.
+Finding duplicate cells in `\memtest13'.
+<suppressed ~21 debug messages>
+Removed a total of 7 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$531 ($dff) from module memtest13 (D = $../../../corpus-external/yosys-simple/memory.v:314$memrd$469$\mem_DATA [7:4], Q = \dout1).
+Adding EN signal on $procdff$532 ($dff) from module memtest13 (D = $../../../corpus-external/yosys-simple/memory.v:315$shiftx$475_Y, Q = \dout2).
+Adding EN signal on $procdff$533 ($dff) from module memtest13 (D = $../../../corpus-external/yosys-simple/memory.v:316$memrd$476$\mem_DATA, Q = \dout3).
+Setting constant 0-bit at position 0 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 1 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 2 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 3 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 4 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 5 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 10 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 11 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 12 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 13 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 14 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 15 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 16 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 17 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 18 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 19 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 20 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 21 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 22 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 23 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 24 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 25 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 26 on $procdff$543 ($dff) from module memtest13.
+Setting constant 0-bit at position 0 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 1 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 2 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 3 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 4 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 5 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 6 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 7 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 8 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 9 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 10 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 11 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 12 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 13 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 14 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 15 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 16 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 17 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 18 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 19 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 20 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 21 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 22 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 23 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 24 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 25 on $procdff$548 ($dff) from module memtest13.
+Setting constant 0-bit at position 26 on $procdff$548 ($dff) from module memtest13.
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \memtest13..
+Removed 13 unused cells and 80 unused wires.
+<suppressed ~16 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module memtest13.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \memtest13..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~18 debug messages>
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \memtest13.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\memtest13'.
+Computing hashes of 29 cells of `\memtest13'.
+Finding duplicate cells in `\memtest13'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \memtest13..
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module memtest13.
+
+3.16. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module memtest13...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== memtest13 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       35 wires
+      527 wire bits
+       16 public wires
+       92 public wire bits
+       16 ports
+       92 port bits
+        1 memories
+      108 memory bits
+       29 cells
+        2   $add
+        3   $dffe
+        3   $memrd
+        7   $memwr_v2
+        9   $mux
+        1   $shiftx
+        2   $shl
+        2   $sub
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.

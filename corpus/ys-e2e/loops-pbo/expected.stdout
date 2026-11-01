@@ -1,0 +1,234 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 5 switch rules as full_case in process $../../../corpus-external/yosys-simple/loops.v:31$proc$1 in module aes.
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 9 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~5 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+     1/34: $4\next_addroundkey_round[3:0]
+     2/34: $4\next_addroundkey_ready_o[0:0]
+     3/34: $4\next_addroundkey_data_reg[3:0]
+     4/34: $4\round_data_var[3:0]
+     5/34: $4\round_key_var[3:0]
+     6/34: $4\data_var[3:0]
+     7/34: $3\keysched_round_i[3:0]
+     8/34: $3\keysched_start_i[0:0]
+     9/34: $4\keysched_last_key_i[3:0]
+    10/34: $3\next_addroundkey_round[3:0]
+    11/34: $3\round_key_var[3:0]
+    12/34: $3\data_var[3:0]
+    13/34: $3\next_addroundkey_ready_o[0:0]
+    14/34: $3\round_data_var[3:0]
+    15/34: $3\next_addroundkey_data_reg[3:0]
+    16/34: $2\next_addroundkey_round[3:0]
+    17/34: $2\keysched_round_i[3:0]
+    18/34: $2\keysched_start_i[0:0]
+    19/34: $3\keysched_last_key_i[3:0]
+    20/34: $2\round_key_var[3:0]
+    21/34: $2\data_var[3:0]
+    22/34: $2\next_addroundkey_ready_o[0:0]
+    23/34: $2\round_data_var[3:0]
+    24/34: $2\next_addroundkey_data_reg[3:0]
+    25/34: $1\next_addroundkey_ready_o[0:0]
+    26/34: $1\next_addroundkey_data_reg[3:0]
+    27/34: $1\round_data_var[3:0]
+    28/34: $1\round_key_var[3:0]
+    29/34: $1\data_var[3:0]
+    30/34: $1\keysched_start_i[0:0]
+    31/34: $1\next_addroundkey_round[3:0]
+    32/34: $1\keysched_round_i[3:0]
+    33/34: $2\keysched_last_key_i[3:0]
+    34/34: $1\keysched_last_key_i[3:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\aes.\keysched_last_key_i' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\keysched_round_i' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\next_addroundkey_data_reg' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\next_addroundkey_round' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\round_data_var' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\keysched_start_i' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+No latch inferred for signal `\aes.\next_addroundkey_ready_o' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+Warning: Latch inferred for signal `\aes.\data_var' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1': $auto$proc_dlatch.cc:559:proc_dlatch$308
+Warning: Latch inferred for signal `\aes.\round_key_var' from process `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1': $auto$proc_dlatch.cc:559:proc_dlatch$311
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 5 empty switches in `\aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+Removing empty process `aes.$../../../corpus-external/yosys-simple/loops.v:31$proc$1'.
+Cleaned up 5 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module aes.
+<suppressed ~41 debug messages>
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module aes.
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\aes'.
+Computing hashes of 88 cells of `\aes'.
+Finding duplicate cells in `\aes'.
+Computing hashes of 86 cells of `\aes'.
+Finding duplicate cells in `\aes'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \aes..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$222.
+    dead port 1/2 on $mux $procmux$216.
+    dead port 1/2 on $mux $procmux$210.
+    dead port 1/2 on $mux $procmux$192.
+    dead port 1/2 on $mux $procmux$186.
+    dead port 1/2 on $mux $procmux$180.
+    dead port 1/2 on $mux $procmux$174.
+    dead port 1/2 on $mux $procmux$168.
+    dead port 1/2 on $mux $procmux$165.
+    dead port 1/2 on $mux $procmux$159.
+    dead port 1/2 on $mux $procmux$156.
+    dead port 1/2 on $mux $procmux$150.
+    dead port 1/2 on $mux $procmux$147.
+    dead port 1/2 on $mux $procmux$123.
+    dead port 1/2 on $mux $procmux$120.
+    dead port 1/2 on $mux $procmux$114.
+    dead port 1/2 on $mux $procmux$111.
+    dead port 1/2 on $mux $procmux$105.
+    dead port 1/2 on $mux $procmux$102.
+    dead port 1/2 on $mux $procmux$96.
+    dead port 1/2 on $mux $procmux$93.
+    dead port 1/2 on $mux $procmux$63.
+    dead port 1/2 on $mux $procmux$60.
+    dead port 1/2 on $mux $procmux$57.
+    dead port 1/2 on $mux $procmux$51.
+    dead port 1/2 on $mux $procmux$48.
+    dead port 1/2 on $mux $procmux$45.
+    dead port 1/2 on $mux $procmux$39.
+    dead port 1/2 on $mux $procmux$36.
+    dead port 1/2 on $mux $procmux$33.
+    dead port 1/2 on $mux $procmux$27.
+    dead port 1/2 on $mux $procmux$24.
+    dead port 1/2 on $mux $procmux$21.
+Removed 33 multiplexer ports.
+<suppressed ~71 debug messages>
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \aes.
+Performed a total of 0 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\aes'.
+Computing hashes of 53 cells of `\aes'.
+Finding duplicate cells in `\aes'.
+Computing hashes of 52 cells of `\aes'.
+Finding duplicate cells in `\aes'.
+Computing hashes of 51 cells of `\aes'.
+Finding duplicate cells in `\aes'.
+Computing hashes of 50 cells of `\aes'.
+Finding duplicate cells in `\aes'.
+Computing hashes of 49 cells of `\aes'.
+Finding duplicate cells in `\aes'.
+<suppressed ~12 debug messages>
+Removed a total of 4 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \aes..
+Removed 13 unused cells and 216 unused wires.
+<suppressed ~16 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module aes.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \aes..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~31 debug messages>
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \aes.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\aes'.
+Computing hashes of 36 cells of `\aes'.
+Finding duplicate cells in `\aes'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \aes..
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module aes.
+
+3.16. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module aes...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== aes ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       45 wires
+      148 wire bits
+       15 public wires
+       48 public wire bits
+       15 ports
+       48 port bits
+       36 cells
+        1   $add
+        2   $eq
+        4   $logic_and
+        2   $logic_not
+        1   $logic_or
+       22   $mux
+        1   $ne
+        1   $reduce_bool
+        2   $xor
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.
+
+Warnings: 2 unique messages, 2 total

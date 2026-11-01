@@ -1,0 +1,318 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 4 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$12'.
+Creating decoders for process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$11'.
+Creating decoders for process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$10'.
+Creating decoders for process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:87$proc$8'.
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\Multiplier_2D.\PP[3]' from process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$12'.
+No latch inferred for signal `\Multiplier_2D.\PP[2]' from process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$11'.
+No latch inferred for signal `\Multiplier_2D.\PP[1]' from process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$10'.
+No latch inferred for signal `\Multiplier_2D.\PP[0]' from process `\Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:87$proc$8'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$12'.
+Removing empty process `Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$11'.
+Removing empty process `Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:99$proc$10'.
+Removing empty process `Multiplier_2D.$../../../corpus-external/yosys-simple/multiplier.v:87$proc$8'.
+Cleaned up 0 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111.
+Optimizing module FullAdder.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101.
+Optimizing module Multiplier_2D.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110.
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111.
+Optimizing module FullAdder.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101.
+Optimizing module Multiplier_2D.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110.
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111'.
+Computing hashes of 7 cells of `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111'.
+Finding duplicate cells in `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111'.
+Finding identical cells in module `\FullAdder'.
+Computing hashes of 2 cells of `\FullAdder'.
+Finding duplicate cells in `\FullAdder'.
+Finding identical cells in module `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101'.
+Computing hashes of 5 cells of `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101'.
+Finding duplicate cells in `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101'.
+Finding identical cells in module `\Multiplier_2D'.
+Computing hashes of 7 cells of `\Multiplier_2D'.
+Finding duplicate cells in `\Multiplier_2D'.
+Finding identical cells in module `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110'.
+Computing hashes of 6 cells of `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110'.
+Finding duplicate cells in `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110'.
+Removed a total of 0 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \FullAdder..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \Multiplier_2D..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111.
+  Optimizing cells in module \FullAdder.
+  Optimizing cells in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101.
+  Optimizing cells in module \Multiplier_2D.
+  Optimizing cells in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110.
+Performed a total of 0 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111'.
+Computing hashes of 7 cells of `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111'.
+Finding duplicate cells in `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111'.
+Finding identical cells in module `\FullAdder'.
+Computing hashes of 2 cells of `\FullAdder'.
+Finding duplicate cells in `\FullAdder'.
+Finding identical cells in module `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101'.
+Computing hashes of 5 cells of `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101'.
+Finding duplicate cells in `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101'.
+Finding identical cells in module `\Multiplier_2D'.
+Computing hashes of 7 cells of `\Multiplier_2D'.
+Finding duplicate cells in `\Multiplier_2D'.
+Finding identical cells in module `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110'.
+Computing hashes of 6 cells of `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110'.
+Finding duplicate cells in `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110'.
+Removed a total of 0 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111..
+Finding unused cells or wires in module \FullAdder..
+Finding unused cells or wires in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101..
+Finding unused cells or wires in module \Multiplier_2D..
+Finding unused cells or wires in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110..
+Removed 0 unused cells and 9 unused wires.
+<suppressed ~2 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111.
+Optimizing module FullAdder.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101.
+Optimizing module Multiplier_2D.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \FullAdder..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module \Multiplier_2D..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Running muxtree optimizer on module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111.
+  Optimizing cells in module \FullAdder.
+  Optimizing cells in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101.
+  Optimizing cells in module \Multiplier_2D.
+  Optimizing cells in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111'.
+Computing hashes of 7 cells of `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111'.
+Finding duplicate cells in `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111'.
+Finding identical cells in module `\FullAdder'.
+Computing hashes of 2 cells of `\FullAdder'.
+Finding duplicate cells in `\FullAdder'.
+Finding identical cells in module `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101'.
+Computing hashes of 5 cells of `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101'.
+Finding duplicate cells in `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101'.
+Finding identical cells in module `\Multiplier_2D'.
+Computing hashes of 7 cells of `\Multiplier_2D'.
+Finding duplicate cells in `\Multiplier_2D'.
+Finding identical cells in module `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110'.
+Computing hashes of 6 cells of `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110'.
+Finding duplicate cells in `$paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111..
+Finding unused cells or wires in module \FullAdder..
+Finding unused cells or wires in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101..
+Finding unused cells or wires in module \Multiplier_2D..
+Finding unused cells or wires in module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110..
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111.
+Optimizing module FullAdder.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101.
+Optimizing module Multiplier_2D.
+Optimizing module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110.
+
+3.16. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111...
+Checking module FullAdder...
+Checking module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101...
+Checking module Multiplier_2D...
+Checking module $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+       31 wire bits
+        6 public wires
+       31 public wire bits
+        5 ports
+       23 port bits
+        7 submodules
+        7   FullAdder
+
+=== FullAdder ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+        7 wire bits
+        5 public wires
+        5 public wire bits
+        5 ports
+        5 port bits
+        2 cells
+        2   $add
+
+=== $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+       23 wire bits
+        6 public wires
+       23 public wire bits
+        5 ports
+       17 port bits
+        5 submodules
+        5   FullAdder
+
+=== Multiplier_2D ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       19 wires
+      105 wire bits
+       19 public wires
+      105 public wire bits
+        3 ports
+       16 port bits
+        4 cells
+        4   $and
+        3 submodules
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111
+
+=== $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        6 wires
+       27 wire bits
+        6 public wires
+       27 public wire bits
+        5 ports
+       20 port bits
+        6 submodules
+        6   FullAdder
+
+=== design hierarchy ===
+
+        +----------Count including submodules.
+        | 
+       40 Multiplier_2D
+        2   FullAdder
+        2   FullAdder
+        2   FullAdder
+
+        +----------Count including submodules.
+        | 
+      145 wires
+      312 wire bits
+      127 public wires
+      276 public wire bits
+      108 ports
+      166 port bits
+        - memories
+        - memory bits
+        - processes
+       40 cells
+       36   $add
+        4   $and
+        3 submodules
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000101
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000110
+        1   $paramod\RippleCarryAdder\N=s32'00000000000000000000000000000111
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.

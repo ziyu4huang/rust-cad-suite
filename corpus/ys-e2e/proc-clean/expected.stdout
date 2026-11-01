@@ -1,0 +1,11 @@
+-- Running command `read_rtlil case.il; clean; check; write_rtlil -readable expected.rtlil' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing CHECK pass (checking for obvious problems).
+Checking module mem2reg_test6...
+Found and reported 0 problems.
+
+3. Executing RTLIL backend.
+Output filename: expected.rtlil

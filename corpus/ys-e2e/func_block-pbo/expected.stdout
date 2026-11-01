@@ -1,0 +1,142 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 73 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\func_block_top.$../../../corpus-external/yosys-simple/func_block.v:32$proc$83'.
+Creating decoders for process `\func_block_top.$../../../corpus-external/yosys-simple/func_block.v:31$proc$46'.
+Creating decoders for process `\func_block_top.$../../../corpus-external/yosys-simple/func_block.v:30$proc$9'.
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\func_block_top.\func3$func$../../../corpus-external/yosys-simple/func_block.v:32$5.$result' from process `\func_block_top.$../../../corpus-external/yosys-simple/func_block.v:32$proc$83'.
+No latch inferred for signal `\func_block_top.\func2$func$../../../corpus-external/yosys-simple/func_block.v:31$4.$result' from process `\func_block_top.$../../../corpus-external/yosys-simple/func_block.v:31$proc$46'.
+No latch inferred for signal `\func_block_top.\func1$func$../../../corpus-external/yosys-simple/func_block.v:30$3.$result' from process `\func_block_top.$../../../corpus-external/yosys-simple/func_block.v:30$proc$9'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `func_block_top.$../../../corpus-external/yosys-simple/func_block.v:32$proc$83'.
+Removing empty process `func_block_top.$../../../corpus-external/yosys-simple/func_block.v:31$proc$46'.
+Removing empty process `func_block_top.$../../../corpus-external/yosys-simple/func_block.v:30$proc$9'.
+Cleaned up 0 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module func_block_top.
+<suppressed ~64 debug messages>
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module func_block_top.
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\func_block_top'.
+Computing hashes of 32 cells of `\func_block_top'.
+Finding duplicate cells in `\func_block_top'.
+Computing hashes of 16 cells of `\func_block_top'.
+Finding duplicate cells in `\func_block_top'.
+<suppressed ~48 debug messages>
+Removed a total of 16 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \func_block_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \func_block_top.
+Performed a total of 0 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\func_block_top'.
+Computing hashes of 16 cells of `\func_block_top'.
+Finding duplicate cells in `\func_block_top'.
+Removed a total of 0 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \func_block_top..
+Removed 0 unused cells and 113 unused wires.
+<suppressed ~1 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module func_block_top.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \func_block_top..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \func_block_top.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\func_block_top'.
+Computing hashes of 16 cells of `\func_block_top'.
+Finding duplicate cells in `\func_block_top'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \func_block_top..
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module func_block_top.
+
+3.16. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module func_block_top...
+Warning: Wire func_block_top.\out3 [0] is used but has no driver.
+Found and reported 1 problems.
+
+5. Printing statistics.
+
+=== func_block_top ===
+
+        +----------Local Count, excluding submodules.
+        | 
+        9 wires
+      288 wire bits
+        9 public wires
+      288 public wire bits
+        4 ports
+      128 port bits
+       16 cells
+       16   $not
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.
+
+Warnings: 1 unique messages, 1 total

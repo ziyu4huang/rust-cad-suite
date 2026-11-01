@@ -1,0 +1,156 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3 in module omsp_dbg_uart.
+Marked 1 switch rules as full_case in process $../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1 in module omsp_dbg_uart.
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 1 assignment to connection.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \dbg_rst in `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~2 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+     1/1: $0\uart_state[2:0]
+Creating decoders for process `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1'.
+     1/1: $1\uart_state_nxt[2:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\omsp_dbg_uart.\uart_state_nxt' from process `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1'.
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\omsp_dbg_uart.\uart_state' using process `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+  created $adff cell `$procdff$16' with positive edge clock and positive level reset.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+Removing empty process `omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:26$proc$3'.
+Found and cleaned up 1 empty switch in `\omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1'.
+Removing empty process `omsp_dbg_uart.$../../../corpus-external/yosys-simple/omsp_dbg_uart.v:18$proc$1'.
+Cleaned up 2 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module omsp_dbg_uart.
+<suppressed ~2 debug messages>
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module omsp_dbg_uart.
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\omsp_dbg_uart'.
+Computing hashes of 10 cells of `\omsp_dbg_uart'.
+Finding duplicate cells in `\omsp_dbg_uart'.
+Computing hashes of 9 cells of `\omsp_dbg_uart'.
+Finding duplicate cells in `\omsp_dbg_uart'.
+<suppressed ~3 debug messages>
+Removed a total of 1 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \omsp_dbg_uart..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~4 debug messages>
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \omsp_dbg_uart.
+Performed a total of 0 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\omsp_dbg_uart'.
+Computing hashes of 9 cells of `\omsp_dbg_uart'.
+Finding duplicate cells in `\omsp_dbg_uart'.
+Removed a total of 0 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$16 ($adff) from module omsp_dbg_uart (D = \uart_state_nxt, Q = \uart_state).
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \omsp_dbg_uart..
+Removed 1 unused cells and 10 unused wires.
+<suppressed ~2 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module omsp_dbg_uart.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \omsp_dbg_uart..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~3 debug messages>
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \omsp_dbg_uart.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\omsp_dbg_uart'.
+Computing hashes of 8 cells of `\omsp_dbg_uart'.
+Finding duplicate cells in `\omsp_dbg_uart'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \omsp_dbg_uart..
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module omsp_dbg_uart.
+
+3.16. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module omsp_dbg_uart...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== omsp_dbg_uart ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       11 wires
+       17 wire bits
+        7 public wires
+       11 public wire bits
+        4 ports
+        4 port bits
+        8 cells
+        1   $adffe
+        1   $and
+        2   $eq
+        1   $mux
+        1   $or
+        1   $pmux
+        1   $reduce_bool
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.

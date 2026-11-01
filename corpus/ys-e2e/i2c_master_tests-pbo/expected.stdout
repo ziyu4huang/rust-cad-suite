@@ -1,0 +1,156 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 2 switch rules as full_case in process $../../../corpus-external/yosys-simple/i2c_master_tests.v:39$proc$6 in module i2c_test02.
+Removed a total of 0 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 2 redundant assignments.
+Promoted 0 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~3 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\i2c_test02.$../../../corpus-external/yosys-simple/i2c_master_tests.v:57$proc$11'.
+     1/1: $0\cmd_stop[0:0]
+Creating decoders for process `\i2c_test02.$../../../corpus-external/yosys-simple/i2c_master_tests.v:39$proc$6'.
+     1/2: $0\clk_en[0:0]
+     2/2: $0\cnt[15:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\i2c_test02.\cmd_stop' using process `\i2c_test02.$../../../corpus-external/yosys-simple/i2c_master_tests.v:57$proc$11'.
+  created $dff cell `$procdff$26' with positive edge clock.
+Creating register for signal `\i2c_test02.\clk_en' using process `\i2c_test02.$../../../corpus-external/yosys-simple/i2c_master_tests.v:39$proc$6'.
+  created $dff cell `$procdff$27' with positive edge clock.
+Creating register for signal `\i2c_test02.\cnt' using process `\i2c_test02.$../../../corpus-external/yosys-simple/i2c_master_tests.v:39$proc$6'.
+  created $dff cell `$procdff$28' with positive edge clock.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\i2c_test02.$../../../corpus-external/yosys-simple/i2c_master_tests.v:57$proc$11'.
+Removing empty process `i2c_test02.$../../../corpus-external/yosys-simple/i2c_master_tests.v:57$proc$11'.
+Found and cleaned up 2 empty switches in `\i2c_test02.$../../../corpus-external/yosys-simple/i2c_master_tests.v:39$proc$6'.
+Removing empty process `i2c_test02.$../../../corpus-external/yosys-simple/i2c_master_tests.v:39$proc$6'.
+Cleaned up 3 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module i2c_test02.
+<suppressed ~4 debug messages>
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module i2c_test02.
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\i2c_test02'.
+Computing hashes of 12 cells of `\i2c_test02'.
+Finding duplicate cells in `\i2c_test02'.
+Removed a total of 0 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \i2c_test02..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~8 debug messages>
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \i2c_test02.
+Performed a total of 0 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\i2c_test02'.
+Computing hashes of 12 cells of `\i2c_test02'.
+Finding duplicate cells in `\i2c_test02'.
+Removed a total of 0 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $procdff$26 ($dff) from module i2c_test02 (D = \cmd, Q = \cmd_stop).
+Adding SRST signal on $procdff$27 ($dff) from module i2c_test02 (D = $procmux$16_Y, Q = \clk_en, rval = 1'0).
+Adding EN signal on $procdff$28 ($dff) from module i2c_test02 (D = $procmux$24_Y, Q = \cnt).
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \i2c_test02..
+Removed 4 unused cells and 12 unused wires.
+<suppressed ~5 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module i2c_test02.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \i2c_test02..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~5 debug messages>
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \i2c_test02.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\i2c_test02'.
+Computing hashes of 9 cells of `\i2c_test02'.
+Finding duplicate cells in `\i2c_test02'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \i2c_test02..
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module i2c_test02.
+
+3.16. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module i2c_test02...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== i2c_test02 ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       13 wires
+       73 wire bits
+        7 public wires
+       22 public wire bits
+        6 ports
+       21 port bits
+        9 cells
+        2   $dffe
+        3   $mux
+        1   $ne
+        1   $reduce_or
+        1   $sdff
+        1   $sub
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.

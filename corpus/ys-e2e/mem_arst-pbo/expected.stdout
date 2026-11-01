@@ -1,0 +1,272 @@
+-- Running command `read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json' --
+
+1. Executing RTLIL frontend.
+Input filename: case.il
+
+2. Executing PROC pass (convert processes to netlists).
+
+2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed 1 dead cases from process $../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4 in module MyMem.
+Marked 4 switch rules as full_case in process $../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4 in module MyMem.
+Removed a total of 1 dead cases.
+
+2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 1 redundant assignment.
+Promoted 5 assignments to connections.
+
+2.4. Executing PROC_INIT pass (extract init attributes).
+
+2.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \Reset_n_i in `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+
+2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~3 debug messages>
+
+2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+     1/25: $2$mem2reg_wr$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_ADDR[3:0]$15
+     2/25: $2$mem2reg_wr$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_DATA[3:0]$16
+     3/25: $2$mem2reg_rd$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_DATA[3:0]$14
+     4/25: $1$mem2reg_wr$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_DATA[3:0]$13
+     5/25: $1$mem2reg_wr$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_ADDR[3:0]$12
+     6/25: $0\Data_o[3:0]
+     7/25: $1$mem2reg_rd$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_DATA[3:0]$11
+     8/25: $1$mem2reg_rd$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_ADDR[3:0]$10
+     9/25: $1\i[31:0]
+    10/25: $0\Mem[15][3:0]
+    11/25: $0\Mem[14][3:0]
+    12/25: $0\Mem[13][3:0]
+    13/25: $0\Mem[12][3:0]
+    14/25: $0\Mem[11][3:0]
+    15/25: $0\Mem[10][3:0]
+    16/25: $0\Mem[9][3:0]
+    17/25: $0\Mem[8][3:0]
+    18/25: $0\Mem[7][3:0]
+    19/25: $0\Mem[6][3:0]
+    20/25: $0\Mem[5][3:0]
+    21/25: $0\Mem[4][3:0]
+    22/25: $0\Mem[3][3:0]
+    23/25: $0\Mem[2][3:0]
+    24/25: $0\Mem[1][3:0]
+    25/25: $0\Mem[0][3:0]
+
+2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\MyMem.\i' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$244' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Data_o' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$249' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[0]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$254' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[1]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$259' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[2]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$264' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[3]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$269' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[4]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$274' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[5]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$279' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[6]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$284' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[7]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$289' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[8]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$294' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[9]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$299' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[10]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$304' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[11]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$309' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[12]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$314' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[13]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$319' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[14]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$324' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.\Mem[15]' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$329' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.$mem2reg_rd$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_ADDR' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$334' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.$mem2reg_rd$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:32$2_DATA' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$339' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.$mem2reg_wr$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_ADDR' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$344' with positive edge clock and positive level reset.
+Creating register for signal `\MyMem.$mem2reg_wr$\Mem$../../../corpus-external/yosys-simple/mem_arst.v:35$3_DATA' using process `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+  created $adff cell `$procdff$349' with positive edge clock and positive level reset.
+
+2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 3 empty switches in `\MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+Removing empty process `MyMem.$../../../corpus-external/yosys-simple/mem_arst.v:20$proc$4'.
+Cleaned up 3 empty switches.
+
+2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module MyMem.
+<suppressed ~46 debug messages>
+
+3. Executing OPT pass (performing simple optimizations).
+
+3.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module MyMem.
+
+3.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\MyMem'.
+Computing hashes of 112 cells of `\MyMem'.
+Finding duplicate cells in `\MyMem'.
+Computing hashes of 72 cells of `\MyMem'.
+Finding duplicate cells in `\MyMem'.
+<suppressed ~120 debug messages>
+Removed a total of 40 cells.
+
+3.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \MyMem..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$21.
+    dead port 2/2 on $mux $procmux$21.
+    dead port 1/2 on $mux $procmux$18.
+    dead port 2/2 on $mux $procmux$18.
+Removed 4 multiplexer ports.
+<suppressed ~50 debug messages>
+
+3.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \MyMem.
+Performed a total of 0 changes.
+
+3.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\MyMem'.
+Computing hashes of 70 cells of `\MyMem'.
+Finding duplicate cells in `\MyMem'.
+Removed a total of 0 cells.
+
+3.6. Executing OPT_DFF pass (perform DFF optimizations).
+Handling D = Q on $procdff$244 ($adff) from module MyMem (removing D path).
+Adding EN signal on $procdff$324 ($adff) from module MyMem (D = \Data_i, Q = \Mem[14]).
+Adding EN signal on $procdff$314 ($adff) from module MyMem (D = \Data_i, Q = \Mem[12]).
+Adding EN signal on $procdff$279 ($adff) from module MyMem (D = \Data_i, Q = \Mem[5]).
+Adding EN signal on $procdff$309 ($adff) from module MyMem (D = \Data_i, Q = \Mem[11]).
+Adding EN signal on $procdff$254 ($adff) from module MyMem (D = \Data_i, Q = \Mem[0]).
+Adding EN signal on $procdff$299 ($adff) from module MyMem (D = \Data_i, Q = \Mem[9]).
+Adding EN signal on $procdff$284 ($adff) from module MyMem (D = \Data_i, Q = \Mem[6]).
+Adding EN signal on $procdff$259 ($adff) from module MyMem (D = \Data_i, Q = \Mem[1]).
+Adding EN signal on $procdff$264 ($adff) from module MyMem (D = \Data_i, Q = \Mem[2]).
+Adding EN signal on $procdff$289 ($adff) from module MyMem (D = \Data_i, Q = \Mem[7]).
+Adding EN signal on $procdff$329 ($adff) from module MyMem (D = \Data_i, Q = \Mem[15]).
+Adding EN signal on $procdff$269 ($adff) from module MyMem (D = \Data_i, Q = \Mem[3]).
+Adding EN signal on $procdff$319 ($adff) from module MyMem (D = \Data_i, Q = \Mem[13]).
+Adding EN signal on $procdff$294 ($adff) from module MyMem (D = \Data_i, Q = \Mem[8]).
+Adding EN signal on $procdff$274 ($adff) from module MyMem (D = \Data_i, Q = \Mem[4]).
+Adding EN signal on $procdff$304 ($adff) from module MyMem (D = \Data_i, Q = \Mem[10]).
+Setting constant 0-bit at position 0 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 1 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 2 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 3 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 1-bit at position 4 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 5 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 6 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 7 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 8 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 9 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 10 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 11 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 12 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 13 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 14 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 15 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 16 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 17 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 18 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 19 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 20 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 21 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 22 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 23 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 24 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 25 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 26 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 27 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 28 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 29 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 30 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 31 on $procdff$244 ($dlatch) from module MyMem.
+Setting constant 0-bit at position 0 on $procdff$334 ($adff) from module MyMem.
+Setting constant 0-bit at position 1 on $procdff$334 ($adff) from module MyMem.
+Setting constant 0-bit at position 2 on $procdff$334 ($adff) from module MyMem.
+Setting constant 0-bit at position 3 on $procdff$334 ($adff) from module MyMem.
+
+3.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \MyMem..
+Removed 34 unused cells and 147 unused wires.
+<suppressed ~35 debug messages>
+
+3.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module MyMem.
+
+3.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+3.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \MyMem..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~2 debug messages>
+
+3.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \MyMem.
+Performed a total of 0 changes.
+
+3.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\MyMem'.
+Computing hashes of 50 cells of `\MyMem'.
+Finding duplicate cells in `\MyMem'.
+Removed a total of 0 cells.
+
+3.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+3.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \MyMem..
+
+3.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module MyMem.
+
+3.16. Finished fast OPT passes. (There is nothing left to do.)
+
+4. Executing CHECK pass (checking for obvious problems).
+Checking module MyMem...
+Found and reported 0 problems.
+
+5. Printing statistics.
+
+=== MyMem ===
+
+        +----------Local Count, excluding submodules.
+        | 
+       56 wires
+      147 wire bits
+       23 public wires
+      111 public wire bits
+        6 ports
+       15 port bits
+       50 cells
+        1   $adff
+       16   $adffe
+       15   $eq
+        1   $logic_not
+        1   $pmux
+       16   $reduce_and
+
+6. Executing RTLIL backend.
+Output filename: expected.rtlil
+
+7. Executing JSON backend.

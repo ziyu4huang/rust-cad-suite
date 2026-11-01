@@ -1,0 +1,1 @@
+read_rtlil case.il; proc; opt; setattr -unset module_not_derived; setattr -mod -set batch2_mod_flag 1; setattr -set quoted_name "hello world"; check; write_rtlil -readable expected.rtlil; write_json expected.json
