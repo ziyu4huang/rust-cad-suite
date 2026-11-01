@@ -79,7 +79,9 @@
    (期望已入库,无需本机装 verilator;当前基线 31/32=96.9%,唯一 FAIL
    = 30_gen_mux 存储器数组 M7 硬错,属声明范围);
 3. 新语义改动附:对应 diff 修复说明(哪条 oracle 证据)或新 case。
-- git 提交单文件精确 add;commit message 禁反引号与 `$(…)`。
+- git 提交单文件精确 add;commit message 禁反引号与 `$(…)`;message 中的行数/计数一律取提交时刻
+  `git diff --cached --stat` 实测,起草于提交前的数字禁直接写、diff 范围变化必同步改 message(实录:3a696ba
+  「183 行」24 秒后 amend 为 df54db3「310+4」;SKILL ryosys 节同条)。
 
 ## 9. 定位工具箱(实录验证)
 
@@ -233,4 +235,37 @@
   `DEVELOPER_DIR=CLT`(僅未設且 CLT 在場觸發;顯式設置尊重不覆蓋;無 CLT
   短路零影響)——正典=SKILL ryosys 節工具鏈條目,形態禁脫離 3 行 `-d` 判定
   (RM1-7 半損壞 CLT 角=紅燈可診斷非假綠,登記在案)。
+- **IdString intern 首見序律(2026-10-29,M2 續弧)**:「名序」=intern
+  index(rtlil.h:413,首見遞增)**非 String 字典序**;二進制實測律=建名
+  時刻升序(禁以 autoidx 負索引編碼推律)。凡名序排序/迭代面(現=
+  opt_expr TopoSort)一律走 intern 序——ryosys 落地=Design.intern_seq
+  (parser 檔案序登記)+autoidx_base 分界派生建名序;新名序消費面入場
+  時同律,禁回退字串序(**例外面三例**:oracle pass 自指定 String
+  比較器時跟 oracle——D-ys8b lt_by_name[compare_signals 尾分支]+
+  opt_balance_tree TopoSort[compare_ptr_by_name,2026-11-01 M3 續弧
+  批量收編第二例]+torder TopoSort[sort_by_id_str=lt_by_name,2026-11-02 批量收編第二批第三例];入場先分類「自指定比較器 vs 默認序」再選律)。機檢=ys-e2e 406/406 byte-exact(M2 續弧收平
+  時點,現行閘=450/460、subbytes/loops/constmuldivmod 的 intern 面在
+  -pb/-pbo 分層各自對帳);正典=SKILL
+  ryosys 節 intern 法條;實錄=RYOSYS-MVP §8.8-4。
+- **opt 编排契约与 M3 裁定(2026-10-30,M3 实作轮)**:`opt` 编排器=
+  序幕 opt_expr+opt_merge -nomux → do{muxtree,reduce,merge,[share],
+  dff,[hier],clean,expr}while(scratchpad `opt.did_something`)→
+  `Finished fast OPT passes.` header——Rerunning/Finished 都是 log_header
+  占编号(golden 内容);changed 置位面=rg 'opt.did_something' 全表
+  (PROVENANCE P8)。**多删幸存序=D-ys8**(集合同、序不同,四单序假设
+  模拟不达,禁硬磕);opt_clean 阶段序=remove_temporary_cells→cells→
+  signals 迴圈→init;`selected_modules()` 盒模组(blackbox/whitebox)跳过;
+  SigMap::add(bit)=promote 代表元重选。**闸=ys-e2e 450/460+10 例
+  known-gap 逐字名单(regress S4;2026-10-31 續弧第 7 輪 31→10)
+  +LIVE 456/456**;stub 面触新语料触发即
+  同轮扩(铁则 3),正典=SKILL ryosys 节。
+- **序差类收平流程(2026-10-29,M2 续弧)**:golden byte-diff 的深树形/
+  序差类残差(cell 树形/输出序/计数差),动手前先①定点读 oracle 对应
+  pass 源码、②做 logic-diff/internal-order 可复刻性分类——结论一律
+  二进制实跑仲裁,源码只定位不改判;logic-diff=修我方收平(golden 零
+  重录),internal-order=按 D-ys5 先例登记分歧不硬磕、同轮翻闸(regress
+  精确数+known-gap 名单与 difftest 实跑 FAIL 集逐字一致);分类前禁按
+  旧文档归因动手(实作轮续弧指南四条入口三条证伪一条精确化,
+  RYOSYS-MVP §8.8-2/§8.8-4)。
+  正典=SKILL ryosys 节「序差类收平流程」条。
 

@@ -129,6 +129,58 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
 - **RTLIL-first 鐵則**:ryosys 輸入一律 oracle 產的 RTLIL 文本(`-readable` 形);golden 從 `vendor-reference/suite-dl/oss-cad-suite/bin/yosys` 實跑錄製(`ry-difftest --record`,cwd=案例目錄相對路徑),測試運行零 oracle 依賴。細節分歧**以二進制實跑為準**(v0.70 clone 落後 179 commits;stat 表頭 2 行形/boxed 模組靜默跳過/`Warnings:` 彙總行皆二進制釘死)。
 - **兩層 registry**:`-H` 普查 306 條逐字入 crates/ry-cli/src/registry.rs+PROVENANCE;普查外名字=逐字重現 oracle `No such command` 錯;登記層命中=`ERROR: <cmd>: not implemented in ryosys (milestone Yx)`(Y0..Y3 映射見 ADR-0010)。**`-p` 切分=token 尾分號**(`clean;clean` 無空白=單一未知命令;`;;`→追加 clean、`;;;`→clean -purge;`#` 註釋;引號內 `;` 不切)——暗角形 fixture 組在 ry-cli cli_contract.rs,擴命令面前先釘。
 - **迭代序契約(hashlib 實測)**:dict/pool 正向迭代=**逆插入序**(check/stat 的模組/cell/wire 迭代與警告序);write_rtlil dump=插入序;write_json 先 `design->sort()` 名序——兩出口順序禁互相推導。cell 端口名以 `\Y` 轉義形存儲(yosys ID::Y 內部即 `\Y`),方向表比較在 unescape 域。
+- **IdString intern 首見序法條(2026-10-29,M2 續弧)**:`IdString::operator<` 比 **intern index**(rtlil.h:413-415;global_id_index_ 首見遞增),**不是 String 字典序**——凡以「名序」迭代/排序的面(TopoSort 的 compare_ptr_by_name 等)一律 intern 序。9534a7f4d 二進制實測律=**建名時刻升序**(autoidx 名=創建序;literal 名同律);禁以 v0.70 源碼 autoidx 負索引編碼當律(`-(autoidx++)` 推出「後建者在前」與二進制實測相反)。ryosys 落地=Design.intern_seq(read_rtlil 檔案序登記 module/wire/memory/cell/process 五類)+autoidx_base 分界(pass 建名 `$…$N` 以 N≥base 派生=N 序=創建序);消費者=opt_expr TopoSort(roots+入邊)。機檢=ys-e2e 406/406(subbytes/loops/constmuldivmod byte-exact 釘死;M2 -pb/-pbo 分層時點,現行閘=461/471)。**字串序例外(2026-11-01,M3 續弧批量收編;第二例)**:opt_balance_tree 的 TopoSort=`TopoSort<Cell*, IdString::compare_ptr_by_name<Cell>>`(opt_balance_tree.cc:271;utils.h:132 node_to_index=std::map<T,int,C> 以 C 排序根遍歷+edges set 同 C+DFS 後序)=**yosys 自指定 String 字典序**,異於 intern 序律——ryosys 落地=byte-wise 名序比較(禁 intern_key);仲裁=carryadd obt 錨 byte-exact。第一例=D-ys8b lt_by_name(compare_signals 尾分支)。凡新名序消費面先分類「本 pass 自指定比較器 vs 默認序」,禁套單一律。**第三例(2026-11-02,批量收編第二批)**:torder 的 `TopoSort<IdString, RTLIL::sort_by_id_str>`(torder.cc:81;sort_by_id_str=lt_by_name,rtlil.h:794)=自指定字串序——torder.rs 全鏈(node_to_index 迭代序/edges set 序)按 byte-wise 名序(禁 intern_key),carryadd 錨 byte-exact。前端分界實況:read_rtlil 檔案序登記五類;jsonin/hierarchy 前端**不登記 intern_seq**——此時僅**無數字尾**的未登記名=(0,MAX) ties 回落 cells 向量序(stable sort,確定);**jsonin 的 autoidx_base=1 使 `$<N>` 數字尾名(yosys JSON 私有名 `$abc$123` 形)落入建名域 (1,N) 按 N 序、不回落**——語料面不觸(-rj 腳本不跑 opt_expr;4 anchors 實測無 `$N` 字面名),擴 read_json→opt_expr 面前先修此邊界(jsonin 補登記 intern 或重定義 base 語義),禁按「未登記必回落」舊句排查。
+- **opt 家族契約(2026-10-30,M3 實作輪)**:`opt` 編排器=序幕
+  `opt_expr`+`opt_merge -nomux` → do{muxtree,reduce,merge,[share(-full)],
+  dff,[hier(-hier)],clean,expr}while(scratchpad `opt.did_something`)→
+  `Finished fast OPT passes.`——`Rerunning OPT passes. (Maybe there is
+  more to do..)`/Finished 皆 log_header 占編號(golden 內容);changed
+  置位面=`rg 'opt.did_something'` 全表(PROVENANCE P8,禁腦補)。
+  opt_clean 階段序=remove_temporary_cells→cells(intern 序刪)→signals
+  迴圈→init;`selected_modules()` 跳過盒模組;SigMap::add(bit)=代表元
+  promote。**多刪 swap-and-pop 幸存序=D-ys8**(集合同、序不同;四單序
+  假設模擬不達,禁硬磕;known-gap 名單=regress S4 逐字)。dump 模型
+  補註:rtlil backend 印 `reversed(module->cells_)`=**陣列正序**(與
+  dict 正向=逆插入是兩個面,勿混)。**M3 續弧批量收編(2026-11-01)四單元**:log(拼接+未知 -token 原樣
+  打印+七旗標 Y2,D-ys10)/help(HELP_SHORT 306 條錄製表=gen_help_desc.sh
+  機械生成落 help_desc.rs 禁運行時排序;bare=312 行歸一化形 vs oracle
+  -H 剝面零差;子形=Y2)/clean(run_opt_clean 拆 (verbose,purge) 兩參;
+  cmd_error 全形=register.cc:174-192 同構 stderr 三行+stdout Syntax 塊;
+  process 面=預過濾靜默異於 opt_clean 迴圈內 warn;`;;;` 端到端不佔
+  編號)/opt_balance_tree(worker 同構移植;**hashlib 逆插入序五消費點**
+  [sources/sinks/BFS 載荷/consumed/sig_to_sink pool;begin()=size-1];
+  NEW_ID 建名配對 leaf cc:97/wire:108+combine cc:132/wire:143,combine
+  wire 被內部 clean -purge 折疊刪名;experimental 機制首消費者=
+  log_experimental 去重+driver.cc:721 flush 行;尾 run_pass("clean
+  -purge")=yosys.cc:880 橫幅不佔編號)。**0.70+179 新形 cells dbg
+  verbose 門控**(cells_temp/cells_all/inits 三處 if(verbose);clean 形
+  零計數——min2 錨抓出)。閘=ys-e2e 461/471(450+anchors 11)+LIVE
+  456/456;registry 271 stub/35 實現(餘 Y2=6)。
+- **批量收編第二批六命令(2026-11-02,§11 實作輪)**:async2sync(FF 異步
+  信號同步化;selected_cells 值拷貝=**逆插入序** `iter().rev()`;NEW_ID 錨
+  =clone v0.70 與二進制**零偏移**[async2sync.cc 全檔行號=二進制行號:
+  arst 253/257/262、aload 220/221/225/226、sr 155..197、latch 285..345;
+  rtlil helper wire 錨=二進制觀測 Not 3201/And 3249/Or 3250/Mux 3337,
+  禁以 clone 推 rtlil.cc 行號——clone 與二進制在 rtlil.cc 漂移非線性])/pmuxtree
+  (recursive_mux_generator 遞歸+or_generator 四臂;建名=`$auto$pmuxtree.cc:
+  65:recursive_mux_generator$N`/`:100/:101:execute$N`/`:35/:37:or_generator$N`
+  實名形)/dffunmap(unmap_ce=ff.cc:592/:594、unmap_srst=:612/:614,FF 全變
+  $dff 靜默面)/setattr(-mod/-set/-unset 全收;值語法=雙引號剝引號/十進
+  32-bit/`N'b`/`N'd`;失敗=`ERROR: Can't decode value '<v>'!` rc=1;執行體
+  **零 header 不占編號**;do_setunset=wires+cells+memories rev)/torder(
+  header+`module <名>`+`  cell <名>`;autostop=Q/CTRL_OUT/RD_DATA+
+  $memrd(_v2) DATA)/edgetypes(四元組 type 形字串+pool 去重+sort 正序;
+  **無 header 不占編號**;multibit=`type.port[index]` 下標形,手寫小錨彌合
+  =edgetypes-multibit)。**錨輸入面律**:錨腳本前置鏈禁踩 known-gap 案例
+  的 `proc;opt` 鏈(D-ys8c 面2 cascade 不可收斂)——pmuxtree/dffunmap 錨=
+  `proc;` 直跑形;decode 錯誤形錨=expected.rtlil 面外(compare 跳過),
+  契約由 cli_contract fixture 逐字執法。registry 收口=stub 265(Y0 257/Y2 6/
+  Y3 2)+實現層 41=306;**help 全文常量六份**=scripts/gen_help_batch2.sh
+  機械轉錄 help_desc.rs(禁手寫);cmd_error 全形六消費面=stderr 三行+
+  stdout header+Syntax 塊+help 全文(selection 裸字=cmd_error=D-ys11)。
+  閘=ys-e2e 469/479(461+anchors 8 入 compare 面)+LIVE 456/456。
 - **歸一化**(ry-difftest):stdout 結構切(prologue/epilogue;**末尾換行分裂的空元素非內容行**)+.il 剝首行+JSON creator;stderr 零歸一化——成功路徑兩端 stderr 必空(多打一行 eprintln=紅)。敵意 fixture 單測釘死(tests/normalize.rs)。
-- **regress 執法**=`SUMMARY ys=402/402` 逐字 grep(M1 弧末基線=M0 層全量+87 -hier[wandwor-hier 已隨 M1-d wand/wor 移植補錄]+87 -rj+87 -sm[simplemap 層,87/87 零排除];P-bearing 54 例的 exit=1 process 硬錯是 M2 翻轉閘,翻綠=同輪錄 expected.json+上調基線)。
+- **regress 執法**=`SUMMARY ys=469/479` 逐字 grep+known-gap 名單逐字(批量收編第二批基線 2026-11-02=461+anchors 8 例入 compare 面[decode 錨面外];known-gap 10 例維持;歷史鏈:M1 弧末 402/402=M0 層全量+87 -hier[wandwor-hier 已隨 M1-d wand/wor 移植補錄]+87 -rj+87 -sm→M2 實作輪 401/406[5 known-gap]→M2 續弧收平 406/406→M3 實作輪 418/460[42 known-gap]→續弧第 2 輪 429/460[31 known-gap]→續弧第 7 輪 450/460→M3 續弧批量收編 461/471→批量收編第二批 469/479[path_else 修補後 sincos/i2c 殘差=D-ys8c 面1 hash 內部態(內層 pattern_t 序新子面)不翻,錨 9 遷入 8 入面];LIVE 腿=456/456 record() 可再生面[anchors 24 例手寫面外])。
+- **序差类收平流程(2026-10-29,M2 续弧立法)**:golden byte-diff 残差为**深树形/序差类**(cell 树形/输出序/计数差,非缺语义规则)时,动手前两步强制:①**定点读 oracle 对应 pass 的源码**(只做定位;序差结论一律二进制实跑轨迹仲裁——9534a7f4d 不可得时以 v0.70 28ba3cb 对读,禁以源码静态推导定案[autoidx 负索引编码类推律已证伪]);②**可复刻性分类**:**logic-diff**(机制可用我方建模复刻)=修 crates/ry-* 收平,golden 零重录;**internal-order**(依赖不可推导的二进制内部序,先例=check 环起点 D-ys5)=在 REGISTRY 登记分歧行(源码级证据+探针实证)不硬磕,同轮翻 regress.sh 执法块精确数与 known-gap 名单(名单=防回归锚,与 difftest 实跑 FAIL 集逐字一致)。分类前禁按旧文档归因动手——实作轮续弧指南四条入口三条被对读证伪、一条精确化(RYOSYS-MVP §8.8-2/§8.8-4;本轮五例全为 logic-diff 收平=流程正例)。
 - **工具鏈對齊(2026-10-27,M1 slice-1/§7.0-4 實錄)**:默認 `xcode-select` 指向 Xcode 26.6 而 CLT 27.0 並存時,Xcode 的 ld 讀 CLT SDK 的 .tbd 報 `tapi error: malformed file`(arm64e.x1 等 token),一切需 C++ 鏈接的腿(rv-diff/toolbox)必紅——lint-only 無鏈接不受累。防禦=regress.sh 頂部 3 行:`DEVELOPER_DIR` 未設且 `/Library/Developer/CommandLineTools/usr/bin` 在場才 export CLT;顯式設置尊重不覆蓋(用戶主權,設壞鏈=預期 FAIL 非 bug,RM1-5);無 CLT 機器 `[ -d ]` 短路零影響(RM1-6:未模擬,設計保證)。驗收兩路徑=裸跑+`env -u DEVELOPER_DIR` 形。
+- **commit message 数字律(2026-10-30,收口弧反省立法)**:commit message 中的行数/计数一律取**提交时刻** `git diff --cached --stat` 实测;起草于提交前的数字(规划时点统计)禁直接写——起草后 diff 范围再变(如换人复审修订并入)必须同步改 message 再 commit。实录=3a696ba(2026-10-29 20:37:47,message「183 行纯插入」)24 秒后被迫 amend 为 df54db3(「310 行新增…4 行删除」)。AGENTS §8 commit 条同句援引。

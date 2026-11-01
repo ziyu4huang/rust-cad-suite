@@ -315,21 +315,38 @@ if [ -f crates/ry-cli/Cargo.toml ]; then
     ys_out=$(cargo run -q -p ry-difftest -- --corpus corpus/ys-e2e 2>&1)
     ys_sum=$(echo "$ys_out" | grep -E "^SUMMARY ys=" || true)
     [ -n "$ys_sum" ] || { echo "GATE FAIL: ys-e2e SUMMARY missing"; fail=1; }
-    echo "$ys_sum" | grep -q "SUMMARY ys=401/406" || { echo "GATE FAIL: ys-e2e baseline (want exact 401/406): $ys_sum"; fail=1; }
-    ys_fail=$(echo "$ys_out" | grep -c "	FAIL	" || true)
-    [ "$ys_fail" -eq 5 ] || { echo "GATE FAIL: ys-e2e FAIL count (want exact 5 known): $ys_fail"; echo "$ys_out" | grep "	FAIL	"; fail=1; }
-    echo "ryosys M0+M1+M2: ry-cli contract + ys-e2e 401/406 (5 known-gap: mem_arst/subbytes/case_expr_non_const/constmuldivmod/loops)"
+    echo "$ys_sum" | grep -q "SUMMARY ys=469/479" || { echo "GATE FAIL: ys-e2e baseline (want exact 469/479): $ys_sum"; fail=1; }
+    # M3 -pbo 層 known-gap 名單(逐字;M2 五例先例形):續弧第 7 輪後 10 例,
+    # 殘差三類=(a) logic-diff 可修面:sincos/i2c=opt_dff find_muxtree_
+    # feedback_patterns 的 pattern 內容差(oracle 深 else 鏈多收集 ctrl 鍵);
+    # fsm/subbytes=3.8 OPT_EXPR 變換集差(fsm 另帶 never-active EN 塌縮:
+    # 我方 connecting-SRST vs oracle Adding-EN,級聯 3.12+ 統計;3.7 兩端
+    # 逐字同,面早於 opt_dff/patterns 階段)+D-ys8c 面1 patterns pool hash
+    # 序;(b) D-ys8c 面2 opt_pmux grouped_b_to_s hash 序=constmuldivmod/
+    # usb/values 的 \B/\S 拼接序(首分歧=New ctrl vector 行);
+    # (c) D-ys8 opt_clean 多刪 swap-and-pop 幸存 dump 序差(loops/memory/
+    # mem_arst;stdout 已綠)。續弧第 7 輪 31→10(D-ys8b 字串序+known-cell
+    # 面+opt_expr consume_x identity/$mul/div-mod 族+delete_wires 檔案序等
+    # 21 例翻綠;中途 identity 誤用 LSB as_bool 曾翻紅 forloops/scopes,
+    # 已按 oracle rtlil.cc:536 非零語義修正回綠)。
+    ys_fail_list=$(echo "$ys_out" | grep "	FAIL	" | awk -F'\t' '{print $1}' | sort | tr '\n' ' ')
+    ys_fail_expect="constmuldivmod-pbo fsm-pbo i2c_master_tests-pbo loops-pbo mem_arst-pbo memory-pbo sincos-pbo subbytes-pbo usb_phy_tests-pbo values-pbo "
+    [ "$ys_fail_list" = "$ys_fail_expect" ] || { echo "GATE FAIL: ys-e2e known-gap FAIL list drift:"; diff <(echo "$ys_fail_expect" | tr ' ' '\n' | head -n -1) <(echo "$ys_fail_list" | tr ' ' '\n' | head -n -1) || true; fail=1; }
+    echo "ryosys M0+M1+M2+M3 續弧批量收編+第二批: ry-cli contract + ys-e2e 469/479(461+批量收編第二批 anchors 8 例入 compare 面=async2sync/pmuxtree/dffunmap/setattr×2/torder/edgetypes×2;decode 錯誤形錨=expected.rtlil 面外由 cli_contract 執法;known-gap 10 例名單逐字維持;批量收編第二批規劃輪 RM11-1:sincos/i2c path_else 修補後殘差=D-ys8c 面1 hash 內部態(內層 pattern_t 序新子面),禁硬磕維持)"
     # live-compare 腿(§3-M1 闸③):oracle 在场=即时重录对拍不低于入库
     # 基线;缺 oracle=skip+note(比照 lint-parity 闸形态)。
     ys_live=$(cargo run -q -p ry-difftest -- --live --corpus corpus/ys-e2e 2>&1 | grep -E "^LIVE ys=" || true)
     if echo "$ys_live" | grep -q "LIVE ys=skip"; then
         echo "ryosys live-compare: $ys_live"
     elif [ -n "$ys_live" ]; then
-        # live 對拍面=record() 可再生面(402=base87+pb54+hier87+rj87+sm87);
-        # anchors 4 例為手寫 .il(record() 不再生,LIVE 不覆蓋,由 compare 面
-        # 401/406 執法)。
-        echo "$ys_live" | grep -q "LIVE ys=402/402" || { echo "GATE FAIL: ryosys live-compare below baseline: $ys_live"; fail=1; }
-        [ "$ys_live" = "LIVE ys=402/402" ] && echo "ryosys live-compare: 402/402 vs committed goldens"
+        # live 對拍面=record() 可再生面(456=base87+pb54+pbo54+hier87+rj87+
+        # sm87);anchors 24 例為手寫/自含 .il(M2 四例+M3 續弧批量收編 11 例
+        # +批量收編第二批 9 例=async2sync/pmuxtree/dffunmap/setattr×2[decode
+        # 錯誤形無 expected.rtlil=compare/LIVE 雙面外,由 cli_contract 執法]/
+        # torder/edgetypes×2 含 multibit 手寫錨;record() 不再生,LIVE 不
+        # 覆蓋,由 compare 面 469/479 執法)。
+        echo "$ys_live" | grep -q "LIVE ys=456/456" || { echo "GATE FAIL: ryosys live-compare below baseline: $ys_live"; fail=1; }
+        [ "$ys_live" = "LIVE ys=456/456" ] && echo "ryosys live-compare: 456/456 vs committed goldens"
     else
         echo "GATE FAIL: ryosys live-compare produced no LIVE line"; fail=1
     fi
