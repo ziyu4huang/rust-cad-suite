@@ -103,4 +103,16 @@ impl SigMap {
     pub fn map(&self, sig: &SigSpec) -> SigSpec {
         SigSpec { bits: sig.bits.iter().map(|b| self.map_bit(b)).collect() }
     }
+
+    /// SigMap::add(SigBit)(sigtools.h:342):位在庫中且其代表元為 wire 位
+    /// → promote 該位為代表元(opt_clean update_assign_map 的代表元重選面)。
+    pub fn promote(&mut self, bit: &SigBit) {
+        let Some(i) = self.index.iter().position(|(b, _)| b == bit) else {
+            return;
+        };
+        let root = self.ifind(i);
+        if matches!(self.index[root].0, SigBit::Wire { .. }) {
+            self.ipromote(i);
+        }
+    }
 }

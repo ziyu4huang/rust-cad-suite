@@ -190,16 +190,31 @@ impl SigSpec {
 }
 
 /// design 頂層:autoidx 計數(read 時取 max、write 時回放,實測值逐字保留)
-/// + 模組插入序清單。
+/// + 模組插入序清單 + 名字 intern 序表(oracle rtlil.h:162 global_id_index_
+/// 首見遞增;IdString::operator< 比的是這個序不是字串字典序——opt_expr
+/// TopoSort 的 compare_ptr_by_name 消費,M2 續弧 2026-10-29 立法)。
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct Design {
     pub autoidx: i64,
     pub modules: Vec<Module>,
+    /// read_rtlil 檔案序登記(首見遞增);pass 建名(autoidx N ≥
+    /// autoidx_base)不入表,由消費端派生。
+    pub intern_seq: std::collections::HashMap<String, u64>,
+    /// read_rtlil 完成時的 autoidx 值=「檔案名 vs pass 建名」分界
+    /// (oracle 寫檔 autoidx > 檔內一切 autoidx 衍生數字名;非 parser
+    /// 前端=0)。
+    pub autoidx_base: i64,
 }
 
 impl Design {
     pub fn find_module(&self, name: &str) -> Option<&Module> {
         self.modules.iter().find(|m| m.name == name)
+    }
+
+    /// 首見登記(檔案序);已登記=原序。
+    pub fn intern(&mut self, name: &str) -> u64 {
+        let next = self.intern_seq.len() as u64;
+        *self.intern_seq.entry(name.to_string()).or_insert(next)
     }
 }
 

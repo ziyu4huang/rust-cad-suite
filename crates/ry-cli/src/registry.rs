@@ -1,12 +1,16 @@
 //! 登記層命令表(yosys -H 普查,2026-10-27 錄製;RYOSYS-MVP §1.2/§7.0-1)。
 //!
 //! 來源=oracle 實跑 `yosys -H` 的 306 條「名字+描述」行(§0-12),名單
-//! 同輪入 corpus/ys-e2e/PROVENANCE——**普查 306=本表實數 286+實現層 20
-//! 命令**(main.rs:read_rtlil/read_json/write_rtlil/write_json/check/
-//! stat/hierarchy/simplemap——M0 五命令+M1 兌現 hierarchy/read_json/
-//! simplemap;M2 兌現 proc+proc_arst/clean/dff/dlatch/init/memwr/mux/
-//! prune/rmdead/rom+opt_expr;實現層不在本表,stub 數隨弧遞減:M2 後
-//! **286**)。命中本表=stub 硬錯 `ERROR: <cmd>: not implemented in
+//! 同輪入 corpus/ys-e2e/PROVENANCE——**普查 306=本表實數 275+實現層 31
+//! 命令**:main.rs:read_rtlil/read_json/write_rtlil/write_json/check/
+//! stat/hierarchy/simplemap/log/help——M0 五命令+M1 兌現 hierarchy/
+//! read_json/simplemap;M2 兌現 proc+proc_arst/clean/dff/dlatch/init/
+//! memwr/mux/prune/rmdead/rom+opt_expr;M3 兌現 opt 編排器+opt_clean/
+//! merge/muxtree/reduce/dff/share/lut/lut_ins/demorgan/ffinv;M3 續弧
+//! 兌現 log/help/clean/opt_balance_tree;實現層不在本表,stub 數隨弧遞減:批量收編第二批(2026-11-02,六命令
+//! 翻實現層同輪刪行)後
+//! **265**,餘 Y2=6(optbarriers/opt_hier/opt_mem 族×4=SAT 面與
+//! process/層級面,RYOSYS-MVP §9 實作輪實錄)。命中本表=stub 硬錯 `ERROR: <cmd>: not implemented in
 //! ryosys (milestone Yx)`(D-ys2);普查外名字=逐字重現
 //! oracle 的 `No such command` 錯誤。Y 碼映射(§1.2,按 §7.0-1 勘誤
 //! 修訂):opt 家族其餘 18 條→Y2(後續弧);read_verilog 族→Y3;其餘
@@ -30,7 +34,6 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("anlogic_fixcarry", "Y0"),
     ("arith_tree", "Y0"),
     ("assertpmux", "Y0"),
-    ("async2sync", "Y0"),
     ("attrmap", "Y0"),
     ("attrmvcp", "Y0"),
     ("autoname", "Y0"),
@@ -47,7 +50,6 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("chformal", "Y0"),
     ("chparam", "Y0"),
     ("chtype", "Y0"),
-    ("clean", "Y0"),
     ("clean_zerowidth", "Y0"),
     ("clk2fflogic", "Y0"),
     ("clkbufmap", "Y0"),
@@ -67,12 +69,10 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("dffinit", "Y0"),
     ("dfflegalize", "Y0"),
     ("dfflibmap", "Y0"),
-    ("dffunmap", "Y0"),
     ("dft_tag", "Y0"),
     ("dump", "Y0"),
     ("echo", "Y0"),
-    ("edgetypes", "Y0"),
-    ("efinix_fixcarry", "Y0"),
+        ("efinix_fixcarry", "Y0"),
     ("equiv_add", "Y0"),
     ("equiv_induct", "Y0"),
     ("equiv_make", "Y0"),
@@ -111,7 +111,6 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("future", "Y0"),
     ("gatemate_foldinv", "Y0"),
     ("glift", "Y0"),
-    ("help", "Y0"),
     ("hilomap", "Y0"),
     ("history", "Y0"),
     ("ice40_braminit", "Y0"),
@@ -130,7 +129,6 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("libcache", "Y0"),
     ("license", "Y0"),
     ("linecoverage", "Y0"),
-    ("log", "Y0"),
     ("logger", "Y0"),
     ("ls", "Y0"),
     ("ltp", "Y0"),
@@ -159,29 +157,16 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("nx_carry", "Y0"),
     ("onehot", "Y0"),
     ("opensta", "Y0"),
-    ("opt", "Y2"),
-    ("opt_balance_tree", "Y2"),
-    ("opt_clean", "Y2"),
-    ("opt_demorgan", "Y2"),
-    ("opt_dff", "Y2"),
-    ("opt_ffinv", "Y2"),
     ("opt_hier", "Y2"),
-    ("opt_lut", "Y2"),
-    ("opt_lut_ins", "Y2"),
     ("opt_mem", "Y2"),
     ("opt_mem_feedback", "Y2"),
     ("opt_mem_priority", "Y2"),
     ("opt_mem_widen", "Y2"),
-    ("opt_merge", "Y2"),
-    ("opt_muxtree", "Y2"),
-    ("opt_reduce", "Y2"),
-    ("opt_share", "Y2"),
     ("optbarriers", "Y2"),
     ("paramap", "Y0"),
     ("peepopt", "Y0"),
     ("plugin", "Y0"),
     ("pmux2shiftx", "Y0"),
-    ("pmuxtree", "Y0"),
     ("portarcs", "Y0"),
     ("portlist", "Y0"),
     ("prep", "Y0"),
@@ -211,7 +196,6 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("script", "Y0"),
     ("sdc_expand", "Y0"),
     ("select", "Y0"),
-    ("setattr", "Y0"),
     ("setenv", "Y0"),
     ("setparam", "Y0"),
     ("setundef", "Y0"),
@@ -265,8 +249,7 @@ pub const REGISTERED: &[(&str, &str)] = &[
     ("test_slangdiag", "Y0"),
     ("test_slangexpr", "Y0"),
     ("timeest", "Y0"),
-    ("torder", "Y0"),
-    ("trace", "Y0"),
+        ("trace", "Y0"),
     ("tribuf", "Y0"),
     ("uniquify", "Y0"),
     ("verific", "Y0"),

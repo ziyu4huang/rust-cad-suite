@@ -316,7 +316,12 @@ pub fn read_json(text: &str, log: &mut String) -> Result<Design, String> {
         _ => return Err("JSON: modules node is not a dictionary.".to_string()),
     };
 
-    let mut design = Design { autoidx: 1, modules: Vec::new() };
+    // jsonin 前端不登記 intern 序。邊界(2026-10-30 復審立法):autoidx_base=1
+    // 使 `$<N>` 數字尾名(yosys JSON 私有名 `$abc$123` 形)在 opt_expr
+    // intern_key 落入建名域 (1,N) 按 N 序、**不**回落 cells 向量序——
+    // 語料面不觸(-rj 腳本不跑 opt_expr),擴 read_json→opt_expr 面前
+    // 先補 intern 登記或重定義 base 語義(正典=SKILL intern 條前端分界句)。
+    let mut design = Design { autoidx: 1, modules: Vec::new(), intern_seq: Default::default(), autoidx_base: 1 };
     // data_dict 正向迭代=逆文件序。
     for (modname, mnode) in entries.iter().rev() {
         let stored = escape_id(modname);

@@ -336,9 +336,9 @@ fn proc_clean_switch(sw: &mut SwitchRule, parent: &mut CaseRule, parent_first: b
             parent.actions.push(a);
         }
         let moved = std::mem::take(&mut sw.cases[0].switches);
-        for m in moved {
-            parent.switches.insert(0, m);
-        }
+        // oracle proc_clean.cc:72 = range-insert-at-begin,保相對序
+        // (逐元素 insert(0) 會翻轉 [read, WR]→[WR, read],mem_arst 實錄)。
+        parent.switches.splice(0..0, moved);
         sw.cases.clear();
     } else {
         for cs in sw.cases.iter_mut() {
@@ -2899,7 +2899,6 @@ fn proc_dlatch_proc(
         let nset2 = if has_rst && !has_set { FALSE_NODE } else if has_set && !has_rst { nset } else { FALSE_NODE };
 
         let mut db = DlatchDb::new(module);
-        let mut rules = RulesDb::new();
 
         let n = find_mux_feedback(module, &mut db, &mut rules, ib.clone(), &ob, true);
         holds.push((ob.clone(), n));

@@ -186,6 +186,321 @@ fn proc_and_opt_expr_keepdc_flip_pass() {
 }
 
 #[test]
+fn empty_design_three_commands_rc0() {
+    // D-ys6 清償(§9.0-P9 母本;oracle 空設計 stat/check/hierarchy rc=0):
+    // * stat → `1. Printing statistics.` 無統計段
+    // * check → header+`Found and reported 0 problems.`
+    // * hierarchy → header 後無 sub-header
+    // 自創無設計硬錯文案已全刪(驗收 7 負向閘;rg 字面量 exit=1)。
+    for (cmd, want) in [
+        ("stat", "1. Printing statistics.\n"),
+        (
+            "check",
+            "1. Executing CHECK pass (checking for obvious problems).\nFound and reported 0 problems.\n",
+        ),
+        (
+            "hierarchy",
+            "1. Executing HIERARCHY pass (managing design hierarchy).\n",
+        ),
+    ] {
+        let (rc, so, se) = run(&["-p", cmd]);
+        assert_eq!(rc, 0, "{cmd}");
+        assert_eq!(se, "", "{cmd}");
+        let body: String = so
+            .lines()
+            .skip_while(|l| !l.starts_with("-- Running command"))
+            .skip(1)
+            .take_while(|l| !l.starts_with("End of script"))
+            .filter(|l| !l.is_empty())
+            .map(|l| format!("{l}\n"))
+            .collect();
+        assert_eq!(body, want, "{cmd}");
+    }
+}
+
+#[test]
+fn opt_family_flag_y2_probes() {
+    // M3 slice-1 探针 fixture(R2 先釘死再擴命令面;RYOSYS-MVP §9.2):
+    // opt 編排器旗標面與子 pass standalone 旗標面=Y2 硬錯(全文斷言取
+    // contains 形——stub 期 `opt: not implemented` 與翻轉後 option 形
+    // `opt: option `-fast' is not implemented` 兩態皆命中,鐵則 3 同輪
+    // 更新由各 slice 消費)。
+    for cmd in [
+        "opt -fast",
+        "opt -full",
+        "opt -fine",
+        "opt -keepdc",
+        "opt -purge",
+        "opt -noff",
+        "opt -hier",
+        "opt_clean -purge",
+        "opt_merge -nomux",
+        "opt_merge -share_all",
+        "opt_reduce -fine",
+        "opt_reduce -full",
+        "opt_dff -nodffe",
+        "opt_dff -nosdff",
+        "opt_dff -sat",
+        // opt_expr 6 新旗标(续弧维持硬错;验收 8:硬错裁决=fixture 含旗标 token)
+        "opt_expr -mux_undef",
+        "opt_expr -mux_bool",
+        "opt_expr -undriven",
+        "opt_expr -noclkinv",
+        "opt_expr -fine",
+        "opt_expr -full",
+    ] {
+        let (rc, _, se) = run(&["-p", cmd]);
+        let first = cmd.split(' ').next().unwrap();
+        assert_eq!(rc, 1, "{cmd}");
+        assert!(
+            se.contains("milestone Y2") && se.starts_with(&format!("ERROR: {first}")),
+            "{cmd}: {se}"
+        );
+    }
+}
+
+// ---------------------------------------------------------------------------
+// M3 续弧·批量收编 slice-1 探针 fixture 先钉(R2 先钉再翻;RYOSYS-MVP §10.1):
+// 四单元 clean/log/help/opt_balance_tree 现行=stub 硬错,本轮以 stub 形钉死;
+// 各 slice 翻转时同轮更新断言为翻轉后形态(铁则 3:能力变更同轮)。
+// ---------------------------------------------------------------------------
+
+#[test]
+fn clean_cmd_forms() {
+    // slice-3 翻转(铁则 3 同轮):无参/-purge=实现(rc=0、零输出、编号
+    // 不占;P1);-foo=cmd_error 全形(oracle 实录形两端一致,stderr 三行
+    // +stdout Syntax 块;byte-exact=PROVENANCE M3 续弧节实录)。
+    for cmd in ["clean", "clean -purge", "clean -purge -purge"] {
+        let (rc, so, se) = run(&["-p", cmd]);
+        assert_eq!(rc, 0, "{cmd}");
+        assert_eq!(se, "", "{cmd}");
+        assert_eq!(so, format!("-- Running command `{cmd}' --\n\n"), "{cmd}");
+    }
+    let (rc, so, se) = run(&["-p", "clean -foo"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> clean -foo\n>       ^\n"
+    );
+    assert!(so.contains("Syntax error in command `clean -foo':"), "{so}");
+    assert!(so.contains("    clean [options] [selection]"), "{so}");
+    assert!(
+        so.contains("This is identical to 'opt_clean', but less verbose."),
+        "{so}"
+    );
+}
+
+#[test]
+fn clean_cmd_selection_divergence() {
+    // D-ys10(§10.1-1/§10.2):oracle 经 extra_args(select=true 默认)
+    // 接受 selection 并正常执行 rc=0;我方=cmd_error rc=1=真实行为面
+    // 分歧,登记 docs/REGISTRY.md。fixture 钉我方 cmd_error 全文断言形
+    // (实录形与我方硬错永不相等,禁用 oracle 实录 golden)。
+    let (rc, _, se) = run(&["-p", "clean carryadd/w:*"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> clean carryadd/w:*\n>       ^\n"
+    );
+}
+
+#[test]
+fn triple_semicolon_end_to_end_clean_purge() {
+    // `;;;` 端到端(§10.1-1;token 层 fixture=p_split_triple_semicolon_
+    // appends_clean_purge 已在):clean -purge 真执行且不占编号
+    // (两 CHECK header 编号连续 2./3.,锚=ys-m3-anchors/
+    // semicolon-end-to-end byte-exact)。
+    let dir = std::env::temp_dir().join(format!("ry-cli-sc-{}", std::process::id()));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(&dir).unwrap();
+    std::fs::write(
+        &dir.join("t.il"),
+        "module \\top\n  wire width 4 input 1 \\a\n  wire width 4 \\t\n  wire width 4 output 2 \\y\n  cell $and $u\n    parameter \\A_SIGNED 0\n    parameter \\B_SIGNED 0\n    parameter \\A_WIDTH 4\n    parameter \\B_WIDTH 4\n    parameter \\Y_WIDTH 4\n    connect \\A \\a\n    connect \\B \\a\n    connect \\Y \\t\n  end\n  connect \\y \\a\nend\n",
+    )
+    .unwrap();
+    let out = ryosys()
+        .arg("-p")
+        .arg("read_rtlil t.il; check ;;; check")
+        .current_dir(&dir)
+        .output()
+        .unwrap();
+    let rc = out.status.code().unwrap();
+    let so = String::from_utf8_lossy(&out.stdout).into_owned();
+    assert_eq!(rc, 0);
+    assert!(so.contains("2. Executing CHECK pass"), "{so}");
+    assert!(so.contains("3. Executing CHECK pass"), "{so}");
+    assert!(so.contains("Removed 1 unused cells and 1 unused wires."), "{so}");
+    let _ = std::fs::remove_dir_all(&dir);
+}
+
+#[test]
+fn log_flag_stdout_y2_error() {
+    // slice-2 翻转(铁则 3 同轮):七已知旗标=Y2 硬错(oracle 真实行为
+    // =旗标语义执行,行为面歧登记 D-ys10;P3 七形实录 PROVENANCE)。
+    let (rc, _, se) = run(&["-p", "log -stdout"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: log: option `-stdout' is not implemented in ryosys (milestone Y2)\n"
+    );
+}
+
+#[test]
+fn log_flag_stderr_y2_error() {
+    let (rc, _, se) = run(&["-p", "log -stderr"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: log: option `-stderr' is not implemented in ryosys (milestone Y2)\n"
+    );
+}
+
+#[test]
+fn log_flag_nolog_y2_error() {
+    let (rc, _, se) = run(&["-p", "log -nolog"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: log: option `-nolog' is not implemented in ryosys (milestone Y2)\n"
+    );
+}
+
+#[test]
+fn log_flag_n_y2_error() {
+    let (rc, _, se) = run(&["-p", "log -n"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: log: option `-n' is not implemented in ryosys (milestone Y2)\n"
+    );
+}
+
+#[test]
+fn log_flag_header_y2_error() {
+    let (rc, _, se) = run(&["-p", "log -header"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: log: option `-header' is not implemented in ryosys (milestone Y2)\n"
+    );
+}
+
+#[test]
+fn log_flag_push_y2_error() {
+    let (rc, _, se) = run(&["-p", "log -push"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: log: option `-push' is not implemented in ryosys (milestone Y2)\n"
+    );
+}
+
+#[test]
+fn log_flag_pop_y2_error() {
+    let (rc, _, se) = run(&["-p", "log -pop"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: log: option `-pop' is not implemented in ryosys (milestone Y2)\n"
+    );
+}
+
+#[test]
+fn log_unknown_token_prints_verbatim() {
+    // P3 oracle 亲证(免费对齐):未知 -token=原样拼接打印 rc=0,
+    // 防「把 - 开头 token 误当旗标报错」的实现走偏(§10.1-2)。
+    let (rc, so, se) = run(&["-p", "log -foo"]);
+    assert_eq!(rc, 0);
+    assert_eq!(se, "");
+    assert_eq!(so, "-- Running command `log -foo' --\n-foo\n\n");
+}
+
+#[test]
+fn log_quoted_semicolon_end_to_end() {
+    // 引号端到端(§10.1-2;token 层 fixture=p_split_quoted_semicolon_
+    // does_not_split 已在):`log "a;b"` 命令真执行,引号保留原样打印
+    // (§0-11 引号契约的执行载体)。
+    let (rc, so, se) = run(&["-p", "log \"a;b\""]);
+    assert_eq!(rc, 0);
+    assert_eq!(se, "");
+    assert_eq!(so, "-- Running command `log \"a;b\"' --\n\"a;b\"\n\n");
+}
+
+#[test]
+fn help_bare_312_line_listing() {
+    // slice-2 翻转:bare help=横幅+空行+306 名单(`    %-20s %s`)+
+    // 空行+两行 Type+空行=312 行(归一化形;oracle 原形 323 行=P5,
+    // 差 11 行=driver 横幅 8+epilogue 3)。与 oracle -H 剥面对拍零差
+    // (免费对拍闸,PROVENANCE M3 续弧节实录)。
+    let (rc, so, se) = run(&["-p", "help"]);
+    assert_eq!(rc, 0);
+    assert_eq!(se, "");
+    let lines: Vec<&str> = so.split('\n').collect();
+    assert_eq!(lines.len(), 313, "312 lines + trailing empty");
+    assert_eq!(lines[0], "-- Running command `help' --");
+    assert_eq!(lines[1], "");
+    assert_eq!(
+        lines[2],
+        "    abc                  use ABC for technology mapping"
+    );
+    assert_eq!(
+        lines[307],
+        "    zinit                add inverters so all FF are zero-initialized"
+    );
+    assert_eq!(lines[308], "");
+    assert_eq!(
+        lines[309],
+        "Type 'help <command>' for more information on a command."
+    );
+    assert_eq!(
+        lines[310],
+        "Type 'help -cells' for a list of all cell types."
+    );
+    assert_eq!(lines[311], "");
+}
+
+#[test]
+fn help_subform_y2_error_probes() {
+    // slice-2 翻转:子形(<名>/未知名/-foo/两参/-all/-cells)=Y2 硬错
+    // (D-ys10:oracle 未知名 rc=0 log 形=分歧本体,P5/P6)。
+    for cmd in [
+        "help nosuchpass",
+        "help -foo",
+        "help opt clean",
+        "help -all",
+        "help -cells",
+    ] {
+        let (rc, _, se) = run(&["-p", cmd]);
+        assert_eq!(rc, 1, "{cmd}");
+        assert!(
+            se.contains("milestone Y2") && se.starts_with("ERROR: help"),
+            "{cmd}: {se}"
+        );
+    }
+}
+
+#[test]
+fn opt_balance_tree_arith_logic_y2_errors() {
+    // slice-4 翻转(铁则 3 同轮):无参形=实现(carryadd/multiplier 锚
+    // byte-exact);-arith/-logic=option 形 Y2 硬错(D-ys10:oracle 真实
+    // 型別置換,§10.2 边界)。
+    let (rc, _, _) = run(&["-p", "opt_balance_tree"]);
+    assert_eq!(rc, 0);
+    for cmd in ["opt_balance_tree -arith", "opt_balance_tree -logic"] {
+        let (rc, _, se) = run(&["-p", cmd]);
+        assert_eq!(rc, 1, "{cmd}");
+        assert_eq!(
+            se,
+            format!(
+                "ERROR: opt_balance_tree: option `{}' is not implemented in ryosys (milestone Y2)\n",
+                cmd.split(' ').nth(1).unwrap()
+            ),
+            "{cmd}"
+        );
+    }
+}
+
+#[test]
 fn simplemap_m1d_surface() {
     // M1-d:simplemap 無參子集——Mapping 行(`%s.%s (%s).` unescape 形)、
     // autoidx 分配($auto$simplemap.cc:<L>:<func>$N 行號錨=二進制實錄,
@@ -518,6 +833,222 @@ fn proc_stub_in_flip_script() {
     assert!(so.starts_with(&format!("-- Running command `{SCRIPT_PB}' --\n")));
     assert!(!so.contains("ERROR"));
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+// ---------------------------------------------------------------------------
+// M3 续弧·批量收编第二批 slice-1 探针 fixture 先钉(R2 先钉再翻;
+// RYOSYS-MVP §11.4):六命令 async2sync/pmuxtree/dffunmap/setattr/torder/
+// edgetypes 现行=registry stub Y0 硬错,本轮以 stub 形钉死;各 slice 翻转
+// 时同轮更新断言为翻轉后形态(铁则 3:能力变更同轮)。
+// * 未知旗标形翻转目标=cmd_error 全形(oracle 实录形=stderr 三行
+//   `Command syntax error…`+`> 串`+`> 空格^`,stdout=header(有 header
+//   面)+`Syntax error in command …`+help 全文;六份 help 常量已落
+//   help_desc.rs);
+// * selection 形(裸字参数)翻转目标=我方 cmd_error(D-ys11:oracle 经
+//   extra_args 接受 rc=0=行为面歧,本轮 stub 期=Y0);
+// * 已知旗标形翻转目标=Y2 文案(async2sync -nolower/dffunmap 两旗标含
+//   双投互斥形/torder 两旗标,§11.1-8);
+// * setattr decode 错误形暂钉 stub 行为,slice-6 翻转为 oracle 逐字
+//   `ERROR: Can't decode value 'true'!`(rc=1)。
+// ---------------------------------------------------------------------------
+
+#[test]
+fn batch2_six_stub_bare_forms_y0() {
+    // slice-3 翻转(铁则 3 同轮):async2sync 无参形=实现层(空设计=
+    // header 即止 rc=0,oracle 空跑亲证);余五命令维持 stub Y0。
+    let (rc, so, se) = run(&["-p", "async2sync"]);
+    assert_eq!(rc, 0);
+    assert_eq!(se, "");
+    assert_eq!(
+        so,
+        "-- Running command `async2sync' --\n\n1. Executing ASYNC2SYNC pass.\n\n"
+    );
+    let (rc, so, se) = run(&["-p", "pmuxtree"]);
+    assert_eq!(rc, 0);
+    assert_eq!(se, "");
+    assert_eq!(
+        so,
+        "-- Running command `pmuxtree' --\n\n1. Executing PMUXTREE pass.\n\n"
+    );
+    let (rc, so, se) = run(&["-p", "dffunmap"]);
+    assert_eq!(rc, 0);
+    assert_eq!(se, "");
+    assert_eq!(
+        so,
+        "-- Running command `dffunmap' --\n\n1. Executing DFFUNMAP pass (unmap clock enable and synchronous reset from FFs).\n\n"
+    );
+    // slice-6 翻转(铁则 3 同轮):setattr 无参形=实现层(执行体静默,
+    // 零 header 不占编号=oracle sa1.log 形)。
+    let (rc, so, se) = run(&["-p", "setattr"]);
+    assert_eq!(rc, 0);
+    assert_eq!(se, "");
+    assert_eq!(so, "-- Running command `setattr' --\n\n");
+    // slice-7 翻转(铁则 3 同轮):torder/edgetypes 无参形=实现层。
+    let (rc, so, se) = run(&["-p", "torder"]);
+    assert_eq!(rc, 0);
+    assert_eq!(se, "");
+    assert_eq!(
+        so,
+        "-- Running command `torder' --\n\n1. Executing TORDER pass (print cells in topological order).\n\n"
+    );
+    let (rc, so, se) = run(&["-p", "edgetypes"]);
+    assert_eq!(rc, 0);
+    assert_eq!(se, "");
+    assert_eq!(so, "-- Running command `edgetypes' --\n\n");
+}
+
+#[test]
+fn batch2_six_stub_flag_forms_y0() {
+    // slice-3 翻转(铁则 3 同轮):async2sync -foo=cmd_error 全形(oracle
+    // 实录形=stderr 三行+stdout header+Syntax 块+help 全文);-nolower=
+    // Y2 文案;余五命令 stub 期一律 Y0(命中 registry 表,旗标不分已知
+    // 未知);翻转 slice 同轮按三形分流(未知=cmd_error 全形/已知=Y2)。
+    let (rc, so, se) = run(&["-p", "async2sync -foo"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> async2sync -foo\n>            ^\n"
+    );
+    assert!(
+        so.starts_with("-- Running command `async2sync -foo' --\n\n1. Executing ASYNC2SYNC pass.\n\nSyntax error in command `async2sync -foo':\n"),
+        "{so}"
+    );
+    assert!(so.contains("    async2sync [options] [selection]"), "{so}");
+    assert!(so.contains("Do not automatically run 'chformal -lower'"), "{so}");
+    let (rc, _, se) = run(&["-p", "async2sync -nolower"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: async2sync: option `-nolower' is not implemented in ryosys (milestone Y2)\n"
+    );
+    let (rc, so, se) = run(&["-p", "pmuxtree -foo"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> pmuxtree -foo\n>          ^\n"
+    );
+    assert!(
+        so.starts_with("-- Running command `pmuxtree -foo' --\n\n1. Executing PMUXTREE pass.\n\nSyntax error in command `pmuxtree -foo':\n"),
+        "{so}"
+    );
+    assert!(so.contains("    pmuxtree [selection]"), "{so}");
+    let (rc, so, se) = run(&["-p", "dffunmap -foo"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> dffunmap -foo\n>          ^\n"
+    );
+    assert!(
+        so.starts_with("-- Running command `dffunmap -foo' --\n\n1. Executing DFFUNMAP pass (unmap clock enable and synchronous reset from FFs).\n\nSyntax error in command `dffunmap -foo':\n"),
+        "{so}"
+    );
+    assert!(so.contains("    dffunmap [options] [selection]"), "{so}");
+    for cmd in ["dffunmap -ce-only", "dffunmap -srst-only", "dffunmap -ce-only -srst-only"] {
+        let (rc, _, se) = run(&["-p", cmd]);
+        let f = cmd.split(' ').nth(1).unwrap();
+        assert_eq!(rc, 1, "{cmd}");
+        assert_eq!(
+            se,
+            format!("ERROR: dffunmap: option `{f}' is not implemented in ryosys (milestone Y2)\n"),
+            "{cmd}"
+        );
+    }
+    // 余五命令已全部翻转,stub 列表清空(六命令=实现层;铁则 3 收口)。
+}
+
+#[test]
+fn batch2_six_stub_selection_forms_y0() {
+    // selection 裸字形(D-ys11 面):oracle 经 extra_args 接受 rc=0
+    // (本轮亲证 async2sync MyMem/* rc=0);我方=cmd_error rc=1=行为面
+    // 分歧已登记。slice-3 翻转:async2sync=cmd_error 全文断言形;余五
+    // 命令 stub 期=Y0。
+    let (rc, _, se) = run(&["-p", "async2sync top/*"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> async2sync top/*\n>            ^\n"
+    );
+    let (rc, _, se) = run(&["-p", "pmuxtree top/*"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> pmuxtree top/*\n>          ^\n"
+    );
+    let (rc, _, se) = run(&["-p", "dffunmap top/*"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> dffunmap top/*\n>          ^\n"
+    );
+    let (rc, so, se) = run(&["-p", "setattr -foo"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> setattr -foo\n>         ^\n"
+    );
+    assert!(
+        so.starts_with("-- Running command `setattr -foo' --\n\nSyntax error in command `setattr -foo':\n"),
+        "{so}"
+    );
+    assert!(
+        so.contains("    setattr [ -mod ] [ -set name value | -unset name ]... [selection]"),
+        "{so}"
+    );
+    // decode 错误形(slice-6 翻转;oracle 逐字=stderr ERROR+rc=1,stdout
+    // 仅横幅;setq 锚 golden=corpus/ys-batch2-anchors/setattr-decode-err)。
+    let (rc, so, se) = run(&["-p", "setattr -set src_sync true"]);
+    assert_eq!(rc, 1);
+    assert_eq!(se, "ERROR: Can't decode value 'true'!\n");
+    assert_eq!(so, "-- Running command `setattr -set src_sync true' --\n");
+    let (rc, _, se) = run(&["-p", "setattr top/*"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> setattr top/*\n>         ^\n"
+    );
+    let (rc, _, se) = run(&["-p", "torder -stop"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: torder: option `-stop' is not implemented in ryosys (milestone Y2)\n"
+    );
+    let (rc, _, se) = run(&["-p", "torder -noautostop"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: torder: option `-noautostop' is not implemented in ryosys (milestone Y2)\n"
+    );
+    let (rc, _, se) = run(&["-p", "torder -stop $and Y"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: torder: option `-stop' is not implemented in ryosys (milestone Y2)\n"
+    );
+    let (rc, _, se) = run(&["-p", "torder -foo"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> torder -foo\n>        ^\n"
+    );
+    let (rc, _, se) = run(&["-p", "torder top/*"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> torder top/*\n>        ^\n"
+    );
+    let (rc, _, se) = run(&["-p", "edgetypes -foo"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> edgetypes -foo\n>           ^\n"
+    );
+    let (rc, _, se) = run(&["-p", "edgetypes top/*"]);
+    assert_eq!(rc, 1);
+    assert_eq!(
+        se,
+        "ERROR: Command syntax error: Unknown option or option in arguments.\n> edgetypes top/*\n>           ^\n"
+    );
+
 }
 
 // 讓 Write 引入不觸發 unused 警告(happy_path 的 Stdio 用 piping)。

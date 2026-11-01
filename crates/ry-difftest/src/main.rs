@@ -39,6 +39,8 @@ const SCRIPT_SM: &str = "read_rtlil case.il; simplemap; check; stat; write_rtlil
 /// M2 翻轉腳本(§8.2-P2 逐字;-pb 層):-pb 層錄製與 compare 同一常量
 /// (RM2-7:結構上不可能單側翻)。
 pub const SCRIPT_PB: &str = "read_rtlil case.il; proc; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json";
+/// M3 擴容層(RYOSYS-MVP §9.1-5 逐字;-pbo 層):-pb 輸入 + opt 全鏈。
+pub const SCRIPT_PBO: &str = "read_rtlil case.il; proc; opt; check; stat; write_rtlil -readable expected.rtlil; write_json expected.json";
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -89,6 +91,7 @@ fn record(corpus: &Path) {
     let mut excluded: Vec<String> = Vec::new();
     let mut n_pfree = 0usize;
     let mut n_pbearing = 0usize;
+    let mut n_pbo = 0usize;
 
     for f in &files {
         let stem = f.trim_end_matches(".v").to_string();
@@ -161,10 +164,21 @@ fn record(corpus: &Path) {
                 // -pb 層的腳本檔(與 -hier/-rj/-sm 同機制;M2 翻轉腳本)。
                 fs::write(dir.join("script.txt"), format!("{SCRIPT_PB}\n")).unwrap();
                 n_pbearing += 1;
+                // M3 層:-pbo(同 case.il;opt 全鏈,§9.1-5 逐字)。
+                let pdir = corpus.join(format!("{stem}-pbo"));
+                fs::create_dir_all(&pdir).unwrap();
+                fs::copy(dir.join("case.il"), pdir.join("case.il")).unwrap();
+                fs::write(pdir.join("script.txt"), format!("{SCRIPT_PBO}\n")).unwrap();
+                let (rc, so, se) = run_in(&pdir, &yosys, SCRIPT_PBO);
+                write_golden(&pdir, rc, &so, &se);
+                n_pbo += 1;
             }
         }
     }
-    println!("recorded pfree={n_pfree} pbearing={n_pbearing} total={}", n_pfree + n_pbearing);
+    println!(
+        "recorded pfree={n_pfree} pbearing={n_pbearing} pbo={n_pbo} total={}",
+        n_pfree + n_pbearing + n_pbo
+    );
     if !excluded.is_empty() {
         println!("EXCLUDED (登記入 PROVENANCE 排除表):");
         for e in &excluded {

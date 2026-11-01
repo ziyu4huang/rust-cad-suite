@@ -44,9 +44,43 @@ fn oracle_il_roundtrip_byte_exact() {
             // M2 翻轉後:-pb 例與 anchors 4 例(global_ff/posedge_memwr/
             // edge_reject/global_memwr)的 expected.rtlil=proc 後產物或
             // 拒收形 0-byte(非 case.il 的 roundtrip 形),與本測試
-            // 「parse case.il→write」不可比——由 ry-difftest 401/406
+            // 「parse case.il→write」不可比——由 ry-difftest 406/406
             // 四件套面承擔;冪等鎖(下測)對這些例仍生效。
+            // M3 續弧批量收編 anchors 11 例中 6 例=變換後產物
+            // (expected.rtlil≠case.il 冪等形):clean-unknown-option=
+            // 拒收形 0-byte;min2-clean/min2-purge=clean 後;
+            // semicolon-end-to-end=;;; 展開 clean -purge 後;
+            // obt-carryadd/obt-multiplier-proc=opt_balance_tree 後。
+            // log 三形/proc-clean/proc-optclean(process 模組靜默
+            // 不變換)=冪等形仍受本測執法。鐵則 3 同輪(2026-11-01)。
+            let m3_anchor_transformed = matches!(
+                name.as_str(),
+                "clean-unknown-option"
+                    | "min2-clean"
+                    | "min2-purge"
+                    | "semicolon-end-to-end"
+                    | "obt-carryadd"
+                    | "obt-multiplier-proc"
+            );
+            // 批量收編第二批 anchors 8 例=變換後產物(expected.rtlil≠
+            // case.il 冪等形;2026-11-02):async2sync/pmuxtree/dffunmap/
+            // setattr×2/torder/edgetypes×2——品質由 ry-difftest 四件套面
+            // 承擔;decode 錯誤形錨(setattr-decode-err)無 expected.rtlil
+            // =下方存在性過濾面外。鐵則 3 同輪。
+            let batch2_anchor_transformed = matches!(
+                name.as_str(),
+                "async2sync-memarst"
+                    | "pmuxtree-fsm"
+                    | "dffunmap-fsm"
+                    | "setattr-set"
+                    | "setattr-unset-mod-quote"
+                    | "torder-carryadd"
+                    | "edgetypes-carryadd"
+                    | "edgetypes-multibit"
+            );
             if name.ends_with("-pb")
+                || m3_anchor_transformed
+                || batch2_anchor_transformed
                 || matches!(
                     name.as_str(),
                     "global_ff" | "posedge_memwr" | "edge_reject" | "global_memwr"
@@ -59,17 +93,22 @@ fn oracle_il_roundtrip_byte_exact() {
         // M1 擴容層的 expected.rtlil 不是 case.il 的 read→write 冪等形:
         // -rj 來自 read_json 流;-hier=hierarchy 變換後(wandwor-hier 的
         // wand/wor 重解析≠case.il;其餘案例恰恆等故 314 時代僥倖通過,
-        // 契約面不應依賴該恆等);-sm=simplemap 變換後。三層全部排除,
-        // 品質由 ry-difftest 對拍把關(閘語義=M0/P-bearing 冪等層)。
+        // 契約面不應依賴該恆等);-sm=simplemap 變換後;-pbo=opt 變換後
+        // (M3,golden=opt 後產物,roundtrip 語義=輸入冪等層不覆蓋變換層)。
+        // 四層全部排除,品質由 ry-difftest 對拍把關(閘語義=M0/P-bearing
+        // 冪等層)。
         .filter(|name| {
-            !name.ends_with("-rj") && !name.ends_with("-hier") && !name.ends_with("-sm")
+            !name.ends_with("-rj")
+                && !name.ends_with("-hier")
+                && !name.ends_with("-sm")
+                && !name.ends_with("-pbo")
         })
         .collect();
     cases.sort();
 
     // §3-M0 閘①:≥20 例。M2 翻轉後 -pb 層的 expected.rtlil=proc 後產物
     // (已在上方排除),P-bearing 的 roundtrip/冪等鎖由 ry-difftest 的
-    // 401/406 四件套面+下方冪等測試(含 -pb 例)承擔。
+    // 406/406 四件套面+下方冪等測試(含 -pb 例)承擔。
     assert!(cases.len() >= 20, "roundtrip 案例數 {} < 20", cases.len());
 
     let mut failures: Vec<String> = Vec::new();

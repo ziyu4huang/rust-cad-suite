@@ -81,6 +81,8 @@ impl<'a> Parser<'a> {
         // `autoidx 0'→回放 1;無 autoidx 行→1;`autoidx 0'+`autoidx 5'→5;
         // 三模組無行→仍 1——消耗一次,與模組數無關)。等效 max(parse, 1)。
         self.design.autoidx = self.design.autoidx.max(1);
+        // 分界值:此後 autoidx 產生的名字=pass 建名(intern key 派生域)。
+        self.design.autoidx_base = self.design.autoidx;
         Ok(())
     }
 
@@ -97,6 +99,8 @@ impl<'a> Parser<'a> {
     fn parse_module(&mut self) -> Result<(), RyError> {
         let module_name = self.cur.parse_id()?;
         self.cur.expect_eol()?;
+        // 名字首見 intern(rtlil.h:162;檔案序,五類登記點之一)。
+        self.design.intern(&module_name);
 
         let mut delete_current_module = false;
         let mut replace_existing = false;
@@ -241,6 +245,7 @@ impl<'a> Parser<'a> {
             }
         }
 
+        self.design.intern(&name);
         module.wires.push(Wire {
             name,
             width,
@@ -295,6 +300,7 @@ impl<'a> Parser<'a> {
             }
         }
 
+        self.design.intern(&name);
         module.memories.push(Memory {
             name,
             width,
@@ -314,6 +320,7 @@ impl<'a> Parser<'a> {
         if module.find_cell(&cell_name).is_some() {
             return Err(self.err(format!("RTLIL error: redefinition of cell {cell_name}.")));
         }
+        self.design.intern(&cell_name);
         let mut cell = Cell {
             ctype: cell_type,
             name: cell_name,
@@ -543,6 +550,7 @@ impl<'a> Parser<'a> {
         if module.find_process(&proc_name).is_some() {
             return Err(self.err(format!("RTLIL error: redefinition of process {proc_name}.")));
         }
+        self.design.intern(&proc_name);
         let mut proc = Process {
             name: proc_name,
             attributes: std::mem::take(&mut self.attrbuf),

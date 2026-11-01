@@ -119,6 +119,16 @@ impl AssignMap {
     }
 }
 
+/// Const::as_bool(rtlil.cc:536)=**任意位 S1 即 true(非零語義)**;與
+/// sigops::const_as_bool(LSB 形,1 位面等價)在多寬常數上不同——identity
+/// 判定(opt_expr.cc:1340/1351/1369)消費本形。
+fn const_nonzero(c: &Const) -> bool {
+    match c {
+        Const::Str(s) => s.bytes().any(|b| b != 0),
+        Const::Bits { bits, .. } => bits.iter().any(|&b| b == Bit::S1),
+    }
+}
+
 // ---------------------------------------------------------------------------
 // invert_map + polarity 面(opt_expr.cc:400-487)
 // ---------------------------------------------------------------------------
@@ -235,22 +245,51 @@ const SWAPS: &[(&str, &str, &str)] = &[
 ];
 
 // ---------------------------------------------------------------------------
-// TopoSort(kernel/utils.h;起點=cell 名序;edges 入邊按名序;DFS 後序)
+// TopoSort(kernel/utils.h;起點=IdString intern 序(非 String 字典序——
+// rtlil.h:413 operator< 比的是 global_id_index_ 首見序,keys 由 intern_key
+// 提供);edges 入邊同序;DFS 後序)
 // ---------------------------------------------------------------------------
 
 struct Topo {
     names: Vec<String>,
+    keys: Vec<(u8, u64)>,
     edges: Vec<Vec<usize>>,
     sorted: Vec<usize>,
     found_loops: bool,
 }
 
+/// 名序鍵(oracle compare_ptr_by_name→IdString::operator<=intern 首見序):
+/// pass 建名 `$…$<N>[.尾]`(N ≥ autoidx_base,單一 autoidx 計數器 ⇒ N 序=
+/// 創建序)= (1, N);檔案名(read_rtlil 首見登記)= (0, intern_seq);
+/// 無數字尾的未登記名=(0, u64::MAX)→ties 回落 cells 向量序(stable
+/// sort)。**jsonin 邊界**(2026-10-30 復審立法):jsonin 前端不登記且
+/// autoidx_base=1,其 `$<N>` 數字尾名(yosys JSON 私有名形)會落入建名域
+/// (1,N) 按 N 序——語料面不觸,擴 read_json→opt_expr 面前先修
+/// (jsonin.rs 註釋同欄;正典=SKILL intern 條前端分界句)。
+pub(crate) fn intern_key(design: &Design, name: &str) -> (u8, u64) {
+    if let Some(rest) = name.rsplit('$').next() {
+        let digits_len = rest.chars().take_while(|c| c.is_ascii_digit()).count();
+        if digits_len > 0 {
+            let after = &rest[digits_len..];
+            if after.is_empty() || after.starts_with('_') {
+                if let Ok(n) = rest[..digits_len].parse::<i64>() {
+                    if n >= design.autoidx_base {
+                        return (1, n as u64);
+                    }
+                }
+            }
+        }
+    }
+    (0, design.intern_seq.get(name).copied().unwrap_or(u64::MAX))
+}
+
 impl Topo {
-    fn node(&mut self, name: &str) -> usize {
+    fn node(&mut self, name: &str, key: (u8, u64)) -> usize {
         if let Some(i) = self.names.iter().position(|n| n == name) {
             return i;
         }
         self.names.push(name.to_string());
+        self.keys.push(key);
         self.edges.push(Vec::new());
         self.names.len() - 1
     }
@@ -267,8 +306,8 @@ impl Topo {
         let mut on_stack = vec![false; n];
         let mut stack: Vec<usize> = Vec::new();
         let mut order: Vec<usize> = (0..n).collect();
-        let names = self.names.clone();
-        order.sort_by(|a, b| names[*a].cmp(&names[*b]));
+        let keys = self.keys.clone();
+        order.sort_by_key(|&i| keys[i]);
         for root in order {
             self.worker(root, &mut on_sorted, &mut on_stack, &mut stack);
         }
@@ -286,8 +325,8 @@ impl Topo {
             stack.push(root);
             on_stack[root] = true;
             let mut succ: Vec<usize> = self.edges[root].clone();
-            let names = self.names.clone();
-            succ.sort_by(|a, b| names[*a].cmp(&names[*b]));
+            let keys = self.keys.clone();
+            succ.sort_by_key(|&i| keys[i]);
             for l in succ {
                 self.worker(l, on_sorted, on_stack, stack);
             }
@@ -345,10 +384,17 @@ fn as_const(sig: &SigSpec) -> Const {
 }
 
 // ---------------------------------------------------------------------------
-// replace_const_cells(-keepdc 形;opt_expr.cc:395 起)
+// replace_const_cells(opt_expr.cc:395 起;consume_x=第二掃描 identity 面,
+// keepdc=-keepdc 契約形門控)
 // ---------------------------------------------------------------------------
 
-fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> bool {
+fn replace_const_cells(
+    design: &mut Design,
+    mi: usize,
+    consume_x: bool,
+    keepdc: bool,
+    log_out: &mut String,
+) -> bool {
     let mut am = AssignMap::new(&design.modules[mi]);
     let invert_map = build_invert_map(&design.modules[mi], &am);
     let mut did = false;
@@ -393,7 +439,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
     }
 
     // TopoSort(evaluable cells;輸出位→cell 名)。
-    let mut topo = Topo { names: Vec::new(), edges: Vec::new(), sorted: Vec::new(), found_loops: false };
+    let mut topo = Topo { names: Vec::new(), keys: Vec::new(), edges: Vec::new(), sorted: Vec::new(), found_loops: false };
     let mut outbit_to_cell: HashMap<SigBit, String> = HashMap::new();
     {
         let module = &design.modules[mi];
@@ -407,18 +453,20 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                         }
                     }
                 }
-                topo.node(&cell.name);
+                let k = intern_key(design, &cell.name);
+                topo.node(&cell.name, k);
             }
         }
         for cell in &module.cells {
             if crate::cells::cell_evaluable(&cell.ctype) {
-                let r = topo.node(&cell.name);
+                let k = intern_key(design, &cell.name);
+                let r = topo.node(&cell.name, k);
                 for (port, conn) in &cell.connections {
                     let (is_in, _) = crate::cells::port_dir(&cell.ctype, port);
                     if is_in {
                         for bit in &am.map(conn).bits {
                             if let Some(src) = outbit_to_cell.get(bit) {
-                                let l = topo.node(src);
+                                let l = topo.node(src, intern_key(design, src));
                                 topo.edge(l, r);
                             }
                         }
@@ -530,7 +578,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                     connect(module, y, val);
                     remove_cell_by_name(module, &name);
                     did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("detect_and/or one-const-input(:653)");
                     continue;
                 }
             }
@@ -578,7 +626,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                     connect(module, y, val);
                     remove_cell_by_name(module, &name);
                     did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("xor/xnor unit(:592 with $not cell)");
                     continue;
                 }
             }
@@ -598,7 +646,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                     let ci = module.cells.iter().position(|c| c.name == name).unwrap();
                     module.cells[ci].ctype = "$not".to_string();
                     did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("unary buffer(:633 with $not cell)");
                     continue;
                 } else {
                     let a = get_port(cell, "\\A").cloned().unwrap();
@@ -610,7 +658,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                     connect(module, y, val);
                     remove_cell_by_name(module, &name);
                     did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("unary buffer(:633 with $not cell)");
                     continue;
                 }
             }
@@ -717,7 +765,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                     connect(module, y_gx, y_new_x);
                     remove_cell_by_name(module, &name);
                     did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("single-const-input(:653 having one fully constant input)");
                     continue;
                 }
             }
@@ -757,7 +805,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                 connect(module, y, val);
                 remove_cell_by_name(module, &name);
                 did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("x-bit-in-input(:851/876/901 port A/B constant driver)");
                 continue;
             }
         }
@@ -809,7 +857,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                 connect(module, y, val);
                 remove_cell_by_name(module, &name);
                 did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("double_invert(:1058)");
                 continue;
             }
         }
@@ -827,7 +875,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                 set_port(&mut module.cells[ci], "\\B", a);
                 set_port(&mut module.cells[ci], "\\S", SigSpec { bits: vec![inv] });
                 did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("mux-select-invert(:1065 Optimizing away select inverter)");
                 continue;
             }
         }
@@ -922,7 +970,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                         let ci = module.cells.iter().position(|c| c.name == name).unwrap();
                         set_port(&mut module.cells[ci], "\\A", sig_const(Bit::Sx, a.size()));
                         did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("gate-match(:198 grouped bits)");
                         continue;
                     }
                 }
@@ -947,7 +995,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                 connect(module, y, val);
                 remove_cell_by_name(module, &name);
                 did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("gate-match(:198 grouped bits)");
                 continue;
             }
         }
@@ -996,7 +1044,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                 connect(module, y, yv);
                 remove_cell_by_name(module, &name);
                 did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("eq/ne/eqx/nex(:1181-1221)");
                 continue;
             }
             if new_a.bits.is_empty() {
@@ -1011,7 +1059,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                 connect(module, y, yv);
                 remove_cell_by_name(module, &name);
                 did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("eq/ne/eqx/nex(:1181-1221)");
                 continue;
             }
             if new_a.size() < a.size() || new_b.size() < b.size() {
@@ -1056,7 +1104,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                         connect(module, y, val);
                         remove_cell_by_name(module, &name);
                         did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("eq/ne 1x3(:1223-1253)");
                         continue;
                     }
                     let b_bool = const_as_bool(&as_const(&b));
@@ -1073,7 +1121,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                         connect(module, y, val);
                         remove_cell_by_name(module, &name);
                         did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("eq/ne 1x3(:1223-1253)");
                         continue;
                     } else {
                         let module = &mut design.modules[mi];
@@ -1083,7 +1131,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                         unset_param(&mut module.cells[ci], "\\B_SIGNED");
                         unset_port(&mut module.cells[ci], "\\B");
                         did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("eq/ne 1x3(:1223-1253)");
                         continue;
                     }
                 }
@@ -1117,16 +1165,17 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                 unset_param(&mut module.cells[ci], "\\B_SIGNED");
                 unset_param(&mut module.cells[ci], "\\B_WIDTH");
                 did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("eq/ne fully-zero(:1255 with $logic_not/$reduce_bool)");
                 continue;
             }
         }
 
-        // ---- shift 固定接線(:1273-1313;keepdc=is_fully_def)----
+        // ---- shift 固定接線(:1273-1313;keepdc?is_fully_def:is_fully_const)----
         if matches!(ctype.as_str(), "$shl" | "$shr" | "$sshl" | "$sshr" | "$shift" | "$shiftx") {
             let cell = &design.modules[mi].cells.iter().find(|c| c.name == name).unwrap();
             let b = am.map(get_port(cell, "\\B").unwrap_or(&SigSpec::default()));
-            if is_fully_def(&b) {
+            let b_gated = if keepdc { is_fully_def(&b) } else { is_fully_const(&b) };
+            if b_gated {
                 let sign_ext = ctype == "$sshr" && param_bool(cell, "\\A_SIGNED");
                 let b_sign_ext = matches!(ctype.as_str(), "$shift" | "$shiftx") && param_bool(cell, "\\B_SIGNED");
                 let mut shift_bits = ce::const_as_int_sat(&as_const(&b), b_sign_ext);
@@ -1156,8 +1205,329 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                 connect(module, y, sig_y);
                 remove_cell_by_name(module, &name);
                 did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("shift-const-B(:1273 replace_cell :126)");
                 continue;
+            }
+        }
+
+        // ---- consume_x identity(:1317-1424;僅第二掃描;skip_identity=
+        // $alu 非 sub 且 CI/BI 非全零 → 跳過本塊續後塊)----
+        if consume_x {
+            let mut identity_wrt_a = false;
+            let mut identity_wrt_b = false;
+            let mut arith_inverse = false;
+            {
+                let cell = &design.modules[mi].cells.iter().find(|c| c.name == name).unwrap();
+                if matches!(ctype.as_str(), "$add" | "$sub" | "$alu" | "$or" | "$xor") {
+                    let a = am.map(get_port(cell, "\\A").unwrap_or(&SigSpec::default()));
+                    let b = am.map(get_port(cell, "\\B").unwrap_or(&SigSpec::default()));
+                    let mut sub = ctype == "$sub";
+                    let mut alu_skip = false;
+                    if ctype == "$alu" {
+                        let ci = am
+                            .map(get_port(cell, "\\CI").unwrap_or(&SigSpec::default()))
+                            .bits
+                            .first()
+                            .cloned()
+                            .unwrap_or(SigBit::Const(Bit::S0));
+                        let bi = am
+                            .map(get_port(cell, "\\BI").unwrap_or(&SigSpec::default()))
+                            .bits
+                            .first()
+                            .cloned()
+                            .unwrap_or(SigBit::Const(Bit::S0));
+                        let c1 = ci == SigBit::Const(Bit::S1);
+                        let b1 = bi == SigBit::Const(Bit::S1);
+                        let c0 = ci == SigBit::Const(Bit::S0);
+                        let b0 = bi == SigBit::Const(Bit::S0);
+                        sub = c1 && b1;
+                        if !sub && (!c0 || !b0) {
+                            alu_skip = true;
+                        }
+                    }
+                    if !alu_skip {
+                        if !sub && is_fully_const(&a) && !const_nonzero(&as_const(&a)) {
+                            identity_wrt_b = true;
+                        }
+                        if is_fully_const(&b) && !const_nonzero(&as_const(&b)) {
+                            identity_wrt_a = true;
+                        }
+                    }
+                }
+                if matches!(ctype.as_str(), "$shl" | "$shr" | "$sshl" | "$sshr" | "$shift" | "$shiftx") {
+                    let cell = &design.modules[mi].cells.iter().find(|c| c.name == name).unwrap();
+                    let b = am.map(get_port(cell, "\\B").unwrap_or(&SigSpec::default()));
+                    if is_fully_const(&b) && !const_nonzero(&as_const(&b)) {
+                        identity_wrt_a = true;
+                    }
+                }
+                if ctype == "$mul" {
+                    let cell = &design.modules[mi].cells.iter().find(|c| c.name == name).unwrap();
+                    let a = am.map(get_port(cell, "\\A").unwrap_or(&SigSpec::default()));
+                    let b = am.map(get_port(cell, "\\B").unwrap_or(&SigSpec::default()));
+                    if is_fully_const(&a) {
+                        let (hit, neg) =
+                            is_one_or_minus_one(&as_const(&a), param_bool(cell, "\\A_SIGNED"));
+                        if hit {
+                            identity_wrt_b = true;
+                            arith_inverse = neg;
+                        }
+                    }
+                    if !identity_wrt_b && is_fully_const(&b) {
+                        let (hit, neg) =
+                            is_one_or_minus_one(&as_const(&b), param_bool(cell, "\\B_SIGNED"));
+                        if hit {
+                            identity_wrt_a = true;
+                            arith_inverse = neg;
+                        }
+                    }
+                }
+                if ctype == "$div" {
+                    let cell = &design.modules[mi].cells.iter().find(|c| c.name == name).unwrap();
+                    let b = am.map(get_port(cell, "\\B").unwrap_or(&SigSpec::default()));
+                    if is_fully_const(&b)
+                        && b.size() <= 32
+                        && ce::const_as_int_sat(&as_const(&b), false) == 1
+                    {
+                        identity_wrt_a = true;
+                    }
+                }
+            }
+            if identity_wrt_a || identity_wrt_b {
+                let mname_dbg = design.modules[mi].name.clone();
+                crate::proc::dbg_inc_what(&format!(
+                    "Replacing {} cell `{}' in module `{}' with identity for port {}.",
+                    ctype,
+                    name,
+                    id_unescape(&mname_dbg),
+                    if identity_wrt_a { 'A' } else { 'B' }
+                ));
+                let src = snap.2.clone();
+                {
+                    let cell = &design.modules[mi].cells.iter().find(|c| c.name == name).unwrap();
+                    if ctype == "$alu" {
+                        let a_signed = param_bool(cell, "\\A_SIGNED");
+                        let b_signed = param_bool(cell, "\\B_SIGNED");
+                        let is_signed = a_signed && b_signed;
+                        let sig_ci = am
+                            .map(get_port(cell, "\\CI").unwrap_or(&SigSpec::default()))
+                            .bits
+                            .first()
+                            .cloned()
+                            .unwrap_or(SigBit::Const(Bit::S0));
+                        let y_width = get_port(cell, "\\Y").map(|s| s.size()).unwrap_or(0);
+                        if sig_ci == SigBit::Const(Bit::S1) {
+                            // sub, b is 0:X=Not(NEW_ID, a extend)(NEW_ID 錨=
+                            // opt_expr.cc:1392;Not wire 錨=rtlil.cc:3201)
+                            let mut av = get_port(cell, "\\A").cloned().unwrap_or_default();
+                            extend_u0(&mut av, y_width, is_signed);
+                            let x_port = get_port(cell, "\\X").cloned().unwrap_or_default();
+                            let co_port = get_port(cell, "\\CO").cloned().unwrap_or_default();
+                            let module = &mut design.modules[mi];
+                            let autoidx = &mut design.autoidx;
+                            let mut pm = Pm { module, autoidx };
+                            let cid = pm.new_id_at("opt_expr.cc", 1392, "replace_const_cells");
+                            let xv = pm.helper_not_at(cid, 3201, &av, src.as_ref());
+                            pm.connect(x_port, xv);
+                            pm.connect(co_port, sig_const(Bit::S1, y_width));
+                            let ci_pos =
+                                pm.module().cells.iter().position(|c| c.name == name).unwrap();
+                            for p in ["\\BI", "\\CI", "\\X", "\\CO"] {
+                                unset_port(&mut pm.module().cells[ci_pos], p);
+                            }
+                        } else {
+                            // add:X=identity 側 extend、CO=0s
+                            let mut ab = if identity_wrt_a {
+                                get_port(cell, "\\A").cloned().unwrap_or_default()
+                            } else {
+                                get_port(cell, "\\B").cloned().unwrap_or_default()
+                            };
+                            extend_u0(&mut ab, y_width, is_signed);
+                            let module = &mut design.modules[mi];
+                            connect(module, get_port(module.cells.iter().find(|c| c.name == name).unwrap(), "\\X").cloned().unwrap_or_default(), ab);
+                            connect(module, get_port(module.cells.iter().find(|c| c.name == name).unwrap(), "\\CO").cloned().unwrap_or_default(), sig_const(Bit::S0, y_width));
+                            let ci = module.cells.iter().position(|c| c.name == name).unwrap();
+                            for p in ["\\BI", "\\CI", "\\X", "\\CO"] {
+                                unset_port(&mut module.cells[ci], p);
+                            }
+                        }
+                    }
+                }
+                {
+                    let module = &mut design.modules[mi];
+                    let ci = module.cells.iter().position(|c| c.name == name).unwrap();
+                    if !identity_wrt_a {
+                        let bv = get_port(&module.cells[ci], "\\B").cloned().unwrap_or_default();
+                        set_port(&mut module.cells[ci], "\\A", bv);
+                        let bw = module.cells[ci].parameters.get("\\B_WIDTH").cloned();
+                        let bs = module.cells[ci].parameters.get("\\B_SIGNED").cloned();
+                        if let Some(v) = bw {
+                            set_param(&mut module.cells[ci], "\\A_WIDTH", v);
+                        }
+                        if let Some(v) = bs {
+                            set_param(&mut module.cells[ci], "\\A_SIGNED", v);
+                        }
+                    }
+                    module.cells[ci].ctype =
+                        if arith_inverse { "$neg".to_string() } else { "$pos".to_string() };
+                    unset_port(&mut module.cells[ci], "\\B");
+                    unset_param(&mut module.cells[ci], "\\B_WIDTH");
+                    unset_param(&mut module.cells[ci], "\\B_SIGNED");
+                }
+                did = true;
+                continue;
+            }
+        }
+
+        // ---- 除零 div/mod(:1786-1808;x-bit/eq/shift 段之後、FOLD 派發
+        // 之前,不受 keepdc 門控):B 經 AssignMap 後 fully_def 且 fully_zero
+        // →connect Y=8'x+swap-and-pop 刪 cell(debug 計數 +1/例)。
+        if matches!(ctype.as_str(), "$div" | "$mod" | "$divfloor" | "$modfloor") {
+            let cell = &design.modules[mi].cells.iter().find(|c| c.name == name).unwrap();
+            let b = am.map(get_port(cell, "\\B").unwrap_or(&SigSpec::default()));
+            if is_fully_def(&b) && is_fully_zero(&b) {
+                let module = &mut design.modules[mi];
+                let y = get_port(module.cells.iter().find(|c| c.name == name).unwrap(), "\\Y").cloned().unwrap_or_default();
+                let xv = sig_const(Bit::Sx, y.size());
+                am.add(&y, &xv);
+                connect(module, y, xv);
+                remove_cell_by_name(module, &name);
+                did = true;
+                crate::proc::dbg_inc_what("Replacing divide-by-zero cell(:1799)");
+                continue;
+            }
+            // onehot 2^n 常數除(:1813-1878;!keepdc):$div/$divfloor→$sshr
+            // (truncating 補 floor+1 電路);$mod/$modfloor→$and mask(truncating
+            // signed 補符號電路)。
+            if !keepdc && matches!(ctype.as_str(), "$div" | "$mod" | "$divfloor" | "$modfloor") {
+                let cell = &design.modules[mi].cells.iter().find(|c| c.name == name).unwrap();
+                let sig_b = am.map(get_port(cell, "\\B").unwrap_or(&SigSpec::default()));
+                let sig_a = am.map(get_port(cell, "\\A").unwrap_or(&SigSpec::default()));
+                let sig_y = am.map(get_port(cell, "\\Y").unwrap_or(&SigSpec::default()));
+                let a_signed = param_bool(cell, "\\A_SIGNED");
+                let b_signed = param_bool(cell, "\\B_SIGNED");
+                if is_fully_def(&sig_b) {
+                    if let Some(exp) = ce::const_is_onehot(&as_const(&sig_b)) {
+                        if !(b_signed && exp as i64 == sig_b.size() - 1) {
+                            let mname_dbg = design.modules[mi].name.clone();
+                            let is_truncating = matches!(ctype.as_str(), "$div" | "$mod");
+                            let src = snap.2.clone();
+                            if matches!(ctype.as_str(), "$div" | "$divfloor") {
+                                crate::proc::dbg_inc_what(&format!(
+                                    "Replacing {}-divide-by-{} cell `{}' in module `{}' with shift-by-{}.",
+                                    if is_truncating { "truncating" } else { "flooring" },
+                                    log_signal(&sig_b, &HashMap::new()),
+                                    name,
+                                    id_unescape(&mname_dbg),
+                                    exp
+                                ));
+                                let module = &mut design.modules[mi];
+                                let ci = module.cells.iter().position(|c| c.name == name).unwrap();
+                                let bc = i32c(exp as i64);
+                                let bw = match &bc {
+                                    Const::Bits { width, .. } => *width,
+                                    _ => 32,
+                                };
+                                module.cells[ci].ctype = "$sshr".to_string();
+                                set_param(&mut module.cells[ci], "\\B_WIDTH", i32c(bw));
+                                set_param(&mut module.cells[ci], "\\B_SIGNED", i32cb(false));
+                                set_port(&mut module.cells[ci], "\\B", sig_from_const_fold(&bc));
+                                if is_truncating && a_signed && sig_a.size() != 0 && exp != 0 {
+                                    // flooring wire + rem 電路(:1829-1835)
+                                    let module = &mut design.modules[mi];
+                                    let autoidx = &mut design.autoidx;
+                                    let mut pm = Pm { module, autoidx };
+                                    let fid = pm.new_id_at("opt_expr.cc", 1829, "replace_const_cells");
+                                    let flooring = pm.add_wire_id(fid, sig_y.size());
+                                    let ci = pm.module().cells.iter().position(|c| c.name == name).unwrap();
+                                    set_port(&mut pm.module().cells[ci], "\\Y", flooring.clone());
+                                    let a_sign = SigSpec {
+                                        bits: vec![sig_a.bits[sig_a.size() as usize - 1].clone()],
+                                    };
+                                    let k = (exp as i64).min(sig_a.size());
+                                    let rem_in = SigSpec { bits: sig_a.bits[..k as usize].to_vec() };
+                                    let rid = pm.new_id_at("opt_expr.cc", 1833, "replace_const_cells");
+                                    // ReduceOr wire 錨=rtlil.cc:3205(二進制 golden 實錄;
+                                    // clone 3249≠二進制行號)
+                                    let rem_nonzero = pm.helper_reduce_or_at(rid, 3205, &rem_in, src.as_ref());
+                                    let aid = pm.new_id_at("opt_expr.cc", 1834, "replace_const_cells");
+                                    let should_add = pm.helper_and_at(aid, 3293, &a_sign, &rem_nonzero, src.as_ref());
+                                    let adid = pm.new_id_at("opt_expr.cc", 1835, "replace_const_cells");
+                                    // addAdd(NEW_ID, flooring, should_add, sig_y)
+                                    pm.add_cell(
+                                        adid,
+                                        "$add",
+                                        vec![
+                                            ("\\A_SIGNED", i32cb(false)),
+                                            ("\\B_SIGNED", i32cb(false)),
+                                            ("\\A_WIDTH", i32c(flooring.size())),
+                                            ("\\B_WIDTH", i32c(should_add.size())),
+                                            ("\\Y_WIDTH", i32c(sig_y.size())),
+                                        ],
+                                        vec![
+                                            ("\\A", flooring),
+                                            ("\\B", should_add),
+                                            ("\\Y", sig_y),
+                                        ],
+                                        src.as_ref(),
+                                    );
+                                }
+                            } else {
+                                crate::proc::dbg_inc_what(&format!(
+                                    "Replacing {}-modulo-by-{} cell `{}' in module `{}' with bitmask.",
+                                    if is_truncating { "truncating" } else { "flooring" },
+                                    log_signal(&sig_b, &HashMap::new()),
+                                    name,
+                                    id_unescape(&mname_dbg)
+                                ));
+                                if is_truncating && a_signed && sig_a.size() != 0 && exp != 0 {
+                                    let module = &mut design.modules[mi];
+                                    let autoidx = &mut design.autoidx;
+                                    let mut pm = Pm { module, autoidx };
+                                    remove_cell_by_name(pm.module(), &name);
+                                    let k = (exp as i64).min(sig_a.size());
+                                    let mut truncating =
+                                        SigSpec { bits: sig_a.bits[..k as usize].to_vec() };
+                                    let a_sign = SigSpec {
+                                        bits: vec![sig_a.bits[sig_a.size() as usize - 1].clone()],
+                                    };
+                                    let rid = pm.new_id_at("opt_expr.cc", 1855, "replace_const_cells");
+                                    // ReduceOr wire 錨=rtlil.cc:3205(二進制 golden 實錄)
+                                    let rem_nonzero = pm.helper_reduce_or_at(rid, 3205, &truncating, src.as_ref());
+                                    let aid = pm.new_id_at("opt_expr.cc", 1856, "replace_const_cells");
+                                    let extend_bit = pm.helper_and_at(aid, 3293, &a_sign, &rem_nonzero, src.as_ref());
+                                    truncating.bits.push(extend_bit.bits[0].clone());
+                                    let pid = pm.new_id_at("opt_expr.cc", 1859, "replace_const_cells");
+                                    // addPos(NEW_ID, truncating, sig_y, true)
+                                    pm.add_cell(
+                                        pid,
+                                        "$pos",
+                                        vec![
+                                            ("\\A_SIGNED", i32cb(true)),
+                                            ("\\A_WIDTH", i32c(truncating.size())),
+                                            ("\\Y_WIDTH", i32c(sig_y.size())),
+                                        ],
+                                        vec![("\\A", truncating), ("\\Y", sig_y)],
+                                        src.as_ref(),
+                                    );
+                                } else {
+                                    let module = &mut design.modules[mi];
+                                    let ci = module.cells.iter().position(|c| c.name == name).unwrap();
+                                    let mut nb: Vec<SigBit> =
+                                        vec![SigBit::Const(Bit::S1); exp as usize];
+                                    if b_signed || exp == 0 {
+                                        nb.push(SigBit::Const(Bit::S0));
+                                    }
+                                    module.cells[ci].ctype = "$and".to_string();
+                                    set_param(&mut module.cells[ci], "\\B_WIDTH", i32c(nb.len() as i64));
+                                    set_port(&mut module.cells[ci], "\\B", SigSpec { bits: nb });
+                                }
+                            }
+                            did = true;
+                            continue;
+                        }
+                    }
+                }
             }
         }
 
@@ -1194,7 +1564,7 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                 connect(module, y, val);
                 remove_cell_by_name(module, &name);
                 did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("mux-conservative(:1651 replace_cell :126)");
                 continue;
             }
         }
@@ -1239,14 +1609,161 @@ fn replace_const_cells(design: &mut Design, mi: usize, log_out: &mut String) -> 
                             let _ = add_shl(&mut pm, shlid, &sig_const(Bit::S1, 1), &y_wire, &sig_const(Bit::S0, y_size), src.as_ref());
                         }
                         did = true;
-                    crate::proc::dbg_inc_what("?");
+                    crate::proc::dbg_inc_what("pow-onehot(:1660-1694)");
                         continue;
                     }
                 }
             }
         }
+
+        // ---- !keepdc $mul 常數面(:1695-1785;swap→×0→onehot→尾零剝除)----
+        if !keepdc && ctype == "$mul" {
+            let cell = &design.modules[mi].cells.iter().find(|c| c.name == name).unwrap();
+            let mut a_signed = param_bool(cell, "\\A_SIGNED");
+            let mut b_signed = param_bool(cell, "\\B_SIGNED");
+            let mut swapped_ab = false;
+            let sig_a0 = am.map(get_port(cell, "\\A").unwrap_or(&SigSpec::default()));
+            let sig_b0 = am.map(get_port(cell, "\\B").unwrap_or(&SigSpec::default()));
+            let sig_y = am.map(get_port(cell, "\\Y").unwrap_or(&SigSpec::default()));
+            let (sig_a, sig_b) = if is_fully_const(&sig_b0) {
+                swapped_ab = true;
+                std::mem::swap(&mut a_signed, &mut b_signed);
+                (sig_b0, sig_a0)
+            } else {
+                (sig_a0, sig_b0)
+            };
+            let mname_dbg = design.modules[mi].name.clone();
+            if is_fully_def(&sig_a) {
+                if is_fully_zero(&sig_a) {
+                    crate::proc::dbg_inc_what(&format!(
+                        "Replacing multiply-by-zero cell `{}' in module `{}' with zero-driver.",
+                        name,
+                        id_unescape(&mname_dbg)
+                    ));
+                    let module = &mut design.modules[mi];
+                    let yz = sig_y.size();
+                    connect(module, sig_y, sig_const(Bit::S0, yz));
+                    remove_cell_by_name(module, &name);
+                    did = true;
+                    continue;
+                }
+                if let Some(exp) = ce::const_is_onehot(&as_const(&sig_a)) {
+                    if !(a_signed && exp as i64 == sig_a.size() - 1) {
+                        crate::proc::dbg_inc_what(&format!(
+                            "Replacing multiply-by-{} cell `{}' in module `{}' with shift-by-{}.",
+                            log_signal(&sig_a, &HashMap::new()),
+                            name,
+                            id_unescape(&mname_dbg),
+                            exp
+                        ));
+                        let module = &mut design.modules[mi];
+                        let ci = module.cells.iter().position(|c| c.name == name).unwrap();
+                        if !swapped_ab {
+                            let bv = get_port(&module.cells[ci], "\\B").cloned().unwrap_or_default();
+                            set_port(&mut module.cells[ci], "\\A", bv);
+                            let bw = module.cells[ci].parameters.get("\\B_WIDTH").cloned();
+                            let bs = module.cells[ci].parameters.get("\\B_SIGNED").cloned();
+                            if let Some(v) = bw {
+                                set_param(&mut module.cells[ci], "\\A_WIDTH", v);
+                            }
+                            if let Some(v) = bs {
+                                set_param(&mut module.cells[ci], "\\A_SIGNED", v);
+                            }
+                        }
+                        module.cells[ci].ctype = "$shl".to_string();
+                        let bc = i32c(exp as i64);
+                        let bw = match &bc {
+                            Const::Bits { width, .. } => *width,
+                            _ => 32,
+                        };
+                        set_param(&mut module.cells[ci], "\\B_WIDTH", i32c(bw));
+                        set_param(&mut module.cells[ci], "\\B_SIGNED", i32cb(false));
+                        set_port(&mut module.cells[ci], "\\B", sig_from_const_fold(&bc));
+                        did = true;
+                        continue;
+                    }
+                }
+            }
+            // 尾零位剝除(:1746-1785;重取 map 後 a/b)
+            let sig_a2 = am.map(get_port(cell, "\\A").unwrap_or(&SigSpec::default()));
+            let sig_b2 = am.map(get_port(cell, "\\B").unwrap_or(&SigSpec::default()));
+            let _ = &sig_a;
+            let _ = &sig_b;
+            let a_zeros =
+                sig_a2.bits.iter().take_while(|b| **b == SigBit::Const(Bit::S0)).count();
+            let b_zeros =
+                sig_b2.bits.iter().take_while(|b| **b == SigBit::Const(Bit::S0)).count();
+            if a_zeros > 0 || b_zeros > 0 {
+                let y_zeros = (a_zeros + b_zeros) as i64;
+                crate::proc::dbg_inc_what(&format!(
+                    "Removing low {} A and {} B bits from cell `{}' in module `{}'.",
+                    a_zeros,
+                    b_zeros,
+                    name,
+                    id_unescape(&mname_dbg)
+                ));
+                let module = &mut design.modules[mi];
+                let ci = module.cells.iter().position(|c| c.name == name).unwrap();
+                if y_zeros >= sig_y.size() {
+                    let yz = sig_y.size();
+                    connect(module, sig_y, sig_const(Bit::S0, yz));
+                    remove_cell_by_name(module, &name);
+                    did = true;
+                    continue;
+                }
+                if a_zeros > 0 {
+                    let rest = SigSpec { bits: sig_a2.bits[a_zeros..].to_vec() };
+                    set_port(&mut module.cells[ci], "\\A", rest);
+                    set_param(&mut module.cells[ci], "\\A_WIDTH", i32c(sig_a2.size() - a_zeros as i64));
+                }
+                if b_zeros > 0 {
+                    let rest = SigSpec { bits: sig_b2.bits[b_zeros..].to_vec() };
+                    set_port(&mut module.cells[ci], "\\B", rest);
+                    set_param(&mut module.cells[ci], "\\B_WIDTH", i32c(sig_b2.size() - b_zeros as i64));
+                }
+                let yrest = SigSpec { bits: sig_y.bits[y_zeros as usize..].to_vec() };
+                set_port(&mut module.cells[ci], "\\Y", yrest);
+                set_param(&mut module.cells[ci], "\\Y_WIDTH", i32c(sig_y.size() - y_zeros));
+                connect(
+                    module,
+                    SigSpec { bits: sig_y.bits[..y_zeros as usize].to_vec() },
+                    sig_const(Bit::S0, y_zeros),
+                );
+                did = true;
+                continue;
+            }
+        }
     }
     did
+}
+
+/// is_one_or_minus_one(opt_expr.cc:348):±1 判定,返回 (命中, 負值)。
+fn is_one_or_minus_one(value: &Const, is_signed: bool) -> (bool, bool) {
+    let bits = ce::c_bits(value);
+    let n = bits.len();
+    if n < 1 {
+        return (false, false);
+    }
+    if n == 1 {
+        if bits[0] != Bit::S1 {
+            return (false, false);
+        }
+        return (true, is_signed);
+    }
+    let mut all_bits_one = true;
+    let mut last_bit_one = true;
+    for (i, b) in bits.iter().enumerate() {
+        if *b != Bit::S1 {
+            all_bits_one = false;
+        }
+        if *b != (if i == 0 { Bit::S1 } else { Bit::S0 }) {
+            last_bit_one = false;
+        }
+    }
+    if all_bits_one && is_signed {
+        return (true, true);
+    }
+    (last_bit_one, false)
 }
 
 /// addShl(NEW_ID, a, b, y)(rtlil.cc DEF_METHOD Shl 組:B_SIGNED=false)。
@@ -1444,8 +1961,10 @@ fn replace_const_connections(module: &mut ry_ir::Module) -> bool {
 
 /// `opt_expr` 命令面(僅 `-keepdc` 契約形;其餘旗標=Y2)。
 pub fn run_opt_expr(design: &mut Design, args: &[String], log: &mut crate::Log) -> Result<(), ProcError> {
+    let mut keepdc = false;
     for a in args.get(1..).unwrap_or(&[]) {
         if a == "-keepdc" {
+            keepdc = true;
             continue;
         }
         if a.starts_with('-') {
@@ -1459,14 +1978,33 @@ pub fn run_opt_expr(design: &mut Design, args: &[String], log: &mut crate::Log) 
     log.push();
     let mut out = std::mem::take(&mut log.out);
     for mi in (0..design.modules.len()).rev() {
+        // selected_modules() 預設=SB_UNBOXED_WARN:盒模組(blackbox/whitebox)
+        // 不進優化面(oracle selected_modules 過濾;-pb 語料無黑盒=零漂移)。
+        let boxed = design.modules[mi]
+            .attributes
+            .get("\\blackbox")
+            .or_else(|| design.modules[mi].attributes.get("\\whitebox"))
+            .map(|c| matches!(c, ry_ir::Const::Bits { bits, .. } if bits.first() == Some(&ry_ir::Bit::S1)))
+            .unwrap_or(false);
+        if boxed {
+            continue;
+        }
         let mname = design.modules[mi].name.clone();
         let m = mname.strip_prefix('\\').unwrap_or(&mname).to_string();
         out.push_str(&format!("Optimizing module {m}.\n"));
-        // do { do { …(consume_x=false)… } while(did); if(!keepdc)… } while(did)
-        // keepdc=true → consume_x 腿不跑,外層僅一輪。
-        let mut did = replace_const_cells(design, mi, &mut out);
-        while did {
-            did = replace_const_cells(design, mi, &mut out);
+        // do { do { …(consume_x=false)… } while(did); if(!keepdc)
+        // consume_x=true 一次; } while(did)(opt_expr.cc:2357-2368)。
+        loop {
+            let mut did = replace_const_cells(design, mi, false, keepdc, &mut out);
+            while did {
+                did = replace_const_cells(design, mi, false, keepdc, &mut out);
+            }
+            if !keepdc {
+                did = replace_const_cells(design, mi, true, keepdc, &mut out);
+            }
+            if !did {
+                break;
+            }
         }
         let _ = replace_const_connections(&mut design.modules[mi]);
     }
