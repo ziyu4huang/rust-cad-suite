@@ -8,6 +8,8 @@
 | Crate | 職責 | 依賴 | 對應上游角色 | 證據/閘 |
 |---|---|---|---|---|
 | `rcs-diag` | spans/source map/診斷/caret 渲染(suite 共享) | 0 | verilator 的 %Error 輸出層 | 渲染 golden 測試 |
+| `analyzer-core` | 統一分析 API(`analyze`+`Analysis` 投影視圖)+ASP/1 codec+§13 報告編碼(10.7 core-first 語義層) | vl-syntax,ry-ir,rcs-diag | —(自建,無 oracle) | `cargo test -p analyzer-core` 34 pass+1 ignored(json 17+api 13+codec 向量 4;2026-11-03 收平輪實測);`bun test`(同 fixtures 12);ADR-0011 |
+| `analyzer-server` | bin `analyzerd`:UDS 面(握手/幀循環/ops/停機/殘留清理),零語義 | analyzer-core | —(自建) | `cargo test -p analyzer-server` 15 測(單測 3+回環 12;2026-11-03 收平輪實測);regress S5 `analyzer smoke` 塊 |
 | `vl-syntax` | pp+lexer+parser+AST(V2005) | rcs-diag | VPreproc/V3Parser | lexer 12 + frontend 17 測試;E2E 全語料過解析閘 |
 | `vl-sim` | 4-state 值/求值/展開/事件調度器(值域已提取=`vl-values`,src/value.rs 為 shim re-export;wait/fork/force 族硬錯自 parse 級遷 build 級,M7/M8 文字逐臂保留 interp.rs:1767-1785) | vl-syntax, rcs-diag, vl-values | VCSD/eval/scheduling | value 8 測試;sim_gate 2(counter8+fulladd byte-diff);e2e 59/59 零漂移 |
 | `vl-cli` | bin `rverilator`(--version/-E/--lint-only/--dump-ast/--binary/--top-module) | 上全部 | verilator driver | 未知旗標=錯 exit1(對抗審 #8) |
