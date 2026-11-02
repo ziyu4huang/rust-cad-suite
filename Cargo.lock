@@ -3,6 +3,22 @@
 version = 4
 
 [[package]]
+name = "analyzer-core"
+version = "0.1.0"
+dependencies = [
+ "rcs-diag",
+ "ry-ir",
+ "vl-syntax",
+]
+
+[[package]]
+name = "analyzer-server"
+version = "0.1.0"
+dependencies = [
+ "analyzer-core",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

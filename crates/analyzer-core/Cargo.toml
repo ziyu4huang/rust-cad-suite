@@ -1,0 +1,15 @@
+[package]
+name = "analyzer-core"
+description = "Unified Verilog/RTLIL analyzer core: analyze() entry, projection view and ASP/1 codec for rust-cad-suite"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+# analyzer-core:統一分析器核心(ANALYZER-SERVICE.md 正典;ADR-0011)。
+# 語義能力全落此 crate(10.7 core-first):SV=vl-syntax 全管線直呼、
+# RTLIL=ry-ir 直呼、查詢集=既有 IR 欄位投影,零新語義;零外部依賴。
+[dependencies]
+vl-syntax = { workspace = true }
+ry-ir = { workspace = true }
+rcs-diag = { workspace = true }

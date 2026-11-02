@@ -1,0 +1,16 @@
+[package]
+name = "analyzer-server"
+description = "analyzerd: UDS analyzer service face over analyzer-core (ASP/1 protocol)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "analyzerd"
+path = "src/main.rs"
+
+# analyzer-server:新 face(10.7)——接收→解碼→調 analyzer-core→編碼→回寫,
+# 不含語義;UDS 用 std::os::unix::net,線程用 std::thread,零外部依賴。
+[dependencies]
+analyzer-core = { workspace = true }
