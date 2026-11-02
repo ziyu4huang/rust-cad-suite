@@ -175,6 +175,11 @@
 - 三面能力變更的機械閘=regress.sh 內(E2E 精確數 100%/lint parity 基線/
   wasm 差分+功能+vcd_parse/demo serve smoke+corpus 白名單/ffi 三閘含
   vcd_read)必綠;條文正典=SKILL「wasm 增補」節。
+- **分析器服務執法面(2026-11-03 冒煙閘收編)**:`analyzerd`(第四面=UDS,
+  core-first 同款,ADR-0011)機械閘=regress.sh S5 `analyzer smoke` 塊
+  (雙守衛降級形:crate 在場+bun 在場;在場時 run-smoke.sh exit≠0 即整閘
+  紅;內建 bun test 編解碼向量閘);條文正典=SKILL「分析器服務增補」節,
+  登記=REGISTRY Crates 表+ADR-0011 D9。
 
 ## 10.8 表示變更與大數契約(2026-10-24 立法;M8 多 limb+riverilog R0 弧實錄)
 

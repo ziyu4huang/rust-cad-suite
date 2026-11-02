@@ -352,6 +352,19 @@ if [ -f crates/ry-cli/Cargo.toml ]; then
     fi
 fi
 
+# S5 analyzer 服務(ANALYZER-SERVICE §8.3;ADR-0011):端到端冒煙閘
+# (run-smoke.sh 內建 bun test 編解碼向量閘)。守衛塊按
+# crates/analyzer-server/Cargo.toml 在場 + bun 在場雙判定;既有閘零擾動。
+if [ -f crates/analyzer-server/Cargo.toml ] && command -v bun >/dev/null 2>&1; then
+    if bash clients/analyzer-ts/run-smoke.sh; then
+        echo "analyzer smoke: PASS"
+    else
+        echo "GATE FAIL: analyzer smoke"; fail=1
+    fi
+else
+    echo "analyzer smoke: SKIP (crate/bun absent)"
+fi
+
 if [ "${1:-}" = "--with-record" ]; then
     echo "== extra: re-record from oracle (requires verilator; review diff!) =="
     ./target/debug/vl-difftest --record 2>&1 | tail -1
