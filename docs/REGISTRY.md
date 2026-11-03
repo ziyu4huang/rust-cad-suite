@@ -10,6 +10,8 @@
 | `rcs-diag` | spans/source map/診斷/caret 渲染(suite 共享) | 0 | verilator 的 %Error 輸出層 | 渲染 golden 測試 |
 | `analyzer-core` | 統一分析 API(`analyze`+`Analysis` 投影視圖)+ASP/1 codec+§13 報告編碼(10.7 core-first 語義層) | vl-syntax,ry-ir,rcs-diag | —(自建,無 oracle) | `cargo test -p analyzer-core` 34 pass+1 ignored(json 17+api 13+codec 向量 4;2026-11-03 收平輪實測);`bun test`(同 fixtures 12);ADR-0011 |
 | `analyzer-server` | bin `analyzerd`:UDS 面(握手/幀循環/ops/停機/殘留清理),零語義 | analyzer-core | —(自建) | `cargo test -p analyzer-server` 15 測(單測 3+回環 12;2026-11-03 收平輪實測);regress S5 `analyzer smoke` 塊 |
+| `rtl-spec` | RTL 行為規則書提取(reset/fsm/handshake/timing/arithmetic/counter/memory/protocol/param 九類)+破口掃描 G1..G7+結構投影摘要+手寫 JSON writer(只寫不讀,鍵序=寫出序 byte-exact)+markdown 渲染;語義姿態=永不 panic、錯誤進結果;走 analyzer-core 逃逸口,**不擴前弧**(ADR-0012 D1) | analyzer-core,vl-syntax,ry-ir,rcs-diag | —(自建,無 oracle;質量閘=V1..V6 機械判據+獨立評審員) | `cargo test -p rtl-spec` 18 測(sv 16+rtlil 2;2026-11-03 收平轮后實測);`bash plugin/rtl2spec/run-rtl-validation.sh`(13 檔 V1..V6 全過,Σrules=325);正典=docs/RTL2SPEC-PLUGIN.md |
+| `rtl-spec-wasm` | wasm face(cdylib):7 導出(JSON 字串進出,analyze/extract/scan×sv|rtlil 面),零 js_sys,`--target web`+顯式位元組 init(ADR-0012 D3) | rtl-spec,wasm-bindgen | —(自建) | `cargo test -p rtl-spec-wasm` 2 測(host 面);smoke.mjs bun+node 雙運行時各 15 斷言、6 路 wasm↔native byte parity(2026-11-03 實測);dist 裝載由兩插件閘驗(D8:閘驗出貨物) |
 | `vl-syntax` | pp+lexer+parser+AST(V2005) | rcs-diag | VPreproc/V3Parser | lexer 12 + frontend 17 測試;E2E 全語料過解析閘 |
 | `vl-sim` | 4-state 值/求值/展開/事件調度器(值域已提取=`vl-values`,src/value.rs 為 shim re-export;wait/fork/force 族硬錯自 parse 級遷 build 級,M7/M8 文字逐臂保留 interp.rs:1767-1785) | vl-syntax, rcs-diag, vl-values | VCSD/eval/scheduling | value 8 測試;sim_gate 2(counter8+fulladd byte-diff);e2e 59/59 零漂移 |
 | `vl-cli` | bin `rverilator`(--version/-E/--lint-only/--dump-ast/--binary/--top-module) | 上全部 | verilator driver | 未知旗標=錯 exit1(對抗審 #8) |
@@ -79,6 +81,8 @@
 | `bun crates/vl-wasm/wasm-test/spec.mjs` | regress.sh | spec 層 wasm 閉環(ADR-0007):correct 0 違例/LSB-first+no-ack 負向指名/BigInt 跨界/雙跑 byte 確定性/未知變體硬錯 |
 | `bun crates/vl-ffi/bun-example/vcd_svg.mjs` | regress.sh | agent 產波形:run→dump→rcs_vcd_svg→svg 形狀+q 終值 title 斷言 |
 | `cargo test -p vl-vcd --test render_golden` | 每次提交 | render golden byte-diff+CLI stdout golden+未知旗標 exit1+VL-E101 |
+| `bash plugin/rtl2spec/run-mcp-e2e.sh`(總閘成員;regress S7 起雙守衛塊) | 每次交付 | MCP stdio 回環七斷言:initialize 回顯/tools list 恰 4 工具/extract_rules 正樣(rules≥3)/scan_gaps Latch 正樣(@* 形)/負樣三形(檔案缺失 isError+path,source 雙缺 isError+未知名 -32601);wasm 陳舊檢查含全部傳遞依賴目錄 | 
+| `bash plugin/rtl2spec/run-rtl-validation.sh`(總閘成員;regress S7 起雙守衛塊) | 每次交付 | 13 檔 in-git 語料 V1..V6 機械判據全過(反 doc-dump 三鎖閘端鎖;snippet 逐位元組對拍=checker 重讀源檔);validation-report.md 機械生成入庫=證據頁 |
 
 ## Divergence register(我方 vs oracle 已知且接受的差異 — 新分歧先登記再動工)
 

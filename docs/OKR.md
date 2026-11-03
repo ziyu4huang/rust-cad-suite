@@ -57,6 +57,14 @@
 - **KR1.6 前端 fuzz 閘(語料變異+隨機字節,無 panic/無掛死)** ✅ 2026-10-21。
   證據:`cargo test -p vl-syntax --test fuzz_smoke`(600 迭代固定種子;首輪抓三個 UTF-8 健壯性 bug 並修復)。
 
+- **KR1.11 rtl-to-spec 插件(ADR-0012,2026-11-03 立)**:RTL 行為規則書提取
+  +破口掃描,完整一路 Rust 核心→wasm→MCP→zcode plugin。
+  證據:`bash plugin/rtl2spec/run-mcp-e2e.sh`(exit 0,回環 11 斷言);
+  `bash plugin/rtl2spec/run-rtl-validation.sh`(exit 0,V1..V6 全過:Σrules
+  325≥50/行為占比 100%/5 類≥4/指紋 325 零重複/13 檔 13 過);報告=
+  plugin/rtl2spec/validation-report.md(機械生成證據頁);正典=
+  docs/RTL2SPEC-PLUGIN.md;regress.sh 雙守衛插件塊。
+
 ## O2: 開發 agent 能力硬化(EDA 工具域)
 
 - **KR2.1 反思文檔帶實錄證據** — `docs/REFLECTION-agent-hardening.md`(7 節,

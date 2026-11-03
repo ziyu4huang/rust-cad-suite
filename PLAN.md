@@ -36,6 +36,14 @@
 3. **P3.5 SV-UNIFY 統一 SystemVerilog 弧(2026-10-25 立案;正典=docs/SV-ELAB-STUDY.md)**——單一共用 SV 前端(vl-syntax dialect 擴充,禁第二 parser)×雙語義引擎;外部參照=povik/sv-elab(ISC,Yosys v0.67 內建/OSS CAD Suite 的 SV 前端,slang 下游=一前端多下游同構證據);三路取值=回歸語料入 git(tests/{various,unit} ISC)/支援矩陣正典/slang 架構研究;弧序 SV-1 語料同位閘→SV-2 即時斷言→SV-3 類型族→SV-4 interface→SV-5 always_ff/fill→SV-6 長字串;riverilog R8 與 rverilator M8-M9 SV 候補在此弧合流。
 4. **P3.6 統一引擎弧(2026-10-25 立案,ADR-0009 接受,推翻 RIVERILOG-PLAN §3 選項 C 裁決與 OD2)**——使用者調整目標:rverilator 與 riverilog 合流為**單一 Rust 引擎**(riv-kernel 4-state 事件核升格),CLI 合規雙面(rverilator=Verilator 形;riverilog+rivvp=iverilog 形);方言=語義開關非引擎分叉;動機=統一 Rust 生態/簡單/跨平台+SV-UNIFY 功能一次落雙面+維護 1×;合流步 U-1 ✅(2026-10-25,USim 驅動 --binary,e2e 59/59 金樣零漂移)→U-2 ✅(2026-10-25,求值面合流=vl-ops 單一語義源三面共呼;雙 oracle 七探針揭發並修 `~`/signed-bitwise/logic-x 三語義分歧,REGISTRY incident 10-24)→U-3 ◐ 前半 ✅(2026-10-25,riverilog -t null/-E/-y fixpoint/-D 雙形+rivvp -N/-q/-l,共享 -E 前端=vl-syntax::pp,兩臂零漂移;U-3b 殘=dialect 關鍵字受理表/-l -/-i/-M 長尾)→U-3 CLI 後半(U-3b)**◐ 第一刀 ✅ 2026-10-26**(-g 登記冊 255/feature 受理+-f/-c/-M/-T 驗證/-W/-p/-P 非致命/-S 指針/-i 真實作/寫檔失敗 255=rivD13 對齊/rivvp -l -=rivD14 釘死;殘=dialect 受理表本體[R8 生效]/-E 正規化閘/-T 選擇語義/parse 錯誤計數)→U-4 rVPI 收編(◐ slice-1 ✅ 2026-10-26 Kernel 四觸發點零成本掛鉤+hooks 閘;slice-2=CbFn embedder 解耦+USim 註冊面)→U-5 segments 退役→U-6 tier-B 重定向;每步 regress 全綠才進,不可達即回退雙引擎現狀;已知代價=riverilog 效能須統一核重驗、profile 差異例登記分歧。
 4. **P3.7 統一分析器服務弧(2026-11-02 立案落地,ADR-0011)**——模組化:Verilog/SystemVerilog 分析器拆為獨立可用高效組件(`analyzer-core` 庫,SV=vl-syntax 全管線直呼、RTLIL=ry-ir 直呼,統一 `Analysis` 視圖+原生 IR 逃逸口,零新語義引擎);client/server(`analyzerd` UDS 服務+`clients/analyzer-ts` 純 Bun 零依賴客戶端,協議=ASP/1 幀+JSON 子集);正典=docs/ANALYZER-SERVICE.md(§17 實作記錄=日誌 SSOT);新基礎設施無 oracle,行為契約=普通單測/集成測試+25 條自建編解碼向量;既有 e2e 語料與 SUMMARY 基線凍結零接觸。
+4. **P3.8 rtl-to-spec 插件弧(2026-11-03 立案,ADR-0012)**——RTL 行為規則書提取+破口掃描:
+   Rust 核心(`rtl-spec`,走 analyzer-core 逃逸口,不擴前弧)→ wasm 面(`rtl-spec-wasm`,
+   --target web 顯式位元組 init)→ MCP server(手寫純 JS .mjs,stdio JSON-RPC 四工具)→
+   zcode plugin 包(`plugin/rtl2spec/`:manifest+skills×3+閘腳本×2);反 doc-dump 三鎖
+   (生成端只由行為構造 spawning/資料端 check.form 五形+指紋去重/閘端 V1..V6 機械判據);
+   正典=docs/RTL2SPEC-PLUGIN.md(§實作記錄=日誌 SSOT);無 oracle 契約,質量閘=機械判據
+   +獨立評審員,禁虛構 golden;驗證集=13 檔 in-git 語料(repo MIT+Apache-2.0+ISC,零 GPL);
+   語料唯讀,寫只落 plugin/rtl2spec/;既有 e2e 語料與 SUMMARY 基線凍結零接觸。
 4. **P4 nextpnr-generic + FPGA 家族**——prjoxide(Rust, ISC)直接收編;其餘長尾。
 5. **P5 formal**——⚠ 風險最高:上游 SMT/SAT 全是 C++,純 Rust solver 成熟度是全 suite 最大未知;屆時再裁。
 6. **P6 波形查看器**——surfer(Rust, EUPL-1.2,僅可獨立二進制)或自寫 TUI。
@@ -100,6 +108,7 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 | M8 | **多 limb 值(>128 bits)** | e2e 100% 精確數+lint parity+寬值對拍 | ✅ 2026-10-24:`Bits` struct+二態 repr(N=u128/W=Box<[u64]> limbs,ADR-0008;N 臂逐字保留);MAX_WIDTH=1<<20+記憶體總量閘;limb-aware 全運算(add..pow/移位/切片/比較/fmt/from_numlit 十進制摺疊/clog2)+帶號 sdiv/srem/spow/cmp(精確模冪);lint 80→**83/87**(寬埠三案例);e2e 58→**59**(`60_wide_values` 首跑逐字對 Verilator);wasm 8/8;附帶修復=負 genvar 二補數/65..128 帶號比較活蟲/$clog2/%o 截斷/Repeat u32 回繞/range_width 上限;窄路徑 bench +2%(≤5% 線);planner→對抗審全吸收 |
 | M9 | tier B `--gen-rust`(編譯設計,Verilator 同構;ADR-0002=docs/adr/0002) | 10-100× 提速錨 | ◐ slice-1 2026-10-26:單 initial 直線子集 4 案例 byte-exact(riv-gen+--gen-rust);多線程/跳轉/always=後續切片 |
 | AN1..AN5 | 統一分析器+ASP/1 服務(analyzer-core/analyzerd/clients/analyzer-ts;正典=docs/ANALYZER-SERVICE.md,ADR-0011) | 總閘四條;run-smoke PASS;基線 469/479+456/456 逐字不動 | ✅ 2026-11-02(S1..S5 一弧收網;analyzer-core 34 測試+1 ignored 生成器+analyzer-server 15 測試[單測 3+回環 12]+bun 12 向量測試+smoke 八項斷言;計數=2026-11-03 收平輪實測刷新,原錄 36/10 回環過時,見 ANALYZER-SERVICE §17 收平條) |
+| RTL1..RTL5 | rtl-to-spec 插件弧(rtl-spec/rtl-spec-wasm/plugin/rtl2spec;正典=docs/RTL2SPEC-PLUGIN.md,ADR-0012) | 總閘四件套(cargo test --workspace+regress.sh+run-mcp-e2e.sh+run-rtl-validation.sh);run-mcp-e2e PASS;run-rtl-validation PASS(V1..V6);基線 469/479+456/456 逐字不動 | 🔶 S1..S7 2026-11-03(核心+wasm+插件包+兩閘全綠;Σrules=325;評審員區=S7 同輪自評,見報告;總閘四件套實測見本檔 §5 RTL 行與 RTL2SPEC-PLUGIN §15) |
 | M8-M9 | 語言廣度/SV 階梯/perf gate + tier-B ADR | 見 PLAN-DRAFT §5;M8 首批候補=層級引用深化(unnamed genblk 鏈×5 檔)、SV fill literals '0/'1(≈11 檔)、>128-bit 多 limb(×6,u128 後餘族)、intra-assign delay、reals、>8 字元字串、宏貼字面量(`SIZE'ha) | |
 
 ## 6. CLI 契約(對抗審 #7/#8 修訂)
