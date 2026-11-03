@@ -1,0 +1,19 @@
+[package]
+name = "rtl-spec-wasm"
+description = "WASM facade over rtl-spec: rulebook extraction / gap scanning / structure summary as JSON strings (ADR-0012)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+# rtl-spec-wasm:wasm face(ADR-0012 D3;10.7 core-first 的面)。
+# crate-type=cdylib+rlib(沿 vl-wasm 形);依賴僅 wasm-bindgen+rtl-spec,
+# **零 js_sys**(純函數進出無回調無狀態);構建=`wasm-pack build
+# crates/rtl-spec-wasm --target web --out-dir pkg`(regress 既證 web 目標)。
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "src/lib.rs"
+
+[dependencies]
+rtl-spec = { workspace = true }
+wasm-bindgen = "0.2"

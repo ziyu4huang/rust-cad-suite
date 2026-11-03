@@ -152,6 +152,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "rtl-spec"
+version = "0.1.0"
+dependencies = [
+ "analyzer-core",
+ "rcs-diag",
+ "ry-ir",
+ "vl-syntax",
+]
+
+[[package]]
+name = "rtl-spec-wasm"
+version = "0.1.0"
+dependencies = [
+ "rtl-spec",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "rustversion"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"

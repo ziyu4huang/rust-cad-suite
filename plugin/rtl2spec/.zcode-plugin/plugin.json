@@ -1,0 +1,17 @@
+{
+  "name": "rtl2spec",
+  "version": "0.1.0",
+  "description": "RTL behaviour rulebook extraction and gap hunting (analyzer-core wasm face)",
+  "author": { "name": "rust-cad-suite" },
+  "license": "MIT",
+  "skills": "skills",
+  "mcpServers": {
+    "rtl2spec": {
+      "type": "stdio",
+      "command": "bun",
+      "args": ["${ZCODE_PLUGIN_ROOT}/dist/server.mjs"],
+      "cwd": "${ZCODE_PROJECT_DIR}",
+      "env": { "RTL2SPEC_WASM_DIR": "${ZCODE_PLUGIN_ROOT}/dist/wasm" }
+    }
+  }
+}

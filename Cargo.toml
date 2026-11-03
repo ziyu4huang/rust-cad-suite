@@ -13,6 +13,8 @@ members = [
     "crates/rcs-diag",
     "crates/analyzer-core",
     "crates/analyzer-server",
+    "crates/rtl-spec",
+    "crates/rtl-spec-wasm",
     "crates/vl-syntax",
     "crates/vl-values",
     "crates/vl-ops",
@@ -36,6 +38,8 @@ authors = ["rust-cad-suite contributors"]
 [workspace.dependencies]
 rcs-diag = { path = "crates/rcs-diag" }
 analyzer-core = { path = "crates/analyzer-core" }
+rtl-spec = { path = "crates/rtl-spec" }
+rtl-spec-wasm = { path = "crates/rtl-spec-wasm" }
 vl-syntax = { path = "crates/vl-syntax" }
 vl-values = { path = "crates/vl-values" }
 vl-ops = { path = "crates/vl-ops" }

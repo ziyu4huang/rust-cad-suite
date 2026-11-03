@@ -1,0 +1,19 @@
+[package]
+name = "rtl-spec"
+description = "RTL behaviour rulebook extraction and gap scanning core for rust-cad-suite (ADR-0012)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+# rtl-spec:RTL 行為規則書提取與破口掃描核心(ADR-0012;正典=docs/RTL2SPEC-PLUGIN.md)。
+# 語義姿態對齊 analyzer-core:永不 panic、錯誤進結果;輸入=源文本(零 FS 觸碰);
+# 走 analyzer-core 逃逸口(Analysis.sv/Analysis.rtlil),不擴前弧(D1)。
+# JSON 編碼復用 analyzer_core::proto::json::Json(**只寫不讀**——D12 opts 標量化
+# 後庫內零 JSON parser 依賴;R1-5 拒的是 ::parse,寫出器與 report.rs 同形同源,
+# 轉義律由 ASP/1 codec 向量單測背書)。
+[dependencies]
+analyzer-core = { workspace = true }
+vl-syntax = { workspace = true }
+ry-ir = { workspace = true }
+rcs-diag = { workspace = true }
