@@ -197,3 +197,60 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
 - **新 crate 同輪 REGISTRY 登记**(`analyzer-core`/`analyzer-server` 兩行已入 Crates 表;閘=api/codec 向量/loopback/smoke 四層)。
 - **regress 執法面(2026-11-03 冒煙閘收編)**:S5 `analyzer smoke` 塊=regress.sh 內既有塊(雙守衛降級形:crates/analyzer-server/Cargo.toml 在場+`command -v bun`;在場時 `bash clients/analyzer-ts/run-smoke.sh` exit≠0 即整閘紅;向量閘由 run-smoke 內建 `bun test` 步承載,regress 一層調用即覆蓋,無需雙跑)。凡測試計數入文檔(§17/PLAN/REGISTRY)=**當輪實跑取數**,同弧後續片增測試必回頭重測重寫(S2 行 36≠分解 32 實錄,收平輪立法)。
 - **CLI 優先級解析律(收平輪立法)**:旗標值解析(`parse_args`)只記 Option,優先級落地(旗標>env>默認)收斂單點(resolve 函數,env 注入式)——**禁在旗標 setter 內硬編碼默認值搶跑 env**(單獨 `--max-frame` 繞過 `ANALYZER_SOCK` 實錄);優先級回歸=單測三象限+集成真 env 兩腿。
+
+## rtl-to-spec 增補(2026-11-03,S1..S7;ADR-0012;正典=docs/RTL2SPEC-PLUGIN.md)
+
+- **三面一路形(D1/D3,10.7 同款)**:語義能力全落 `rtl-spec` 核心(走
+  analyzer-core `Analysis.sv`/`Analysis.rtlil` 逃逸口,**不擴 analyzer-core**);
+  `rtl-spec-wasm` 只是 face(JSON 字串進出,`--target web`+顯式位元組 init);
+  MCP server(手寫純 JS .mjs,源=產物零編譯步)只做「收參→裝載 wasm→調導出→
+  編幀」,零語義。
+- **反 doc-dump 三鎖(規則書資料層契約)**:①生成端鎖=規則只由行為構造
+  spawning(Always/Initial/ContAssign/case 臂/generate 分支/RTLIL process+
+  connections),純宣告(port/wire/param 列表)永不單獨產規則,evidence 必含
+  ≥1 行為類(process|assign|case|generate|expr),decl 只許作輔助;param 類
+  側門=僅 generate 行為構造 spawning;②資料端鎖=每規則 check 必填且
+  form∈五形(guard/transition/sequence/relation/invariant)且 form 專屬欄位
+  非空,fingerprint=拼接鍵串(source|category|module|subject|when|effects,
+  零哈希)全集零重複;③閘端鎖=check-rulebook.mjs 獨立重算(行為證斷言+
+  snippet 與源檔逐位元組對拍+陳述含源碼真標識符)。任何一鎖被繞過其餘兩鎖
+  仍攔;**V2/V5-④ 是冗餘防線(守鎖①的回歸探針),主判據=V5-①+V4**,報告
+  與 SKILL 禁把冗餘防線包裝成主防線。
+- **規則陳述律(D7)**:中文模板句+標識符保持源碼原文名,模板機械生成禁自由
+  散文;snippet 拼接=多行各**行原文**按序 `\n` 連接(保留縮進,末行不帶
+  終結換行),生成端與 checker 同一定義。
+- **relation 適用域與 fingerprint source 契約(R3-②/④收平輪)**:relation
+  的 `when`=適用域——分支域恆等式必攜條件鏈轉寫(分支轉寫不冒充全域,
+  subbytes R007「state=0 else 分支被全局誤讀預測狀態環」實錄),缺席=全域
+  ContAssign;when 入 fingerprint when 維,空串 when=V5-② 違例(checker
+  執法)。fingerprint source 維=傳入 extract_rules 的 `name` **逐字**
+  (驗證閘傳全路徑),**禁 basename 慣例**(兩個 i2c_master.v basename
+  同名,慣例化=R1-2 跨檔同名防線靜默回歸)。
+- **RTLIL 結構證形態律(D2)**:ry-ir 無 span→RTLIL evidence=結構路徑
+  (`file="<name>.il"`,line=0,`path="module/process[N]/sync.posedge"`);
+  逐位元組溯源判據(V4)只對 SV 側斷言,報告須注明雙證形。
+- **V1..V6 閾值指針**:floor 契約=RTL2SPEC-PLUGIN §8.3(V1 全集 ≥50/單檔
+  ≥3/truncated 非空→該檔 FAIL;V2 60%/40%;V3 ≥4;V4 SV 側 100%;V5
+  四判據 100%;V6 13/13);降閾唯一路徑=ADR-0012 修訂+閘重跑,禁靜默。
+- **fixtures 自著授權律**:plugin/rtl2spec/fixtures/ 只放本弧自著小型
+  Verilog(repo MIT);外部語料(yosys-simple=ISC/xls=Apache-2.0)唯讀引用
+  原檔不入 plugin/;zipcpu=GPL 永不入驗證集不入 plugin/。
+- **零 serde 手寫 JSON 鍵序契約**:rtl-spec JSON writer 只寫不讀(D12 opts
+  標量化,庫內零 parser);鍵序=寫出序 byte-exact 契約(單測釘死,沿
+  analyzer-core report.rs 形);敵意轉義 fixture(引號/控制字元/非 ASCII)
+  單測釘死。
+- **破口=測試缺口清單**:每 GapItem 攜 suggested_test 機械模板,「完整測試」
+  的操作定義=suggested_test 全部有對應 TB 條目;每類破口配「會觸發形+零誤報
+  形」雙 fixture(AGENTS §4 第 2 條精神);confidence=certain(結構可證)|
+  heuristic(受限場景),評審按 confidence 差異化抽查。G1 判準含**塊首默認
+  賦值對沖**(R3-①收平輪):行程頂層無條件賦值覆蓋的訊號各路徑均有值
+  不報——誤報形 fixture 矩陣(latch_default_ok 負樣+latch_default_matrix
+  同行程雙 outcome 正樣)釘死;剩餘報告=無默認+分支不對稱=結構可證,
+  certain 維持。
+- **語料唯讀+dist 重建律**:閘腳本只讀 corpus/ 與 corpus-external/,寫只落
+  plugin/rtl2spec/;dist/wasm=構建產物(run-mcp-e2e.sh 同步步從 pkg 刷新,
+  陳舊檢查 find -newer 清單必含全部傳遞依賴目錄——漏列=雙閘驗陳舊 wasm);
+  dist/server.mjs=手寫源入庫。
+- **regress 執法面(S7 收編)**:雙守衛降級形(守衛=`crates/rtl-spec-wasm/pkg`
+  在場+bun 在場;在場時兩插件閘 exit≠0 即整閘紅);既有 SUMMARY 斷言數字
+  (469/479+456/456)逐字不動;analyzer smoke 塊=同形先例。

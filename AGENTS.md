@@ -274,3 +274,46 @@
   RYOSYS-MVP §8.8-2/§8.8-4)。
   正典=SKILL ryosys 节「序差类收平流程」条。
 
+
+## 10.10 rtl-to-spec 紀律(2026-11-03 立法;ADR-0012;正典=SKILL「rtl-to-spec 增補」節)
+
+- **三面一路形(D1/D3,10.7 同款)**:規則書提取/破口掃描的語義能力全落
+  `rtl-spec` 核心(走 analyzer-core `Analysis.sv`/`Analysis.rtlil` 逃逸口,
+  **不擴 analyzer-core**——其立檔禁區「求值/解析」不承載規則歸納);
+  `rtl-spec-wasm` 只是 face(JSON 字串進出、`--target web` 顯式位元組 init、
+  零 js_sys 無 BigInt 面);MCP server(plugin/rtl2spec/dist/server.mjs,手寫
+  純 JS 源=產物零編譯步)只做「收參→裝載 wasm→調導出→編幀」,零語義;
+  **禁只在單一面實現能力**,新能力先落核心再露面。
+- **規則書資料層三鎖(反 doc-dump)**:①生成端鎖=規則只由行為構造 spawning
+  (Always/Initial/ContAssign/case 臂/generate 分支/RTLIL process+
+  connections),純宣告永不單獨成規則,evidence 必含 ≥1 行為類
+  (process|assign|case|generate|expr),decl 只許輔助;param 側門=僅由
+  generate 行為構造 spawning;②資料端鎖=check.form∈五形(guard/transition/
+  sequence/relation/invariant)且專屬欄位非空,fingerprint=拼接鍵串
+  (source|category|module|subject|when|effects,零哈希、source 維必入,
+  跨檔同名模組不誤殺);③閘端鎖=check-rulebook.mjs 獨立重算(行為證斷言+
+  snippet 與源檔逐位元組對拍[拼接規則=各行原文 \n 連接,生成端與 checker
+  同一定義]+陳述含源碼真標識符)。任何一鎖被繞過其餘兩鎖仍攔;**V2/V5-④
+  是冗餘防線(守鎖①的回歸探針),主判據=V5-①+V4**,報告與條文禁把冗餘
+  防線包裝成主防線。
+- **破口=測試缺口清單**:每 GapItem 攜 suggested_test 機械模板,「完整測試」
+  的操作定義=suggested_test 全部有對應 TB 條目(產清單不執行 TB);每類
+  破口判定配「會觸發形+零誤報形」雙 fixture(§4 第 2 條精神);confidence
+  =certain(結構可證)|heuristic(受限場景),按 confidence 差異化採信;
+  誤報形進單測釘死(拼接 LHS 驅動圖誤報 G3 實錄)。
+- **插件閘雙腳本=總閘成員**:`bash plugin/rtl2spec/run-mcp-e2e.sh`(stdio
+  JSON-RPC 回環七斷言)+`bash plugin/rtl2spec/run-rtl-validation.sh`(13 檔
+  in-git 語料 V1..V6 機械判據);S7 起以**雙守衛降級形**收編 regress.sh
+  (守衛=crates/rtl-spec-wasm/pkg 在場+bun 在場;在場時 exit≠0 即整閘紅;
+  D9,R2-4;基線 SUMMARY 斷言逐字不動);**閘驗出貨物**(D8:checker 裝載
+  dist 同一 wasm;陳舊檢查 find -newer 清單必含全部傳遞依賴目錄,漏列=
+  雙閘驗陳舊 wasm)。
+- **語料唯讀+dist 重建律**:閘腳本只讀 corpus/ 與 corpus-external/,寫只落
+  plugin/rtl2spec/(build/=gitignored 產物);dist/wasm=構建產物(同步步
+  刷新,禁手改),dist/server.mjs+md.mjs=手寫源入庫;fixtures/ 只放本弧
+  自著 Verilog(repo MIT);外部語料唯讀引用原檔不入 plugin/;zipcpu=GPL
+  永不入驗證集不入 plugin/。
+- **spec 提取無 oracle 契約**:質量閘=機械判據 V1..V6(降閾唯一路徑=
+  ADR-0012 修訂+閘重跑,禁靜默)+獨立評審員定性評審(validation-report.md
+  評審員區),**禁虛構 golden**;V4 逐位元組溯源=SV 側全量機械,RTLIL 側
+  =結構路徑證形(D2,ry-ir 無 span),報告注明雙證形。

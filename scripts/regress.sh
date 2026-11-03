@@ -365,6 +365,25 @@ else
     echo "analyzer smoke: SKIP (crate/bun absent)"
 fi
 
+# S7 rtl2spec 插件閘(RTL2SPEC-PLUGIN §8.5;ADR-0012 D9):雙守衛降級形
+# (守衛=crates/rtl-spec-wasm/pkg 在場 + bun 在場;在場時兩插件閘 exit≠0
+# 即整閘紅)。既有基線斷言(469/479+456/456)逐字不動;總閘四件套保持
+# 直調雙保險。pkg 缺=SKIP(wasm-pack 腿由 run-* 自建)。
+if [ -f crates/rtl-spec-wasm/pkg/rtl_spec_wasm_bg.wasm ] && command -v bun >/dev/null 2>&1; then
+    if bash plugin/rtl2spec/run-mcp-e2e.sh; then
+        echo "rtl2spec mcp-e2e: PASS"
+    else
+        echo "GATE FAIL: rtl2spec mcp-e2e"; fail=1
+    fi
+    if bash plugin/rtl2spec/run-rtl-validation.sh; then
+        echo "rtl2spec rtl-validation: PASS"
+    else
+        echo "GATE FAIL: rtl2spec rtl-validation"; fail=1
+    fi
+else
+    echo "rtl2spec gates: SKIP (pkg/bun absent)"
+fi
+
 if [ "${1:-}" = "--with-record" ]; then
     echo "== extra: re-record from oracle (requires verilator; review diff!) =="
     ./target/debug/vl-difftest --record 2>&1 | tail -1
