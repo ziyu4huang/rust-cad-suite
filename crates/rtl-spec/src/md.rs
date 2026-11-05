@@ -33,7 +33,10 @@ impl Rulebook {
             let joined: Vec<String> = self
                 .skipped
                 .iter()
-                .map(|n| format!("{}({})", n.file, n.reason.as_str()))
+                .map(|n| match &n.detail {
+                    Some(d) => format!("{}({}: {})", n.file, n.reason.as_str(), d),
+                    None => format!("{}({})", n.file, n.reason.as_str()),
+                })
                 .collect();
             out.push_str(&format!("- 跳過注記:{}\n", joined.join(", ")));
         }
@@ -166,7 +169,10 @@ impl GapReport {
             let joined: Vec<String> = self
                 .skipped
                 .iter()
-                .map(|n| format!("{}({})", n.file, n.reason.as_str()))
+                .map(|n| match &n.detail {
+                    Some(d) => format!("{}({}: {})", n.file, n.reason.as_str(), d),
+                    None => format!("{}({})", n.file, n.reason.as_str()),
+                })
                 .collect();
             out.push_str(&format!("- 跳過注記:{}\n", joined.join(", ")));
         }

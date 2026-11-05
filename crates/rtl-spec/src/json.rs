@@ -187,10 +187,15 @@ pub fn rulebook_json(rb: &Rulebook) -> String {
 }
 
 fn skipped_json(n: &SkippedNote) -> Json {
-    Json::Obj(vec![
+    let mut v = vec![
         ("file".to_string(), s(n.file.clone())),
         ("reason".to_string(), s(n.reason.as_str())),
-    ])
+    ];
+    // detail 僅在有值時輸出(既有 tb_file 注記 byte 形不變)。
+    if let Some(d) = &n.detail {
+        v.push(("detail".to_string(), s(d.clone())));
+    }
+    Json::Obj(v)
 }
 
 fn module_rules_json(m: &ModuleRules) -> Json {

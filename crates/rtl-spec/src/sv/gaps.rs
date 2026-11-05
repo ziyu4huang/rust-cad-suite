@@ -83,6 +83,7 @@ pub(crate) fn scan_gaps_sv(input: &SvInput) -> GapReport {
             skipped: vec![SkippedNote {
                 file: input.name.clone(),
                 reason: SkipReason::TbFile,
+                detail: None,
             }],
             items: Vec::new(),
         };
@@ -95,6 +96,7 @@ pub(crate) fn scan_gaps_sv(input: &SvInput) -> GapReport {
         analysis: &analysis,
     };
     let mut items = Vec::new();
+    let mut skipped: Vec<SkippedNote> = Vec::new();
     if let Some(file) = &analysis.sv {
         for m in &file.modules {
             let sc = build_scan(m);
@@ -103,15 +105,16 @@ pub(crate) fn scan_gaps_sv(input: &SvInput) -> GapReport {
             scan_incomplete_cases(&ctx, &sc, &mut counters, &mut items);
             scan_undriven(&ctx, &sc, &mut counters, &mut items);
             scan_missing_reset(&ctx, &sc, &mut counters, &mut items);
-            scan_comb_loops(&ctx, &sc, &mut counters, &mut items);
+            scan_comb_loops(&ctx, &sc, &mut counters, &mut items, &mut skipped);
             scan_multi_drivers(&ctx, &sc, &mut counters, &mut items);
             scan_blocking_in_seq(&ctx, &sc, &mut counters, &mut items);
+            scan_dead_branches(&ctx, &sc, &mut counters, &mut items);
         }
     }
     GapReport {
         source: input.name.clone(),
         parse_errors,
-        skipped: Vec::new(),
+        skipped,
         items,
     }
 }
@@ -399,7 +402,12 @@ fn check_paths(
         Stmt::If { span, cond, then, els } => {
             let l = lhs_set(then);
             let r = els.as_ref().map(|e| lhs_set(e)).unwrap_or_default();
-            for sig in l.iter().chain(r.iter()) {
+            // F1b(16.0):HashSet 迭代序禁入報告序與 id↔內容綁定——
+            // 收集排序去重後遍歷(集合邏輯不變,報告序確定)。
+            let mut sigs: Vec<&String> = l.iter().chain(r.iter()).collect();
+            sigs.sort();
+            sigs.dedup();
+            for sig in sigs {
                 let in_then = l.contains(sig);
                 let in_else = r.contains(sig);
                 if in_then == in_else || defaults.contains(sig) {
@@ -436,7 +444,11 @@ fn check_paths(
             if let Some(dset) = default_set {
                 for it in arms {
                     if let ast::CaseItem::Items(_, s) = it {
-                        for sig in lhs_set(s) {
+                        // F1b(16.0):同 If 臂——臂內 sig 集排序後遍歷。
+                        let mut sigs: Vec<String> =
+                            lhs_set(s).into_iter().collect();
+                        sigs.sort();
+                        for sig in sigs {
                             if !dset.contains(&sig)
                                 && !defaults.contains(&sig)
                                 && reported.insert(sig.clone())
@@ -662,12 +674,15 @@ fn scan_missing_reset(ctx: &Ctx, sc: &ModuleScan, counters: &mut HashMap<&'stati
                 }
             }
             None => {
-                let regs = lhs_set(p.body);
+                // F1a(16.0):無復位臂寄存器集的取樣必須有序——HashSet
+                // 迭代序隨機抖 suggested_test;收集排序後取字典序首名。
+                let mut regs: Vec<String> = lhs_set(p.body).into_iter().collect();
+                regs.sort();
                 let mut evs = Vec::new();
                 if let Some(e) = ev(ctx, p.span) {
                     evs.push(e);
                 }
-                let first = regs.iter().next().cloned().unwrap_or_default();
+                let first = regs.first().cloned().unwrap_or_default();
                 push_gap(
                      sc,
                     counters,
@@ -689,7 +704,65 @@ fn scan_missing_reset(ctx: &Ctx, sc: &ModuleScan, counters: &mut HashMap<&'stati
 
 // ---- G5 組合環(§3.1;certain) ----
 
-fn scan_comb_loops(ctx: &Ctx, sc: &ModuleScan, counters: &mut HashMap<&'static str, usize>, items: &mut Vec<GapItem>) {
+/// F2 圖規模守衛閾值(§16.0;R11「注記附實數」)。釘選集 37 檔實測
+/// 最大 nodes=36/edges=24(macros.v test_ifdef,S8 探針普查);閾值取
+/// 100×+ 餘量=釘選集零觸發,同時把超限圖的 O(E·(V+E)) 環檢測壓在
+/// 秒級。scopes.v 復驗後真根因=bfs 死循環(非規模),守衛保留以防
+/// 未來真大圖面積。超限=「守衛截斷」注記(skipped/comb_loop_guard)
+/// 後終止環檢測,非靜默截斷。
+const COMB_LOOP_NODE_LIMIT: usize = 4096;
+const COMB_LOOP_EDGE_LIMIT: usize = 16384;
+
+/// F2 守衛判定+注記構造(抽函數供 src 單測;超限=Some(注記))。
+/// 「超限」語義=嚴格大於(恰在閾值=不觸發,守衛只擋面積失控圖)。
+fn comb_loop_guard_note(
+    file: &str,
+    nodes: usize,
+    edges: usize,
+) -> Option<SkippedNote> {
+    (nodes > COMB_LOOP_NODE_LIMIT || edges > COMB_LOOP_EDGE_LIMIT).then(|| SkippedNote {
+        file: file.to_string(),
+        reason: SkipReason::CombLoopGuard,
+        detail: Some(format!(
+            "nodes={nodes} edges={edges}(守衛截斷,環檢測未執行)"
+        )),
+    })
+}
+
+#[cfg(test)]
+mod guard_tests {
+    use super::*;
+
+    #[test]
+    fn guard_note_pins_selected_set_headroom() {
+        // R11 數字錨:釘選集 37 檔實測最大 nodes=36/edges=24(macros.v
+        // test_ifdef,S8 探針普查)——閾值必須留 100×+ 餘量,釘選集零觸發。
+        assert!(COMB_LOOP_NODE_LIMIT > 36 * 100);
+        assert!(COMB_LOOP_EDGE_LIMIT > 24 * 100);
+    }
+
+    #[test]
+    fn guard_note_boundary_strict_gt() {
+        assert!(comb_loop_guard_note("f.v", COMB_LOOP_NODE_LIMIT, 0).is_none());
+        assert!(comb_loop_guard_note("f.v", 0, COMB_LOOP_EDGE_LIMIT).is_none());
+        let hit = comb_loop_guard_note("f.v", COMB_LOOP_NODE_LIMIT + 1, 0).unwrap();
+        assert_eq!(hit.reason.as_str(), "comb_loop_guard");
+        assert_eq!(hit.file, "f.v");
+        assert!(hit
+            .detail
+            .as_deref()
+            .unwrap()
+            .contains(&format!("nodes={}", COMB_LOOP_NODE_LIMIT + 1)));
+        let hit2 = comb_loop_guard_note("f.v", 0, COMB_LOOP_EDGE_LIMIT + 1).unwrap();
+        assert!(hit2
+            .detail
+            .as_deref()
+            .unwrap()
+            .contains(&format!("edges={}", COMB_LOOP_EDGE_LIMIT + 1)));
+    }
+}
+
+fn scan_comb_loops(ctx: &Ctx, sc: &ModuleScan, counters: &mut HashMap<&'static str, usize>, items: &mut Vec<GapItem>, skipped: &mut Vec<SkippedNote>) {
     // 節點=組合 LHS 基底名;邊=rhs Ident → lhs(組合傳播方向)。
     let mut comb_lhs: HashSet<String> = HashSet::new();
     let mut edges: Vec<(String, String, Span)> = Vec::new();
@@ -714,6 +787,14 @@ fn scan_comb_loops(ctx: &Ctx, sc: &ModuleScan, counters: &mut HashMap<&'static s
         .into_iter()
         .filter(|(f, t, _)| comb_lhs.contains(f) && comb_lhs.contains(t))
         .collect();
+    // F2 規模守衛:超限=顯式「守衛截斷」注記後終止環檢測(禁靜默截斷、
+    // 禁無限爬;詳數入 skipped detail,R11)。
+    if let Some(note) =
+        comb_loop_guard_note(&ctx.file_name, comb_lhs.len(), edges.len())
+    {
+        skipped.push(note);
+        return;
+    }
     let mut adj: HashMap<&str, Vec<&str>> = HashMap::new();
     for (f, t, _) in &edges {
         adj.entry(f.as_str()).or_default().push(t.as_str());
@@ -777,14 +858,26 @@ fn bfs_path<'a>(
     start: &'a str,
     goal: &'a str,
 ) -> Option<Vec<String>> {
+    // F2(scopes.v 實錄,2026-11-03):起點必須入 visited。原實現用
+    // prev.contains_key 防重——start 不在 prev,自環邊(adj[start] 含
+    // start)會把 prev[start] 寫成 start(自映射),路徑重建 while 沿
+    // 自映射永不停(native 4s+ 掛死樣本棧=bfs_path→HashMap::get;
+    // wasm 腿表現為秒級 trap。scopes.v 實測圖僅 nodes=2/edges=7,
+    // 真根因=死循環非規模)。
+    let mut visited: HashSet<&str> = HashSet::new();
     let mut prev: HashMap<&str, &str> = HashMap::new();
     let mut queue = VecDeque::new();
+    visited.insert(start);
     queue.push_back(start);
     while let Some(cur) = queue.pop_front() {
         if cur == goal {
             let mut path = vec![cur];
             let mut cur = cur;
-            while let Some(&p) = prev.get(cur) {
+            // 重建沿 prev 走到 start 為止:start 永無 prev 映射
+            // (visited 擋回),鏈必終止;`?`=defensive(不可達前驅
+            // 視為無路徑,不 panic)。
+            while cur != start {
+                let &p = prev.get(cur)?;
                 path.push(p);
                 cur = p;
             }
@@ -793,7 +886,8 @@ fn bfs_path<'a>(
         }
         if let Some(nexts) = adj.get(cur) {
             for &n in nexts {
-                if !prev.contains_key(n) {
+                if !visited.contains(n) {
+                    visited.insert(n);
                     prev.insert(n, cur);
                     queue.push_back(n);
                 }
@@ -892,6 +986,77 @@ fn scan_blocking_in_seq(ctx: &Ctx, sc: &ModuleScan, counters: &mut HashMap<&'sta
 }
 
 // ---- 共用小件 ----
+
+// ---- G8 常量死分支(§17 拓展性實證;certain) ----
+// 判定:If 條件為純字面量(NumLit),值可判定且無 x/z 位(digits 含
+// x/z → lit_u64 None → 不報,X-safe):恆假(值=0)→ then 臂不可達;
+// 恆真(值≠0)→ else 臂不可達(若有)。param 名不求值(§11.5 非目標)。
+// 有序契約(§16.1.5 契約③):語句樹序遍歷,零 HashSet 迭代面。
+
+fn collect_ifs<'a>(s: &'a Stmt, out: &mut Vec<&'a Stmt>) {
+    match s {
+        Stmt::Block { body, .. } => body.iter().for_each(|b| collect_ifs(b, out)),
+        Stmt::If { then, els, .. } => {
+            out.push(s);
+            collect_ifs(then, out);
+            if let Some(e) = els {
+                collect_ifs(e, out);
+            }
+        }
+        Stmt::Case { items, .. } => {
+            for it in items {
+                match it {
+                    ast::CaseItem::Items(_, st) => collect_ifs(st, out),
+                    ast::CaseItem::Default(st) => collect_ifs(st, out),
+                }
+            }
+        }
+        Stmt::For { body, .. }
+        | Stmt::While { body, .. }
+        | Stmt::Repeat { body, .. }
+        | Stmt::Forever { body, .. } => collect_ifs(body, out),
+        Stmt::Fork { branches, .. } => branches.iter().for_each(|b| collect_ifs(b, out)),
+        // 非容器葉子(BAssign/DelayCtrl/Null 等)。**新增容器型 Stmt 變體
+        // 須在此展開**(extension recipe §17.2 步驟 b;漏展開=靜默漏報)。
+        _ => {}
+    }
+}
+
+fn scan_dead_branches(ctx: &Ctx, sc: &ModuleScan, counters: &mut HashMap<&'static str, usize>, items: &mut Vec<GapItem>) {
+    for p in &sc.procs {
+        let mut ifs: Vec<&Stmt> = Vec::new();
+        collect_ifs(&p.body, &mut ifs);
+        for s in ifs {
+            let Stmt::If { span, cond, els, .. } = s else {
+                continue;
+            };
+            let Some(v) = lit_u64(cond) else {
+                continue;
+            };
+            let (dead_then, msg) = if v == 0 {
+                (true, format!("條件 {} 恆假,then 臂不可達(死分支)", render(cond)))
+            } else {
+                (false, format!("條件 {} 恆真,else 臂不可達(死分支)", render(cond)))
+            };
+            if dead_then || els.is_some() {
+                let mut evs = Vec::new();
+                if let Some(e) = ev(ctx, *span) {
+                    evs.push(e);
+                }
+                push_gap(
+                    sc,
+                    counters,
+                    items,
+                    GapClass::DeadBranch,
+                    Confidence::Certain,
+                    msg,
+                    evs,
+                    "移除死臂或把條件改為可變表達式;測試釘住活臂行為".to_string(),
+                );
+            }
+        }
+    }
+}
 
 fn literal_width(r: &ast::Range) -> Option<u32> {
     let msb = lit_u64(&r.msb)?;

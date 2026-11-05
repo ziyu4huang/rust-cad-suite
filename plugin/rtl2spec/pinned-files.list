@@ -1,0 +1,46 @@
+# pinned-files.list — golden 釘選語料集 37 檔(§16.1.1;SSOT=方案文檔表)
+# 註釋行跳過;路徑=repo 相對。釘選集增刪=語義事件:同輪更新 §16.1.1 表。
+# license:corpus-external/yosys-simple=ISC(COPYING 隨附);corpus/=repo MIT;
+# crates/spec-i2c=乾淨室 MIT(OpenCores 唯讀啟發零拷貝)。
+
+# --- yosys-simple 頭部 5(九類規則主力) ---
+corpus-external/yosys-simple/operators.v
+corpus-external/yosys-simple/memory.v
+corpus-external/yosys-simple/constmuldivmod.v
+corpus-external/yosys-simple/sincos.v
+corpus-external/yosys-simple/partsel.v
+# --- yosys-simple 中部 12(fsm 類面+generate/case 臂+G1) ---
+corpus-external/yosys-simple/fsm.v
+corpus-external/yosys-simple/dff_different_styles.v
+corpus-external/yosys-simple/generate.v
+corpus-external/yosys-simple/process.v
+corpus-external/yosys-simple/fiedler-cooley.v
+corpus-external/yosys-simple/multiplier.v
+corpus-external/yosys-simple/i2c_master_tests.v
+corpus-external/yosys-simple/undef_eqx_nex.v
+corpus-external/yosys-simple/always03.v
+corpus-external/yosys-simple/forloops.v
+corpus-external/yosys-simple/realexpr.v
+corpus-external/yosys-simple/subbytes.v
+# --- yosys-simple 尾部 15(低規則數下限面+G1/G5) ---
+corpus-external/yosys-simple/signedexpr.v
+corpus-external/yosys-simple/task_func.v
+corpus-external/yosys-simple/vloghammer.v
+corpus-external/yosys-simple/wreduce.v
+corpus-external/yosys-simple/muxtree.v
+corpus-external/yosys-simple/dff_init.v
+corpus-external/yosys-simple/mem2reg.v
+corpus-external/yosys-simple/macros.v
+corpus-external/yosys-simple/aes_kexp128.v
+corpus-external/yosys-simple/carryadd.v
+corpus-external/yosys-simple/loops.v
+corpus-external/yosys-simple/attrib04_net_var.v
+corpus-external/yosys-simple/omsp_dbg_uart.v
+corpus-external/yosys-simple/mem_arst.v
+corpus-external/yosys-simple/forgen02.v
+# --- repo 自有 5(protocol/handshake 重鎮+xls 面+G4;路徑全名釘) ---
+corpus/e2e/59_i2c_master/i2c_master.v
+crates/spec-i2c/rtl/i2c_master.v
+corpus/e2e/58_xls_acc_pipe/acc_pipe.v
+corpus/e2e/57_xls_add3/add3.v
+corpus/fulladd/fulladd.v

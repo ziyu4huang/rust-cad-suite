@@ -354,6 +354,7 @@ pub(crate) fn extract_rules_sv(input: &SvInput, max_rules: usize) -> Rulebook {
             skipped: vec![SkippedNote {
                 file: input.name.clone(),
                 reason: SkipReason::TbFile,
+                detail: None,
             }],
             modules: Vec::new(),
             truncated: Vec::new(),

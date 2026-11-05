@@ -276,6 +276,8 @@ pub enum SkipReason {
     TbFile,
     /// 該輸入形本弧未支援(帶里程碑;硬錯契約以注記形呈現)。
     Unsupported,
+    /// 破口掃描被圖規模守衛截斷(§16.0 F2;詳數入 detail,非靜默截斷)。
+    CombLoopGuard,
 }
 
 impl SkipReason {
@@ -283,6 +285,7 @@ impl SkipReason {
         match self {
             SkipReason::TbFile => "tb_file",
             SkipReason::Unsupported => "unsupported",
+            SkipReason::CombLoopGuard => "comb_loop_guard",
         }
     }
 }
@@ -291,6 +294,9 @@ impl SkipReason {
 pub struct SkippedNote {
     pub file: String,
     pub reason: SkipReason,
+    /// 附帶實數注記(如 `nodes=… edges=…`);None=無(tb_file 等
+    /// 既有注記保持原輸出形,detail 鍵不輸出)。
+    pub detail: Option<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -368,6 +374,8 @@ pub enum GapClass {
     CombLoop,
     MultiDriver,
     BlockingInSeq,
+    /// §17 拓展性實證(R17/S13):常量條件死分支。
+    DeadBranch,
 }
 
 impl GapClass {
@@ -380,10 +388,11 @@ impl GapClass {
             GapClass::CombLoop => "comb_loop",
             GapClass::MultiDriver => "multi_driver",
             GapClass::BlockingInSeq => "blocking_in_seq",
+            GapClass::DeadBranch => "dead_branch",
         }
     }
 
-    /// §3.1 id 前綴(G1..G7)。
+    /// §3.1 id 前綴(G1..G8;G8=§17 拓展性實證)。
     pub fn prefix(self) -> &'static str {
         match self {
             GapClass::Latch => "G1",
@@ -393,6 +402,7 @@ impl GapClass {
             GapClass::CombLoop => "G5",
             GapClass::MultiDriver => "G6",
             GapClass::BlockingInSeq => "G7",
+            GapClass::DeadBranch => "G8",
         }
     }
 }

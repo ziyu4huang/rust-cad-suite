@@ -32,6 +32,12 @@ export function checkText(check) {
   }
 }
 
+// 跳過注記標籤(detail=Some 時追加,與 rtl-spec md.rs 同一定義;
+// None 時既有形 `${file}(${reason})` byte 不變)。
+export function skipLabel(n) {
+  return n.detail ? `${n.file}(${n.reason}: ${n.detail})` : `${n.file}(${n.reason})`;
+}
+
 export function renderRulebookMarkdown(rb) {
   const lines = [];
   const total = sumRules(rb);
@@ -40,7 +46,7 @@ export function renderRulebookMarkdown(rb) {
   lines.push(`- 模組數:${(rb.modules ?? []).length};規則總數:${total}`);
   if (rb.parse_errors?.length) lines.push(`- 解析錯誤:${rb.parse_errors.length} 條`);
   if (rb.skipped?.length)
-    lines.push(`- 跳過注記:${rb.skipped.map((n) => `${n.file}(${n.reason})`).join(', ')}`);
+    lines.push(`- 跳過注記:${rb.skipped.map((n) => skipLabel(n)).join(', ')}`);
   if (rb.truncated?.length) lines.push(`- 截斷模組:${rb.truncated.join(', ')}(超過模組內上限)`);
   lines.push('');
   for (const m of rb.modules ?? []) {
@@ -79,7 +85,7 @@ export function renderGapsMarkdown(gr) {
   lines.push(`- 破口數:${(gr.items ?? []).length}`);
   if (gr.parse_errors?.length) lines.push(`- 解析錯誤:${gr.parse_errors.length} 條`);
   if (gr.skipped?.length)
-    lines.push(`- 跳過注記:${gr.skipped.map((n) => `${n.file}(${n.reason})`).join(', ')}`);
+    lines.push(`- 跳過注記:${gr.skipped.map((n) => skipLabel(n)).join(', ')}`);
   lines.push('');
   for (const g of gr.items ?? []) {
     lines.push(`### ${g.id} [${g.class} ${g.confidence}] ${g.message}`);

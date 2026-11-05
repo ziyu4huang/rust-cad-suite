@@ -1,8 +1,8 @@
 # rtl2spec 真實 RTL 驗證報告
 
-- 日期:2026-11-03
+- 日期:2026-11-05
 - 命令行:`bash plugin/rtl2spec/run-rtl-validation.sh`(機械生成禁手改)
-- 工具鏈:bun 1.4.2、wasm sha256 `eb69248ca63a5c9cf7cceb61f680a909ce194cb945e4814b2f9abb3a99d57a32`
+- 工具鏈:bun 1.4.2、wasm sha256 `4b143d3afd22c41f85a0c2cebc23edd0c0176e3eb0f2ae88849fc4c8d855f3cd`
 - 本檔=閘契約 V1..V6 的證據頁;評審員區外全部機械生成。
 
 ## 閘契約表(V1..V6)
@@ -1618,7 +1618,7 @@
 ### G4-__acc_pipe__acc_pipe-001 [missing_reset certain] 邊沿行程完全無復位臂,2 個寄存器上電值未定義
 
 - 證據:corpus/e2e/58_xls_acc_pipe/acc_pipe.v:13-16(process)
-- 建議測試:復位後直接讀 y__input_flop,釘住其上電值
+- 建議測試:復位後直接讀 x__input_flop,釘住其上電值
 
 ### G4-__acc_pipe__acc_pipe-002 [missing_reset certain] 邊沿行程完全無復位臂,2 個寄存器上電值未定義
 
@@ -1640,7 +1640,7 @@
 ### G4-__add3__add3-001 [missing_reset certain] 邊沿行程完全無復位臂,3 個寄存器上電值未定義
 
 - 證據:corpus/e2e/57_xls_add3/add3.v:15-19(process)
-- 建議測試:復位後直接讀 y__input_flop,釘住其上電值
+- 建議測試:復位後直接讀 x__input_flop,釘住其上電值
 
 ### G4-__add3__add3-002 [missing_reset certain] 邊沿行程完全無復位臂,1 個寄存器上電值未定義
 

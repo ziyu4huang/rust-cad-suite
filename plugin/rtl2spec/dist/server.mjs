@@ -18,7 +18,7 @@ import { sumRules, countGaps, renderRulebookMarkdown, renderGapsMarkdown } from 
 import { fileURLToPath } from 'node:url';
 
 const SERVER_NAME = 'rtl2spec';
-const SERVER_VERSION = '0.1.0';
+const SERVER_VERSION = '0.2.0';
 const PROTOCOL_LATEST = '2025-11-25';
 const PROTOCOL_SUPPORTED = [
   '2025-11-25',
@@ -54,6 +54,22 @@ try {
   api = glue;
 } catch (e) {
   fatal(`wasm init failed: ${e?.message ?? e}`);
+}
+
+// ---- ABI 兼容裝載校驗(§17.5;內核 ABI 軌=rtl_spec_version(Cargo workspace),
+// 與插件 semver(SERVER_VERSION)雙軌;不匹配=清晰錯誤含雙版本+修復指引) ----
+const EXPECTED_ABI = ['0.1.0'];
+try {
+  const abiVersion = api.rtl_spec_version();
+  if (!EXPECTED_ABI.includes(abiVersion)) {
+    fatal(
+      `wasm ABI 版本不兼容: 內核=${abiVersion} 期望=${EXPECTED_ABI.join('/')}\n` +
+      `修復: wasm-pack build crates/rtl-spec-wasm --target web --out-dir pkg 後同步 dist/wasm/` +
+      `(run-mcp-e2e.sh / run-rtl-validation.sh 均自動同步;EXPECTED_ABI 名單=dist/server.mjs 頂部常量)`
+    );
+  }
+} catch (e) {
+  fatal(`ABI 校驗失敗(rtl_spec_version 不可用): ${e?.message ?? e}`);
 }
 
 // ---- 語義入口(JSON 進出;parse 錯誤=結構化欄位,非工具級錯誤) ----

@@ -472,6 +472,7 @@ fn rulebook_json_key_order_is_byte_exact() {
         skipped: vec![rtl_spec::SkippedNote {
             file: "tb.v".to_string(),
             reason: rtl_spec::SkipReason::TbFile,
+            detail: None,
         }],
         modules: vec![rtl_spec::ModuleRules {
             module: "demo".to_string(),
@@ -594,4 +595,247 @@ fn markdown_render_contains_samples() {
     let gmd = scan_gaps(&sv("gaps_positive.v", gsrc)).render_markdown();
     assert!(gmd.starts_with("# 破口報告:gaps_positive.v"));
     assert!(gmd.contains("- 建議測試:"));
+}
+
+// ---- S8:確定性契約(F1a/F1b)+bfs 環形回歸(F2)+守衛注記契約 ----
+
+/// F1a 回歸錨:無復位臂行程的 suggested_test 必取**字典序首寄存器名**。
+/// 聲明序(c,b,a)故意異於字典序(a<b<c)——HashSet 迭代序隨機取樣會抖。
+#[test]
+fn gap_missing_reset_no_arm_suggested_test_is_deterministic_name() {
+    let src = r#"module gap_no_arm(input wire clk, input wire d, output reg cbus, output reg abus, output reg zbus);
+  always @(posedge clk) begin
+    cbus <= d;
+    abus <= ~d;
+    zbus <= d & abus;
+  end
+endmodule"#;
+    let first_seen = {
+        let gaps = scan_gaps(&sv("gap_no_arm.v", src));
+        let g4: Vec<_> = gaps
+            .items
+            .iter()
+            .filter(|g| g.class.as_str() == "missing_reset")
+            .collect();
+        assert_eq!(g4.len(), 1, "無復位臂=單條 G4,實得 {}", g4.len());
+        assert_eq!(g4[0].confidence.as_str(), "certain");
+        assert!(g4[0].message.contains("3 個寄存器"), "{}", g4[0].message);
+        g4[0].suggested_test.clone()
+    };
+    // 逐字名斷言:字典序首名=abus(聲明序首名 cbus 不得出現)。
+    assert!(
+        first_seen.contains("abus") && !first_seen.contains("cbus"),
+        "suggested_test 必含字典序首名 abus、不含聲明序首名 cbus: {first_seen}"
+    );
+    // 同進程重複掃描 3 跑全等(F1a 修前 HashSet 取樣抖)。
+    for _ in 0..3 {
+        let gaps = scan_gaps(&sv("gap_no_arm.v", src));
+        let g = gaps
+            .items
+            .iter()
+            .find(|g| g.class.as_str() == "missing_reset")
+            .unwrap();
+        assert_eq!(g.suggested_test, first_seen);
+    }
+}
+
+/// F1b+§16.1.5 契約①②:G1 If/Case 臂報告序=字典序(HashSet 迭代序禁入
+/// 輸出),同進程 5 跑 gap_report_json byte-identical。
+#[test]
+fn gap_report_is_deterministic_and_ordered_in_process() {
+    let src = r#"module gap_order_if(input wire s, input wire a, input wire b, output reg m_z, output reg m_y, output reg m_x);
+  always @* begin
+    if (s) begin
+      m_z = a;
+      m_y = b;
+      m_x = a & b;
+    end
+  end
+endmodule
+module gap_order_case(input wire [1:0] s, output reg c_q2, output reg c_q1);
+  always @* begin
+    case (s)
+      2'b01: begin
+        c_q2 = 1'b1;
+        c_q1 = 1'b0;
+      end
+      default: ;
+    endcase
+  end
+endmodule"#;
+    // 報告序釘死:If 臂=字典序 m_x < m_y < m_z(聲明序反向);Case 臂=
+    // c_q1 < c_q2。
+    let ordered = |module: &str| -> Vec<String> {
+        let gaps = scan_gaps(&sv("gap_order.v", src));
+        gaps.items
+            .iter()
+            .filter(|g| g.module == module)
+            .map(|g| g.message.clone())
+            .collect()
+    };
+    let msgs_if = ordered("gap_order_if");
+    assert_eq!(msgs_if.len(), 3, "If 無 else 臂三訊號各報一條: {msgs_if:?}");
+    assert!(
+        msgs_if[0].contains("m_x") && msgs_if[1].contains("m_y") && msgs_if[2].contains("m_z"),
+        "報告序必為字典序 m_x,m_y,m_z(聲明序反向),實得 {msgs_if:?}"
+    );
+    let msgs_case = ordered("gap_order_case");
+    assert_eq!(msgs_case.len(), 2, "Case 臂兩訊號各報一條: {msgs_case:?}");
+    assert!(
+        msgs_case[0].contains("c_q1") && msgs_case[1].contains("c_q2"),
+        "報告序必為字典序 c_q1,c_q2,實得 {msgs_case:?}"
+    );
+    // 契約①:同進程 5 跑 byte-identical(含跨檔調用序——兩 module 交替)。
+    let first = gap_report_json(&scan_gaps(&sv("gap_order.v", src)));
+    for _ in 0..5 {
+        let _ = scan_gaps(&sv("gap_order.v", src));
+        assert_eq!(gap_report_json(&scan_gaps(&sv("gap_order.v", src))), first);
+    }
+}
+
+/// F2 回歸錨:bfs_path 死循環(自環邊使 prev[start]=start 自映射,路徑
+/// 重建永不停)最小復現形=scopes.v 同構(組合 always+命名塊局部 reg+
+/// 自環+雙信號環)。修後:終止、G5 報告精確(2 自環+2 環)、同進程
+/// 3 跑 byte-identical。fixture 同形在 plugin/rtl2spec/fixtures/
+/// gap_hang_repro.v(插件閘面);本測試內聯同 RTL,不跨包引用。
+#[test]
+fn gap_comb_loop_self_edges_terminate_and_report() {
+    let src = r#"module gap_hang_repro(input wire a, input wire b, output reg x, output reg y);
+  always @* begin : blk
+    reg t1;
+    reg t2;
+    t1 = a;
+    t2 = b;
+    x = t1 & t2;
+    y = t1 | t2;
+    x = x ^ y;
+    y = y ^ x;
+  end
+endmodule"#;
+    let gr = scan_gaps(&sv("gap_hang_repro.v", src));
+    assert!(gr.skipped.is_empty(), "小圖不得觸發守衛: {:?}", gr.skipped);
+    let g5: Vec<_> = gr.items.iter().filter(|g| g.class.as_str() == "comb_loop").collect();
+    assert_eq!(g5.len(), 4, "精確 4 條(2 自環+2 環),實得 {:?}", gr.items);
+    let self_loops = g5.iter().filter(|g| g.message.contains("自環")).count();
+    let cycles = g5.iter().filter(|g| g.message.contains("組合環:")).count();
+    assert_eq!((self_loops, cycles), (2, 2), "自環/環計數: {g5:?}");
+    // 全部 certain(結構可證)。
+    assert!(g5.iter().all(|g| g.confidence.as_str() == "certain"));
+    // 雙信號環的環形確定:x→y→x 與 y→x→y 各一(修前死循環,修後確定)。
+    assert!(g5.iter().any(|g| g.message.contains("x → y → x")), "{:?}", g5.iter().map(|g| &g.message).collect::<Vec<_>>());
+    assert!(g5.iter().any(|g| g.message.contains("y → x → y")), "{:?}", g5.iter().map(|g| &g.message).collect::<Vec<_>>());
+    // 同進程 3 跑 byte-identical。
+    let first = gap_report_json(&gr);
+    for _ in 0..3 {
+        assert_eq!(gap_report_json(&scan_gaps(&sv("gap_hang_repro.v", src))), first);
+    }
+}
+
+/// schema 擴面契約(SkippedNote.detail):detail=Some 時 JSON 追加 detail
+/// 鍵;None 時既有注記 byte 形不變(無 detail 鍵)。守衛語義單測
+/// (閾值邊界)在 src/sv/gaps.rs guard_tests。
+#[test]
+fn skipped_note_detail_json_contract() {
+    use rtl_spec::{SkippedNote, SkipReason};
+    let gr = rtl_spec::GapReport {
+        source: "x.v".to_string(),
+        parse_errors: vec![],
+        skipped: vec![
+            SkippedNote {
+                file: "x.v".to_string(),
+                reason: SkipReason::TbFile,
+                detail: None,
+            },
+            SkippedNote {
+                file: "y.v".to_string(),
+                reason: SkipReason::CombLoopGuard,
+                detail: Some("nodes=4097 edges=0(守衛截斷,環檢測未執行)".to_string()),
+            },
+        ],
+        items: vec![],
+    };
+    let json = gap_report_json(&gr);
+    assert!(
+        json.contains("{\"file\":\"x.v\",\"reason\":\"tb_file\"}"),
+        "detail=None 的既有注記 byte 形不變(無 detail 鍵): {json}"
+    );
+    assert!(
+        json.contains(
+            "{\"file\":\"y.v\",\"reason\":\"comb_loop_guard\",\"detail\":\
+\"nodes=4097 edges=0(守衛截斷,環檢測未執行)\"}"
+        ),
+        "detail=Some 追加 detail 鍵: {json}"
+    );
+}
+
+// ---- G8 dead_branch(§17 拓展性實證;R17) ----
+
+#[test]
+fn g8_dead_branch_constant_if_reported_certain_and_zero_colateral() {
+    // 正樣:恆假 then 死+恆真 else 死;塊首默認賦值防 G1,設計零共報。
+    let src = r#"module deadb(input wire a, output reg y);
+  always @* begin
+    y = a;
+    if (1'b0) begin
+      y = ~a;
+    end
+  end
+endmodule
+module deadb_else(input wire b, input wire c, output reg z);
+  always @* begin
+    z = b;
+    if (1'b1) begin
+      z = c;
+    end else begin
+      z = b;
+    end
+  end
+endmodule
+"#;
+    let gaps = scan_gaps(&sv("deadb.v", src));
+    assert_eq!(gaps.items.len(), 2, "{:?}", gaps.items);
+    for g in &gaps.items {
+        assert_eq!(g.class.as_str(), "dead_branch");
+        assert_eq!(g.confidence.as_str(), "certain");
+        assert_eq!(g.id.split('-').next().unwrap(), "G8");
+    }
+    assert!(gaps.items[0].message.contains("恆假"), "{}", gaps.items[0].message);
+    assert!(gaps.items[1].message.contains("恆真"), "{}", gaps.items[1].message);
+}
+
+#[test]
+fn g8_negative_variable_and_param_and_x_conditions_are_clean() {
+    // 負樣三形:變量條件/param 條件(§11.5 不求值)/x 位字面量(X-safe)——零命中。
+    let src = r#"module cleanb(input wire en, input wire [1:0] sel, output reg y);
+  always @* begin
+    y = 1'b0;
+    if (en) begin
+      y = 1'b1;
+    end else begin
+      y = sel[0];
+    end
+  end
+endmodule
+module param_cond(input wire a, output reg y);
+  parameter WIDE = 1;
+  always @* begin
+    y = a;
+    if (WIDE) begin
+      y = ~a;
+    end else begin
+      y = a;
+    end
+  end
+endmodule
+module x_cond(input wire a, output reg y);
+  always @* begin
+    y = a;
+    if (1'bx) begin
+      y = ~a;
+    end
+  end
+endmodule
+"#;
+    let gaps = scan_gaps(&sv("clean.v", src));
+    assert!(gaps.items.is_empty(), "{:?}", gaps.items);
 }
