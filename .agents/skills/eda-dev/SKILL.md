@@ -254,3 +254,43 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
 - **regress 執法面(S7 收編)**:雙守衛降級形(守衛=`crates/rtl-spec-wasm/pkg`
   在場+bun 在場;在場時兩插件閘 exit≠0 即整閘紅);既有 SUMMARY 斷言數字
   (469/479+456/456)逐字不動;analyzer smoke 塊=同形先例。
+- **拓展與版本增補(2026-11-04,§17/S13..S15;ADR-0012 D17..D19,增訂於該 ADR 修訂記錄)**:①新破口類=
+  靜態詞表+掃描序註冊點(enum 窮盡 match=編譯期 registry;新類=序列
+  尾部追加=舊 id/序零漂移),端到端配方=docs/RTL2SPEC-PLUGIN §17.2
+  (判定設計→schema 註冊→掃描器[禁 HashSet 迭代面進輸出,§16.1.5
+  契約③]→單測雙向→plugin fixtures 正樣零共報設計→wasm 重建+parity
+  [trim 對齊=smoke.mjs 先例]→golden 錄製[12 跑自檢前置]→skills+版本);
+  實證=G8 dead_branch 全鏈路(§17.3,釘選集零觸發=基線零擾動);
+  ②版本雙軌:插件 semver SSOT=plugin.json(四點一致=manifest/CHANGELOG
+  頭/SERVER_VERSION/serverInfo 引用常量;run-plugin-check.sh 執法)+
+  內核 ABI 軌=rtl_spec_version()(workspace 共享,禁 bump 擾基線);
+  server.mjs 裝載時核對 EXPECTED_ABI 名單,不匹配=fatal 含修復指引;
+  CHANGELOG=plugin/rtl2spec/CHANGELOG.md(Added/Fixed/Breaking);
+  git tag 慣例=rtl2spec-vX.Y.Z(真打由 user 定)。
+- **golden 回歸與評測增補(2026-11-04,S9..S12;ADR-0012 D14..D16;§16)**:
+  ①golden=提取器**自身輸出快照**(self-recorded snapshot,非 oracle 期望;
+  「禁虛構 golden」讀法=錄製產生禁手寫);釘選 37 檔×rules+gaps=74 份
+  JSON byte-exact(golden/ 鏡像源路徑:corpus-external/<X> 剥根,corpus/
+  crates/ 全路徑),閘=`bash plugin/rtl2spec/run-golden-regression.sh`
+  (wasm 腿=dist 同一產物,D8;--record 顯式重錄,錄前進程內每檔每模式
+  3 跑自檢[兩階段防部分錄製],錄後 `git diff golden/` 逐案對帳=re-record
+  語義事件);**golden 紅≠錯,=語義變了**:能解釋→--record 重錄,不能
+  解釋→停,排查提取器。②確定性契約=輸出禁依賴調用流位置+禁
+  HashSet/HashMap 迭代面進輸出(§16.1.5;F1a/F1b 實錄,wasm 跨進程測試
+  無判別力);新檢測器/新代碼入提取路徑須過 12 跑制
+  (probe-determinism.mjs)。③破口 fixture 矩陣閘=`bash
+  plugin/rtl2spec/run-gap-fixtures.sh`:G1..G7 正負樣**條級
+  (module,class,confidence) 多重集合相等**斷言(條級 vs 單測 classes_of
+  去重類集兩種形不矛盾;G5 雙向環×2/G6/G7 雙行程各 G4×2)+expected
+  findings=斷言規格手寫合法(與 sv_rules.rs 同源),golden=錄製快照
+  禁手寫,兩者劃界(D15)+selfcheck 判別力自證+終止性守衛行。④真實評測
+  擴面=`bash plugin/rtl2spec/run-realworld-eval.sh`(L1=93 檔全提取+
+  破口/L2=sv-tests 260 檔容錯面;per-file 三檔分類,擴面集失敗條件=
+  結構性違例非產量;閘級硬 FAIL=trap/V4/V5-①②④/V5-③ 指紋重複/V6
+  覆蓋;報告=docs/RTL2SPEC-EVAL.md 機械生成禁手改+R5 分層抽樣 5 檔
+  探針×3 複評內聯)——總閘直調不進 regress(353 檔時長)。⑤golden/
+  gap-fixtures 兩閘 S11 起以雙守衛降級形收編 regress.sh 既有 rtl2spec
+  塊(守衛不變,在場時 exit≠0 即整閘紅)。⑥PROVENANCE 兩域:正式樹=
+  golden/PROVENANCE.md(--record 全量重寫);demo(plugin-fixtures 域)=
+  record-golden.mjs 追加式,兩域互不覆蓋。
+

@@ -317,3 +317,21 @@
   ADR-0012 修訂+閘重跑,禁靜默)+獨立評審員定性評審(validation-report.md
   評審員區),**禁虛構 golden**;V4 逐位元組溯源=SV 側全量機械,RTLIL 側
   =結構路徑證形(D2,ry-ir 無 span),報告注明雙證形。
+- **回歸與真實評測執法面(2026-11-04 S9..S12;ADR-0012 D14..D16)**:
+  ①golden 回歸閘=`bash plugin/rtl2spec/run-golden-regression.sh`——
+  golden=提取器自身輸出快照(非 oracle 期望,錄製產生禁手寫);釘選
+  37 檔×2 模式 byte-exact;**錄製順序鐵則=非確定源(HashSet/HashMap
+  迭代面/調用流位置耦合)修復且 flapper 清零前禁錄任何 golden**
+  (F1a/F1b 實錄:wasm 跨進程測試無判別力,自檢必須進程內跑);
+  --record 顯式重錄+錄後 `git diff golden/` 逐案對帳=re-record 語義
+  事件,golden 紅且無語義變更=停弧排查。②破口 fixture 矩陣閘=
+  `bash plugin/rtl2spec/run-gap-fixtures.sh`——G1..G7 正負樣條級
+  multiset 集合相等+selfcheck 判別力自證+終止性守衛;expected findings
+  =斷言規格(手寫合法)與 golden 快照(禁手寫)劃界。③評測擴面閘=
+  `bash plugin/rtl2spec/run-realworld-eval.sh`——L1=93 檔/L2=sv-tests
+  260 檔,閘級硬 FAIL=trap/V4/V5-①②④/指紋重複/覆蓋面;報告=
+  docs/RTL2SPEC-EVAL.md 機械生成禁手改;**總閘直調不進 regress**
+  (353 檔時長;進 regress 的只有 golden/gap-fixtures 兩閘,沿既有
+  rtl2spec 塊雙守衛降級形,S11 起)。④單進程同步 wasm 循環**禁宣稱
+  計時器超時守衛**(掛死時計時器無法觸發,R16-3)——終止性防線=圖
+  規模守衛+visited 修復+trap 計數。

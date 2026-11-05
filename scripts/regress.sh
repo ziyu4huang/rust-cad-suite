@@ -380,6 +380,16 @@ if [ -f crates/rtl-spec-wasm/pkg/rtl_spec_wasm_bg.wasm ] && command -v bun >/dev
     else
         echo "GATE FAIL: rtl2spec rtl-validation"; fail=1
     fi
+    if bash plugin/rtl2spec/run-golden-regression.sh; then
+        echo "rtl2spec golden-regression: PASS"
+    else
+        echo "GATE FAIL: rtl2spec golden-regression"; fail=1
+    fi
+    if bash plugin/rtl2spec/run-gap-fixtures.sh; then
+        echo "rtl2spec gap-fixtures: PASS"
+    else
+        echo "GATE FAIL: rtl2spec gap-fixtures"; fail=1
+    fi
 else
     echo "rtl2spec gates: SKIP (pkg/bun absent)"
 fi
