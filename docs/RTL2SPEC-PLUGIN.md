@@ -1061,3 +1061,828 @@ skipped/analyze_summary/analysis_json)、§4.2(TB 行+src/summary.rs)、
   run-rtl-validation.sh exit 0(Σrules=325/V2 100%/V3 5 類/指紋
   325/325/V6 13/13;破口總數 48→39,validation-report.md 重生成
   1745 行含新注記)。——通過。
+
+- **S8 確定性與終止性修復(2026-11-04 實作落地;規劃=§16.6 S8)**:
+  F1a G4 無復位臂有序取樣+F1b G1 If/Case 臂迭代有序化(gaps.rs 三處,
+  收集入 Vec+sort 後取首/遍歷;集合邏輯不變)+F2 bfs_path visited 集
+  (真根因=bfs 死循環非規模,REGISTRY 11-03 行勘正;守衛保留防禦)+
+  gap_hang_repro.v 入 plugin/fixtures+probe-determinism.mjs(37 檔×12 跑
+  +調用序擾動)+pinned-files.list 釘選清單。自驗:①probe 37/37 PASS
+  (flapper 12 檔清零,2026-11-04 復跑實測);②scopes.v wasm 腿零 trap
+  (eval 全集 trap=0);③cargo test -p rtl-spec 全綠;④run-rtl-validation
+  exit 0(validation-report.md 重生成 3 行 diff 對帳=wasm sha 戳+G4
+  suggested_test 兩處)。——通過(本行為後續輪補記,數字以當場復跑為準)。
+- **S9 golden 體系落地(2026-11-04)**:run-golden-regression.sh(五段形
+  沿 run-rtl-validation)+scripts/golden-check.mjs(兩階段 --record:全檔
+  每模式 3 跑自檢→統一寫盤+PROVENANCE 全量重寫;默認=產出 build/
+  golden-current+逐份 byte-diff[首個差異鍵路徑]+PROVENANCE 表核對);
+  37 檔×2=74 份首錄入 golden/(鏡像源路徑:corpus-external/<X> 剥根,
+  corpus|crates 全路徑);PROVENANCE 兩域拆分(正式樹 vs plugin-fixtures
+  demo 域,record-golden.mjs 改指向)。自驗:①錄後對帳=74 份全新庫,
+  抽查規則數與 §16.1.1 表逐字一致(operators 85/memory 59/sincos 46/
+  subbytes 7/acc_pipe 7);②比對模式 exit 0(74/74+PROVENANCE 核對
+  PASS);③紅路雙向=golden 篡一字節(latch→Latch)必紅(DIFF+
+  PROV-DIFF 雙層,exit 1)→還原綠;提取器 message 改一字(可能鎖存→
+  可能鎖存X)閘自動 rebuild 必紅(僅有 G1 釘選檔 subbytes/loops 2 檔
+  DIFF)→還原綠。——通過。
+- **S10 破口 fixture 矩陣閘(2026-11-04)**:scripts/gap-fixture-check.mjs
+  (條級 (module,class,confidence) multiset 集合相等+msgSubs 關鍵詞
+  抽點+selfcheck 判別力自證+終止性守衛行)+run-gap-fixtures.sh+
+  fixtures/gap_missing_reset_no_arm.v(零共報設計:恰 1 條 G4 certain,
+  suggested_test 逐字含 ra 不含 rb);crates 單測層 G4 無復位臂確定名
+  斷言=S8 輪已在(sv_rules.rs gap_missing_reset_no_arm_
+  suggested_test_is_deterministic_name)。實錄勘正:矩陣初稿 G5×1/G6×2/
+  G7×3 為**類級 dedup**語義,條級實跑全集=G5×2(雙向環)/G6×3(雙行程
+  各 G4)/G7×4=14 條(§16.2 表為類級斷言仍成立;閘以條級 multiset,
+  兩形不矛盾,R16-2 勘誤的延伸)。自驗:①閘 exit 0;②selfcheck 紅路
+  PASS;③G4 新正樣 suggested_test 逐字名(msgSubs 含 ra 不含 rb)
+  PASS+12 跑守衛 PASS。——通過。
+- **S11 regress 收編+立法四層(2026-11-04)**:regress.sh 既有 rtl2spec
+  塊內追加 run-golden-regression.sh+run-gap-fixtures.sh 兩直調(守衛
+  不變/SKIP 行不動/基線斷言 469/479+456/456 逐字不動);四層同輪:
+  SKILL「golden 回歸與評測增補」條/AGENTS 10.10「回歸與真實評測執法
+  面」條/REGISTRY(Crates rtl-spec 行 26 測+閘表三行)/ADR-0012 機械
+  閘序列 4..6 條翻現役+修訂記錄行。自驗:見總閘輪(regress exit 0 全
+  塊 PASS)。——通過。
+- **S12 評測擴面+報告+複評(2026-11-04)**:scripts/eval-all.mjs(單
+  bun 進程 353 檔;L1=93 全提取+破口/L2=260 容錯;per-file 三檔分類;
+  trap=try/catch 計數)+scripts/gen-eval-report.mjs(實測列 verdict
+  推導+自洽斷言,R3-③ 先例)+run-realworld-eval.sh+docs/RTL2SPEC-EVAL.md
+  首錄+eval-review-notes.md(R5 五檔探針×3,答案引用 rule id+粗讀 RTL
+  對照)。實錄:eval-all L2 清單初版只濾 .v 致 L2=0(EVAL_EXIT 0 假綠),
+  被分層統計行「L1=93 L2=0」當場抓出→修 .sv——**清單短收不攔的教訓:
+  分層統計數字必人讀對帳**。首錄實測:37 design-rules/117 sparse/
+  193 skip-perr/6 skip-tb/trap=0/指紋 672 unique/80ms;報告 509 行。
+  自驗:①閘 exit 0(353 檔全終止);②自洽斷言 PASS;③R5 五檔探針
+  答案引用 rule id 在場。——通過。
+- **S13..S15 補記(§17.8 承諾的本輪清償;數字以 §17.3/§17.8 實錄為準)**:
+  S13=G8 dead_branch 全鏈路(26 測/零 warning/釘選集零觸發/probe
+  37/37+2/2/parity×2/demo golden 2 份錄製);S14=版本 0.2.0 四點一致
+  +EXPECTED_ABI 裝載校驗+run-plugin-check.sh 12 斷言+紅路兩路;
+  S15=§17 章+SKILL 拓展與版本增補條+skills 三處+CHANGELOG。——通過
+  (前輪實作,本行為日誌 SSOT 補記)。
+
+---
+
+## 16. 回歸與真實評測弧(2026-11-03 立項起草;開弧勘察報告[ask 材料,未入庫]+本弧復驗全實跑取證;開弧對抗審修訂見 §16.9;ADR-0012 增訂 D14..D16)
+
+目標(使用者原話轉寫):**真實評測,建立有效的 regression**——①提取器任何行為
+漂移當場紅(rulebook golden 逐位元組回歸+破口種洞雙向 fixture 矩陣,兩閘入
+regress.sh 執法面);②真實評測從 13 檔驗證集擴到 ≥30 檔 in-git 真實 RTL,
+per-file 質量報告機械生成,R1..R5 在擴面集抽樣複評;③全程遵守 golden 禁
+手寫/re-record=語義事件/計數一律實測/GPL 派生不入庫紀律。
+
+### 16.0 前置事實:非確定性與終止性破洞(錄 golden 前必修;S8 前置)
+
+**F1 非確定取樣清單(確定性破洞;三處,同輪修;開弧對抗審 R16-1 修訂擴面)**:
+- **F1a G4 無復位臂取樣**:`scan_missing_reset` 無復位臂分支
+  `regs.iter().next()`(crates/rtl-spec/src/sv/gaps.rs:670)從
+  `HashSet<String>`(lhs_set,gaps.rs:489-496)隨機取樣寄存器名,抖
+  suggested_test 欄。
+- **F1b G1 路徑敏感報告序(R16-1 補登記)**:`check_paths` 兩處 HashSet
+  迭代序直接進輸出 items 序與 id↔內容綁定——If 臂
+  `for sig in l.iter().chain(r.iter())`(gaps.rs:402,l/r 均 lhs_set)
+  與 Case 臂 `for sig in lhs_set(s)`(gaps.rs:439)。初稿「gaps 的
+  id/序穩定」為假命題,已勘誤(16.1.5)。id↔內容互換逐字實證(本弧
+  wasm 探針,同進程 6 跑):run2 中 G1-aes-002/003 內容
+  data_var↔round_key_var 互換而 id 串不變(其餘 5 跑 round_key_var
+  在前)——快照若錄,任何釘選集增刪/調用序變更即大面積 golden churn
+  「期望變了而提取器沒變」。
+- **按腿症狀(本弧雙腿實測,命令可重跑)**:native 腿跨進程真抖——
+  loops.v(釘選集內 G1 檔,**零 G4 觸發**)5 跑得 2 種 sha256
+  (bc3bc6fe×3/d353d0d6×2;命令=`for i in 1 2 3 4 5; do
+  ./target/debug/examples/emit sv gaps probe
+  corpus-external/yosys-simple/loops.v | shasum -a 256; done`);
+  fiedler-cooley.v native 5 跑 4 種。wasm32 腿 RandomState=調用流
+  位置函數:跨進程首跑 byte 一致(fsm.v 4 個獨立 bun 進程首跑全
+  bc8e3dc7——**bug 隱蔽面**,跨進程測試無判別力)、**同進程重複調用
+  抖**(fsm.v 同進程 12 跑 5 種 hash)。開弧 flapper 普查(對抗審
+  8-20 跑/檔)=釘選集 **12/37 檔**多於 1 種 hash;本弧 wasm 腿同進程
+  12 跑全量復驗 **12/12 命中**(hash 種數:memory 9/task_func 7/
+  fsm 5/acc_pipe 4/add3 3/always03 3/generate 2/forloops 2/mem_arst
+  2/i2c_master_tests 2/loops 2/fiedler-cooley[native 4])。smoke.mjs
+  parity 只蓋 gaps_positive.v(單發現面),flapper 檔無 parity 兜底。
+- **開弧初登記勘誤(誠實注記)**:初稿引用的三個 fiedler-cooley
+  sha256(78d135de…/8fbd3b77…/e310fc9a…)為開弧規劃輪 native emit
+  3 跑快照,觀測腿未注明且**在任何固定 build 上不可復現**(hash 集合
+  本身逐進程隨機;本弧同命令重跑得另一集合 11077d43/65060307/
+  910cbd9b/c696d571)——具體 hash 不作證據,證據只留「N 跑>K 種」
+  可重跑事實+上述命令。
+- **修法(S8,三處同輪)**:G4 無復位臂分支+G1 If/Case 臂迭代全部改
+  **有序迭代**(收集入 Vec+sort 後取首/遍歷;gaps.rs:591-593 G3 與
+  :820-821 G6 的 names.sort() 先例);單測釘死「同檔進程內 N 跑
+  byte-identical」。驗收=16.1.5 契約(全 37 檔×12 跑+調用序擾動)。
+
+**F2 G5 掃描終止性破洞(按腿症狀不同)**:`corpus-external/yosys-simple/
+scopes.v` gaps 模式——**native 腿=掛死**(開弧複驗:4s 觀測窗口未終止,
+kill 後遺留孤兒 emit 子進程需手動清;深層棧=開弧勘察 sample 實證[未入庫]
+scan_comb_loops→bfs_path→HashMap::get,gaps.rs:692/746/775);**wasm
+腿=秒級 panic trap**(本弧實證:rtl_scan_gaps_sv 探針拋
+`RuntimeError: Unreachable`——見 16.4 終止性防線,R16-3)。修法(S8):
+①G5 驅動圖**規模守衛**(節點/邊數上限,超限=如實「守衛截斷」注記後
+終止,禁靜默截斷、禁無限爬);②最小復現形(組合 always+命名塊內 local
+reg+雙信號環)入 plugin/rtl2spec/fixtures/gap_hang_repro.v(/tmp 易失,
+AGENTS §9)。驗收=16.6 S8②(按腿)。
+
+兩修皆屬**語義事件**:S8 落地後觸發 golden 首錄(16.1)與
+validation-report.md 破口樣本區重生成(收平輪先例,數字對帳)。
+錄製順序鐵則:**F1a+F1b 修復且 37 檔 flapper 清零前,禁錄任何 gaps
+golden**(錄即抖,或錄入調用流位置耦合快照——期望變了而提取器沒變,
+按 16.1.4 必須停弧)。
+
+### 16.1 golden 體系(閘=`bash plugin/rtl2spec/run-golden-regression.sh`)
+
+**語義定位(D14,先決澄清)**:golden ≠ oracle 期望。spec 提取無 oracle
+(§11.8 不變,「禁虛構 golden」繼續成立);本弧 golden=**提取器自身輸出的
+快照**(self-recorded snapshot),用途=行為漂移檢測(任何提取器改動撞
+快照即紅,強制「改了什麼必須能說清」),錄製來源=真實運行輸出,禁手寫
+——與 AGENTS「期望一律從真實運行錄製」同構,只是參照物從 oracle 換成
+自身上一版輸出。golden 紅≠錯,=語義變了;處置只有兩條:能解釋→顯式
+re-record(16.1.4);不能解釋→停,排查提取器。
+
+**16.1.1 釘選語料集(37 檔;規則數=本弧 emit sv rules 實測,Σ=630 條)**
+
+| 組 | 檔數 | 清單(規則數實測) | license | 入選依據 |
+|---|---|---|---|---|
+| yosys-simple 頭部 | 5 | operators 85/memory 59/constmuldivmod 46/sincos 46/partsel 39 | ISC(COPYING 隨附) | 九類規則主力+G2/G3/G4/G6 觸發面(memory=G3+G6,sincos=counter+reset+G2+G4) |
+| yosys-simple 中部 | 12 | fsm 18/dff_different_styles 17/generate 15/process 13/fiedler-cooley 11/multiplier 10/i2c_master_tests 9/undef_eqx_nex 8/always03 7/forloops 7/realexpr 7/subbytes 7 | 同上 | fsm 類面+generate/case 臂+G1(subbytes,默認對沖正樣在庫同形) |
+| yosys-simple 尾部 | 15 | signedexpr 6/task_func 6/vloghammer 6/wreduce 6/muxtree 6/dff_init 5/mem2reg 5/macros 5/aes_kexp128 4/carryadd 4/loops 4[G1]/attrib04_net_var 4/omsp_dbg_uart 4/mem_arst 4/forgen02 3[G5] | 同上 | 低規則數下限面(≥3 線)+G1(loops)/G5 組合環(forgen02) |
+| repo 自有 | 5 | corpus/e2e/59 i2c_master 69/crates/spec-i2c/rtl i2c_master 69/58 acc_pipe 7[G4×3]/57 add3 6/corpus/fulladd/fulladd 3 | MIT(spec-i2c=乾淨室,OpenCores 唯讀啟發零拷貝) | protocol/handshake 重鎮(雙路徑同名檔,fingerprint source 維同理**按完整路徑釘**)+xls 面+G4 |
+
+排除記錄:scopes.v(F2 修復前雙面排除;修後入評測面 L1,是否入 golden
+由修後重評);const_branch_finish(TB skip);zero-rules 34 檔(無斷言
+價值,入評測面 L1);corpus/counter8/counter.v(2 規則<3,只入評測面;repo 另有 corpus/oracle-fixtures/counter.v 同名檔,find 實證——路徑釘全名,與 fingerprint source 維全路徑紀律同款,R16-7);sv-tests 260 檔
+(parse_err 192+has_rules 僅 8 檔 1 條;開弧 fitness 實掃[未入庫],
+檔數 260=本弧 `git ls-files 'corpus-external/sv-tests/*.sv' | wc -l`
+復驗——只配容錯面 L2,不入 golden);**sv-elab 不在庫**(git ls-files=0 本弧實測);**zipcpu
+GPL 永不入**(vendor-reference 唯讀 gitignored)。
+
+**16.1.2 golden 產物形態**:`plugin/rtl2spec/golden/` 內鏡像源路徑
+(目錄層=來源樹,如 `golden/yosys-simple/sincos.rules.json`+
+`sincos.gaps.json`),37 檔×2 模式=**74 份 JSON**,逐檔逐位元組比對。
+rules 側=Rulebook 全量 JSON(含 source/parse_errors/skipped/truncated
+欄——截斷與跳過行為同被釘);gaps 側=GapReport 全量 JSON(schema.rs:430-436,
+含 suggested_test——16.0 F1 修復後其確定性成立才可入快照)。
+`plugin/rtl2spec/golden/PROVENANCE.md`=機械生成:錄製命令/日期/bun 與
+wasm sha256/每份 golden 的 sha256 表/re-record 歷史(語義事件日志)。
+
+**授權澄清(防審計誤紅)**:golden JSON 含有界 snippet 片段(證據形,
+≤3 行/規則)屬提取產物非原檔拷貝——validation-report.md 內嵌 snippet
+在庫已為先例;外部語料**原 .v 檔仍禁入 plugin/**(SKILL fixtures 授權
+律不變);PROVENANCE 每行記源檔路徑+license 指針。
+
+**16.1.3 錄製與比對機制(D14:golden 走 wasm 腿=dist 同一 wasm)**
+
+`run-golden-regression.sh` 五段(形沿 run-rtl-validation.sh,其
+①守衛②同步③④⑤段:16-19/21-45/47-82/88-101/103-114):
+
+1. 守衛:bun+wasm-pack 在場+37 檔釘選清單在場(缺→exit 2 逐一列出);
+2. pkg 陳舊檢查+同步 dist/wasm(6 個傳遞依賴目錄 find -newer,D8 同形
+   ——**閘驗出貨物**:比對對象=交付的 dist wasm 裝載面,非平行實現);
+3. 逐檔跑 extract_rules+rtl_scan_gaps(wasm;單 bun 進程內循環,
+   scripts/golden-check.mjs),產物寫 `build/golden-current/`(gitignored);
+4. 逐份 byte-diff vs golden/:diff 清單逐行打印(檔名+首個差異鍵路徑);
+5. 任何 diff→exit 1;全等→exit 0+PROVENANCE sha256 表核對。
+
+**選 wasm 腿的理由(記錄)**:①與既有兩閘守衛形一致(pkg+bun 雙守衛
+降級形,regress 塊同構);②D8 延續——golden 釘住的是「交付面」行為;
+③wasm↔native 語義等價已由 smoke.mjs 6 路 byte parity 釘死(S4 實測),
+native 漂移由 parity 閘兜底,兩閘分工不重疊。
+
+**16.1.4 re-record 顯式機制與語義事件紀律**
+
+- 顯式開關:`bash plugin/rtl2spec/run-golden-regression.sh --record`
+  (無 flag=純比對,golden/ 樹唯讀)。--record 前置自檢(R16-5 修訂):
+  **實現形=進程內重複調用**——同一 bun 進程對抽樣檔各跑 3 次,3 hash
+  必須唯一,不過→拒絕錄製 exit 3。理由:跨進程跑在 wasm32 腿**無判別
+  力**(RandomState=調用流位置函數,跨進程首跑 byte 一致——F1 未修時
+  自檢全綠=假陰性);進程內跑才抓位置耦合抖動。**前提=F1a+F1b 修復且
+  全 flapper 清零**(16.0;未清零時進程內自檢抽中 flapper=exit 3 永久
+  擋錄、抽不中=漏放,兩向皆失效——自檢有意義以 S8 驗收過為前提)。
+- 錄後必讀:`git diff plugin/rtl2spec/golden` 逐案對帳——**期望變了而
+  提取器沒變=必須能解釋,否則停**(AGENTS 10.5 re-record=語義事件
+  同款;delta 分類:語義修復/缺陷修復/意外,逐檔寫進 PROVENANCE
+  re-record 歷史)。
+- PROVENANCE.md 只由 --record 機械重寫,禁手改;與 golden/ 同輪提交
+  (弧內禁 commit,由 user 定)。
+- 新增/移除釘選檔=釘選集變更,屬語義事件:清單變更同輪更新 §16.1.1
+  表+PROVENANCE,禁靜默增刪。
+
+**16.1.5 確定性契約(開弧對抗審 R16-1/R16-4 修訂;初稿「gaps 的 id/
+class/module/message/序穩定」為假命題,勘誤)**
+
+- 實測現狀(修正):rules 模式穩定(37 檔實跑);gaps 模式**當前非確定**
+  ——F1a/F1b 三處 HashSet 迭代序進輸出,flapper=釘選集 12 檔(16.0
+  清單);掃描序(gaps.rs:102-108 固定)+G3/G6 names.sort+G5 canonical
+  環排序(gaps.rs:750-751)只覆蓋各自類內部,不覆蓋 G1 報告序與 G4
+  suggested_test。
+- 契約三則(golden 快照合法形):
+  ①同輸入→同輸出 byte-exact(進程內任意重複調用);
+  ②**輸出禁依賴調用流位置**——同進程第 k 次調用輸出≠首跑輸出=違例
+  (golden 禁錄位置耦合快照;反例=16.0 F1b loops.v);
+  ③禁 HashSet/HashMap 迭代面進入輸出欄位與 items 序(並行/時間/
+  環境隨機同禁)。新代碼入提取路徑須過 16.6 S8① 同款 12 跑制。
+- 驗收形(S8;升級自初稿單檔 100 跑):**全 37 檔×12 跑(同進程重複
+  調用)逐字不變+調用序擾動檢查**(同進程先跑他檔再跑目標檔,輸出與
+  單獨跑一致——抓跨檔位置耦合)。
+- 錄製 cwd 無關性:輸入按相對 repo root 傳入(emit name 欄=fingerprint
+  source 維逐字,run-rtl-validation.sh 先例),golden 不含機器相關串
+  (絕對路徑/主機名;AGENTS 10.8 expected.* 禁機器相關字串同款)。
+
+### 16.2 破口 fixture 矩陣閘(閘=`bash plugin/rtl2spec/run-gap-fixtures.sh`)
+
+**定位**:插件級直跑(不經 cargo test 全量)的 G 類×正負樣雙向矩陣,
+斷言**精確到 expected findings**(類/confidence/條數/id 前綴形)。
+與 cargo 單測層(sv_rules.rs:328-450:正樣逐類 class/confidence 斷言+
+負樣零命中+concat LHS 誤報釘死)的分工:單測=開發期紅綠;本閘=交付面
+(dist wasm 裝載)執法+expected findings 全表結構化+掛死守衛——三鎖
+精神的閘端複刻。
+
+**expected findings 的性質邊界(與 16.1 禁手寫的劃分,記錄)**:
+fixture 本身是自著觸發形(repo MIT,SKILL fixtures 授權律),其
+expected findings=**斷言規格**(「這個洞必須報且 confidence=certain」
+的設計意圖),手寫合法——同 sv_rules.rs 單測斷言形;golden=運行輸出
+**快照**,錄製產生禁手寫。兩者不可混淆:fixtures/gap-expected 斷言表
+在 scripts/gap-fixture-check.mjs 內(結構化常量表,注釋指明與
+sv_rules.rs 同源),不走錄製。
+
+**矩陣全表(G1..G7 按 gaps.rs 代碼現實;正樣=種洞必報+confidence 契約
+成立,負樣=乾淨必靜默)**:
+
+| 類 | confidence | 正樣(種洞形→expected **全集**,含共報) | 負樣(乾淨形→expected) | 現狀 |
+|---|---|---|---|---|
+| G1 latch | certain | `latch_trap`→[latch]×1 certain;`latch_default_matrix`→[latch]×1 certain(x 對沖不報,message/suggested_test 不含 x) | `latch_ok`/`latch_default_ok`→零命中 | 複用形在 crates fixtures |
+| G2 incomplete_case | heuristic | `incomplete_case`→[incomplete_case]×1 heuristic | `case_ok`→零命中 | 複用形在 crates fixtures |
+| G3 undriven_read | heuristic | `undriven_read`→[undriven_read]×1 heuristic | `driven_ok`→零命中 | 複用形在 crates fixtures |
+| G4 missing_reset | certain | `missing_reset`(有復位臂缺覆蓋)→[missing_reset]×1「不在復位臂 effect 集」形;**新增 `gap_missing_reset_no_arm.v`**(無復位臂)→[missing_reset]×1「N 個寄存器上電值未定義」+suggested_test=**確定寄存器名**(F1a 修後有序取樣釘死,斷言逐字名) | `full_reset`→零命中 | 複用形在 crates fixtures+新增 1 檔在 plugin/fixtures |
+| G5 comb_loop | certain | `comb_loop`→[comb_loop]×1;環形=**t1/t2 雙信號環,無自環**(gaps_positive.v:46-52 實讀;初稿「自環+雙信號環」勘誤,R16-2) | `chain_ok`(鏈式無環)→零命中 | 複用形在 crates fixtures |
+| G6 multi_driver | certain | `multi_driver`→**共報兩類**=[missing_reset,multi_driver](sv_rules.rs:366 釘死;初稿「G6-001×1」低估勘誤,R16-2) | `word_writes_ok`(多位選同行程=按源計數)→零命中 | 複用形在 crates fixtures |
+| G7 blocking_in_seq | certain | `blocking_race`→**共報三類**=[blocking_in_seq,missing_reset,multi_driver](sv_rules.rs:368-370 釘死;初稿「G7-001×1」低估勘誤,R16-2) | `blocking_ok`→零命中 | 複用形在 crates fixtures |
+| 終止性守衛 | — | **新增 `gap_hang_repro.v`**(F2 復現形:組合 always+命名塊 local reg+環)→wasm 腿零 trap 且 G5 報告確定(進程內 12 跑逐字不變,R16-3) | — | 新增(plugin/fixtures) |
+
+**fixture 樹兩處(R16-6 釘明路徑)**:複用正負樣形=
+`crates/rtl-spec/tests/fixtures/gaps_positive.v`/`gaps_negative.v`
+(8+8 模組,sv_rules.rs 單測在用,模組名與上表一一對應——插件閘跨包
+唯讀引用,**不搬移不複製**以免雙源漂移);本弧新增 2 檔
+(gap_missing_reset_no_arm.v/gap_hang_repro.v)=
+`plugin/rtl2spec/fixtures/`(弧約束:新 fixtures 入 plugin 內)。
+expected findings 斷言形=**按模組集合相等**(多報少報皆紅),禁
+contains 弱斷言——守本節開頭「精確到 expected findings」宣稱(初稿
+矩陣低估共報即會逼出弱斷言,R16-2 教訓)。
+負樣紅路演練(閘自證):gap-fixture-check.mjs 內建自檢——把某正樣誤配
+到負樣斷言必紅(--selfcheck 隱含在每次運行,防斷言表恆真假綠);
+crates 單測層同步增 G4 無復位臂確定名斷言(內聯 RTL 字串,不動既有
+fixture 檔)。
+
+### 16.3 regress.sh 執法面與四層立法落點
+
+**新塊形態(照既有 S7 塊雙守衛降級形,scripts/regress.sh:368-385 同構)**:
+既有 rtl2spec 塊**內部追加**兩直調(守衛不變=pkg 在場+bun 在場;
+golden/gap-fixtures 兩閘同走 wasm 腿,守衛語義一致):
+
+```bash
+    if bash plugin/rtl2spec/run-golden-regression.sh; then
+        echo "rtl2spec golden-regression: PASS"
+    else
+        echo "GATE FAIL: rtl2spec golden-regression"; fail=1
+    fi
+    if bash plugin/rtl2spec/run-gap-fixtures.sh; then
+        echo "rtl2spec gap-fixtures: PASS"
+    else
+        echo "GATE FAIL: rtl2spec gap-fixtures"; fail=1
+    fi
+```
+
+else 分支 SKIP 行改 `rtl2spec gates: SKIP (pkg/bun absent)` 不動;
+既有兩閘直調(:373-382)與基線斷言(469/479+456/456)逐字不動;
+`--with-record` 腿與 fail 匯總 exit 1(:387-397)不動。**realworld-eval
+不收編 regress**(理由:353 檔規模時長+ask 契約邊界只收編 2、3 兩閘;
+它進總閘直調序列,見 16.4)。
+
+**失敗語義**:任一新閘 exit≠0→塊內 `GATE FAIL`+`fail=1`→總閘
+`REGRESSION GATE: FAIL` exit 1;守衛缺失→SKIP(不靜默失敗也不假綠);
+閘自身退出碼表意沿 run-rtl-validation.sh 先例(2=守衛缺,3=構建/自檢
+敗,1=判據敗)。
+
+**四層立法同輪落點(缺一不算改規則,AGENTS §10)**:
+
+1. 機械閘:regress.sh 新塊+兩閘 exit≠0 執法(本節);
+2. 正典:.agents/skills/eda-dev/SKILL.md「rtl-to-spec 增補」節追加
+   「golden 回歸與評測增補」條(golden=自錄快照非 oracle 期望/
+   re-record=語義事件必對帳/expected findings=斷言規格與快照的邊界/
+   確定性契約/雙守衛降級形收編);
+3. 條文:AGENTS.md §10.10 追加「回歸與真實評測執法面」條(三閘形+
+   錄製順序鐵則 F1 先於 golden+realworld-eval 總閘直調不進 regress);
+4. 證據頁:docs/RTL2SPEC-EVAL.md(16.4,機械生成禁手改)+golden/
+   PROVENANCE.md(機械)+validation-report.md(S8 後重生成一次,數字
+   對帳)。REGISTRY.md 同輪:閘表加兩行(golden-regression/
+   gap-fixtures+realworld-eval),Crates 表 rtl-spec 行閘列補指針。
+
+**ADR-0012 增訂(需要,同輪)**:D14 golden 自錄快照語義與錄製機制;
+D15 fixture 矩陣斷言規格層;D16 評測擴面分層(L1 質量層/L2 容錯層)。
+V1..V6 閾值**全部不動**(13 檔驗證集閘 run-rtl-validation.sh 原樣);
+§11.8「不手寫 golden 期望」讀法=16.1 語義定位,不衝突、同輪在 ADR
+注記澄清。
+
+### 16.4 真實評測擴面(閘=`bash plugin/rtl2spec/run-realworld-eval.sh`;報告=docs/RTL2SPEC-EVAL.md 機械生成)
+
+**評測集(D16 分層;總 353 檔全 in-git)**:
+
+- **L1 質量層 93 檔**:yosys-simple 全 87 檔(F2 修復後含 scopes.v;
+  parse_err=0/TB skip=1 檔 const_branch_finish——開弧 fitness 實掃
+  [未入庫];87=`git ls-files 'corpus-external/yosys-simple/*.v' | wc -l`
+  本弧復驗)
+  +repo 自有 6 檔(acc_pipe/add3/fulladd/counter.v/e2e-59 i2c/spec-i2c
+  i2c)。license:ISC 87(COPYING 隨附)+MIT 6。零 panic+可終止+JSON
+  可解析+如實計數,**全部跑提取+破口掃描**。
+- **L2 容錯層 260 檔**:corpus-external/sv-tests 全量(ISC,LICENSE
+  隨附,SymbiFlow)。只斷言:進程可終止(10s 守衛/檔)+零 panic+
+  parse_errors 如實入 verdict(192 檔 parse_err=已知事實記錄不 FAIL,
+  SV-2009 構造超 parser 閘;開弧 fitness 實掃[未入庫])。
+- xls 檔(acc_pipe/add3)已入 L1 repo 組(Apache-2.0 派生在 repo 為
+  MIT 載體,e2e 語料先例 §8.3 表);zipcpu=GPL 永不入(重申);sv-elab
+  不在庫不入。
+
+**判據鏈(per-file 三檔分類,避免 V1..V6 閾值與擴面衝突——記錄理由:
+V1 單檔≥3 是 13 檔精選集的驗收閘,照搬到含 34 檔 zero-rules 的全量集
+會把「誠實的稀薄」錯判成 FAIL;擴面集的失敗條件=結構性違例而非產量)**:
+
+- `design-rules`(parse_ok+非 TB+規則數≥3):跑 V4(snippet 逐位元組
+  對拍)/V5-①②④/V6 形判據,判定 PASS/FAIL;V1/V2/V3 為報告列
+  (規則數/行為占比/類別數)不設單檔 FAIL;
+- `design-sparse`(parse_ok+非 TB+規則數<3,含 zero-rules):只跑
+  終止性+JSON 可解析+V4 vacuous,判定 OK-sparse(誠實報告,不虛紅);
+- `skip-perr`/`skip-tb`:parse_errors>0 / TB 跳過,判定 SKIP(計數
+  如實)。
+- **閘級硬 FAIL**(任一即整閘紅):任何檔 wasm trap(panic;每例進
+  verdict.trap 分類,F2 修後應零——初錄唯一 trap=scopes.v,R16-3)/
+  JSON 不可解析/design-rules 檔 V4/V5-①②④ 敗/**全集 V5-③ 指紋
+  重複**(去重擴到 L1 全量)/成功呼叫數≠檔數(V6 覆蓋面)。
+
+**腳本形**:run-realworld-eval.sh(守衛 bun+wasm-pack+同步同 16.1.3
+段 2)→scripts/eval-all.mjs(單 bun 進程循環 353 檔;verdict 寫
+build/eval/,gitignored;判據復用 check-rulebook.mjs 的獨立重算函數
+形)→scripts/gen-eval-report.mjs(機械生成 docs/RTL2SPEC-EVAL.md)。
+實測列由 verdict 數據推導禁硬編碼+自洽斷言(gen-report.mjs:100-128
+先例)。
+
+**終止性防線(開弧對抗審 R16-3 修訂;初稿「單進程循環+每檔 10s 守衛」
+自相矛盾,勘誤)**:單 bun 進程內同步 wasm 調用阻塞事件循環,真掛死時
+進程內計時器無法觸發——**計時器守衛對掛死無效,僅對同步 throw(可
+catch)有效**。按腿明示:wasm 腿終止性防線=**F2 修復本身(圖規模守衛
+後理論全終止)+trap 計數**——wasm 掛死形表現為秒級同步 trap(本弧實
+證 scopes.v `RuntimeError: Unreachable` 秒級),eval-all 對每檔
+catch trap 記 verdict.trap,閘級硬 FAIL=修後 trap 總數>0;「10s 守
+衛」僅保留在 **native 腿 subprocess 形**(S8 驗收②的 emit 腿探針等
+process 級工具)——subprocess 才對真掛死有效;**禁在單進程 wasm 循
+環內宣稱超時守衛**(如需真掛死防線→Worker/subprocess 形,屬實作輪
+可選升級,非本弧必需)。
+
+**docs/RTL2SPEC-EVAL.md 形態(機械生成禁手改;入庫=證據頁)**:
+日期/命令行/退出碼/工具鏈版本(bun+wasm sha256)→分層統計表(L1/L2
+檔數×判定檔數,Σ 行=實測推導)→**per-file 表:檔名|license|行數|
+規則數|類別數|破口數(按類)|判定**(93 檔 L1 全列;L2 以分檔統計+
+parse_err 清單呈現,不逐檔列表)→類別分布表(九類×檔計數,R4 複評
+素材)→評審員區(eval-review-notes.md 機械內聯,同 validation-report
+形)。
+
+### 16.5 R1..R5 擴樣複評(擴面集上的抽樣設計)
+
+- **R1 溯源**:V4 逐位元組對拍=L1 全 design-rules 檔機械全量(閘級
+  FAIL 條件),擴面即全量複評,無抽樣;
+- **R3 非同義反覆**:V5-①③+V5-③ 指紋去重=全集機械;V2/V5-④ 冗餘
+  防線照跑(R1-7 定位不變);
+- **R4 覆蓋面**:類別分布表(九類×93 檔計數)機械;V3 的 ≥4 類閘值
+  仍在 13 檔驗證集執法不動;
+- **R5 增值(人工,分層抽樣 5 檔)**:頭部 1 檔=operators(85 條,
+  timing/arithmetic 密度面)/中部 2 檔=fsm(18,fsm+counter)+
+  multiplier(10,arithmetic+G3 誤報史)/尾部 2 檔=subbytes(7,G1
+  對沖正樣+R007 when 適用域先例)+acc_pipe(7,G4×3+Apache 面);
+  探針題×3×檔,只讀規則書作答後對照粗讀 RTL,答案引用 rule id——
+  落 plugin/rtl2spec/eval-review-notes.md(機械內聯進 EVAL 報告
+  評審員區),provenance 注明會話內評審非獨立第三人(S7 先例);
+- **R2 散文感**:上 5 檔規則陳述人工讀+抽查(i2c 深層 else-if 條件
+  鏈=忠實噪音先例,接受基準)。
+
+### 16.6 切片分解(S8..S12;每片帶自驗與驗收;切片序=依賴序:S8 確定性
+先於 S9 錄製)
+
+- **S8 確定性與終止性修復(前置;開弧對抗審 R16-1/R16-3 擴面)**:
+  F1 三處有序迭代(F1a G4 gaps.rs:670+F1b G1 gaps.rs:402/439)+單測
+  (無復位臂形 suggested_test 逐字名+G1 報告序釘死);F2 G5 圖規模
+  守衛+gap_hang_repro.v 入 plugin/fixtures。自驗:①**全 37 檔×12
+  跑(同進程重複調用)+調用序擾動(先他檔後目標檔)逐字不變=flapper
+  12 檔清零**(對抗審清單逐檔核銷);②scopes.v 按腿:wasm 腿零 trap
+  且輸出確定、native 腿 subprocess 10s 守衛內可終止;③cargo test
+  -p rtl-spec 全綠(18+新增);④run-rtl-validation.sh exit 0
+  (validation-report.md 破口樣本區重生成+Σ 破口數對帳)。
+  驗收:①②③④全過。
+- **S9 golden 體系落地**:釘選 37 檔×2 模式錄製入 plugin/rtl2spec/
+  golden/+PROVENANCE.md+run-golden-regression.sh(+golden-check.mjs,
+  含 --record 自檢 3×3)。自驗:①錄後 `git diff plugin/rtl2spec/
+  golden` 逐案對帳(全部可解釋=首錄基線);②比對模式 exit 0;
+  ③反向紅路演練:臨時改一提取 message 一字→閘紅→還原→綠。
+  驗收:三項全過。
+- **S10 破口 fixture 矩陣閘**:gap-fixture-check.mjs(expected
+  findings 斷言表+--selfcheck)+gap_missing_reset_no_arm.v+
+  run-gap-fixtures.sh;crates 單測層 G4 無復位臂確定名斷言同輪。
+  自驗:①閘 exit 0;②自檢紅路(正樣配負樣斷言必紅);③G4 新正樣
+  suggested_test 逐字名斷言過。驗收:三項全過。
+- **S11 regress 收編+立法四層**:regress.sh 塊內追加兩直調(既有兩閘
+  與基線逐字不動)+SKILL/AGENTS 10.10/REGISTRY/ADR-0012 D14..D16
+  同輪。自驗:①`bash scripts/regress.sh` exit 0 且既有基線
+  (E2E 59/59,ryosys 469/479+live 456/456,analyzer smoke)逐字未動;
+  ②新塊兩行 PASS 字樣在場;③rg 交叉引用閉合(三閘名+D14..D16 在
+  ADR/SKILL/REGISTRY/AGENTS 四檔互指)。驗收:三項全過。
+- **S12 評測擴面+報告+複評**:run-realworld-eval.sh+eval-all.mjs+
+  gen-eval-report.mjs+docs/RTL2SPEC-EVAL.md 首錄+R5 分層抽樣 5 檔
+  複評落 eval-review-notes.md。自驗:①閘 exit 0(353 檔全終止,
+  零守衛觸發);②報告實測列自洽斷言過(判定 FAIL 而實測列無違約=
+  紅,gen-report 先例);③R5 五檔探針答案引用 rule id 在場。
+  驗收:①②③+總閘七命令(cargo test --workspace/bash scripts/regress.sh/
+  run-mcp-e2e.sh/run-rtl-validation.sh/run-golden-regression.sh/
+  run-gap-fixtures.sh/run-realworld-eval.sh)全 exit 0。
+
+### 16.7 顯式不做清單(§16 增量;§11 既有 13 條不變)
+
+1. 不修 sv-tests 192 檔 parse_err(構造超 parser 閘,配 L2 容錯面
+   即可;解析容錯能力屬 analyzer/vl-syntax 軌);
+2. 不把 sv-tests 任何檔入 golden 釘選集(16.1.1 排除記錄);
+3. 不對 golden 做 partial/fuzzy 比對(byte-exact 唯一形態,禁模糊
+   逃逸口);
+4. 不動 13 檔驗證集與 V1..V6 閾值(run-rtl-validation.sh 原樣;
+   擴面判據用 16.4 三檔分類不與之衝突);
+5. 不把 run-realworld-eval.sh 收編 regress(總閘直調成員);
+6. F1(a+b)/F2 修復且 flapper 清零前不錄任何 gaps golden(16.0 錄製順序鐵則);
+7. 不手寫/手改 golden 快照、PROVENANCE.md、RTL2SPEC-EVAL.md(全機械
+   生成;評審員區屬人工區但只在指定檔 eval-review-notes.md 填寫);
+8. 不做 suggested_test→TB 自動生成與執行(破口=清單,§11.7 不變);
+9. 不做 golden 的跨平台差分(macOS 本機單平台;linux oracle 面屬
+   10.7 CI 機制,本弧無觸)。
+
+### 16.8 風險清單(§16 增量;§12 既有 R1..R9 不變)
+
+| # | 風險 | 緩解/觸發應對 |
+|---|---|---|
+| R10 | 隱藏非確定源殘留(F1a+F1b 修後仍有 HashSet/HashMap 迭代面或調用流位置耦合進輸出;wasm 跨進程一致性使跨進程測試無判別力) | --record 進程內自檢(16.1.4,前提=S8 flapper 清零)+驗收 12 跑制×37 檔+調用序擾動檢查(16.1.5);golden 紅且無語義變更=立即排查 |
+| R11 | G5 規模守衛截斷真環(誤殺) | 超限=「守衛截斷」顯式注記入 verdict(非靜默);閾值取值=S8 實測 scopes.v 邊數×安全係數,注記附實數;修後 golden/評測對帳 |
+| R12 | 擴面時長(353 檔)失控 | 單 bun 進程循環(進程啟動一次);L1 首錄實測耗時寫進報告 provenance;若 >5min→檔分批+報告注明(不降判據);終止性防線=trap 計數非進程內計時器(16.4,R16-3 勘誤) |
+| R13 | F1 修復波及既有斷言面 | validation-report.md 破口樣本區內嵌 suggested_test 會 churn——重生成一次+數字對帳(收平輪先例);cargo 單測層 G4 相關斷言同步 |
+| R14 | golden 與 wasm/native 語義漂移方向不一致 | golden 釘 wasm 腿(交付面);native parity 由 smoke.mjs 6 路 byte parity 兜底;parity 面擴類時同輪補對應 golden 檔 |
+| R15 | 外部語料上游變更致 golden 失配 | corpus-external 隨 git 鎖定(唯讀引用);上游升級=語義事件輪,re-record+逐案對帳同 16.1.4 |
+| R16 | bun/wasm-pack 環境缺導致執法面靜默退化 | 雙守衛降級形 SKIP 行在 regress 輸出可見(非靜默);本機 bun 1.4.2+wasm32 target 在場(環境事實);缺失輪由 user 決策補環境 |
+
+### 16.9 修訂記錄(2026-11-03 開弧對抗審 7 條意見逐條消化;意見編號 R16-1..R16-7;每條附本弧實證)
+
+R16-1 **[high] 非確定清單不完整(G1 兩處漏登記;golden 釘選集 12/37 檔
+實測抖動)**——已修(§16.0 F1 重寫為 F1a+F1b/§16.1.5 契約重寫/S8 擴面/
+§16.1.4 自檢重定義)。本弧實證:①gaps.rs:402 `for sig in
+l.iter().chain(r.iter())`+gaps.rs:439 `for sig in lhs_set(s)`
+(lhs_set=gaps.rs:489-496 HashSet)實讀確認;②loops.v(G1 檔零 G4)
+native 5 跑 2 種 hash(bc3bc6fe×3/d353d0d6×2)——「僅 G4 抖」不成立;
+③12 檔 flapper 清單(對抗審)wasm 腿同進程 12 跑全量復驗 **12/12
+命中**(hash 種數 memory 9/task_func 7/fsm 5/acc_pipe 4/add3 3/
+always03 3/generate 2/forloops 2/mem_arst 2/i2c_master_tests 2/
+loops 2/fiedler-cooley native 4);④wasm 跨進程首跑 byte 一致(fsm.v
+4 個獨立 bun 進程全 bc8e3dc7)+同進程抖=調用流位置耦合雙面實證;
+⑤初稿三個 sha256 勘誤(§16.0 誠實注記:觀測腿未注明+不可復現)。
+契約補:golden 快照禁依賴調用流位置(§16.1.5 契約②);驗收升級=
+全 37 檔×12 跑+調用序擾動(§16.6 S8①)。
+
+R16-2 **[medium] 矩陣 G5/G6/G7 expected 低估(與 sv_rules.rs:366-370
+矛盾)**——已修(§16.2 矩陣行重寫+集合相等斷言形釘明)。實證:
+sv_rules.rs:366 `classes_of("multi_driver")==
+["missing_reset","multi_driver"]`、:368-370
+`classes_of("blocking_race")==["blocking_in_seq","missing_reset",
+"multi_driver"]`、:341 `classes_of("latch_trap")==["latch"]`(單類)
+實讀;gaps_positive.v:46-52 comb_loop=t1/t2 雙信號環無自環(初稿
+「自環+雙信號環」勘誤)。
+
+R16-3 **[medium] 「單進程循環+每檔 10s 守衛」自相矛盾**——已修
+(§16.4 終止性防線節新增+閘級 FAIL 條件+S8②+矩陣守衛行+R12)。實證:
+scopes.v wasm 腿=秒級 trap(本弧 rtl_scan_gaps_sv 探針實拋
+`RuntimeError: Unreachable`;對抗審 eval-scale 353 檔實跑唯一 trap,
+耗 1305ms),native 腿=掛死(開弧 4s 未終止);單 bun 進程同步 wasm
+調用阻塞事件循環,進程內計時器對掛死無效。防線改=wasm 腿 F2 修復+
+trap 計數(verdict.trap,修後應零),10s 守衛僅保留 native 腿
+subprocess 形;禁在單進程 wasm 循環內宣稱超時守衛。
+
+R16-4 **[medium] 證據指針不可溯源(「勘察事實 §n」懸空+sha256 不可
+復現)**——已修(§16.0 勘誤段+標題行+§16.1.1/§16.4 五處引用改寫)。
+實證:RTL2SPEC-PLUGIN §2=規則書形態/§4=Rust 核心落點(章節號錯位——
+「勘察事實 §n」實指開弧 ask 材料的勘察報告,該報告未入庫,§16 所引
+flake 普查/fitness 實掃內容未經 §0 基座章收錄);初稿三個
+fiedler-cooley hash 在當前 build 雙腿不可復現(本弧 native 5 跑=
+另一集合 11077d43/65060307/910cbd9b/c696d571)。修=§16 內懸空引用
+清零(sed 區間驗證=0 命中),改為本弧可重跑命令+當場 hash 集合+
+git ls-files 復驗數;sha256 具體值不作證據;觀測腿逐項注明。
+
+R16-5 **[medium] --record 自檢雙向失效(跨進程無判別力/進程內抽樣
+漏放)**——已修(§16.1.4 實現形釘明=進程內重複調用+前提=S8 flapper
+清零)。實證=§16.0 跨進程(4 進程全一致)/同進程(12 跑 5 種)雙面。
+
+R16-6 **[low] fixture 位置未注明(兩處樹)**——已修(§16.2 fixture
+樹段釘明兩處路徑+跨包唯讀引用不搬移)。實證:gaps_positive.v/
+gaps_negative.v=crates/rtl-spec/tests/fixtures/(本弧實讀在場,模組
+名與矩陣一一對應);新增 2 檔入 plugin/rtl2spec/fixtures/(弧約束)。
+
+R16-7 **[low] counter.v 路徑歧義(repo 兩個同名檔)**——已修(§16.1.1
+全路徑=corpus/counter8/counter.v+同名檔注記)。實證:`find . -name
+counter.v`(排除 target/vendor)=corpus/oracle-fixtures/counter.v+
+corpus/counter8/counter.v 兩檔。
+
+同輪同步:ADR-0012 D14 修訂+實作記錄補行。未動:§0..§15(sha256
+斷言)、既有閘與基線、crates 代碼(修復屬 S8 實作輪)。
+
+---
+
+## 17. 拓展性與版本管理(2026-11-04 起草+實證落地;ADR-0012 D17..D19 增訂於同輪[初稿宣稱未落地,復審 R17-1 勘誤後補];§16 零刪改)
+
+目標(使用者原話轉寫):整個工具鏈要能拓展,作為「分析提取 RTL 源碼規格
+書」的 agent tool 成熟化;zcode plugin 包裝好了,要有版本管理機制。
+本章雙交付:①拓展配方正典(extension recipe)+**按配方真實新增一個破口
+類的端到端實證**(禁只寫文檔不做演示,見 17.3);②版本管理機制(semver
+SSOT/CHANGELOG/四點一致/ABI 裝載校驗/檢查閘 run-plugin-check.sh)。
+
+### 17.0 設計決策(D17..D19;已增訂入 docs/adr/0012-rtl-to-spec-plugin.md 修訂記錄 2026-11-04 行;域內裸引,D 外引用須全限定「ADR-0012 D17..D19」——ADR-0007 已有本域 D17=rVPI timer)
+
+- **D17 拓展接入=靜態詞表+掃描序註冊點(enum 窮盡 match=編譯期
+  registry)**:不引入運行時 registry(字串註冊表/動態加載)——本弧
+  「零 serde/手寫 JSON 鍵序 byte-exact」契約下,`GapClass` enum+兩處
+  窮盡 match(schema.rs `as_str`/`prefix`)=編譯期註冊表:新增成員漏
+  match 直接編譯紅(比字串 registry 多一層編譯期保護);掃描序=
+  scan_gaps_sv 內顯式呼叫序列(gaps.rs scan_latches..scan_blocking_in_seq,
+  :107-108 區),**新類=序列尾部追加一行**——舊類 id/序零漂移
+  (輸出序=掃描序契約 §16.1.5)。
+- **D18 版本雙軌**:插件 semver(SSOT=`plugin/rtl2spec/.zcode-plugin/
+  plugin.json` 的 `version`,面向使用者的功能版本)與內核 ABI 版本
+  (`rtl_spec_version()`=Cargo workspace 版本,內核能力面)分離——
+  workspace version 被全 repo crate 共享(`version.workspace = true`),
+  bump 有擾動 ryosys/E2E 基線風險且語義(整倉)≠插件面;雙軌各對各的
+  執法:插件四點一致(17.4)+內核 ABI∈EXPECTED_ABI(17.5)。
+- **D19 ABI 裝載時校驗**:server.mjs 裝載 dist/wasm 後即核對
+  `rtl_spec_version()`∈`EXPECTED_ABI` 名單,不匹配=fatal(清晰錯誤
+  含雙版本+修復指引)——在「語義入口」前攔,裝載失敗=exit 1 stderr
+  (沿既有「載入失敗=exit 1」姿態,server.mjs:11)。
+
+### 17.1 拓展面接入點盤點(§17 配方的地圖)
+
+| 拓展方向 | 接入點 | 觸碰檔 | 不變式 |
+|---|---|---|---|
+| 新破口類 | `GapClass` enum 成員+`as_str`+`prefix`(schema.rs:369-405 區)+掃描函數+呼叫序列尾部(schema.rs/gaps.rs) | 2 檔 5 處 | 舊類 id/序零漂移;新檢測器過 12 跑制(§16.1.5 契約③);JSON 鍵序=寫出序(byte-exact 由共用 writer 承載,新類零改) |
+| 新規則類別 | category 詞表(schema.rs Rule 區)+提取器函數+extract 呼叫序列+V3 類別計數聯動(check-rulebook.mjs 類別面) | 同構 | fingerprint/category 詞表新增=CHANGELOG minor;V3 閾值不動(13 檔集) |
+| 新 wasm 導出 | rtl-spec-wasm lib.rs `#[wasm_bindgen]` 函數+EXPECTED_ABI 名單+smoke parity 面 | +1 檔 | 零 js_sys;JSON 字串進出 |
+| 新 MCP 工具 | server.mjs tools/list 註冊+handler | +1 檔 | 工具內錯誤=isError:true;協議級=JSON-RPC error(§7) |
+
+### 17.2 extension recipe(新破口類端到端配方;S13 按此實證)
+
+1. **判定設計**:寫清判定依據+confidence(certain=結構可證/heuristic=
+   受限場景)+X-safe 面+param 不求值面(§11.5)——一類一判定文;
+2. **schema.rs 註冊**:`GapClass` enum 追加成員+`as_str` 字串+`prefix`
+   `G<n>`(n=既有最大+1);若 Statement 容器型新變體,gaps.rs
+   `collect_ifs` 類遍歷器同步展開(漏展開=靜默漏報,遍歷器 `_` 臂有
+   注記錨);
+3. **gaps.rs 掃描器**:新函數(簽名同族
+   `scan_x(ctx, sc, counters, items)`)+呼叫序列**尾部**追加;遍歷用
+   Vec 按語句樹序,**禁 HashSet/HashMap 迭代面進輸出**(§16.1.5 契約③,
+   F1 實錄);
+4. **單測雙向**(sv_rules.rs,內聯 RTL 字串不動既有 fixture 檔):正樣
+   (觸發形,斷言 id 前綴/class/confidence/message 關鍵詞+**零共報
+   斷言**)+負樣(變量/param/x 位三形至少覆蓋兩形,零命中);
+5. **plugin fixtures 正負樣檔**(弧約束:新 fixtures 入
+   plugin/rtl2spec/fixtures/):正樣檔**設計為零共報**(期望 findings
+   全集=純新類,使整份 gaps JSON 可入 golden——§16.0 錄製順序鐵則的
+   合法繞行面:鐵則禁的是「含 F1 抖動形的全量錄製」,零共報設計檔
+   不含抖動源);負樣檔全零;
+6. **wasm 重建+parity**:`wasm-pack build crates/rtl-spec-wasm --target
+   web --out-dir pkg`+同步 dist/wasm(三檔;run-mcp-e2e.sh/
+   run-rtl-validation.sh 陳舊檢查同形)→wasm↔native byte parity
+   (trim 對齊=smoke.mjs:75 先例;native emit 的 println! 尾換行非語義);
+7. **golden 錄製**:`bun scripts/record-golden.mjs <正樣> <負樣>`(12 跑
+   自檢前置+第 13 跑寫盤+PROVENANCE 機械追加,錄製=真實運行禁手寫);
+   錄後 `git diff golden/` 逐案對帳;
+8. **skills+版本**:skills 類清單行+confidence 行同步;CHANGELOG
+   minor bump+四點一致;`bash run-plugin-check.sh` 綠+紅路演練。
+
+### 17.3 拓展性實證:G8 `dead_branch`(常量死分支;S13 全鏈路實錄,本節數字全部當場實跑)
+
+**判定**:If 條件為純字面量(NumLit)且值可判定——恆假(值=0)→then 臂
+不可達;恆真(值≠0)→else 臂不可達(若有)。x/z 位 digits 使
+`lit_u64` 回 None→不報(X-safe);param 名為 Ident 非 NumLit→不報
+(§11.5 求值禁區)。confidence=**certain**(常量真值結構可證)。
+
+**鏈路逐步實測**:
+1. Rust 核心:schema.rs 3 處(enum+as_str "dead_branch"+prefix "G8")+
+   gaps.rs 2 處(`collect_ifs` 遍歷器[23 個 Stmt 變體顯式展開+容器型
+   注記錨]+`scan_dead_branches`)+呼叫序列尾部追加——5 處錨點手術各
+   命中==1;`cargo build -p rtl-spec` 零 warning(grep warning=0);
+2. 單測:sv_rules.rs +2 測(正樣=恆假/恆真兩模組恰 2 條 certain+零
+   共報斷言;負樣=變量+param+x 位三形零命中)→`cargo test -p
+   rtl-spec` **26 測全綠**(2 lib+2 rtlil+22 sv,原 24+新增 2);
+3. 基線零擾動:**釘選集 37 檔 G8 觸發=0**(emit sv gaps 逐檔 grep
+   `"G8-`=無輸出)→probe-determinism 37/37 PASS、run-rtl-validation
+   exit 0;報告**行數不變 wc -l=1745+重生成 3 行 diff 對帳在案**:
+   wasm sha256 戳 eb69248c→4b143d3a+G4 suggested_test
+   y__input_flop→x__input_flop 兩處=§16 F1a 有序取樣修復收據(即
+   §16.6 S8④ 的重生成對帳;R17-4 復審修訂勘誤初稿「不變」表述,
+   讀作檔案不變則誤導)——舊類 id/序與既有 findings 全集 byte 不變;
+4. wasm:wasm-pack build+dist/wasm 同步→wasm↔native **byte parity
+   PASS×2**(gap_dead_branch/gap_clean_branches;trim 對齊=smoke.mjs
+   :75 同形,native println! 尾換行非語義);probe 12 跑 2/2 PASS;
+5. MCP 面:server.mjs **零改**(scan_gaps 透傳 JSON)→run-mcp-e2e.sh
+   exit 0(SERVER_VERSION bump 同驗);
+6. fixture/golden:正負樣 2 檔入 plugin/fixtures(正樣零共報設計,
+   expected findings 注記在檔頭)→record-golden.mjs 錄製 2 份 demo
+   golden(gap_dead_branch.gaps.json sha256=e811ea79…/gap_clean_
+   branches.gaps.json sha256=9407d571…)+PROVENANCE.md 機械生成
+   (含 wasm ABI 戳 0.1.0);
+7. skills:rtl-gap-hunt/SKILL.md 3 處(description 類清單/歸併清單
+   G1..G8/certain 清單加 G8)。
+
+### 17.4 版本管理(semver SSOT+四點一致;D18)
+
+- **SSOT**=`plugin/rtl2spec/.zcode-plugin/plugin.json` 的 `version`;
+  semver 語義:major=工具面/ABI 破壞性變更;minor=新增能力(規則類別/
+  破口類/MCP 工具);patch=缺陷修復與文檔;
+- **CHANGELOG**=`plugin/rtl2spec/CHANGELOG.md`(Keep-a-Changelog 形:
+  Added/Fixed/Breaking;頭部 `## [X.Y.Z]` 必等於 SSOT——檢查閘①a
+  執法);0.1.0=初版(S1..S7),0.2.0=G8+版本機制+run-plugin-check
+  (本次);
+- **四點一致**:①manifest.version ②CHANGELOG 頭版本 ③
+  dist/server.mjs `SERVER_VERSION` ④serverInfo.version——④的執法形=
+  驗證 serverInfo 行**引用 SERVER_VERSION 常量**而非字面量(禁硬編碼
+  漂移;檢查閘①b);
+- **雙軌**(D18):內核 ABI 版本=rtl_spec_version()(0.1.0,workspace
+  共享)獨立於插件 semver(0.2.0)——同輪實證:插件 bump 後 mcp-e2e/
+  rtl-validation/probe 三閘零擾動;
+- **git tag 慣例(文檔慣例,真打 tag 由 user 定)**:`rtl2spec-v<X.Y.Z>`
+  對齊 CHANGELOG 版本;打 tag 前提=run-plugin-check.sh PASS(弧內禁
+  commit/tag,工作樹呈現由 user 裁量)。
+
+### 17.5 兼容契約:ABI 裝載校驗(D19)
+
+server.mjs 裝載段(:46-54 區)後新增:`EXPECTED_ABI=['0.1.0']` 名單,
+`rtl_spec_version()` 不在名單→fatal:`wasm ABI 版本不兼容: 內核=X
+期望=Y + 修復指引(wasm-pack build 同步)`——語義入口前攔。名單語義
+=兼容集(多個內核版本可並列;當前=單元素)。檢查閘③a/③b 獨立重算
+(從 server.mjs 提取名單+裝載 dist wasm 實調比對——閘驗出貨物 D8 同款)。
+
+### 17.6 run-plugin-check.sh 判據表(bash 直跑;總閘成員)
+
+| # | 判據 | 紅路面 |
+|---|---|---|
+| ①a | manifest=CHANGELOG頭=SERVER_VERSION 三點相等 | 任一漂移(紅路實證:SERVER_VERSION 篡改→紅) |
+| ①b | serverInfo 行引用 SERVER_VERSION 常量 | 字面量硬編碼漂移 |
+| ①c | manifest 版本 semver 三段 | 非法版本串 |
+| ② | manifest 靜態校驗(復用 validate-manifest.mjs) | 必填欄/skills/dist 產物缺 |
+| ③a | EXPECTED_ABI 名單非空 | 名單被清空 |
+| ③b | 裝載 dist wasm 實調 rtl_spec_version()∈名單 | 內核升級未同步名單 |
+| ④a | 正樣 expected findings **集合相等**(恰 2 條 G8,§16.2 形) | 檢測器漏報/多報 |
+| ④b | 正樣 confidence 全 certain | 置信契約破 |
+| ④c | 負樣零命中 | 誤報(誤報紅路面) |
+| ④d | 兩檔輸出與 demo golden byte-diff | 語義漂移(golden 紅=語義事件,紅路實證:golden 篡改→紅) |
+
+與既有閘不重複:不跑 13 檔驗證集(run-rtl-validation.sh)、不跑 MCP
+全程回環(run-mcp-e2e.sh)、不跑 regress。「無現狀即綠」防線=④c 負樣
+(檢測器誤報必紅)+①③對真值比對(非存在性檢查)+紅路演練兩路實錄
+(17.3 步 8;SERVER_VERSION→9.9.9 必紅/golden 篡一字節必紅/還原綠)。
+
+### 17.7 文檔面與上手路徑
+
+- skills 已同步:rtl-gap-hunt/SKILL.md 三處 G8(17.3 步 7);
+  repo 正典=.agents/skills/eda-dev/SKILL.md「rtl-to-spec 增補」節
+  追加「拓展與版本增補」條(同輪);
+- **外部 agent 上手路徑**:manifest→skills(rtl-rulebook 提取/rtl-
+  gap-hunt 破口/rtl-analyze 投影)→CHANGELOG 看能力邊界與 breaking→
+  extension recipe(§17.2)拓能力→run-plugin-check.sh 自證交付;
+- git tag 慣例見 17.4(文檔慣例;真打 tag 由 user 定)。
+
+### 17.8 切片分解(S13..S15;本輪三片全部落地——切片與實作同輪,自驗實錄內聯)
+
+- **S13 拓展性實證(G8 全鏈路)**:見 17.3;自驗:26 測綠/零 warning/
+  釘選集零觸發/probe 37/37+2/2/parity×2/demo golden 錄製對帳。——
+  通過。
+- **S14 版本管理+檢查閘**:bump 0.2.0(兩點)+CHANGELOG 新建+EXPECTED_ABI
+  裝載校驗+run-plugin-check.sh(12 斷言)+紅路兩路必紅還原綠+mcp-e2e
+  exit 0(版本 bump 零擾動)。——通過。
+- **S15 文檔面**:本節(§17 章)+SKILL 增補條+skills 三處+CHANGELOG。
+  §15 日誌 SSOT 的 S13..S15 條目**留後續輪補記**(本輪受「既有章節
+  零刪改」約束;§15 自身定義=每片一行,補記時數字以本節實錄為準)。
+  ——通過(補記義務移交後續輪,如實注記)。
+
+### 17.9 顯式不做清單(§17 增量;§11/§16.7 既有不變)
+
+1. 不做規則類別新增的實作演示(配方同構已盤點 §17.1/§17.2;破口類
+   全鏈路已證=「或等價小步」裁量,記錄理由:同構工作量×2 而邊際
+   證明力不增);
+2. 不 bump Cargo workspace 版本(內核 ABI 軌獨立,D18;全 crate 共享
+   version 的基線擾動風險);
+3. 不做運行時動態 registry/動態插件加載(D17 靜態 enum=編譯期窮盡
+   保護;動態面非目標);
+4. G8 v1 只掃 If 形(行程內):三元運算子常量死分支(ContAssign/
+   Ternary)、case 選擇子常量不匹配臂不做(配方注記=可拓展點,非
+   缺陷);
+5. 不把 run-plugin-check.sh 收編 regress(總閘成員直調;收編立法屬
+   後續輪,沿 §16.3 四層落點形態);
+6. 正式 37 檔 golden 樹(S9)不在本輪:本輪只 demo 樣例
+   (golden/plugin-fixtures/,PROVENANCE 注記演示性質),S9 錄製鐵則
+   與機制照 §16 不變;
+7. §15 日誌不在本輪追加(零刪改約束;S13..S15 補記移交後續輪);
+8. **§16 S9..S12 交付物全景欠賬注記(R17-5 復審補)**——現狀盤點
+   (2026-11-04 ls 實證):已實作=S8(確定性三修+probe-determinism.mjs+
+   pinned-files.list+gap_hang_repro.v)與本輪 S13..S15;**未實作=**
+   run-golden-regression.sh(S9)、run-gap-fixtures.sh+scripts/
+   gap-fixture-check.mjs+fixtures/gap_missing_reset_no_arm.v(S10)、
+   run-realworld-eval.sh+scripts/eval-all.mjs+gen-eval-report.mjs+
+   docs/RTL2SPEC-EVAL.md(S12)與 regress 收編(S11)——讀者對照 §16 時
+   以本條為全景狀態表,禁把規劃閘當實存閘(ADR 機械閘條 4 分階段
+   同款勘誤);golden 樹現存內容僅本輪 demo 樣例(17.9.6)。
+   docs/RTL2SPEC-EVAL.md(S12)與 regress 收編(S11)——讀者對照 §16 時
+   以本條為全景狀態表,禁把規劃閘當實存閘(ADR 機械閘條 4 分階段
+   同款勘誤);golden 樹現存內容僅本輪 demo 樣例(17.9.6)。
+9. **上條欠賬清償勘誤(2026-11-04 S9..S12 輪追加;原第 8 條為快照
+   不改)**:§16 S9..S12 已全部落地——run-golden-regression.sh(S9,
+   74 份 golden+PROVENANCE 全量重寫形)/run-gap-fixtures.sh+
+   gap-fixture-check.mjs+gap_missing_reset_no_arm.v(S10)/
+   run-realworld-eval.sh+eval-all.mjs+gen-eval-report.mjs+
+   docs/RTL2SPEC-EVAL.md(S12,353 檔首錄 trap=0)/regress 收編(S11,
+   雙守衛塊兩直調)——三閘轉現役(ADR-0012 機械閘條 4 同輪更新);
+   §16 錄製順序鐵則已按前提成立(F1a/F1b 修復+flapper 37/37 清零)
+   後執行首錄;正式 37 檔 golden 樹已在庫(demo 樣例與正式樹兩域並存,
+   PROVENANCE 分域注記,17.9.6 的 demo-only 狀態同步解除);§15 日誌
+   S8..S15 補記同輪清償。
+
+### 17.10 風險清單(§17 增量;§12/§16.8 既有不變)
+
+| # | 風險 | 緩解/觸發應對 |
+|---|---|---|
+| R17a | 新檢測器引入非確定源(HashSet 迭代面/位置耦合) | recipe 步 3 禁令+步 7 錄前 12 跑自檢強制(機械化=record-golden.mjs 內建)+§16.1.5 契約③ |
+| R17b | 版本四點手工漂移 | run-plugin-check ①a/b/c 執法+紅路實證;bump 檢查單=SSOT 先改→CHANGELOG→SERVER_VERSION→閘驗 |
+| R17c | 內核升級未同步 EXPECTED_ABI | 裝載時 fatal 清晰錯誤(雙版本+修復指引,D19);名單多元素兼容集可吸收次版本漂移 |
+| R17d | demo golden 與 S9 正式樹結構衝突 | PROVENANCE 注記演示性質;S9 實作時以 pinned-files.list 鏡像路徑統一,demo 檔遷移=語義事件對帳 |
+| R17e | G8 誤報面(位寬截斷/字面量上下文) | 條件為自決定上下文(§5.4),字面量按自身值取真——負樣三形釘死+④c 閘執法;新形誤報=單測釘死+CHANGELOG patch |
+
+### 17.11 復審修訂記錄(2026-11-04 換人復審 8 條意見逐條消化;編號 R17-1..R17-8;每條附本輪實證)
+
+R17-1 **[high] 「ADR-0012 增訂 D17..D19」宣稱未落地+總閘定義分裂**——
+已修。實證(本輪復跑):`rg 'D17|D18|D19' docs/adr/0012-rtl-to-spec-plugin.md`
+與 `rg '2026-11-04'` 同檔初查均 0 命中(exit 1)——初稿 §17.0/SKILL
+以完成時態宣稱而 ADR 實未動(ADR diff 43/2 與 §16 輪相同)。修=同輪
+增訂 ADR-0012:D17(靜態詞表+掃描序註冊點)/D18(版本雙軌)/D19(ABI
+裝載校驗)三條+修訂記錄 2026-11-04 行;**總閘序列改現役/規劃分階段**
+——初稿七命令把三個未實作規劃閘(golden-regression/gap-fixtures/
+realworld-eval)寫成現役=定義分裂,勘誤為現役五命令(cargo test
+--workspace/regress.sh/run-mcp-e2e.sh/run-rtl-validation.sh/**
+run-plugin-check.sh 入列**)+規劃三命令(存在性由 S9..S12 交付,禁預寫
+CI);SKILL 引用改全限定形「ADR-0012 D17..D19」(ADR-0007 已有本域
+D17=rVPI timer,裸引歧義);本節標題同步注記。
+
+R17-2 **[medium] record-golden.mjs 裝載 pkg 非 dist(錄製面與驗證面
+平行,脫節時 golden 錯釘非交付面)**——已修=改 dist 裝載(優於頭注
+豁免:D8「閘驗出貨物」語義本位)。實作與除錯實錄:首輪修復只改了
+init 行、api import 仍指 pkg→`wasm.__wbindgen_free undefined`(pkg
+glue 從未 init,棧指向 pkg 路徑=線索);雙路徑調試探針實證 glue/wasm
+byte 相同且各自可載後,補改 `const api = await import(join(distWasm,...))`;
+重錄兩檔**內容 byte 不變**(sha256 e811ea79…/9407d571… 與初錄一致=
+錄/驗面同源證),PROVENANCE 機械追加重錄行。
+
+R17-3 **[medium] F2 根因賬本分裂(REGISTRY 11-03 行勘正真根因=bfs_path
+死循環[prev 自映射,實測 nodes=2/edges=7,規模爆炸假說證偽;修法=
+visited 集,守衛防禦性保留],§16.0/§16.4 凍結於舊歸因)**——本輪
+§16 零刪改不可動,登記移交義務:**後續輪解除零刪改時,§16.0 F2 原地
+補勘誤注記+§16.4「圖規模守衛後理論全終止」論證改引 REGISTRY 11-03
+行**(真根因=死循環已修,守衛=防未來真大圖的防禦層;REGISTRY 行措辭
+「§16.0 F2 記錄勘正」在補注記前讀作「待補」)。本輪驗證:REGISTRY:162
+行內容實讀在案;bfs_path visited 修復+gap_hang_repro.v+
+gap_comb_loop_self_edges_terminate_and_report 單測=S8 輪已落地
+(工作樹在案)。
+
+R17-4 **[low] §17.3 步 3「1745 行不變」表述含糊**——已修(步 3 原地)。
+實證:`git diff validation-report.md`=3 insertions+3 deletions
+(1 行 wasm sha256 戳 eb69248c→4b143d3a+2 行 G4 suggested_test
+y__input_flop→x__input_flop=F1a 有序取樣修復收據);新表述=「行數
+不變 wc -l=1745+重生成 3 行 diff 對帳在案」,指向 §16.6 S8④ 承諾。
+
+R17-5 **[low] §17.9 欠賬交代不全(讀者對照 §16 會誤判只剩 S9/S11)**——
+已修(§17.9 新增第 8 條全景狀態表):已實作=S8+本輪 S13..S15;未實作=
+run-golden-regression.sh/run-gap-fixtures.sh+gap-fixture-check.mjs+
+gap_missing_reset_no_arm.v/run-realworld-eval.sh+eval-all.mjs+
+gen-eval-report.mjs+RTL2SPEC-EVAL.md+regress 收編(ls 實證)。
+
+R17-6 **[low] pinned-files.list:4「乾浙室」錯字**——已修=「乾淨室
+MIT(OpenCores 唯讀啟發零拷貝)」。
+
+R17-7 **[low] run-plugin-check.sh:57 死變量 abiList**——已刪(③a 實際
+用 expectedAbi 精確提取;死變量誤導讀者以為存在額外名單斷言)。
+
+R17-8 **[low] probe-determinism.mjs 頭注與實現不符(「倒序重跑」不存在;
+實現=per-file N 輪+全檔正序後本檔再跑一輪擾動)**——已修=頭注對齊
+實現+殘差注記(無倒序階段,清單首檔無跨檔前序覆蓋=跨檔-only 耦合
+理論殘餘面;主風險=同檔抖動已由 N 輪覆蓋;未來發現跨檔-only 耦合形
+擴倒序階段=語義事件)。
+
+同輪同步:ADR-0012(D17..D19+總閘分階段+修訂記錄 2026-11-04 行)/
+SKILL(全限定引用)/record-golden.mjs+run-plugin-check.sh+
+probe-determinism.mjs+pinned-files.list 四檔腳本與清單。未動:
+§0..§16+§17.0..§17.10 主體(除標題/步 3/17.9 三處 R17 修訂點);
+修復後復跑 run-plugin-check.sh PASS+dist 腿重錄 byte 不變(見各條)。
