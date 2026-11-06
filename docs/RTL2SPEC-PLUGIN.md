@@ -1396,8 +1396,9 @@ V1..V6 閾值**全部不動**(13 檔驗證集閘 run-rtl-validation.sh 原樣);
   i2c)。license:ISC 87(COPYING 隨附)+MIT 6。零 panic+可終止+JSON
   可解析+如實計數,**全部跑提取+破口掃描**。
 - **L2 容錯層 260 檔**:corpus-external/sv-tests 全量(ISC,LICENSE
-  隨附,SymbiFlow)。只斷言:進程可終止(10s 守衛/檔)+零 panic+
-  parse_errors 如實入 verdict(192 檔 parse_err=已知事實記錄不 FAIL,
+  隨附,SymbiFlow)。只斷言:F2 圖規模守衛+trap 計數(wasm 單進程循環,無計時器
+   面;native 腿=subprocess 10s)+零 panic+
+  parse_errors 如實入 verdict(193 檔 parse_err=已知事實記錄不 FAIL,
   SV-2009 構造超 parser 閘;開弧 fitness 實掃[未入庫])。
 - xls 檔(acc_pipe/add3)已入 L1 repo 組(Apache-2.0 派生在 repo 為
   MIT 載體,e2e 語料先例 §8.3 表);zipcpu=GPL 永不入(重申);sv-elab
@@ -1505,7 +1506,7 @@ parse_err 清單呈現,不逐檔列表)→類別分布表(九類×檔計數,R4 �
 
 ### 16.7 顯式不做清單(§16 增量;§11 既有 13 條不變)
 
-1. 不修 sv-tests 192 檔 parse_err(構造超 parser 閘,配 L2 容錯面
+1. 不修 sv-tests 193 檔 parse_err(構造超 parser 閘,配 L2 容錯面
    即可;解析容錯能力屬 analyzer/vl-syntax 軌);
 2. 不把 sv-tests 任何檔入 golden 釘選集(16.1.1 排除記錄);
 3. 不對 golden 做 partial/fuzzy 比對(byte-exact 唯一形態,禁模糊
@@ -1886,3 +1887,109 @@ SKILL(全限定引用)/record-golden.mjs+run-plugin-check.sh+
 probe-determinism.mjs+pinned-files.list 四檔腳本與清單。未動:
 §0..§16+§17.0..§17.10 主體(除標題/步 3/17.9 三處 R17 修訂點);
 修復後復跑 run-plugin-check.sh PASS+dist 腿重錄 byte 不變(見各條)。
+
+---
+
+## 18. 復原力弧實施記錄(S0..S5;2026-11-05;RTL2SPEC-MVP-NEXT R2 執行;append-only)
+
+本章=復原力 MVP 弧(S0..S5)的實施記錄;既有章節零刪改。provenance 標記:
+【實跑】=本弧命令實測;【檔】=在庫工件;【材料】=提案/網調材料引文。
+
+### 18.1 M8 殘文候選十行逐行裁定(【實勘】+S5 授權訂正)
+
+候選來源=殘文掃描(與 R16-3 勘誤條/實測計數牴觸的 remnant)。裁定:
+- **訂正 4 行**(2026-11-05 S5 同輪):
+  1. PLUGIN.md:1399「進程可終止(10s 守衛/檔)」→「F2 圖規模守衛+trap 計數
+     (wasm 單進程循環,無計時器面;native 腿=subprocess 10s)」——與 §16.6
+     R16-3 條(1430-1439)對齊;
+  2. PLUGIN.md:1400「192 檔 parse_err」→193(實測 193,R16 實跑);
+  3. PLUGIN.md:1508「不修 sv-tests 192 檔」→193(同上);
+  4. scripts/eval-all.mjs:7 註釋「192 檔 parse_err」→193(註釋與實測對齊)。
+- **歷史記載保留 6 行**(逐行實勘=當時實測快照/勘誤記錄本身,不改寫歷史):
+  ①1215(parse_err 192=開弧 fitness 實掃快照);②1430-1439(R16-3 勘誤條
+  本身——初稿謬誤+修正後法條同存,勘誤記錄不可刪);③1477(native 腿
+  subprocess 10s=現行正確法條);④1530(R12 風險表=trap 計數勘誤記錄);
+  ⑤1562(R16-3 記錄行);⑥1685/1862 區(S9/S12 wasm sha 過渡日志
+  eb69248c→4b143d3a,S0 時已裁定保留)。
+
+### 18.2 各切片機械門檻實跑數字(【實跑】;詳證在各切片對賬記錄/本弧 session)
+
+- **S0**(PROVENANCE 手記保留):演練斷言①手記行逐字保留②元資料區機械重寫
+  ③git diff golden 僅 PROVENANCE(+4/-2)+74 JSON byte-identical;seed 回退路
+  (暫移檔→--record→seed+錄製行)演練通過。
+- **S1**(contract 節+lint):三 specs 對拍 62 PASS/0 FAIL(counter WIDTH=8/
+  acc_pipe x/y[8] out[16]/i2c scl_i+prescale[16]+cmd[4]+state[4]+cnt[16]+
+  bitcnt[4]+10 localparam 逐值);lint i2c 兩副本差集=∅;37 檔 B 面三次
+  證據驅動擴充後懸空=0/37;golden 對賬 37 檔 rules 深等(純增量)。
+- **S2**(組合覆蓋放寬):acc_pipe p1_bit_slice/p2_scaled 定義規則在場;
+  muxtree default_cases 0→4;正負 fixture(rel_positive/rel_negative)閘行
+  全綠;golden 對賬+33 條全數謂詞命中、零刪改。
+- **S3**(復位語義+指紋+M3):i2c R001 async=true(敏感列表第二證);
+  muxtree R003/R004 when 互斥(!rst vs !(!rst));HOLD/IDLE 臂 tip/bitcnt
+  可見;DEFAULT_MAX_RULES 128→256(i2c 152 觸頂);對賬 guard+async=12/
+  敏感列表證=29/seq+when=296/去重復活=175/零漂移=261/零刪除。
+- **S4**(M1/M2/M4/M5/M6):M1 2'b01 觸發域在場;M2 default 臂否定合取;
+  六 fixtures 入 fixtures/+閘清單 8 行;golden 對賬 7 档全歸因
+  (muxtree/generate/process=M1+M2、sincos/constmuldivmod/fiedler-cooley=
+  M2 否定鏈、partsel.gaps=M6 精確移除「4/4 覆蓋」誤報);gap_clean_branches
+  零命中保持。
+- **S5**(復原對拍):23 場景一鍵跑通(iverilog 13.0 守衛);消融點分段——
+  S1 點:i2c A0=compiled=false(pre-S1 對照)→A1..A3 全 compiled+11/11
+  (判準 n≥3 中 ≥2 compiled=true=PASS);S2 點:acc A0=0/6→A1..A3 全 6/6
+  (提案時預測「matched 仍低」被實測推翻=N3 修復後滿分,如實記錄預測偏差);
+  S3 點:A0f(top_fixed)=SCENE10 失配 10/11→A1..A3 全 11/11(PASS);
+  抄寫通道:A/B 差=0(i2c-B1 11/11、acc-B1 6/6)——B 組執行者與 A 組同一
+  agent,上下文污染雙側對稱,差值解讀力受限(REIMPL-PROTOCOL.md §0),如實
+  分列禁混報。
+- 基線位移(阈形/結構形閘,無釘數):V1-total 506(13 檔);eval 指紋 1212
+  dup=0 保持;37 檔 Σrules=838(cap=256 零截斷);閘級 SUMMARY(E2E 59/59、
+  ryosys 469/479、live 456/456)零擾動。
+
+### 18.3 過程/結果判據分層(S5 立法核心)
+
+- **結果判據(機械,可重跑)**:iverilog 編譯成敗+TB 逐場景 diff——
+  run-reimpl-eval.sh 執法,寫只落 build/reimpl-eval/。
+- **過程判據(輔助,永不進確定性閘)**:盲寫腿(prompt 模板+模型身份+採樣
+  n;REIMPL-PROTOCOL.md 釘檔)——本弧盲寫腿模型=GLM-5.3-Flash max n=3;
+  盲寫執行者與實施弧同源,上下文污染記錄在案;泄漏核查只能證偽不能證真。
+- **預測 vs 實測**:提案材料中的預測(canon S2「matched 仍低」)與實測
+  (滿分)分歧時,記實測+預測偏差歸因,禁改預測文本。
+
+### 18.4 §18 待決清單(用戶裁決事項;禁清理 build/mvp-exp/)
+
+1. build/mvp-exp/ 記錄文檔(experiment-record*.md/audit 5 份/specs 3 份/
+   README-e1.md/e1 TB 舊件/reimpl 舊件)的 git 晉升落點——裝備已遷
+   fixtures/(byte-identical),記錄文檔晉升與否待裁決;
+2. M4 EventCtrl 展開=canon 名單二字外同形容器補齊——正典追認與否;
+3. S2 IndexedPart/Index 不在名單(canon 字面三形)——擴名單與否;
+4. 內核 ABI 車(workspace 0.1.0)不隨插件 semver 0.3.0 上調——雙軌制
+   (§17.5)下 vl-cli version golden 釘 workspace 版,晉升策略待裁決;
+5. B 組(裁剪 evidence)樣本在本弧條件下的解讀力(上下文污染對稱)——
+   獨立對話盲寫輪是否補跑。
+
+### 18.5 S6 未執行記錄
+
+metamorphic 歸一化結構比較探針(§5.2 S6)本弧未執行(留後續弧);其邊界
+條文已隨 S5 同輪落 AGENTS.md 10.10 與 SKILL.md rtl-to-spec 增補節
+(探針寫只落 build/、無 oracle 近似形聲明、變換集收窄)。
+
+### 18.6 S6 實施記錄(2026-11-05 後續補錄;探針與比較層寫只落 build/s6-metamorphic/)
+
+- **結果(【實跑】)**:`bash plugin/rtl2spec/build/s6-metamorphic/run.sh` exit 0——
+  比較層自檢 ALL PASS(10 斷言:paren/rename/reorder 三臂 iverilog 同輸出+有符號
+  溢出邊界單獨測($signed 加法重排)+負樣 a-b≠b-a 雙檢(iverilog 輸出異+摘要判異));
+  探針=pinned 37 檔非平凡全集×三臂(paren=單行賦值 RHS 整體包裹/rename=系統
+  重命名附映射/reorder=純標識符交換律交換)→**IF=0**(≥20 檔達標)。
+- **比較層實現形**(與 canon §5.2 S6(a) 對應):名稱歸一化=標識符映射逆回寫
+  (rename 臂記錄映射,變體經逆映射還原後進 base 詞彙表排序規範名 n1..nk);
+  AST 規範化=優先級爬升解析+交換律運算(+ * & | ^ ==)孩子排序;AST 無 Paren
+  節點→渲染天然去括號;when 頂層按「 且 」合取切分排序(提取器 conds 慣例)。
+- **比較層誤報排查記錄(IF>0 → 0 的迭代,全部=比較層缺陷非提取器)**:
+  ①單字符運算符分類漏 `~`(~tx 情形);②基數字面量字符類漏 s/o/h/H(S3 的
+  `'sd7`/S2 的 `'h0` 情形);③`$signed` 系統函數無 Call 面;④IndexedPart 渲染形
+  `+::` 未識別;⑤when 頂層「 且 」合取未切分;⑥PARSE-ERR 標記內嵌原文→
+  rename 臂生偽 IF(改去名稱 token 序列);⑦transform paren 臂吞逗號續行;
+  ⑧rename 臂改寫 `` `timescale `` 參數(編譯指令整行跳過)——⑧項屬變換面
+  侷限(編譯守衛攔截計數,非 IF),已修。
+- **誠實邊界(聲明)**:本探針=原文判據的無 oracle 近似形——摘要集相等≠語義
+  正確性證明;語義正確性判斷留給未來 oracle 全量化(§18.3 分層同源)。

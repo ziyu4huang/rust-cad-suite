@@ -1,9 +1,9 @@
 # rtl2spec 真實評測擴面報告(§16.4;機械生成禁手改)
 
-- 日期:2026-11-03
+- 日期:2026-11-05
 - 命令行:`bash plugin/rtl2spec/run-realworld-eval.sh`(機械生成禁手改)
-- 工具鏈:bun v26.3.0、wasm ABI 0.1.0、wasm sha256 `4b143d3afd22c41f85a0c2cebc23edd0c0176e3eb0f2ae88849fc4c8d855f3cd`
-- 耗時:107ms(單 bun 進程循環 353 檔);語料零 GPL(yosys-simple/sv-tests=ISC、corpus=repo MIT、spec-i2c=MIT 乾淨室、xls=Apache-2.0 載體)
+- 工具鏈:bun v26.3.0、wasm ABI 0.1.0、wasm sha256 `23af31de63d6580c01d4df81d4c467297180b1f71e091f4d4ac0f06556b92c74`
+- 耗時:165ms(單 bun 進程循環 353 檔);語料零 GPL(yosys-simple/sv-tests=ISC、corpus=repo MIT、spec-i2c=MIT 乾淨室、xls=Apache-2.0 載體)
 - 判據鏈:per-file 三檔分類(design-rules/design-sparse/skip-perr/skip-tb);閘級硬 FAIL=trap/JSON 不可解析/design-rules 檔 V4/V5-①②④ 敗/V5-③ 指紋重複(L1+L2 全量)/成功呼叫≠檔數。V1(≥3)/V2/V3 為報告列不設單檔 FAIL(擴面集失敗條件=結構性違例而非產量);13 檔驗證集 V1..V6 閾值閘另行執法不動(run-rtl-validation.sh)。
 
 ## 閘級判據表
@@ -11,8 +11,8 @@
 | 判據 | 實測 | 判定 |
 |---|---|---|
 | trap(終止性防線=F2 修復+trap 計數,R16-3) | 0 | PASS |
-| design-rules 檔 V4+V5-①②④ | 37/37 檔全過(checker 同形獨立重算) | PASS |
-| V5-③ 指紋去重(L1+L2 全量) | 672 條規則,重複=0 | PASS |
+| design-rules 檔 V4+V5-①②④ | 48/48 檔全過(checker 同形獨立重算) | PASS |
+| V5-③ 指紋去重(L1+L2 全量) | 1212 條規則,重複=0 | PASS |
 | V6 覆蓋面(成功呼叫=檔數) | 353/353 | PASS |
 | parse_err 如實計數(L2 已知事實記錄,不 FAIL) | skip-perr=193 檔 | INFO |
 
@@ -22,9 +22,9 @@
 
 | 層 | 檔數 | design-rules | design-sparse | skip-perr | skip-tb |
 |---|---|---|---|---|---|
-| L1 質量層 | 93 | 37 | 55 | 0 | 1 |
-| L2 容錯層 | 260 | 0 | 62 | 193 | 5 |
-| 全集 | 353 | 37 | 117 | 193 | 6 |
+| L1 質量層 | 93 | 43 | 49 | 0 | 1 |
+| L2 容錯層 | 260 | 5 | 57 | 193 | 5 |
+| 全集 | 353 | 48 | 106 | 193 | 6 |
 
 ## L1 per-file 表(93 檔全列)
 
@@ -42,93 +42,93 @@
 | corpus-external/yosys-simple/attrib04_net_var.v | ISC(COPYING 隨附) | 32 | 4 | 4 | missing_reset=1 | PASS |
 | corpus-external/yosys-simple/attrib06_operator_suffix.v | ISC(COPYING 隨附) | 23 | 2 | 2 | 0 | OK-sparse |
 | corpus-external/yosys-simple/attrib08_mod_inst.v | ISC(COPYING 隨附) | 22 | 2 | 2 | 0 | OK-sparse |
-| corpus-external/yosys-simple/attrib09_case.v | ISC(COPYING 隨附) | 26 | 0 | 0 | incomplete_case=1 | OK-sparse |
+| corpus-external/yosys-simple/attrib09_case.v | ISC(COPYING 隨附) | 26 | 4 | 1 | 0 | PASS |
 | corpus-external/yosys-simple/carryadd.v | ISC(COPYING 隨附) | 25 | 4 | 1 | 0 | PASS |
 | corpus-external/yosys-simple/case_expr_const.v | ISC(COPYING 隨附) | 50 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/case_expr_non_const.v | ISC(COPYING 隨附) | 60 | 0 | 0 | 0 | OK-sparse |
-| corpus-external/yosys-simple/case_large.v | ISC(COPYING 隨附) | 274 | 0 | 0 | 0 | OK-sparse |
+| corpus-external/yosys-simple/case_large.v | ISC(COPYING 隨附) | 274 | 256 | 1 | 0 | PASS |
 | corpus-external/yosys-simple/const_branch_finish.v | ISC(COPYING 隨附) | 37 | 0 | 0 | 0 | SKIP |
 | corpus-external/yosys-simple/const_fold_func.v | ISC(COPYING 隨附) | 62 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/const_func_shadow.v | ISC(COPYING 隨附) | 34 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/constmuldivmod.v | ISC(COPYING 隨附) | 68 | 46 | 1 | 0 | PASS |
 | corpus-external/yosys-simple/constpower.v | ISC(COPYING 隨附) | 16 | 2 | 1 | 0 | OK-sparse |
-| corpus-external/yosys-simple/dff_different_styles.v | ISC(COPYING 隨附) | 104 | 17 | 2 | missing_reset=3 | PASS |
+| corpus-external/yosys-simple/dff_different_styles.v | ISC(COPYING 隨附) | 104 | 18 | 2 | missing_reset=3 | PASS |
 | corpus-external/yosys-simple/dff_init.v | ISC(COPYING 隨附) | 55 | 5 | 1 | missing_reset=5 multi_driver=5 | PASS |
 | corpus-external/yosys-simple/dynslice.v | ISC(COPYING 隨附) | 13 | 1 | 1 | missing_reset=1 | OK-sparse |
 | corpus-external/yosys-simple/fiedler-cooley.v | ISC(COPYING 隨附) | 34 | 11 | 1 | missing_reset=1 | PASS |
 | corpus-external/yosys-simple/forgen01.v | ISC(COPYING 隨附) | 24 | 0 | 0 | undriven_read=1 | OK-sparse |
-| corpus-external/yosys-simple/forgen02.v | ISC(COPYING 隨附) | 31 | 3 | 1 | comb_loop=2 | PASS |
+| corpus-external/yosys-simple/forgen02.v | ISC(COPYING 隨附) | 31 | 4 | 1 | comb_loop=2 | PASS |
 | corpus-external/yosys-simple/forloops.v | ISC(COPYING 隨附) | 26 | 7 | 2 | undriven_read=2 missing_reset=1 | PASS |
-| corpus-external/yosys-simple/fsm.v | ISC(COPYING 隨附) | 69 | 18 | 3 | incomplete_case=1 missing_reset=1 | PASS |
+| corpus-external/yosys-simple/fsm.v | ISC(COPYING 隨附) | 69 | 23 | 3 | incomplete_case=1 missing_reset=1 | PASS |
 | corpus-external/yosys-simple/func_block.v | ISC(COPYING 隨附) | 34 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/func_recurse.v | ISC(COPYING 隨附) | 26 | 0 | 0 | 0 | OK-sparse |
-| corpus-external/yosys-simple/func_width_scope.v | ISC(COPYING 隨附) | 42 | 0 | 0 | 0 | OK-sparse |
+| corpus-external/yosys-simple/func_width_scope.v | ISC(COPYING 隨附) | 42 | 2 | 1 | 0 | OK-sparse |
 | corpus-external/yosys-simple/genblk_collide.v | ISC(COPYING 隨附) | 28 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/genblk_dive.v | ISC(COPYING 隨附) | 22 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/genblk_order.v | ISC(COPYING 隨附) | 19 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/genblk_port_shadow.v | ISC(COPYING 隨附) | 11 | 0 | 0 | 0 | OK-sparse |
-| corpus-external/yosys-simple/generate.v | ISC(COPYING 隨附) | 326 | 15 | 2 | missing_reset=2 undriven_read=1 | PASS |
-| corpus-external/yosys-simple/graphtest.v | ISC(COPYING 隨附) | 35 | 2 | 1 | 0 | OK-sparse |
+| corpus-external/yosys-simple/generate.v | ISC(COPYING 隨附) | 326 | 17 | 2 | missing_reset=2 undriven_read=1 | PASS |
+| corpus-external/yosys-simple/graphtest.v | ISC(COPYING 隨附) | 35 | 6 | 1 | 0 | PASS |
 | corpus-external/yosys-simple/hierarchy.v | ISC(COPYING 隨附) | 27 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/hierdefparam.v | ISC(COPYING 隨附) | 26 | 1 | 1 | comb_loop=1 | OK-sparse |
-| corpus-external/yosys-simple/i2c_master_tests.v | ISC(COPYING 隨附) | 62 | 9 | 3 | missing_reset=3 | PASS |
+| corpus-external/yosys-simple/i2c_master_tests.v | ISC(COPYING 隨附) | 62 | 12 | 3 | missing_reset=3 | PASS |
 | corpus-external/yosys-simple/ifdef_1.v | ISC(COPYING 隨附) | 89 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/ifdef_2.v | ISC(COPYING 隨附) | 22 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/localparam_attr.v | ISC(COPYING 隨附) | 12 | 0 | 0 | 0 | OK-sparse |
-| corpus-external/yosys-simple/loop_prefix_case.v | ISC(COPYING 隨附) | 19 | 0 | 0 | incomplete_case=1 | OK-sparse |
-| corpus-external/yosys-simple/loop_var_shadow.v | ISC(COPYING 隨附) | 16 | 0 | 0 | 0 | OK-sparse |
-| corpus-external/yosys-simple/loops.v | ISC(COPYING 隨附) | 79 | 4 | 1 | latch=3 | PASS |
+| corpus-external/yosys-simple/loop_prefix_case.v | ISC(COPYING 隨附) | 19 | 2 | 1 | incomplete_case=1 | OK-sparse |
+| corpus-external/yosys-simple/loop_var_shadow.v | ISC(COPYING 隨附) | 16 | 1 | 1 | 0 | OK-sparse |
+| corpus-external/yosys-simple/loops.v | ISC(COPYING 隨附) | 79 | 11 | 1 | latch=3 | PASS |
 | corpus-external/yosys-simple/macro_arg_surrounding_spaces.v | ISC(COPYING 隨附) | 21 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/macros.v | ISC(COPYING 隨附) | 245 | 5 | 1 | comb_loop=1 | PASS |
 | corpus-external/yosys-simple/mem_arst.v | ISC(COPYING 隨附) | 41 | 4 | 1 | undriven_read=1 missing_reset=1 | PASS |
 | corpus-external/yosys-simple/mem2reg_bounds_tern.v | ISC(COPYING 隨附) | 20 | 2 | 1 | missing_reset=2 | OK-sparse |
 | corpus-external/yosys-simple/mem2reg.v | ISC(COPYING 隨附) | 117 | 5 | 3 | undriven_read=1 missing_reset=1 | PASS |
 | corpus-external/yosys-simple/memory.v | ISC(COPYING 隨附) | 320 | 59 | 2 | missing_reset=15 undriven_read=4 multi_driver=1 | PASS |
-| corpus-external/yosys-simple/module_scope_case.v | ISC(COPYING 隨附) | 12 | 0 | 0 | incomplete_case=1 | OK-sparse |
+| corpus-external/yosys-simple/module_scope_case.v | ISC(COPYING 隨附) | 12 | 2 | 1 | incomplete_case=1 | OK-sparse |
 | corpus-external/yosys-simple/module_scope_func.v | ISC(COPYING 隨附) | 46 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/module_scope.v | ISC(COPYING 隨附) | 30 | 0 | 0 | 0 | OK-sparse |
-| corpus-external/yosys-simple/multiplier.v | ISC(COPYING 隨附) | 133 | 10 | 1 | 0 | PASS |
-| corpus-external/yosys-simple/muxtree.v | ISC(COPYING 隨附) | 83 | 6 | 2 | incomplete_case=1 | PASS |
+| corpus-external/yosys-simple/multiplier.v | ISC(COPYING 隨附) | 133 | 11 | 1 | 0 | PASS |
+| corpus-external/yosys-simple/muxtree.v | ISC(COPYING 隨附) | 83 | 16 | 3 | incomplete_case=1 | PASS |
 | corpus-external/yosys-simple/named_genblk.v | ISC(COPYING 隨附) | 28 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/nested_genblk_resolve.v | ISC(COPYING 隨附) | 15 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/omsp_dbg_uart.v | ISC(COPYING 隨附) | 34 | 4 | 3 | 0 | PASS |
 | corpus-external/yosys-simple/operators.v | ISC(COPYING 隨附) | 122 | 85 | 1 | incomplete_case=1 missing_reset=1 | PASS |
 | corpus-external/yosys-simple/param_attr.v | ISC(COPYING 隨附) | 12 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/paramods.v | ISC(COPYING 隨附) | 53 | 1 | 1 | 0 | OK-sparse |
-| corpus-external/yosys-simple/partsel.v | ISC(COPYING 隨附) | 152 | 39 | 3 | incomplete_case=1 missing_reset=2 | PASS |
-| corpus-external/yosys-simple/process.v | ISC(COPYING 隨附) | 84 | 13 | 3 | incomplete_case=2 | PASS |
+| corpus-external/yosys-simple/partsel.v | ISC(COPYING 隨附) | 152 | 43 | 3 | missing_reset=2 | PASS |
+| corpus-external/yosys-simple/process.v | ISC(COPYING 隨附) | 84 | 14 | 3 | incomplete_case=2 | PASS |
 | corpus-external/yosys-simple/realexpr.v | ISC(COPYING 隨附) | 34 | 7 | 1 | 0 | PASS |
 | corpus-external/yosys-simple/repwhile.v | ISC(COPYING 隨附) | 37 | 0 | 0 | undriven_read=2 | OK-sparse |
 | corpus-external/yosys-simple/retime.v | ISC(COPYING 隨附) | 7 | 1 | 1 | missing_reset=1 multi_driver=1 | OK-sparse |
 | corpus-external/yosys-simple/rotate.v | ISC(COPYING 隨附) | 48 | 1 | 1 | undriven_read=1 comb_loop=1 | OK-sparse |
 | corpus-external/yosys-simple/scopes.v | ISC(COPYING 隨附) | 64 | 1 | 1 | comb_loop=4 | OK-sparse |
 | corpus-external/yosys-simple/sign_part_assign.v | ISC(COPYING 隨附) | 21 | 0 | 0 | 0 | OK-sparse |
-| corpus-external/yosys-simple/signed_full_slice.v | ISC(COPYING 隨附) | 30 | 0 | 0 | 0 | OK-sparse |
+| corpus-external/yosys-simple/signed_full_slice.v | ISC(COPYING 隨附) | 30 | 2 | 1 | 0 | OK-sparse |
 | corpus-external/yosys-simple/signedexpr.v | ISC(COPYING 隨附) | 19 | 6 | 1 | 0 | PASS |
 | corpus-external/yosys-simple/sincos.v | ISC(COPYING 隨附) | 125 | 46 | 3 | incomplete_case=1 missing_reset=3 | PASS |
 | corpus-external/yosys-simple/specify.v | ISC(COPYING 隨附) | 31 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/string_format.v | ISC(COPYING 隨附) | 8 | 0 | 0 | 0 | OK-sparse |
-| corpus-external/yosys-simple/subbytes.v | ISC(COPYING 隨附) | 83 | 7 | 3 | latch=1 | PASS |
+| corpus-external/yosys-simple/subbytes.v | ISC(COPYING 隨附) | 83 | 16 | 3 | latch=1 | PASS |
 | corpus-external/yosys-simple/task_func.v | ISC(COPYING 隨附) | 142 | 6 | 1 | missing_reset=3 | PASS |
 | corpus-external/yosys-simple/undef_eqx_nex.v | ISC(COPYING 隨附) | 12 | 8 | 1 | 0 | PASS |
-| corpus-external/yosys-simple/usb_phy_tests.v | ISC(COPYING 隨附) | 36 | 1 | 1 | incomplete_case=1 missing_reset=1 | OK-sparse |
-| corpus-external/yosys-simple/values.v | ISC(COPYING 隨附) | 44 | 0 | 0 | 0 | OK-sparse |
+| corpus-external/yosys-simple/usb_phy_tests.v | ISC(COPYING 隨附) | 36 | 10 | 2 | missing_reset=1 | PASS |
+| corpus-external/yosys-simple/values.v | ISC(COPYING 隨附) | 44 | 16 | 1 | 0 | PASS |
 | corpus-external/yosys-simple/verilog_primitives.v | ISC(COPYING 隨附) | 16 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/vloghammer.v | ISC(COPYING 隨附) | 82 | 6 | 1 | 0 | PASS |
-| corpus-external/yosys-simple/wandwor.v | ISC(COPYING 隨附) | 37 | 2 | 1 | 0 | OK-sparse |
-| corpus-external/yosys-simple/wreduce.v | ISC(COPYING 隨附) | 10 | 6 | 1 | 0 | PASS |
+| corpus-external/yosys-simple/wandwor.v | ISC(COPYING 隨附) | 37 | 3 | 1 | 0 | PASS |
+| corpus-external/yosys-simple/wreduce.v | ISC(COPYING 隨附) | 10 | 7 | 1 | 0 | PASS |
 | corpus/counter8/counter.v | repo MIT | 19 | 2 | 2 | 0 | OK-sparse |
 | corpus/e2e/57_xls_add3/add3.v | Apache-2.0(xls 派生;repo MIT 載體) | 34 | 6 | 2 | missing_reset=2 | PASS |
-| corpus/e2e/58_xls_acc_pipe/acc_pipe.v | Apache-2.0(xls 派生;repo MIT 載體) | 45 | 7 | 2 | missing_reset=3 | PASS |
-| corpus/e2e/59_i2c_master/i2c_master.v | repo MIT | 317 | 69 | 4 | 0 | PASS |
+| corpus/e2e/58_xls_acc_pipe/acc_pipe.v | Apache-2.0(xls 派生;repo MIT 載體) | 45 | 9 | 2 | missing_reset=3 | PASS |
+| corpus/e2e/59_i2c_master/i2c_master.v | repo MIT | 317 | 152 | 4 | 0 | PASS |
 | corpus/fulladd/fulladd.v | repo MIT | 26 | 3 | 1 | 0 | PASS |
-| crates/spec-i2c/rtl/i2c_master.v | repo MIT(乾淨室;OpenCores 唯讀啟發零拷貝) | 315 | 69 | 4 | 0 | PASS |
+| crates/spec-i2c/rtl/i2c_master.v | repo MIT(乾淨室;OpenCores 唯讀啟發零拷貝) | 315 | 152 | 4 | 0 | PASS |
 
 ## L2 容錯層(260 檔;分檔統計+parse_err 清單,不逐檔列表)
 
 - 可終止+零 trap+JSON 可解析:260/260 檔(trap=0)
 - parse_err(SV-2009 構造超 parser 閘,已知事實記錄不 FAIL):193 檔
-- 非 parse_err 判定分布:design-rules=0、design-sparse=62、skip-tb=5
+- 非 parse_err 判定分布:design-rules=5、design-sparse=57、skip-tb=5
 
 <details><summary>parse_err 檔名清單(機械列出)</summary>
 
@@ -332,12 +332,12 @@
 
 | 類別 | 檔數 | 規則數 |
 |---|---|---|
-| arithmetic | 29 | 172 |
-| counter | 10 | 25 |
+| arithmetic | 39 | 506 |
+| counter | 10 | 47 |
 | fsm | 3 | 23 |
 | reset | 20 | 92 |
-| timing | 36 | 351 |
-| **Σ** | — | **663** |
+| timing | 36 | 507 |
+| **Σ** | — | **1175** |
 
 ## 評審員區(R5 分層抽樣 5 檔定性複評;人工區,機械內聯自 eval-review-notes.md)
 

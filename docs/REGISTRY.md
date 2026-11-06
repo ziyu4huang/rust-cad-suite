@@ -165,3 +165,46 @@
 | 11-03 | rtl-spec G5 掃描 scopes.v(63 行小檔)雙面掛死:native emit 4s+ 未終止(sample 棧=bfs_path→HashMap::get)、wasm 腿秒級 `RuntimeError: Unreachable` trap;開弧規劃誤判為「圖規模爆炸」 | **bfs_path 死循環真 bug**:防重用 prev.contains_key 但 start 不在 prev——組合圖含自環邊(adj[start] 含 start,scopes.v 函數/命名塊遮蔽產生自賦值)時 prev[start]=start 自映射,路徑重建 `while let Some(&p)=prev.get(cur)` 沿自映射永不停;實測圖僅 nodes=2/edges=7(規模假說證偽) | bfs_path 加 visited 集(起點入 visited=永無 prev 映射,重建 `while cur!=start` 必終止);wasm32 腿的 panic(unreachable)=死循環在 wasm 的表現形,兩腿同根因;gap_hang_repro.v 最小復現形入 plugin/rtl2spec/fixtures,單測 gap_comb_loop_self_edges_terminate_and_report 釘死(自環×2+雙向環×2 精確+3 跑 byte-identical) | rtl-spec S8(gaps.rs bfs 修復+單測)+probe-determinism.mjs(37 檔×12 跑+調用序擾動,flapper 12 檔清零)+§16.0 F2 記錄勘正(真根因=死循環非規模,守衛保留防未來真大圖) |
 | `vl-difftest --html` | 報告需求 | 生成 docs/e2e-report/index.html |
 | `vl-difftest --record` | 語義變更後 | 重錄 oracle 期望(人工讀 diff) |
+
+## 復原力弧增補(2026-11-05;S0..S5;PLUGIN.md §18 為記錄 SSOT)
+
+- **新閘行**:run-reimpl-eval.sh(復原對拍評測;iverilog 守衛缺場 exit 2;
+  23 場景 6+6+11;A/B 兩組分列禁混報;寫只落 build/reimpl-eval/;直調不進
+  regress——盲寫腿=輔助證據永不進確定性閘,機械面=編譯成敗+TB 逐場景 diff;
+  裝備=fixtures/e1+fixtures/e1-reimpl,協議=REIMPL-PROTOCOL.md)。
+- **M7/M8 編號命名空間注記**:MVP-NEXT R2 的 M1..M8=復原力弧提案材料編號
+  (M1 多標簽臂/M2 default 臂/M3 else 包膜/M4 G8 容器/M5 missing_reset/
+  M6 incomplete_case/M7=PROVENANCE 手記抹除/M8=殘文候選十行),與 AGENTS
+  10.8 的 M8(多 limb 表示變更弧)同名異軌——引用時須帶弧前綴,禁裸引。
+- **基線上調處(S0..S5 累計)**:DEFAULT_MAX_RULES 128→256(schema.rs SSOT
+  +golden-check/check-rulebook/eval-all/probe-determinism 四處調用點);
+  插件 semver 0.2.0→0.3.0(plugin.json/CHANGELOG/SERVER_VERSION 三點;
+  內核 ABI 軌 workspace 0.1.0 獨立);V1-total 506(13 檔)/eval 指紋 1212
+  dup=0;parse_err 殘文 192→193(PLUGIN.md:1400/:1508+eval-all.mjs:7)。
+- **Crates 表**:rtl-spec 行測數增至 sv 35 測(含 S1-S4 條級 fixture 斷言);
+  新增 lint.rs(N5 詞法/集合差,3 單測)。
+
+### 復原力弧終審已知未決(2026-11-05 終審發現,2026-11-06 提交前登記;10.5 先登記再繼續;修復歸 C 閉環弧前置切片)
+
+- **D-r1a max_rules 上調未達 MCP/batch 面**:DEFAULT_MAX_RULES 256 的調用點
+  實況=6 處已達(golden-check.mjs:80/check-rulebook.mjs:39/eval-all.mjs:140/
+  probe-determinism.mjs:81,85/reimpl-eval.mjs:37),3 處仍 128——
+  plugin/rtl2spec/dist/server.mjs:150(MCP rtl_extract_rules 默認)與 :219
+  (batch 掃描硬編碼,用戶不可繞)、scripts/gap-fixture-check.mjs:215(本弧新寫
+  漏改)。後果=i2c_master(152 條)經 MCP 默認/batch 仍截 152→128;上行
+  「四處調用點」計數以此實況為準訂正。修法=server.mjs 兩處與
+  gap-fixture-check 對齊 SSOT(面隨核心對齊,非語義新增)。
+- **D-r1b PLUGIN §18.2 S3 對賬數字不可復算**:文檔稱 guard+async=12/
+  敏感列表證=29/seq+when=296/去重復活=175;2026-11-05 終審+主會話實測
+  golden 全樹=async:true 59、guard 帶敏感列表第二證 85、sequence+when 476
+  ——無口徑能對上,疑為 delta/子集口徑未注明(計數一律實測條違例)。
+  修法=C 弧內按實測口徑重算訂正或注明統計口徑。
+- **D-r1c mem_arst 復位前置敏感列表 async 分類洞**:`always @(negedge
+  Reset_n_i or posedge Clk_i)`(首沿=復位信號)形 async 分類整類失明——
+  sv/mod.rs:752 `trigger = edges.iter().find_map` 取敏感列表首個沿,而復位臂
+  判定(:790-808)要求 trigger.signal≠reset_sig;golden/yosys-simple/
+  mem_arst.rules.json 實測零 async 欄位(4 條全 timing/sequence,異步復位被
+  表述為 latency-1)。HEAD 既有缺類非本弧回歸(舊版同形);普查全語料受害面
+  =僅 mem_arst 1 檔(其餘 11 檔雙沿形 clk 前置分類正確)。修法=trigger 改取
+  「非復位信號的邊沿」+run-gap-fixtures 補 mem_arst 形正負 fixture+同輪
+  golden 重錄對賬。
