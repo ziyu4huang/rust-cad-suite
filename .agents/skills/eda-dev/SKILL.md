@@ -294,3 +294,23 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
   golden/PROVENANCE.md(--record 全量重寫);demo(plugin-fixtures 域)=
   record-golden.mjs 追加式,兩域互不覆蓋。
 
+
+### 17. rtl-to-spec 復原力增補(2026-11-05;S0..S5;AGENTS 10.11 同源)
+
+- contract 節+decl_lint:規則書三件套=接口契約章(投影直讀+localparam AST
+  補收)+lint(A∖B 字典序)+行為規則;contract 使 wasm 導出 schema 變更=
+  wasm 同輪重建+六路 parity(10.7 同律);lint 基線預期全綠,非空=提取器
+  懸空引用 bug。
+- 產出分界(S2):relation=結構形(PartSelect/Concat/Repeat)一律+純常量限
+  分支域(conds 非空)+無條件直賦/直通別名不產(Daikon 教訓);Index/
+  IndexedPart 不在 canon 名單(擴名單=修訂事項)。
+- 復位語義(S3):guard 載荷 async=復位訊號帶自有沿(全邊收集);敏感列表入
+  第二證;Sequence when=conds 串(指紋可區分);else 臂包膜=!(render(條件))
+  機械形(雙否定不歸一);FSM transition when 不加包膜。
+- 分支條件家族(S4):多標簽臂逐標簽展開(含 casez 模式字面);default 臂=
+  全顯式標簽否定合取(無顯式臂=不可導不推);G8 容器展開須隨 Stmt 容器變體
+  擴充;missing_reset 無條件純常量=無狀態保持不報;incomplete_case
+  n_labels≥total 守衛。
+- 復原對拍(S5):機械面=iverilog+TB 逐場景 diff;盲寫腿=輔助證據永不進閘;
+  A/B 按組分列;消融點按切片分段;預測與實測分歧記實測+偏差歸因;
+  metamorphic 探針邊界(AGENTS 10.11)=比較層歸一化摘要集+無 oracle 聲明。

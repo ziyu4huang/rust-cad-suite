@@ -335,3 +335,25 @@
   rtl2spec 塊雙守衛降級形,S11 起)。④單進程同步 wasm 循環**禁宣稱
   計時器超時守衛**(掛死時計時器無法觸發,R16-3)——終止性防線=圖
   規模守衛+visited 修復+trap 計數。
+
+## 10.11 rtl-to-spec 復原力增補(2026-11-05;S0..S5;正典=SKILL「rtl-to-spec 增補」節)
+
+- **contract 節契約(S1)**:規則書必攜接口契約章(端口/參數/內部聲明清單=
+  結構投影直讀+localparam AST 補收)+decl_lint(規則書引用標識符∖原檔宣告集,
+  字典序,隨 golden 每輪重算)——聲明清單使盲寫方免猜聲明(E1 compiled=false
+  實錄);schema 變更先普查讀取面再動(10.8 同律)。
+- **復原對拍機械主門檻(S5)**:盲寫復原的驗收=iverilog 編譯成敗+公共 TB 逐
+  場景 diff(run-reimpl-eval.sh;iverilog 缺場 exit 2 沿 golden-regression
+  守衛形)——**盲寫腿(prompt/模型/採樣)=輔助證據永不進確定性閘**;A/B 證據
+  塊消融兩組按組分列禁混報;消融點數字按切片分段;協議釘檔(REIMPL-PROTOCOL.md)
+  記模型身份/採樣參數/prompt 模板逐字,append-only。
+- **re-record 對賬對照物**:工作樹多切片未提交時(R1 禁 commit 形),逐切片
+  對賬對照物=record 前 compare 快照(build/golden-current,content 判定其
+  時代),git diff(對 HEAD)=累積視圖須聲明。
+- **metamorphic 探針邊界(S6,未執行預立法)**:歸一化結構比較探針寫只落
+  build/、直調不進 regress;指紋內嵌信號名/RHS 渲染文本(schema.rs)→「變換
+  後指紋集不變」判據必敗,比較層=名稱歸一化+AST 規範化後的結構摘要集
+  (無 oracle 近似形,報告須聲明);變換集收窄(非交換重排=非語義保持禁入);
+  比較層自身配正負 fixture 自證。
+- **預算常數隨能力同輪上調**:能力變更使提取量觸頂預算常數(DEFAULT_MAX_RULES
+  形)=V1 截斷紅燈,同輪上調(SSOT+全部調用點普查 rg),截斷語義不動。
