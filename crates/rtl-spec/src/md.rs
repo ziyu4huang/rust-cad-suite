@@ -1,6 +1,60 @@
 //! markdown 渲染(確定性;validation-report.md 的規則書全文樣本資料源)。
 
-use crate::schema::{CheckPayload, GapReport, Rulebook};
+use crate::schema::{CheckPayload, Contract, GapReport, Rulebook};
+
+/// 接口契約塊渲染(S1;確定性;與 dist/md.mjs renderContract 同一定義):
+/// 參數 `名=值` 帶 `(local)` 標;端口 `名:dir[width]`(parametric=true→
+/// `[parametric]`;signed=true→` signed` 後綴);內部聲明 `名:kind[width]`
+/// (width=0=參數化範圍佔位,§4.2;unpacked>0 追加 `x<dims>`);空面省略。
+fn contract_markdown(c: &Contract) -> String {
+    let mut out = String::new();
+    out.push_str("- 接口契約:\n");
+    if !c.params.is_empty() {
+        let items: Vec<String> = c
+            .params
+            .iter()
+            .map(|p| {
+                if p.local {
+                    format!("{}={} (local)", p.name, p.value)
+                } else {
+                    format!("{}={}", p.name, p.value)
+                }
+            })
+            .collect();
+        out.push_str(&format!("  - 參數: {}\n", items.join("; ")));
+    }
+    if !c.ports.is_empty() {
+        let items: Vec<String> = c
+            .ports
+            .iter()
+            .map(|p| {
+                let width = if p.parametric {
+                    "[parametric]".to_string()
+                } else {
+                    format!("[{}]", p.width)
+                };
+                let signed = if p.signed { " signed" } else { "" };
+                format!("{}:{}{}{}", p.name, p.dir, width, signed)
+            })
+            .collect();
+        out.push_str(&format!("  - 端口: {}\n", items.join("; ")));
+    }
+    if !c.signals.is_empty() {
+        let items: Vec<String> = c
+            .signals
+            .iter()
+            .map(|g| {
+                if g.unpacked_dims > 0 {
+                    format!("{}:{}[{}]x{}", g.name, g.kind, g.width, g.unpacked_dims)
+                } else {
+                    format!("{}:{}[{}]", g.name, g.kind, g.width)
+                }
+            })
+            .collect();
+        out.push_str(&format!("  - 內部聲明: {}\n", items.join("; ")));
+    }
+    out
+}
 
 impl Rulebook {
     pub fn render_markdown(&self) -> String {
@@ -46,9 +100,21 @@ impl Rulebook {
                 self.truncated.join(", ")
             ));
         }
+        // N5 信號-聲明完備性 lint(S1;審讀 #6):隨提取器輸出每輪重算。
+        if self.decl_lint.dangling_refs.is_empty() {
+            out.push_str("- 聲明完備性 lint:懸空引用 0 條\n");
+        } else {
+            out.push_str(&format!(
+                "- 聲明完備性 lint:懸空引用 {} 條:{}\n",
+                self.decl_lint.dangling_refs.len(),
+                self.decl_lint.dangling_refs.join(", ")
+            ));
+        }
         out.push('\n');
         for m in &self.modules {
             out.push_str(&format!("## 模組 {}({} 條)\n\n", m.module, m.rules.len()));
+            // S1 接口契約章(N2):①端口/參數面+②內部聲明清單。
+            out.push_str(&contract_markdown(&m.contract));
             for r in &m.rules {
                 out.push_str(&format!(
                     "### {} [{}/{}]\n\n",
@@ -84,6 +150,7 @@ fn check_text(p: &CheckPayload) -> String {
         CheckPayload::Guard {
             trigger,
             when,
+            r#async,
             effects,
         } => {
             let trig = trigger
@@ -101,8 +168,9 @@ fn check_text(p: &CheckPayload) -> String {
                 .map(|e| format!("{}←{}", e.lhs, e.value))
                 .collect();
             format!(
-                "trigger={trig}; when={}; effects={}",
+                "trigger={trig}; when={}; async={}; effects={}",
                 when.as_deref().unwrap_or("-"),
+                r#async,
                 eff.join("; ")
             )
         }

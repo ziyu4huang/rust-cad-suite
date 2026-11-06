@@ -17,11 +17,13 @@
 
 use analyzer_core::RtlilInput;
 use ry_ir::ast::{CaseRule, Process, SigBit, SigSpec, SyncType};
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 
+use crate::lint;
 use crate::schema::{
-    Category, Check, CheckForm, CheckPayload, Confidence, Effect, Evidence, EvidenceClass,
-    GapClass, GapItem, GapReport, Qualifier, Rulebook, Trigger,
+    Category, Check, CheckForm, CheckPayload, Confidence, Contract, ContractParam, ContractPort,
+    ContractSignal, DeclLint, Effect, Evidence, EvidenceClass, GapClass, GapItem, GapReport,
+    Qualifier, Rulebook, Trigger,
 };
 use crate::sv::{extract_parse_errors, finalize_module, Draft};
 
@@ -90,10 +92,70 @@ pub(crate) fn extract_rules_rtlil(input: &RtlilInput, max_rules: usize) -> Ruleb
     };
     let mut modules = Vec::new();
     let mut truncated = Vec::new();
+    // S1:contract=RTLIL 投影聲明面直讀(wires 全量+memories+params;RTLIL
+    // 語義無 localparam/parameter 之分——全入 params 面,見 view.rs 注);
+    // lint B=同一投影面(名歸一律見 lint::insert_decl_name)。
+    let mut decl_b_set: BTreeSet<String> = BTreeSet::new();
+    for mi in analysis.modules() {
+        for p in &mi.params {
+            lint::insert_decl_name(&mut decl_b_set, &p.name);
+        }
+        for p in &mi.ports {
+            lint::insert_decl_name(&mut decl_b_set, &p.name);
+        }
+        for n in &mi.nets {
+            lint::insert_decl_name(&mut decl_b_set, &n.name);
+        }
+    }
     if let Some(design) = &analysis.rtlil {
+        let mi_by_name: HashMap<&str, &analyzer_core::view::ModuleInfo> = analysis
+            .modules()
+            .iter()
+            .map(|mi| (mi.name.as_str(), mi))
+            .collect();
         for m in &design.modules {
             let widths: HashMap<&str, i64> =
                 m.wires.iter().map(|w| (w.name.as_str(), w.width)).collect();
+            let contract = match mi_by_name.get(m.name.as_str()) {
+                Some(mi) => Contract {
+                    params: mi
+                        .params
+                        .iter()
+                        .map(|p| ContractParam {
+                            name: p.name.clone(),
+                            value: p.value.clone(),
+                            local: false,
+                        })
+                        .collect(),
+                    ports: mi
+                        .ports
+                        .iter()
+                        .map(|p| ContractPort {
+                            name: p.name.clone(),
+                            dir: p.dir.as_str().to_string(),
+                            width: p.width,
+                            parametric: p.parametric,
+                            signed: p.signed,
+                        })
+                        .collect(),
+                    signals: mi
+                        .nets
+                        .iter()
+                        .filter(|n| !n.is_port)
+                        .map(|n| ContractSignal {
+                            name: n.name.clone(),
+                            kind: n.kind.as_str().to_string(),
+                            width: n.width,
+                            unpacked_dims: n.unpacked_dims,
+                        })
+                        .collect(),
+                },
+                None => Contract {
+                    params: Vec::new(),
+                    ports: Vec::new(),
+                    signals: Vec::new(),
+                },
+            };
             let mut drafts = Vec::new();
             for (pi, p) in m.processes.iter().enumerate() {
                 extract_process(&ctx, &widths, m.name.as_str(), pi, p, &mut drafts);
@@ -101,18 +163,26 @@ pub(crate) fn extract_rules_rtlil(input: &RtlilInput, max_rules: usize) -> Ruleb
             modules.push(finalize_module(
                 &input.name,
                 m.name.as_str(),
+                contract,
                 drafts,
                 max_rules,
                 &mut truncated,
             ));
         }
     }
+    // N5 lint(RTLIL 腿):A=check 自由文本+snippet(RTLIL snippet 恆空,
+    // D2 路徑證形不掃);B=投影宣告面。差集隨輸出 decl_lint 出場。
+    let a_set = lint::rulebook_ref_idents(modules.iter().flat_map(|m| &m.rules));
+    let decl_lint = DeclLint {
+        dangling_refs: lint::diff_sets(&a_set, &decl_b_set),
+    };
     Rulebook {
         source: input.name.clone(),
         parse_errors,
         skipped: Vec::new(),
         modules,
         truncated,
+        decl_lint,
     }
 }
 
@@ -262,6 +332,15 @@ fn extract_process(
                             payload: CheckPayload::Guard {
                                 trigger: trigger.clone(),
                                 when: Some(format!("{sel} == {cmp_text}")),
+                                // N4(§5.2 S3)RTLIL 腿同律:復位選擇子帶自有
+                                // sync 沿=異步;僅時鐘 sync=同步。
+                                r#async: p.syncs.iter().any(|s| {
+                                    matches!(s.stype, SyncType::Posedge | SyncType::Negedge)
+                                        && s.signal
+                                            .as_ref()
+                                            .map(|sig| render_sig(sig, &widths) == sel)
+                                            .unwrap_or(false)
+                                }),
                                 effects: vec![Effect {
                                     lhs: lhs.clone(),
                                     value: value.clone(),

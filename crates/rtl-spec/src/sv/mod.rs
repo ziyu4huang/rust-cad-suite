@@ -7,18 +7,21 @@
 //! 兩端同一定義。巨集/include 產生的 span(file≠0)不產證據:整規則
 //! 無證即丟(誠實降級,記入實作記錄)。
 
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 pub(crate) mod gaps;
 
+use analyzer_core::view::ModuleInfo;
 use analyzer_core::{Analysis, SourceInput, SvInput};
 use rcs_diag::{FileId, Span};
 use vl_syntax::ast::{self, EdgeKind, EventCtrl, ModuleItem, Stmt};
 
 use crate::expr::{self, lvalue_base, render, walk_expr};
+use crate::lint;
 use crate::schema::{
-    Category, Check, CheckForm, CheckPayload, Effect, Evidence, EvidenceClass, ModuleRules,
-    Qualifier, Rule, Rulebook, SkippedNote, SkipReason, Trigger,
+    Category, Check, CheckForm, CheckPayload, Contract, ContractParam, ContractPort,
+    ContractSignal, DeclLint, Effect, Evidence, EvidenceClass, ModuleRules, Qualifier, Rule,
+    Rulebook, SkippedNote, SkipReason, Trigger,
 };
 
 /// TB 啟發判定(R7b):檔含 `$finish` → 整檔跳過(注記入 skipped,不入
@@ -204,18 +207,50 @@ pub(crate) fn walk_stmt<'a>(
             }
         }
         Stmt::Case { expr, items, .. } => {
+            // M2(§5.2 S4)前置掃描:全部顯式標簽條件(default 臂推「未被任何
+            // 臂覆蓋」=對每個顯式標簽取否定合取;多標簽臂每個標簽一條)。
+            let label_conds: Vec<String> = items
+                .iter()
+                .filter_map(|it| match it {
+                    ast::CaseItem::Items(ls, _) => Some(
+                        ls.iter()
+                            .map(|l| format!("{} == {}", render(expr), render(l)))
+                            .collect::<Vec<_>>(),
+                    ),
+                    _ => None,
+                })
+                .flatten()
+                .collect();
             for item in items {
                 match item {
                     ast::CaseItem::Items(labels, s) => {
-                        if let Some(first) = labels.first() {
-                            conds.push(format!("{} == {}", render(expr), render(first)));
+                        // M1(§5.2 S4):多標簽臂逐標簽展開——每個標簽一條適用
+                        // 域(2'b01 觸發域可見),不再只取首標簽(單標簽臂形不變)。
+                        if labels.is_empty() {
                             walk_stmt(s, conds, out);
-                            conds.pop();
                         } else {
-                            walk_stmt(s, conds, out);
+                            for l in labels {
+                                conds.push(format!("{} == {}", render(expr), render(l)));
+                                walk_stmt(s, conds, out);
+                                conds.pop();
+                            }
                         }
                     }
-                    ast::CaseItem::Default(s) => walk_stmt(s, conds, out),
+                    ast::CaseItem::Default(s) => {
+                        // M2(§5.2 S4):default 臂=未被任何顯式臂覆蓋的編碼域
+                        // (機械可導;進指紋可區分域)。無顯式臂=條件不可導,
+                        // 保持無條件行走。
+                        if label_conds.is_empty() {
+                            walk_stmt(s, conds, out);
+                        } else {
+                            let base = conds.len();
+                            for c in &label_conds {
+                                conds.push(format!("!({c})"));
+                            }
+                            walk_stmt(s, conds, out);
+                            conds.truncate(base);
+                        }
+                    }
                 }
             }
         }
@@ -306,6 +341,7 @@ impl Draft {
 pub(crate) fn finalize_module(
     source: &str,
     module: &str,
+    contract: Contract,
     mut drafts: Vec<Draft>,
     max_rules: usize,
     truncated: &mut Vec<String>,
@@ -338,6 +374,7 @@ pub(crate) fn finalize_module(
         .collect();
     ModuleRules {
         module: module.to_string(),
+        contract,
         rules,
     }
 }
@@ -358,6 +395,7 @@ pub(crate) fn extract_rules_sv(input: &SvInput, max_rules: usize) -> Rulebook {
             }],
             modules: Vec::new(),
             truncated: Vec::new(),
+            decl_lint: DeclLint::default(),
         };
     }
     let analysis = analyzer_core::analyze(&SourceInput::Sv(input.clone()));
@@ -369,18 +407,234 @@ pub(crate) fn extract_rules_sv(input: &SvInput, max_rules: usize) -> Rulebook {
     };
     let mut truncated = Vec::new();
     let mut modules = Vec::new();
-    if let Some(file) = &analysis.sv {
-        for m in &file.modules {
-            let drafts = extract_module(&ctx, m);
-            modules.push(finalize_module(&input.name, &m.name, drafts, max_rules, &mut truncated));
+    let mut decl_b_set: BTreeSet<String> = BTreeSet::new();
+    // B 面(投影,兩腿同查詢形):宣告名按歸一律入集;呼叫端擴充面見 lint.rs 註。
+    for mi in analysis.modules() {
+        for p in &mi.params {
+            lint::insert_decl_name(&mut decl_b_set, &p.name);
+        }
+        for p in &mi.ports {
+            lint::insert_decl_name(&mut decl_b_set, &p.name);
+        }
+        for n in &mi.nets {
+            lint::insert_decl_name(&mut decl_b_set, &n.name);
         }
     }
+    // 模組名入 B(規則/證據行可引他處模組名的場景=宣告面同源)。
+    if let Some(file) = &analysis.sv {
+        let mi_by_name: HashMap<&str, &ModuleInfo> = analysis
+            .modules()
+            .iter()
+            .map(|mi| (mi.name.as_str(), mi))
+            .collect();
+        for m in &file.modules {
+            decl_b_set.insert(m.name.clone());
+            // localparam/函數/任務名=檔內具名宣告(AST 補收;投影面不載,
+            // 見 analyzer-core view.rs params 裁定注)。漏收會讓 lint 對
+            // 合法引用誤報(ST_* 編碼/任務呼叫=基線非綠)。
+            collect_local_decl_names(&m.items, &mut decl_b_set);
+            let mi = mi_by_name.get(m.name.as_str());
+            let contract = match mi {
+                Some(mi) => build_contract(mi, m),
+                None => Contract {
+                    params: Vec::new(),
+                    ports: Vec::new(),
+                    signals: Vec::new(),
+                },
+            };
+            let drafts = extract_module(&ctx, m);
+            modules.push(finalize_module(
+                &input.name,
+                &m.name,
+                contract,
+                drafts,
+                max_rules,
+                &mut truncated,
+            ));
+        }
+    }
+    // N5 lint(審讀 #6):A=規則書全部 evidence/check 行引用標識符 vs
+    // B=原檔宣告集;差集非空=提取器懸空引用。隨輸出 golden 每輪重算。
+    let a_set = lint::rulebook_ref_idents(modules.iter().flat_map(|m| &m.rules));
+    let decl_lint = DeclLint {
+        dangling_refs: lint::diff_sets(&a_set, &decl_b_set),
+    };
     Rulebook {
         source: input.name.clone(),
         parse_errors,
         skipped: Vec::new(),
         modules,
         truncated,
+        decl_lint,
+    }
+}
+
+/// 檔內具名宣告 AST 補收(localparam/函數/任務;generate 作用域含)。
+/// 【S1 實測擴充記錄】37 檔 lint 實測(canonical B=投影+localparam+函數名)
+/// 懸空 3/37,逐案歸類皆為「檔內具名宣告面」而 canon 括號清單未列——目的
+/// 條款「規則書引用了原檔不存在的信號=提取器 bug」下報之皆誤報,故按證據
+/// 擴入:①命名 generate 塊標籤(carryadd `begin:STAGE`/generate.v
+/// `begin : foo`,被層級引用 `STAGE[i-1].C`);②行程命名塊+塊內聲明
+/// (sincos `begin: DESIGN_PROCESSOR` 內 reg i/state/dz/dx/dy/y/x/z);
+/// ③函數/任務頭尾聲明(ports+decls)。三面皆=原檔具名宣告,與「端口+
+/// wire/reg+localparam/參數」同屬宣告面;逐案證據入切片對賬。
+fn collect_local_decl_names(items: &[ModuleItem], out: &mut BTreeSet<String>) {
+    // 自遞歸(不走 walk_items:GenFor/GenBlock 被 walk_items 消費,閉包看不到
+    // 其 block/name 欄位——GenFor.block=`for (...) begin : STAGE` 標籤載體)。
+    for item in items {
+        match item {
+            ModuleItem::GenerateRegion(inner) => collect_local_decl_names(inner, out),
+            ModuleItem::GenIf { then, els, .. } => {
+                collect_local_decl_names(then, out);
+                if let Some(e) = els {
+                    collect_local_decl_names(e, out);
+                }
+            }
+            ModuleItem::GenFor { block, items: inner, .. } => {
+                if let Some(n) = block {
+                    out.insert(n.clone());
+                }
+                collect_local_decl_names(inner, out);
+            }
+            ModuleItem::GenCase { items, default, .. } => {
+                for (_, its) in items {
+                    collect_local_decl_names(its, out);
+                }
+                if let Some(d) = default {
+                    collect_local_decl_names(d, out);
+                }
+            }
+            ModuleItem::GenBlock { name, items: inner, .. } => {
+                if let Some(n) = name {
+                    out.insert(n.clone());
+                }
+                collect_local_decl_names(inner, out);
+            }
+            ModuleItem::Decl(d) => {
+                if d.kind == ast::DeclKind::Localparam {
+                    for e in &d.entries {
+                        out.insert(e.name.clone());
+                    }
+                }
+            }
+            ModuleItem::Function(f) | ModuleItem::Task(f) => {
+                out.insert(f.name.clone());
+                for d in f.ports.iter().chain(f.decls.iter()) {
+                    for e in &d.entries {
+                        out.insert(e.name.clone());
+                    }
+                }
+                for s in &f.body {
+                    collect_stmt_decl_names(s, out);
+                }
+            }
+            ModuleItem::Always { body, .. } | ModuleItem::Initial { body, .. } => {
+                collect_stmt_decl_names(body, out);
+            }
+            _ => {}
+        }
+    }
+}
+
+/// 語句樹具名面收集(命名 begin 塊標籤+塊內聲明;嵌套全展開)。
+fn collect_stmt_decl_names(s: &Stmt, out: &mut BTreeSet<String>) {
+    match s {
+        Stmt::Block { name, decls, body, .. } => {
+            if let Some(n) = name {
+                out.insert(n.clone());
+            }
+            for d in decls {
+                for e in &d.entries {
+                    out.insert(e.name.clone());
+                }
+            }
+            for b in body {
+                collect_stmt_decl_names(b, out);
+            }
+        }
+        Stmt::If { then, els, .. } => {
+            collect_stmt_decl_names(then, out);
+            if let Some(e) = els {
+                collect_stmt_decl_names(e, out);
+            }
+        }
+        Stmt::Case { items, .. } => {
+            for it in items {
+                match it {
+                    ast::CaseItem::Items(_, st) => collect_stmt_decl_names(st, out),
+                    ast::CaseItem::Default(st) => collect_stmt_decl_names(st, out),
+                }
+            }
+        }
+        Stmt::For { body, .. } | Stmt::While { body, .. } | Stmt::Repeat { body, .. }
+        | Stmt::Forever { body, .. } => collect_stmt_decl_names(body, out),
+        Stmt::DelayCtrl { body, .. } | Stmt::EventCtrl { body, .. } | Stmt::Wait { body, .. } => {
+            if let Some(b) = body {
+                collect_stmt_decl_names(b, out);
+            }
+        }
+        Stmt::Fork { branches, .. } => {
+            for b in branches {
+                collect_stmt_decl_names(b, out);
+            }
+        }
+        _ => {}
+    }
+}
+
+/// 模組接口契約(§5.2 S1):①端口/參數面+②內部聲明清單;來源=結構投影
+/// 既有聲明面(ModuleInfo 直投,零新語義),localparam 由 AST 補收(值=
+/// AST 原文渲染,對拍友善;投影 params 面裁定不收 localparam)。
+fn build_contract(mi: &ModuleInfo, m: &ast::Module) -> Contract {
+    let mut params: Vec<ContractParam> = mi
+        .params
+        .iter()
+        .map(|p| ContractParam {
+            name: p.name.clone(),
+            value: p.value.clone(),
+            local: false,
+        })
+        .collect();
+    walk_items(&m.items, false, &mut |item, _| {
+        if let ModuleItem::Decl(d) = item {
+            if d.kind == ast::DeclKind::Localparam {
+                for e in &d.entries {
+                    params.push(ContractParam {
+                        name: e.name.clone(),
+                        value: e.init.as_ref().map(render).unwrap_or_default(),
+                        local: true,
+                    });
+                }
+            }
+        }
+    });
+    let ports = mi
+        .ports
+        .iter()
+        .map(|p| ContractPort {
+            name: p.name.clone(),
+            dir: p.dir.as_str().to_string(),
+            width: p.width,
+            parametric: p.parametric,
+            signed: p.signed,
+        })
+        .collect();
+    // 內部聲明=nets 剔除端口面(!is_port);width=0=參數化範圍佔位(§4.2)。
+    let signals = mi
+        .nets
+        .iter()
+        .filter(|n| !n.is_port)
+        .map(|n| ContractSignal {
+            name: n.name.clone(),
+            kind: n.kind.as_str().to_string(),
+            width: n.width,
+            unpacked_dims: n.unpacked_dims,
+        })
+        .collect();
+    Contract {
+        params,
+        ports,
+        signals,
     }
 }
 
@@ -395,7 +649,10 @@ fn extract_module(ctx: &Ctx, m: &ast::Module) -> Vec<Draft> {
         }
         ModuleItem::ContAssign(pairs) => {
             for p in pairs {
-                if expr::has_binary(&p.rhs) {
+                // S2(N3)分界:ContAssign 無分支域(in_branch_domain=false)——
+                // assign 純常量直賦/直通別名不產(負 fixture 釘死);結構形
+                // RHS(PartSelect/Concat/Repeat)與含二元運算者一律產。
+                if expr::relation_worthy(&p.rhs, false) {
                     if let Some(ev) = ctx.evidence(
                         p.span,
                         if in_generate {
@@ -441,7 +698,11 @@ fn extract_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
             let mut out = Vec::new();
             walk_stmt(body, &mut conds, &mut out);
             for a in out {
-                if expr::has_binary(a.rhs) {
+                // S2(N3)分界:分支域=conds 非空(case/if 臂內;default 臂
+                // walk_stmt 不 push cond=非分支域,歸 S4/M2)。結構形一律產;
+                // 純常量僅分支域內;無條件直賦純常量/直通別名不產(A12 教訓
+                // 寫進 relation_worthy 註釋)。
+                if expr::relation_worthy(a.rhs, !a.conds.is_empty()) {
                     if let Some(ev) = ctx.evidence(a.span, EvidenceClass::Process) {
                         let lhs = render(a.lhs);
                         let rhs = render(a.rhs);
@@ -520,9 +781,12 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
     };
 
     // 復位臂:首層 If 且 cond=單訊號(±否定);復位訊號≠觸發訊號。
+    // M3(§5.2):else 臂賦值補 !(reset 條件) 包裹——非復位行為的適用域
+    // 顯式攜「非復位」,與復位臂 guard 邏輯互斥(muxtree R003/R004 現狀
+    // 自相矛盾 audit 在檔);if 後的頂層語句兩臂共用,不帶基條件。
     let mut reset_when: Option<String> = None;
     let mut reset_arm: Option<&Stmt> = None;
-    let mut continuation: Vec<&Stmt> = Vec::new();
+    let mut continuation: Vec<(&Stmt, Option<String>)> = Vec::new();
     if let Some(Stmt::If { cond, then, els, .. }) = top.first() {
         if let Some(sig) = reset_cond_signal(cond) {
             let is_trigger = trigger
@@ -533,25 +797,41 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
             if !is_trigger {
                 reset_when = Some(render(cond));
                 reset_arm = Some(&**then);
+                let base = format!("!({})", render(cond));
                 if let Some(e) = els {
-                    continuation.push(&**e);
+                    continuation.push((&**e, Some(base)));
                 }
                 for s in top.iter().skip(1) {
-                    continuation.push(s);
+                    continuation.push((s, None));
                 }
             }
         }
     }
     if reset_arm.is_none() {
-        continuation.extend(top.iter().copied());
+        continuation.extend(top.iter().map(|s| (*s, None)));
     }
 
-    // 1) reset 規則:then 臂每個賦值一條 guard(evidence=then 臂 span)。
+    // 1) reset 規則:then 臂每個賦值一條 guard(evidence=then 臂 span+
+    // process 敏感列表 span——N4 async 分類的可審計面)。
     if let (Some(arm), Some(when)) = (reset_arm, reset_when.clone()) {
         let mut conds = Vec::new();
         let mut out = Vec::new();
         walk_stmt(arm, &mut conds, &mut out);
         let ev = ctx.evidence(stmt_span(arm), EvidenceClass::Process);
+        // N4(§5.2):全邊收集分類——復位訊號帶自有沿(如 negedge rst_n)=
+        // 異步;敏感列表原文入 evidence(第二證)。
+        let reset_sig = top.first().and_then(|s| match s {
+            Stmt::If { cond, .. } => reset_cond_signal(cond).map(|x| x.to_string()),
+            _ => None,
+        });
+        let r#async = reset_sig
+            .map(|s| {
+                edges.iter().any(|e| {
+                    matches!(e.kind, EdgeKind::Posedge | EdgeKind::Negedge) && render(&e.expr) == s
+                })
+            })
+            .unwrap_or(false);
+        let sens_ev = ctrl.and_then(|c| ctx.evidence(c.span, EvidenceClass::Process));
         for a in &out {
             let Some(ev) = ev.clone() else { continue };
             let lhs = render(a.lhs);
@@ -568,16 +848,21 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
                 ),
                 None => format!("當 {when} 時,{lhs} 裝載 {value}"),
             };
+            let mut evidence = vec![ev];
+            if let Some(se) = sens_ev.clone() {
+                evidence.push(se);
+            }
             drafts.push(Draft {
                 category: Category::Reset,
                 qualifier: Qualifier::Derived,
                 statement: stmt_text,
-                evidence: vec![ev],
+                evidence,
                 check: Check {
                     form: CheckForm::Guard,
                     payload: CheckPayload::Guard {
                         trigger: trigger.clone(),
                         when: Some(when.clone()),
+                        r#async,
                         effects: vec![Effect {
                             lhs: lhs.clone(),
                             value: value.clone(),
@@ -591,14 +876,14 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
     // 2) FSM:續體內 Case,選擇子=本行程 NbAssign 過的同名寄存器。
     let nb_names = {
         let mut names = HashSet::new();
-        for s in &continuation {
+        for (s, _) in &continuation {
             names.extend(nb_lhs_names(s));
         }
         names
     };
     let mut consumed: HashSet<u32> = HashSet::new(); // span.start.0
     let mut cases: Vec<CaseLike> = Vec::new();
-    collect_cases(&continuation, &mut cases);
+    collect_cases(&continuation.iter().map(|(s, _)| *s).collect::<Vec<_>>(), &mut cases);
     for case in &cases {
         let sel = lvalue_base(case.selector);
         let Some(sel_name) = sel else { continue };
@@ -669,8 +954,14 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
     }
 
     // 3) timing/counter:續體全部賦值,排除 FSM 已消費的狀態賦值。
-    for s in &continuation {
+    // N1(§5.2):Sequence when 維並入 conds(指紋可區分適用域——i2c
+    // HOLD/IDLE 臂 tip/bitcnt 條件賦值現狀被指紋去重吞掉,E2 gap 關閉);
+    // M3:else 臂語句以 !(reset 條件) 為外層條件(seed)。
+    for (s, base) in &continuation {
         let mut conds = Vec::new();
+        if let Some(b) = base {
+            conds.push(b.clone());
+        }
         let mut out = Vec::new();
         walk_stmt(s, &mut conds, &mut out);
         for a in out {
@@ -687,6 +978,11 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
                 trigger_text.clone()
             } else {
                 a.conds.join(" 且 ")
+            };
+            let when = if a.conds.is_empty() {
+                None
+            } else {
+                Some(a.conds.join(" 且 "))
             };
             let is_counter = lhs_base
                 .as_ref()
@@ -716,7 +1012,7 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
                         becomes: rhs,
                         anchor,
                         latency: 1,
-                        when: None,
+                        when,
                     },
                 },
             });

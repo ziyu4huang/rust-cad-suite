@@ -80,10 +80,14 @@ fn rulebook_sample_extracts_five_categories() {
         CheckPayload::Guard {
             trigger: Some(t),
             when: Some(w),
+            r#async,
             effects,
         } => {
             assert_eq!((t.edge.as_deref(), t.signal.as_deref()), (Some("posedge"), Some("clk")));
             assert_eq!(w, "!rst_n");
+            // N4:fixture=always @(posedge clk or negedge rst_n)——復位訊號
+            // 帶自有沿=異步,async=true(全邊收集分類的機械判準)。
+            assert!(r#async, "異步復位(negedge rst_n 自有沿)應 async=true");
             assert_eq!(effects.len(), 1);
             assert_eq!(effects[0].lhs, "state");
             assert_eq!(effects[0].value, "2'b00");
@@ -476,6 +480,11 @@ fn rulebook_json_key_order_is_byte_exact() {
         }],
         modules: vec![rtl_spec::ModuleRules {
             module: "demo".to_string(),
+            contract: rtl_spec::Contract {
+                params: vec![],
+                ports: vec![],
+                signals: vec![],
+            },
             rules: vec![Rule {
                 id: "demo.R001".to_string(),
                 category: Category::Reset,
@@ -498,6 +507,7 @@ fn rulebook_json_key_order_is_byte_exact() {
                             signal: Some("clk".to_string()),
                         }),
                         when: Some("!rst_n".to_string()),
+                        r#async: false,
                         effects: vec![Effect {
                             lhs: "state".to_string(),
                             value: "2'b00".to_string(),
@@ -508,19 +518,80 @@ fn rulebook_json_key_order_is_byte_exact() {
             }],
         }],
         truncated: vec![],
+        decl_lint: rtl_spec::DeclLint { dangling_refs: vec![] },
     };
     let json = rtl_spec::rulebook_json(&rb);
     let want = "{\"source\":\"demo.v\",\"parse_errors\":[\"VL-E100: syntax error\"],\
 \"skipped\":[{\"file\":\"tb.v\",\"reason\":\"tb_file\"}],\
-\"modules\":[{\"module\":\"demo\",\"rules\":[\
+\"modules\":[{\"module\":\"demo\",\
+\"contract\":{\"params\":[],\"ports\":[],\"signals\":[]},\
+\"rules\":[\
 {\"id\":\"demo.R001\",\"category\":\"reset\",\"module\":\"demo\",\
 \"statement\":\"當 !rst_n 且 clk 上升沿時,state 裝載 2'b00\",\
 \"qualifier\":\"derived\",\
 \"evidence\":[{\"file\":\"demo.v\",\"line\":5,\"end_line\":6,\"class\":\"process\",\
 \"snippet\":\"if (!rst_n) begin\\n  state <= 2'b00;\"}],\
 \"check\":{\"form\":\"guard\",\"trigger\":{\"edge\":\"posedge\",\"signal\":\"clk\"},\
-\"when\":\"!rst_n\",\"effects\":[{\"lhs\":\"state\",\"value\":\"2'b00\"}]},\
-\"fingerprint\":\"demo.v|reset|demo|state|!rst_n|state<=2'b00\"}]}],\"truncated\":[]}";
+\"when\":\"!rst_n\",\"async\":false,\"effects\":[{\"lhs\":\"state\",\"value\":\"2'b00\"}]},\
+\"fingerprint\":\"demo.v|reset|demo|state|!rst_n|state<=2'b00\"}]}],\
+\"truncated\":[],\"decl_lint\":{\"dangling_refs\":[]}}";
+    assert_eq!(json, want);
+}
+
+#[test]
+fn contract_json_shape_byte_exact() {
+    // S1 接口契約章:contract 欄序(name/value/local;name/dir/width/
+    // parametric/signed;name/kind/width/unpacked_dims)byte-exact 釘死。
+    let rb = Rulebook {
+        source: "c.v".to_string(),
+        parse_errors: vec![],
+        skipped: vec![],
+        modules: vec![rtl_spec::ModuleRules {
+            module: "c".to_string(),
+            contract: rtl_spec::Contract {
+                params: vec![
+                    rtl_spec::ContractParam {
+                        name: "WIDTH".to_string(),
+                        value: "32'sd8".to_string(),
+                        local: false,
+                    },
+                    rtl_spec::ContractParam {
+                        name: "ST_IDLE".to_string(),
+                        value: "4'd0".to_string(),
+                        local: true,
+                    },
+                ],
+                ports: vec![rtl_spec::ContractPort {
+                    name: "q".to_string(),
+                    dir: "output".to_string(),
+                    width: 0,
+                    parametric: true,
+                    signed: false,
+                }],
+                signals: vec![rtl_spec::ContractSignal {
+                    name: "mem".to_string(),
+                    kind: "memory".to_string(),
+                    width: 8,
+                    unpacked_dims: 1,
+                }],
+            },
+            rules: vec![],
+        }],
+        truncated: vec![],
+        decl_lint: rtl_spec::DeclLint {
+            dangling_refs: vec!["ghost".to_string()],
+        },
+    };
+    let json = rtl_spec::rulebook_json(&rb);
+    let want = "{\"source\":\"c.v\",\"parse_errors\":[],\"skipped\":[],\
+\"modules\":[{\"module\":\"c\",\
+\"contract\":{\"params\":[\
+{\"name\":\"WIDTH\",\"value\":\"32'sd8\",\"local\":false},\
+{\"name\":\"ST_IDLE\",\"value\":\"4'd0\",\"local\":true}],\
+\"ports\":[{\"name\":\"q\",\"dir\":\"output\",\"width\":0,\"parametric\":true,\"signed\":false}],\
+\"signals\":[{\"name\":\"mem\",\"kind\":\"memory\",\"width\":8,\"unpacked_dims\":1}]},\
+\"rules\":[]}],\
+\"truncated\":[],\"decl_lint\":{\"dangling_refs\":[\"ghost\"]}}";
     assert_eq!(json, want);
 }
 
@@ -532,6 +603,7 @@ fn json_escapes_hostile_strings() {
         skipped: vec![],
         modules: vec![],
         truncated: vec![],
+        decl_lint: rtl_spec::DeclLint { dangling_refs: vec![] },
     };
     let json = rtl_spec::rulebook_json(&rb);
     // 引號/反斜線/換行轉義 + 非 ASCII 原樣保留(UTF-8 直出)。
@@ -838,4 +910,494 @@ endmodule
 "#;
     let gaps = scan_gaps(&sv("clean.v", src));
     assert!(gaps.items.is_empty(), "{:?}", gaps.items);
+}
+
+// ---- S1 接口契約章(N2)+信號-聲明完備性 lint(N5;§5.2) ----
+
+#[test]
+fn s1_contract_interface_and_internal_signals() {
+    // 自著 fixture(repo MIT):介面參數+localparam+parametric 端口寬+
+    // 內部 reg/wire+記憶體;contract=投影直讀+localparam AST 補收。
+    let src = "module m #(parameter WIDTH = 8) (\n\
+input wire clk,\n\
+input wire [WIDTH-1:0] d,\n\
+output reg [WIDTH-1:0] q\n\
+);\n\
+localparam [1:0] S_IDLE = 2'd0;\n\
+reg [1:0] state;\n\
+wire en;\n\
+reg [7:0] mem [0:15];\n\
+always @(posedge clk) begin\n\
+if (en) q <= d + 1'b1;\n\
+else q <= q + 1'b1;\n\
+end\n\
+endmodule\n";
+    let rb = extract_rules(&sv("contract_m.v", src), DEFAULT_MAX_RULES);
+    assert!(rb.parse_errors.is_empty(), "{:?}", rb.parse_errors);
+    assert_eq!(rb.modules.len(), 1);
+    let c = &rb.modules[0].contract;
+    // ①參數面:介面參數 local=false 帶默認值(§4.5 字面量形);localparam
+    // local=true(AST 補收,值=AST 原文渲染)。
+    assert_eq!(c.params.len(), 2, "{:?}", c.params);
+    assert_eq!(c.params[0].name, "WIDTH");
+    assert!(!c.params[0].local);
+    assert!(c.params[0].value.ends_with("d8"), "{:?}", c.params[0].value);
+    assert_eq!(c.params[1].name, "S_IDLE");
+    assert!(c.params[1].local);
+    assert_eq!(c.params[1].value, "2'd0");
+    // ①端口面:名/方向/位寬;parametric=true=寬度非字面量(width=0 佔位,
+    // 不求值參數——投影 §4.2 佔位語義)。
+    assert_eq!(c.ports.len(), 3, "{:?}", c.ports);
+    assert_eq!(c.ports[0].name, "clk");
+    assert_eq!(c.ports[0].dir, "input");
+    assert_eq!(c.ports[0].width, 1);
+    assert!(!c.ports[0].parametric);
+    assert_eq!(c.ports[1].name, "d");
+    assert!(c.ports[1].parametric, "{:?}", c.ports[1]);
+    assert_eq!(c.ports[1].width, 0);
+    assert_eq!(c.ports[2].name, "q");
+    assert_eq!(c.ports[2].dir, "output");
+    // ②內部聲明清單:全部非端口宣告面(含記憶體 unpacked 維數);端口三面
+    // 不入(即 q/d/clk 排除——E1 盲寫漏 state 聲明的修復點)。
+    let names: Vec<&str> = c.signals.iter().map(|g| g.name.as_str()).collect();
+    assert_eq!(names, vec!["state", "en", "mem"], "{:?}", c.signals);
+    assert_eq!((c.signals[0].kind.as_str(), c.signals[0].width), ("reg", 2));
+    assert_eq!((c.signals[1].kind.as_str(), c.signals[1].width), ("wire", 1));
+    // SV 側記憶體投影=Decl 原形(reg+unpacked 維數;kind="memory" 標籤僅
+    // RTLIL 腿,view.rs §13 裁定)。
+    assert_eq!(
+        (c.signals[2].kind.as_str(), c.signals[2].width, c.signals[2].unpacked_dims),
+        ("reg", 8, 1)
+    );
+}
+
+#[test]
+fn s1_decl_lint_green_on_wellformed_source() {
+    // 語料(counter8)基線綠:evidence/check 引用標識符⊆宣告集。
+    let src = std::fs::read_to_string(concat!(env!("CARGO_MANIFEST_DIR"), "/../../corpus/counter8/counter.v"))
+        .expect("corpus/counter8/counter.v 在場(repo MIT)");
+    let rb = extract_rules(&sv("counter.v", &src), DEFAULT_MAX_RULES);
+    assert!(
+        rb.decl_lint.dangling_refs.is_empty(),
+        "lint 基線應綠: {:?}",
+        rb.decl_lint.dangling_refs
+    );
+}
+
+#[test]
+fn s1_decl_lint_catches_dangling_reference() {
+    // 判別力自證(閘必須能紅):行為行程引用未宣告函數名 → A∖B 非空。
+    let src = "module m(input wire clk, input wire [3:0] d, output reg [3:0] q);\n\
+always @(posedge clk) q <= ghost_fn(d) + 1'b1;\n\
+endmodule\n";
+    let rb = extract_rules(&sv("dangling.v", src), DEFAULT_MAX_RULES);
+    assert!(
+        rb.decl_lint.dangling_refs.contains(&"ghost_fn".to_string()),
+        "懸空引用應被抓: {:?}",
+        rb.decl_lint.dangling_refs
+    );
+    // 同檔已宣告名(d/q/clk)不誤報。
+    for known in ["d", "q", "clk"] {
+        assert!(
+            !rb.decl_lint.dangling_refs.iter().any(|x| x == known),
+            "已宣告 {known} 被誤報: {:?}",
+            rb.decl_lint.dangling_refs
+        );
+    }
+}
+
+#[test]
+fn s1_decl_lint_localparam_refs_green() {
+    // FSM 狀態編碼走 localparam(localparam 名在 B)→ 轉移規則 to=ST_* 不誤報。
+    let src = "module fsm(input wire clk, output reg [1:0] y);\n\
+localparam A = 2'd0;\n\
+localparam B = 2'd1;\n\
+reg [1:0] state;\n\
+always @(posedge clk) begin\n\
+case (state)\n\
+A: state <= B;\n\
+B: state <= A;\n\
+default: state <= A;\n\
+endcase\n\
+y <= state;\n\
+end\n\
+endmodule\n";
+    let rb = extract_rules(&sv("lsm.v", src), DEFAULT_MAX_RULES);
+    assert!(
+        rb.decl_lint.dangling_refs.is_empty(),
+        "localparam 引用誤報: {:?}",
+        rb.decl_lint.dangling_refs
+    );
+}
+
+// ---- S2 組合邏輯覆蓋放寬(N3;§5.2) ----
+
+/// S2 正負 fixture(自著 MIT,住 plugin/rtl2spec/fixtures/;與
+/// gap-fixture-check.mjs S2 規則面行同源,跨域引用=tests→repo 根三層)。
+fn s2_fixture(name: &str) -> SourceInput {
+    let path = concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../plugin/rtl2spec/fixtures/"
+    );
+    let src = std::fs::read_to_string(format!("{path}{name}.v")).expect("S2 fixture 在場");
+    sv(&format!("{name}.v"), &src)
+}
+
+#[test]
+fn s2_rel_positive_boundary_matrix() {
+    // 正樣=條級 multiset 斷言(多報少報皆紅;R16-2 教訓同款):
+    // 結構形(PartSelect/Concat)無條件產;純常量僅 case 帶標籤臂產;
+    // default 臂 conds 空=不產(S4/M2 管轄)。
+    let rb = extract_rules(&s2_fixture("rel_positive"), DEFAULT_MAX_RULES);
+    assert!(rb.decl_lint.dangling_refs.is_empty());
+    let got: Vec<(String, String, String)> = rb
+        .modules
+        .iter()
+        .flat_map(|m| {
+            m.rules.iter().map(move |r| {
+                let (lhs, rhs, when) = match &r.check.payload {
+                    CheckPayload::Relation { lhs, rhs, when, .. } => {
+                        (lhs.clone(), rhs.clone(), when.clone().unwrap_or_default())
+                    }
+                    _ => panic!("S2 正樣應全為 relation: {}", r.id),
+                };
+                (r.module.clone(), format!("{lhs} ≡ {rhs}"), when)
+            })
+        })
+        .collect();
+    // 渲染形=AST 規範字面量(num_lit 律:無寬前綴無符號整數→'sdN;既有渲染
+    // 約定不動,golden byte-diff 同源)。
+    let want = vec![
+        ("rel_positive".to_string(), "slice ≡ a['sd7:'sd3]".to_string(), "".to_string()),
+        (
+            "rel_positive".to_string(),
+            "scaled ≡ {1'b0, b['sd7:'sd3]}".to_string(),
+            "".to_string(),
+        ),
+        (
+            "rel_positive".to_string(),
+            "arm_c ≡ 4'd1".to_string(),
+            "sel == 1'b0".to_string(),
+        ),
+        // S4/M2:default 臂=未被覆蓋編碼域(對全部顯式標簽取否定合取)。
+        (
+            "rel_positive".to_string(),
+            "arm_c ≡ 4'd2".to_string(),
+            "!(sel == 1'b0)".to_string(),
+        ),
+    ];
+    let mut g = got.clone();
+    g.sort();
+    let mut w = want.clone();
+    w.sort();
+    assert_eq!(g, w, "S2 正樣 multiset 不等: {got:?}");
+}
+
+#[test]
+fn s2_rel_negative_direct_assigns_produce_zero() {
+    // 負樣=零規則(緊湊性保留;A12/Daikon 教訓釘死形):
+    // 純常量直賦+直通別名+行程內無條件純常量。
+    let rb = extract_rules(&s2_fixture("rel_negative"), DEFAULT_MAX_RULES);
+    assert!(
+        rb.total_rules() == 0,
+        "無條件直賦不產 relation,實得: {:?}",
+        rb.modules.iter().map(|m| &m.rules).collect::<Vec<_>>()
+    );
+    assert!(rb.decl_lint.dangling_refs.is_empty());
+}
+
+#[test]
+fn s2_acc_pipe_bit_slice_and_scaled_rules() {
+    // 主門檻:acc_pipe 含 p1_bit_slice_103_comb([8:1] 右移語義)與
+    // p2_scaled_comb(拼接)定義規則(現狀 0 條);直通別名 out=out__output_flop
+    // 不產(負形同檔釘死)。
+    let src = std::fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../corpus/e2e/58_xls_acc_pipe/acc_pipe.v"
+    ))
+    .expect("corpus 在場");
+    let rb = extract_rules(&sv("acc_pipe.v", &src), DEFAULT_MAX_RULES);
+    assert_v4(&rb, &src);
+    let mut got: Vec<(String, String)> = Vec::new();
+    for m in &rb.modules {
+        for r in &m.rules {
+            if let CheckPayload::Relation { lhs, rhs, .. } = &r.check.payload {
+                got.push((lhs.clone(), rhs.clone()));
+            }
+        }
+    }
+    assert!(
+        got.contains(&(
+            "p1_bit_slice_103_comb".to_string(),
+            "p1_add_96_comb['sd8:'sd1]".to_string()
+        )),
+        "缺位切片定義規則: {got:?}"
+    );
+    assert!(
+        got.contains(&(
+            "p2_scaled_comb".to_string(),
+            "{5'h00, p2_add_98_comb, p0_add_20['sd0]}".to_string()
+        )),
+        "缺拼接定義規則: {got:?}"
+    );
+    // 直通別名不產(負形)。
+    assert!(
+        !got.iter().any(|(l, r)| l == "out" && r == "out__output_flop"),
+        "別名直賦誤產: {got:?}"
+    );
+}
+
+#[test]
+fn s2_muxtree_default_cases_grows_rules() {
+    // 主門檻:muxtree default_cases 模組 0→≥1(帶標籤臂常量=分支域);
+    // usb_tx_phy 的無條件 ld_sop_d = 1'b0 不產(負形同檔)。
+    let src = std::fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../corpus-external/yosys-simple/muxtree.v"
+    ))
+    .expect("corpus 在場");
+    let rb = extract_rules(&sv("muxtree.v", &src), DEFAULT_MAX_RULES);
+    assert_v4(&rb, &src);
+    let dc = rb
+        .modules
+        .iter()
+        .find(|m| m.module == "default_cases")
+        .expect("default_cases 模組在場");
+    assert!(dc.rules.len() >= 1, "default_cases 應 ≥1 條(現狀 0)");
+    for r in &dc.rules {
+        let when = r.check.when_text();
+        assert!(when.contains("a == 3'b"), "臂常量規則應攜分支域 when: {}", when);
+    }
+    // S4/M1+M2:帶標籤臂逐標簽展開(3'b000+3'b111 兩條)+單標簽臂 3 條
+    // +default 臂 1 條(否定合取 when)=6 條。
+    assert_eq!(dc.rules.len(), 6, "{:?}", dc.rules.iter().map(|r| &r.check.payload).collect::<Vec<_>>());
+    let multi2 = dc.rules.iter().filter(|r| r.check.when_text() == "a == 3'b000" || r.check.when_text() == "a == 3'b111").count();
+    assert_eq!(multi2, 2, "M1 多標簽臂應逐標簽展開");
+    let def = dc.rules.iter().find(|r| r.check.when_text().contains("!(a == 3'b000)")).expect("M2 default 臂規則在場");
+    assert_eq!(def.check.when_text(), "!(a == 3'b000) 且 !(a == 3'b111) 且 !(a == 3'b001) 且 !(a == 3'b010) 且 !(a == 3'b100)");
+    // usb_tx_phy:無條件 ld_sop_d = 1'b0 / ld_data_d = 1'b0 不產;臂內
+    // ld_sop_d = 1'b1 等產(conds 含 TxValid_i)。
+    let phy = rb.modules.iter().find(|m| m.module == "usb_tx_phy").unwrap();
+    let lhs_set: Vec<String> = phy
+        .rules
+        .iter()
+        .map(|r| r.check.subject())
+        .collect();
+    assert!(
+        !lhs_set.iter().any(|l| *l == "ld_sop_d"
+            && phy
+                .rules
+                .iter()
+                .any(|r| r.check.subject() == "ld_sop_d" && r.check.when_text().is_empty())),
+        "無條件常量直賦不應產(when 空形): {lhs_set:?}"
+    );
+    assert!(
+        phy.rules.iter().any(|r| {
+            r.check.subject() == "ld_sop_d" && r.check.when_text().contains("TxValid_i")
+        }),
+        "臂內常量應產(帶 when): {lhs_set:?}"
+    );
+}
+
+// ---- S3 復位語義承載(N4)+指紋完整性(N1)+M3(§5.2) ----
+
+fn corpus_src(rel: &str) -> String {
+    std::fs::read_to_string(format!(
+        "{}/../../{rel}",
+        env!("CARGO_MANIFEST_DIR")
+    ))
+    .expect("corpus 在場")
+}
+
+#[test]
+fn s3_i2c_reset_guard_async_true_and_senslist_evidence() {
+    // 主門檻:i2c R001 載荷含 async=true(@(posedge clk or negedge rst_n));
+    // 敏感列表入 evidence(第二證,process 類,V4 可對拍)。
+    let src = corpus_src("corpus/e2e/59_i2c_master/i2c_master.v");
+    let rb = extract_rules(&sv("i2c_master.v", &src), DEFAULT_MAX_RULES);
+    assert_v4(&rb, &src);
+    let r1 = &rb.modules[0].rules[0];
+    assert_eq!(r1.id, "i2c_master.R001");
+    assert_eq!(r1.category, Category::Reset);
+    let CheckPayload::Guard { r#async, .. } = &r1.check.payload else {
+        panic!("R001 應為 guard");
+    };
+    assert!(*r#async, "i2c 異步復位應 async=true");
+    let evidence = &r1.evidence;
+    assert!(
+        evidence.len() == 2 && evidence[1].class == EvidenceClass::Process,
+        "敏感列表應為第二證: {:?}",
+        evidence.iter().map(|e| (e.line, e.end_line)).collect::<Vec<_>>()
+    );
+    assert!(
+        evidence[1].snippet.contains("posedge clk or negedge rst_n"),
+        "第二證=敏感列表原文: {:?}",
+        evidence[1].snippet
+    );
+}
+
+#[test]
+fn s3_counter_sync_reset_async_false() {
+    // 同步復位對照形:counter.v=always @(posedge clk) if (rst)——無自有沿
+    // → async=false。
+    let src = corpus_src("corpus/counter8/counter.v");
+    let rb = extract_rules(&sv("counter.v", &src), DEFAULT_MAX_RULES);
+    let g = rb.modules[0]
+        .rules
+        .iter()
+        .find(|r| r.category == Category::Reset)
+        .expect("counter 應有 reset guard");
+    let CheckPayload::Guard { r#async, .. } = &g.check.payload else {
+        panic!("應為 guard");
+    };
+    assert!(!*r#async, "同步復位應 async=false");
+    let evidence = &g.evidence;
+    assert!(evidence.len() == 2, "敏感列表證仍在場(對拍形一致)");
+}
+
+#[test]
+fn s3_muxtree_r003_r004_when_exclusive() {
+    // 主門檻:重錄後 muxtree R003/R004 when 互斥(R003=!rst 復位臂;
+    // R004=!(!rst) else 臂包膜——M3)。邏輯互斥機檢:R004 when 以 !( 包
+    // R003 的 when 文本。
+    let src = corpus_src("corpus-external/yosys-simple/muxtree.v");
+    let rb = extract_rules(&sv("muxtree.v", &src), DEFAULT_MAX_RULES);
+    let phy = rb.modules.iter().find(|m| m.module == "usb_tx_phy").unwrap();
+    let r3 = phy.rules.iter().find(|r| r.id.ends_with("R003")).unwrap();
+    let r4 = phy.rules.iter().find(|r| r.id.ends_with("R004")).unwrap();
+    let w3 = r3.check.when_text();
+    let w4 = r4.check.when_text();
+    assert_eq!(w3, "!rst", "{w3}");
+    assert_eq!(w4, "!(!rst)", "M3 else 包膜: {w4}");
+    // 互斥:!(w3) ≡ w4 的機械面=文字面對應。
+    assert_eq!(w4, format!("!({w3})"));
+}
+
+#[test]
+fn s3_i2c_hold_idle_conditional_assigns_visible() {
+    // 主門檻(N1):i2c HOLD/IDLE 臂 tip<=1/bitcnt<=0 條件賦值規則可見——
+    // Sequence when 並入指紋後不再被去重吞掉;每條攜分支域 when(M3 前缀
+    // =!(rst_n) else 包膜)。
+    let src = corpus_src("corpus/e2e/59_i2c_master/i2c_master.v");
+    let rb = extract_rules(&sv("i2c_master.v", &src), DEFAULT_MAX_RULES);
+    assert_v4(&rb, &src);
+    let seqs: Vec<(String, String, String)> = rb.modules[0]
+        .rules
+        .iter()
+        .filter_map(|r| match &r.check.payload {
+            CheckPayload::Sequence { signal, becomes, when, .. } => {
+                Some((signal.clone(), becomes.clone(), when.clone().unwrap_or_default()))
+            }
+            _ => None,
+        })
+        .collect();
+    // IDLE 臂 tip<=1'b0(when 含 ST_IDLE)。
+    assert!(
+        seqs.iter().any(|(s, b, w)| s == "tip" && b == "1'b0" && w.contains("ST_IDLE")),
+        "IDLE 臂 tip<=1'b0 不可見: {seqs:?}"
+    );
+    // HOLD 臂 tip<=1'b1(when 含 ST_HOLD 與 pend_wr)。
+    assert!(
+        seqs.iter().any(|(s, b, w)| s == "tip" && b == "1'b1" && w.contains("ST_HOLD") && w.contains("pend_wr")),
+        "HOLD 臂 tip<=1'b1 不可見: {seqs:?}"
+    );
+    // bitcnt<=4'd0 多臂可見(IDLE/START/SHIFT/HOLD 各自 when 不同)。
+    let bitcnt_zeros: Vec<&String> = seqs
+        .iter()
+        .filter(|(s, b, _)| s == "bitcnt" && b == "4'd0")
+        .map(|(_, _, w)| w)
+        .collect();
+    assert!(
+        bitcnt_zeros.len() >= 3,
+        "bitcnt<=4'd0 應 ≥3 條(現狀被吞): {bitcnt_zeros:?}"
+    );
+    // 全部 timing 規則 when 非空(i2c 續體全在 else 臂=M3 包膜在場)。
+    assert!(
+        seqs.iter().all(|(_, _, w)| !w.is_empty()),
+        "i2c sequence 全應攜 when(含 !(rst_n) 包膜): {seqs:?}"
+    );
+    // M3 包膜文本=包裹 render(復位條件) 本身:cond=!rst_n → 基條件
+    // "!(!rst_n)"(與 muxtree R004 "!(!rst)" 同律;機械忠實,不做 !! 歸一)。
+    assert!(seqs.iter().all(|(_, _, w)| w.contains("!(!rst_n)")));
+}
+
+// ---- S4 分支條件家族收平(M1/M2)+破口面三修(M4/M5/M6)(§5.2) ----
+
+fn fixture_src(name: &str) -> String {
+    // 路徑層數:crates/rtl-spec → repo 根=兩層(10.6 跨目錄引用先數層級)。
+    std::fs::read_to_string(format!(
+        "{}/../../plugin/rtl2spec/fixtures/{name}.v",
+        env!("CARGO_MANIFEST_DIR")
+    ))
+    .expect("S4 fixture 在場")
+}
+
+#[test]
+fn s4_m1_m2_m1min_boundary() {
+    // 主門檻:M1 樣規則含 2'b01 觸發域;M2 樣產 default 臂規則(否定合取
+    // when 進指紋可區分域);M3 包膜在場。
+    let src = fixture_src("m1_min_case");
+    let rb = extract_rules(&sv("m1_min_case.v", &src), DEFAULT_MAX_RULES);
+    assert_v4(&rb, &src);
+    let whens: Vec<String> = rb.modules[0]
+        .rules
+        .iter()
+        .map(|r| r.check.when_text().to_string())
+        .collect();
+    assert!(whens.iter().any(|w| w == "!(rst) 且 s == 2'b01"), "M1 2'b01 觸發域不可見: {whens:?}");
+    assert!(whens.iter().any(|w| w == "!(rst) 且 s == 2'b00"), "{whens:?}");
+    assert!(
+        whens.iter().any(|w| w == "!(rst) 且 !(s == 2'b00) 且 !(s == 2'b01) 且 !(s == 2'b10)"),
+        "M2 default 臂規則不可見: {whens:?}"
+    );
+    // M1 負形(同檔):單標簽臂恰一條,不增殖。
+    assert!(
+        whens.iter().filter(|w| *w == "!(rst) 且 s == 2'b10").count() == 1,
+        "{whens:?}"
+    );
+}
+
+#[test]
+fn s4_m12_negative_no_multiplication() {
+    // 負樣:單標簽臂 4 條各攜自身域+無 default 不產否定合取規則。
+    let src = fixture_src("m12_negative");
+    let rb = extract_rules(&sv("m12_negative.v", &src), DEFAULT_MAX_RULES);
+    let seqs: Vec<(String, String)> = rb
+        .modules
+        .iter()
+        .flat_map(|m| &m.rules)
+        .map(|r| (r.module.clone(), r.check.when_text().to_string()))
+        .collect();
+    let m1neg = seqs.iter().filter(|(m, _)| m == "m1neg").count();
+    let m2neg = seqs.iter().filter(|(m, _)| m == "m2neg").count();
+    assert_eq!((m1neg, m2neg), (4, 2), "{seqs:?}");
+    assert!(seqs.iter().all(|(_, w)| !w.contains("!(")), "負樣不應有否定合取: {seqs:?}");
+}
+
+#[test]
+fn s4_m6_incomplete_case_guard() {
+    // M6:4/4 覆蓋樣不再報;1/4 稀疏樣仍報 heuristic。
+    let gaps = scan_gaps(&sv("gap_case_covered.v", &fixture_src("gap_case_covered")));
+    let mods: Vec<(String, &str)> = gaps
+        .items
+        .iter()
+        .map(|g| (g.module.clone(), g.class.as_str()))
+        .collect();
+    assert_eq!(mods, vec![("case_sparse".to_string(), "incomplete_case")], "{mods:?}");
+    let sparse = &gaps.items[0];
+    assert_eq!(sparse.confidence.as_str(), "heuristic");
+    assert!(sparse.message.contains("1/4"), "{}", sparse.message);
+}
+
+#[test]
+fn s4_m5_missing_reset_constraint() {
+    // M5:真缺口(數據承載/條件賦值)=certain;無條件純常量逐拍清除(strobe)
+    // =不報(誤報形)。
+    let gaps = scan_gaps(&sv("gap_missing_reset_strobe.v", &fixture_src("gap_missing_reset_strobe")));
+    let mods: Vec<&String> = gaps.items.iter().map(|g| &g.module).collect();
+    assert!(mods.contains(&&"mr_data".to_string()), "{mods:?}");
+    assert!(!mods.contains(&&"mr_strobe".to_string()), "strobe 誤報: {mods:?}");
+    let g4 = gaps.items.iter().find(|g| &g.module == "mr_data").unwrap();
+    assert_eq!(g4.confidence.as_str(), "certain");
+    assert!(g4.message.contains("hold"), "{}", g4.message);
 }

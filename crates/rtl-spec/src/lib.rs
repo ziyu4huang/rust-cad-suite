@@ -11,6 +11,7 @@
 
 pub mod expr;
 pub mod json;
+mod lint;
 pub mod md;
 pub mod rtlil;
 pub mod schema;
@@ -19,9 +20,10 @@ pub mod summary;
 
 pub use analyzer_core::{RtlilInput, SourceInput, SvInput};
 pub use schema::{
-    AnalysisSummary, Category, Check, CheckForm, CheckPayload, Confidence, Effect, Evidence,
-    EvidenceClass, GapClass, GapItem, GapReport, InvKind, ModuleRules, ModuleSummary, Qualifier,
-    Rule, Rulebook, SkippedNote, SkipReason, Trigger, DEFAULT_MAX_RULES,
+    AnalysisSummary, Category, Check, CheckForm, CheckPayload, Confidence, Contract, ContractParam,
+    ContractPort, ContractSignal, DeclLint, Effect, Evidence, EvidenceClass, GapClass, GapItem,
+    GapReport, InvKind, ModuleRules, ModuleSummary, Qualifier, Rule, Rulebook, SkippedNote,
+    SkipReason, Trigger, DEFAULT_MAX_RULES,
 };
 
 /// 提取規則書(永不 panic;parse 錯誤進 Rulebook.parse_errors;TB 檔整檔

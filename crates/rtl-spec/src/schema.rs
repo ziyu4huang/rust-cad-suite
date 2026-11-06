@@ -8,7 +8,11 @@
 
 /// extract_rules 的模組內規則上限(D12 opts 標量化;超限截斷並記入
 /// Rulebook.truncated,驗證閘 V1 對 truncated 非空→該檔 FAIL)。
-pub const DEFAULT_MAX_RULES: usize = 128;
+/// S3(§5.2)同輪上調 128→256:N1 指紋並入 conds 使 i2c 去重復活規則數
+/// 69→152 觸頂(128 截斷=V1 紅+行為清單再度不完整);256=實測全集 152
+/// 的 1.7× 預算(截斷語義不動;JVM 面見 golden-check/check-rulebook/
+/// eval-all/probe-determinism 同步)。
+pub const DEFAULT_MAX_RULES: usize = 256;
 
 /// §2.2 類別分類學 v1(9 類;詞表=機械閘 V2/V3 的域)。
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
@@ -146,6 +150,10 @@ pub enum CheckPayload {
     Guard {
         trigger: Option<Trigger>,
         when: Option<String>,
+        /// N4 復位語義(§5.2 S3):全邊收集分類——復位訊號在 process 敏感
+        /// 列表帶自有沿(negedge rst_n 形)=true(異步);僅時鐘沿=false(同步)。
+        /// JSON 鍵="async"(Rust 側 r#async=保留字轉義)。
+        r#async: bool,
         effects: Vec<Effect>,
     },
     Transition {
@@ -246,6 +254,90 @@ impl Check {
             }
         }
     }
+
+    /// N5 信號-聲明完備性 lint 的 check 引用面(§5.2 S1;審讀 #6):form
+    /// 專屬自由文本欄位原文;invariant 的 kind=詞表關鍵字不收。
+    pub fn referenced_texts(&self) -> Vec<&str> {
+        match &self.payload {
+            CheckPayload::Guard {
+                trigger,
+                when,
+                effects,
+                ..
+            } => {
+                let mut v: Vec<&str> = Vec::new();
+                if let Some(t) = trigger {
+                    if let Some(e) = &t.edge {
+                        v.push(e);
+                    }
+                    if let Some(sg) = &t.signal {
+                        v.push(sg);
+                    }
+                }
+                if let Some(w) = when {
+                    v.push(w);
+                }
+                for e in effects {
+                    v.push(&e.lhs);
+                    v.push(&e.value);
+                }
+                v
+            }
+            CheckPayload::Transition {
+                state_reg,
+                from,
+                to,
+                when,
+            } => {
+                let mut v = vec![state_reg.as_str(), from.as_str(), to.as_str()];
+                if let Some(w) = when {
+                    v.push(w);
+                }
+                v
+            }
+            CheckPayload::Sequence {
+                signal,
+                becomes,
+                anchor,
+                latency: _,
+                when,
+            } => {
+                let mut v = vec![signal.as_str(), becomes.as_str(), anchor.as_str()];
+                if let Some(w) = when {
+                    v.push(w);
+                }
+                v
+            }
+            CheckPayload::Relation {
+                lhs,
+                rhs,
+                when,
+                width_note,
+            } => {
+                let mut v = vec![lhs.as_str(), rhs.as_str()];
+                if let Some(w) = when {
+                    v.push(w);
+                }
+                if let Some(n) = width_note {
+                    v.push(n);
+                }
+                v
+            }
+            CheckPayload::Invariant {
+                subject,
+                values,
+                expr,
+                ..
+            } => {
+                let mut v = vec![subject.as_str()];
+                v.extend(values.iter().map(|x| x.as_str()));
+                if let Some(e) = expr {
+                    v.push(e);
+                }
+                v
+            }
+        }
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -264,9 +356,64 @@ pub struct Rule {
     pub fingerprint: String,
 }
 
+// ---- S1 接口契約章(N2;§5.2) ----
+
+/// 參數面條目:介面參數(header `#(...)` + 體內 parameter)local=false,
+/// 值=投影 §4.5 字面量形;localparam local=true(AST 補收,值=AST 原文渲染
+/// ——投影 params 面裁定不收 localparam,見 analyzer-core view.rs 注)。
+#[derive(Clone, Debug, PartialEq)]
+pub struct ContractParam {
+    pub name: String,
+    pub value: String,
+    pub local: bool,
+}
+
+/// 端口面條目(投影 PortInfo 直投):parametric=true=寬度非字面量(不求值
+/// 參數,width=0 佔位);signed=符號聲明。
+#[derive(Clone, Debug, PartialEq)]
+pub struct ContractPort {
+    pub name: String,
+    pub dir: String,
+    pub width: u32,
+    pub parametric: bool,
+    pub signed: bool,
+}
+
+/// 內部聲明清單條目(投影 nets 直投,`!is_port` 過濾=內部聲明面):kind=
+/// DeclKind 詞表(wire/reg/integer/genvar/…/memory);width=0=參數化範圍
+/// 佔位(§4.2);unpacked_dims>0=記憶體維數。E1 盲寫方可整表抄聲明,免猜
+/// (實錄:i2c 盲寫漏 `reg [3:0] state` 即 N2 修復點)。
+#[derive(Clone, Debug, PartialEq)]
+pub struct ContractSignal {
+    pub name: String,
+    pub kind: String,
+    pub width: u32,
+    pub unpacked_dims: u32,
+}
+
+/// 模組接口契約(①端口/參數面+②內部聲明清單;來源=結構投影既有聲明面
+/// 「experiment-record.md :65」,零新語義;欄序=投影序,byte-exact 契約)。
+#[derive(Clone, Debug, PartialEq)]
+pub struct Contract {
+    pub params: Vec<ContractParam>,
+    pub ports: Vec<ContractPort>,
+    pub signals: Vec<ContractSignal>,
+}
+
+/// N5 信號-聲明完備性 lint(每檔;審讀 #6 可執行形):A=規則書全部
+/// evidence/check 行引用的標識符集 vs B=原檔宣告集——dangling_refs=A∖B
+/// (字典序;非空=規則書引用了原檔不存在的信號=提取器 bug)。防回歸閘:
+/// 結果作為提取器輸出的一部分(rulebook JSON decl_lint),隨 golden 74 檔
+/// byte-exact 每輪重算,不另立閘。
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct DeclLint {
+    pub dangling_refs: Vec<String>,
+}
+
 #[derive(Clone, Debug)]
 pub struct ModuleRules {
     pub module: String,
+    pub contract: Contract,
     pub rules: Vec<Rule>,
 }
 
@@ -309,6 +456,8 @@ pub struct Rulebook {
     pub modules: Vec<ModuleRules>,
     /// 超 max_rules 被截斷的模組名(V1 執法:非空→該檔 FAIL)。
     pub truncated: Vec<String>,
+    /// N5 信號-聲明完備性 lint(每檔;S1;詳見 DeclLint 註)。
+    pub decl_lint: DeclLint,
 }
 
 impl Rulebook {

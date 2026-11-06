@@ -518,6 +518,14 @@ fn scan_incomplete_cases(ctx: &Ctx, sc: &ModuleScan, counters: &mut HashMap<&'st
                 continue;
             }
             let width = lvalue_base(sel).and_then(|n| sc.decl_width.get(&n).copied());
+            // M6(§5.2 S4)守衛:n_labels≥total=編碼全集已被顯式臂覆蓋(無
+            // default 不構成缺口),不報——修 4/4 覆蓋樣誤報。
+            if let Some(w) = width {
+                let total = if w >= 63 { u64::MAX } else { 1u64 << w };
+                if (n_labels as u64) >= total {
+                    continue;
+                }
+            }
             let mut evs = Vec::new();
             if let Some(e) = ev(ctx, span) {
                 evs.push(e);
@@ -652,9 +660,30 @@ fn scan_missing_reset(ctx: &Ctx, sc: &ModuleScan, counters: &mut HashMap<&'stati
                         }
                     }
                 }
+                // M5(§5.2 S4)約束:無條件純常量賦值(conds 空+RHS 純常量)
+                // =逐拍恆定清除/strobe,無跨拍狀態保持,復位值不影響可觀察
+                // 行為——不報(誤報形;關聯 span 供審計)。數據承載/條件賦值
+                // 仍=certain(結構可證)。
+                let stateless_clears: HashSet<u32> = {
+                    let mut set = HashSet::new();
+                    for s in cont {
+                        let mut conds_v = Vec::new();
+                        let mut out_v = Vec::new();
+                        walk_stmt(s, &mut conds_v, &mut out_v);
+                        for a in &out_v {
+                            if a.conds.is_empty() && crate::expr::is_pure_constant(a.rhs) {
+                                set.insert(a.span.start.0);
+                            }
+                        }
+                    }
+                    set
+                };
                 let mut reported: HashSet<&str> = HashSet::new();
                 for (reg, span) in &cont_assigns {
-                    if reset_set.contains(reg) || !reported.insert(reg.as_str()) {
+                    if reset_set.contains(reg)
+                        || stateless_clears.contains(&span.start.0)
+                        || !reported.insert(reg.as_str())
+                    {
                         continue;
                     }
                     let mut evs = Vec::new();
@@ -1016,8 +1045,15 @@ fn collect_ifs<'a>(s: &'a Stmt, out: &mut Vec<&'a Stmt>) {
         | Stmt::Repeat { body, .. }
         | Stmt::Forever { body, .. } => collect_ifs(body, out),
         Stmt::Fork { branches, .. } => branches.iter().for_each(|b| collect_ifs(b, out)),
-        // 非容器葉子(BAssign/DelayCtrl/Null 等)。**新增容器型 Stmt 變體
-        // 須在此展開**(extension recipe §17.2 步驟 b;漏展開=靜默漏報)。
+        // M4(§5.2 S4):DelayCtrl/Wait 展開——容器形語句(賦值延遲/事件等待
+        // 的 body 內 if 同樣可死分支;觸發形 `always #1 if(1'b0)`)。EventCtrl
+        // 同形容器一併補齊(同一漏展開類;canon 名單二字,EventCtrl 為同形
+        // 家族,註記於此)。其餘(BAssign/Null 等)=非容器葉子。**新增容器型
+        // Stmt 變體須在此展開**(extension recipe §17.2 步驟 b;漏展開=靜默
+        // 漏報)。
+        Stmt::DelayCtrl { body: Some(b), .. } => collect_ifs(b, out),
+        Stmt::EventCtrl { body: Some(b), .. } => collect_ifs(b, out),
+        Stmt::Wait { body: Some(b), .. } => collect_ifs(b, out),
         _ => {}
     }
 }

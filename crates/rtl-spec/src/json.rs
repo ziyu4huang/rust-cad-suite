@@ -7,8 +7,8 @@
 use analyzer_core::proto::json::Json;
 
 use crate::schema::{
-    AnalysisSummary, CheckPayload, CheckForm, Evidence, GapClass, GapItem, GapReport, ModuleRules,
-    ModuleSummary, Rule, Rulebook, SkippedNote,
+    AnalysisSummary, CheckPayload, CheckForm, Contract, Evidence, GapClass, GapItem, GapReport,
+    ModuleRules, ModuleSummary, Rule, Rulebook, SkippedNote,
 };
 
 fn s(v: impl Into<String>) -> Json {
@@ -59,6 +59,7 @@ fn payload_fields(payload: &CheckPayload) -> Vec<(String, Json)> {
         CheckPayload::Guard {
             trigger,
             when,
+            r#async,
             effects,
         } => {
             let mut fields = vec![(
@@ -72,6 +73,7 @@ fn payload_fields(payload: &CheckPayload) -> Vec<(String, Json)> {
                 },
             )];
             fields.push(("when".to_string(), opt_str(when)));
+            fields.push(("async".to_string(), b(*r#async)));
             fields.push((
                 "effects".to_string(),
                 Json::Arr(
@@ -182,6 +184,14 @@ pub fn rulebook_json(rb: &Rulebook) -> String {
             "truncated".to_string(),
             Json::Arr(rb.truncated.iter().map(|t| s(t.clone())).collect()),
         ),
+        // N5 信號-聲明完備性 lint(S1;審讀 #6):隨提取器輸出每輪重算。
+        (
+            "decl_lint".to_string(),
+            Json::Obj(vec![(
+                "dangling_refs".to_string(),
+                Json::Arr(rb.decl_lint.dangling_refs.iter().map(|d| s(d.clone())).collect()),
+            )]),
+        ),
     ]);
     v.render()
 }
@@ -201,9 +211,64 @@ fn skipped_json(n: &SkippedNote) -> Json {
 fn module_rules_json(m: &ModuleRules) -> Json {
     Json::Obj(vec![
         ("module".to_string(), s(m.module.clone())),
+        // S1 接口契約章:①端口/參數面+②內部聲明清單(§5.2;欄序=byte-exact 契約)。
+        ("contract".to_string(), contract_json(&m.contract)),
         (
             "rules".to_string(),
             Json::Arr(m.rules.iter().map(rule_json).collect()),
+        ),
+    ])
+}
+
+fn contract_json(c: &Contract) -> Json {
+    Json::Obj(vec![
+        (
+            "params".to_string(),
+            Json::Arr(
+                c.params
+                    .iter()
+                    .map(|p| {
+                        Json::Obj(vec![
+                            ("name".to_string(), s(p.name.clone())),
+                            ("value".to_string(), s(p.value.clone())),
+                            ("local".to_string(), b(p.local)),
+                        ])
+                    })
+                    .collect(),
+            ),
+        ),
+        (
+            "ports".to_string(),
+            Json::Arr(
+                c.ports
+                    .iter()
+                    .map(|p| {
+                        Json::Obj(vec![
+                            ("name".to_string(), s(p.name.clone())),
+                            ("dir".to_string(), s(p.dir.clone())),
+                            ("width".to_string(), i(p.width)),
+                            ("parametric".to_string(), b(p.parametric)),
+                            ("signed".to_string(), b(p.signed)),
+                        ])
+                    })
+                    .collect(),
+            ),
+        ),
+        (
+            "signals".to_string(),
+            Json::Arr(
+                c.signals
+                    .iter()
+                    .map(|g| {
+                        Json::Obj(vec![
+                            ("name".to_string(), s(g.name.clone())),
+                            ("kind".to_string(), s(g.kind.clone())),
+                            ("width".to_string(), i(g.width)),
+                            ("unpacked_dims".to_string(), i(g.unpacked_dims)),
+                        ])
+                    })
+                    .collect(),
+            ),
         ),
     ])
 }
