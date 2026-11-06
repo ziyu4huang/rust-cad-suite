@@ -4,7 +4,7 @@
 //   (corpus MIT/spec-i2c MIT 乾淨室/xls Apache-2.0 派生載體)——全部跑
 //   提取+破口掃描。L2 容錯層 260 檔=corpus-external/sv-tests 全量(ISC;
 //   LICENSE 隨附)——只斷言:可終止+零 trap+JSON 可解析+parse_errors 如實
-//   入 verdict(192 檔 parse_err=已知事實記錄不 FAIL,SV-2009 構造超
+//   入 verdict(193 檔 parse_err=已知事實記錄不 FAIL,SV-2009 構造超
 //   parser 閘)。**zipcpu=GPL 永不入;sv-elab 不在庫**(§16.4 排除記錄)。
 //
 // per-file 三檔分類(判據鏈;V1/V2/V3 為報告列不設單檔 FAIL——擴面集的
@@ -137,7 +137,7 @@ for (const f of ALL) {
   let rb = null;
   let gr = null;
   try {
-    rb = JSON.parse(glue.rtl_extract_rules_sv(f, src, 128));
+    rb = JSON.parse(glue.rtl_extract_rules_sv(f, src, 256));
     gr = JSON.parse(glue.rtl_scan_gaps_sv(f, src));
     successCalls++;
   } catch (e) {

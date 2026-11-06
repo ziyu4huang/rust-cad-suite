@@ -18,7 +18,7 @@ import { sumRules, countGaps, renderRulebookMarkdown, renderGapsMarkdown } from 
 import { fileURLToPath } from 'node:url';
 
 const SERVER_NAME = 'rtl2spec';
-const SERVER_VERSION = '0.2.0';
+const SERVER_VERSION = '0.3.0';
 const PROTOCOL_LATEST = '2025-11-25';
 const PROTOCOL_SUPPORTED = [
   '2025-11-25',

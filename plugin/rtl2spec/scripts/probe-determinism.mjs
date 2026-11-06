@@ -78,11 +78,11 @@ for (const rel of files) {
   const ruleHashes = new Set();
   const gapHashes = new Set();
   for (let k = 0; k < runs; k++) {
-    ruleHashes.add(sha(glue.rtl_extract_rules_sv(rel, source, 128)));
+    ruleHashes.add(sha(glue.rtl_extract_rules_sv(rel, source, 256)));
     gapHashes.add(sha(glue.rtl_scan_gaps_sv(rel, source)));
   }
   // ② 調用序擾動:全檔正序跑完後本檔再跑一輪(此時調用流位置已不同)
-  const rulePert = sha(glue.rtl_extract_rules_sv(rel, source, 128));
+  const rulePert = sha(glue.rtl_extract_rules_sv(rel, source, 256));
   const gapPert = sha(glue.rtl_scan_gaps_sv(rel, source));
   const okRules = ruleHashes.size === 1;
   const okGaps = gapHashes.size === 1 && gapHashes.has(gapPert);

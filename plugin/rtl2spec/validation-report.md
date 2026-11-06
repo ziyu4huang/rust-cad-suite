@@ -1,22 +1,22 @@
 # rtl2spec 真實 RTL 驗證報告
 
-- 日期:2026-11-05
+- 日期:2026-11-06
 - 命令行:`bash plugin/rtl2spec/run-rtl-validation.sh`(機械生成禁手改)
-- 工具鏈:bun 1.4.2、wasm sha256 `4b143d3afd22c41f85a0c2cebc23edd0c0176e3eb0f2ae88849fc4c8d855f3cd`
+- 工具鏈:bun 1.4.2、wasm sha256 `23af31de63d6580c01d4df81d4c467297180b1f71e091f4d4ac0f06556b92c74`
 - 本檔=閘契約 V1..V6 的證據頁;評審員區外全部機械生成。
 
 ## 閘契約表(V1..V6)
 
 | 判據 | 閾值 | 實測 | 判定 |
 |---|---|---|---|
-| V1 規則數 | 全集 ≥50;單檔 ≥3;truncated 非空→FAIL | 全集 325;單檔最小 4;截斷模組 0 | PASS |
+| V1 規則數 | 全集 ≥50;單檔 ≥3;truncated 非空→FAIL | 全集 506;單檔最小 4;截斷模組 0 | PASS |
 | V2 行為占比 | 全集 ≥60%;任一檔 ≥40%(冗餘防線,主判據=V5-①+V4,R1-7) | 全集 100.0%;單檔最小 100.0% | PASS |
 | V3 類別覆蓋 | ≥4(floor,ask 契約;目標 ≥6) | 5 類:reset/fsm/timing/counter/arithmetic | PASS |
-| V4 溯源 | SV 側 100% 帶 file:line 且 snippet 逐位元組相等(拼接規則=各行原文 \n 連接,R1-10) | 325/325 規則過(checker 獨立重讀源檔對拍) | PASS |
-| V5 反 doc-dump | ①行為證 ②form 五形+欄位非空(relation when 在場必非空,R3-②) ③鍵串零重複 ④陳述含源碼標識符(②④=冗餘防線) | ①②③④ 全過:325/325 指紋零重複 | PASS |
+| V4 溯源 | SV 側 100% 帶 file:line 且 snippet 逐位元組相等(拼接規則=各行原文 \n 連接,R1-10) | 506/506 規則過(checker 獨立重讀源檔對拍) | PASS |
+| V5 反 doc-dump | ①行為證 ②form 五形+欄位非空(relation when 在場必非空,R3-②) ③鍵串零重複 ④陳述含源碼標識符(②④=冗餘防線) | ①②③④ 全過:506/506 指紋零重複 | PASS |
 | V6 全檔成功 | 13/13 | 13/13(本輪 skipped=0) | PASS |
 
-規則總數 325(行為類 325);破口總數 39;主判據聲明=V5-①(行為證)+V4(逐位元組溯源),V2/V5-④ 為守生成端鎖的冗餘防線(R1-7 定位聲明)。
+規則總數 506(行為類 506);破口總數 39;主判據聲明=V5-①(行為證)+V4(逐位元組溯源),V2/V5-④ 為守生成端鎖的冗餘防線(R1-7 定位聲明)。
 
 ## license 表(驗證集 13 檔;全 in-git,零 GPL)
 
@@ -40,19 +40,19 @@
 
 | 檔案 | 行數 | 模組數 | 規則數 | 類別分布 | 破口數(按類) | 判定 |
 |---|---|---|---|---|---|---|
-| corpus/e2e/59_i2c_master/i2c_master.v | 317 | 1 | 69 | reset=20 fsm=9 timing=38 counter=2 | 0 | PASS |
-| crates/spec-i2c/rtl/i2c_master.v | 315 | 1 | 69 | reset=20 fsm=9 timing=38 counter=2 | 0 | PASS |
-| corpus/e2e/58_xls_acc_pipe/acc_pipe.v | 45 | 1 | 7 | timing=5 arithmetic=2 | missing_reset=3 | PASS |
+| corpus/e2e/59_i2c_master/i2c_master.v | 317 | 1 | 152 | reset=20 fsm=9 timing=112 counter=11 | 0 | PASS |
+| crates/spec-i2c/rtl/i2c_master.v | 315 | 1 | 152 | reset=20 fsm=9 timing=112 counter=11 | 0 | PASS |
+| corpus/e2e/58_xls_acc_pipe/acc_pipe.v | 45 | 1 | 9 | timing=5 arithmetic=4 | missing_reset=3 | PASS |
 | corpus/e2e/57_xls_add3/add3.v | 34 | 1 | 6 | timing=4 arithmetic=2 | missing_reset=2 | PASS |
-| corpus-external/yosys-simple/subbytes.v | 83 | 1 | 7 | reset=3 timing=3 arithmetic=1 | latch=1 | PASS |
+| corpus-external/yosys-simple/subbytes.v | 83 | 1 | 16 | reset=3 timing=3 arithmetic=10 | latch=1 | PASS |
 | corpus-external/yosys-simple/fiedler-cooley.v | 34 | 1 | 11 | timing=11 | missing_reset=1 | PASS |
 | corpus-external/yosys-simple/sincos.v | 125 | 1 | 46 | reset=8 timing=31 counter=7 | incomplete_case=1 missing_reset=3 | PASS |
-| corpus-external/yosys-simple/multiplier.v | 133 | 4 | 10 | arithmetic=10 | 0 | PASS |
+| corpus-external/yosys-simple/multiplier.v | 133 | 4 | 11 | arithmetic=11 | 0 | PASS |
 | corpus-external/yosys-simple/memory.v | 320 | 15 | 59 | reset=18 timing=41 | missing_reset=15 undriven_read=4 multi_driver=1 | PASS |
 | corpus-external/yosys-simple/carryadd.v | 25 | 1 | 4 | arithmetic=4 | 0 | PASS |
-| corpus-external/yosys-simple/generate.v | 326 | 9 | 15 | arithmetic=9 timing=6 | missing_reset=2 undriven_read=1 | PASS |
+| corpus-external/yosys-simple/generate.v | 326 | 9 | 17 | arithmetic=9 timing=8 | missing_reset=2 undriven_read=1 | PASS |
 | corpus-external/yosys-simple/mem2reg.v | 117 | 6 | 5 | reset=1 timing=3 arithmetic=1 | undriven_read=1 missing_reset=1 | PASS |
-| corpus-external/yosys-simple/dff_different_styles.v | 104 | 9 | 17 | timing=12 reset=5 | missing_reset=3 | PASS |
+| corpus-external/yosys-simple/dff_different_styles.v | 104 | 9 | 18 | timing=13 reset=5 | missing_reset=3 | PASS |
 
 ## 規則書全文樣本(代表檔)
 
@@ -60,10 +60,15 @@
 
 # 規則書:corpus/e2e/59_i2c_master/i2c_master.v
 
-- 模組數:1;規則總數:69
+- 模組數:1;規則總數:152
+- 聲明完備性 lint:懸空引用 0 條
 
-## 模組 i2c_master(69 條)
+## 模組 i2c_master(152 條)
 
+- 接口契約:
+  - 參數: ST_IDLE=4'd0 (local); ST_START=4'd1 (local); ST_SHIFT=4'd2 (local); ST_ACK=4'd3 (local); ST_HOLD=4'd4 (local); ST_STOP=4'd5 (local); CMD_START=4'b0001 (local); CMD_STOP=4'b0010 (local); CMD_WR=4'b0100 (local); CMD_RD=4'b1000 (local)
+  - 端口: clk:input[1]; rst_n:input[1]; we:input[1]; scl_i:input[1]; sda_i:input[1]; ack_rx:output[1]; done:output[1]; busy:output[1]; tip:output[1]; scl_o:output[1]; sda_o:output[1]; scl_oe:output[1]; sda_oe:output[1]; prescale:input[16]; cmd:input[4]; din:input[8]; dout:output[8]
+  - 內部聲明: state:reg[4]; cnt:reg[16]; half:reg[1]; bitcnt:reg[4]; step:reg[2]; tx:reg[8]; rd_mode:reg[1]; pend_start:reg[1]; pend_stop:reg[1]; pend_wr:reg[1]; pend_rd:reg[1]; cnt_end:wire[1]
 ### i2c_master.R001 [reset/derived]
 
 - 陳述:當 !rst_n 且 clk 上升沿 時,state 裝載 ST_IDLE
@@ -92,7 +97,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=state←ST_IDLE
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=state←ST_IDLE
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|state|!rst_n|state<=ST_IDLE`
 
 ### i2c_master.R002 [reset/derived]
@@ -123,7 +132,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=cnt←16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=cnt←16'd0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|cnt|!rst_n|cnt<=16'd0`
 
 ### i2c_master.R003 [reset/derived]
@@ -154,7 +167,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=half←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=half←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|half|!rst_n|half<=1'b0`
 
 ### i2c_master.R004 [reset/derived]
@@ -185,7 +202,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=bitcnt←4'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=bitcnt←4'd0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|bitcnt|!rst_n|bitcnt<=4'd0`
 
 ### i2c_master.R005 [reset/derived]
@@ -216,7 +237,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=step←2'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=step←2'd0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|step|!rst_n|step<=2'd0`
 
 ### i2c_master.R006 [reset/derived]
@@ -247,7 +272,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=tx←8'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=tx←8'd0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|tx|!rst_n|tx<=8'd0`
 
 ### i2c_master.R007 [reset/derived]
@@ -278,7 +307,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=rd_mode←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=rd_mode←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|rd_mode|!rst_n|rd_mode<=1'b0`
 
 ### i2c_master.R008 [reset/derived]
@@ -309,7 +342,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=pend_start←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=pend_start←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|pend_start|!rst_n|pend_start<=1'b0`
 
 ### i2c_master.R009 [reset/derived]
@@ -340,7 +377,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=pend_stop←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=pend_stop←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|pend_stop|!rst_n|pend_stop<=1'b0`
 
 ### i2c_master.R010 [reset/derived]
@@ -371,7 +412,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=pend_wr←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=pend_wr←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|pend_wr|!rst_n|pend_wr<=1'b0`
 
 ### i2c_master.R011 [reset/derived]
@@ -402,7 +447,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=pend_rd←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=pend_rd←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|pend_rd|!rst_n|pend_rd<=1'b0`
 
 ### i2c_master.R012 [reset/derived]
@@ -433,7 +482,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=scl_o←1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=scl_o←1'b1
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|scl_o|!rst_n|scl_o<=1'b1`
 
 ### i2c_master.R013 [reset/derived]
@@ -464,7 +517,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=sda_o←1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=sda_o←1'b1
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|sda_o|!rst_n|sda_o<=1'b1`
 
 ### i2c_master.R014 [reset/derived]
@@ -495,7 +552,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=scl_oe←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=scl_oe←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|scl_oe|!rst_n|scl_oe<=1'b0`
 
 ### i2c_master.R015 [reset/derived]
@@ -526,7 +587,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=sda_oe←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=sda_oe←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|sda_oe|!rst_n|sda_oe<=1'b0`
 
 ### i2c_master.R016 [reset/derived]
@@ -557,7 +622,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=busy←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=busy←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|busy|!rst_n|busy<=1'b0`
 
 ### i2c_master.R017 [reset/derived]
@@ -588,7 +657,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=tip←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=tip←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|tip|!rst_n|tip<=1'b0`
 
 ### i2c_master.R018 [reset/derived]
@@ -619,7 +692,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=done←1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=done←1'b0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|done|!rst_n|done<=1'b0`
 
 ### i2c_master.R019 [reset/derived]
@@ -650,7 +727,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=ack_rx←1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=ack_rx←1'b1
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|ack_rx|!rst_n|ack_rx<=1'b1`
 
 ### i2c_master.R020 [reset/derived]
@@ -681,7 +762,11 @@
         dout <= 8'd0;
       end else begin
   ```
-- check(guard):trigger=clk posedge; when=!rst_n; effects=dout←8'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:70-70(process)
+  ```verilog
+    always @(posedge clk or negedge rst_n) begin
+  ```
+- check(guard):trigger=clk posedge; when=!rst_n; async=true; effects=dout←8'd0
 - 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|reset|i2c_master|dout|!rst_n|dout<=8'd0`
 
 ### i2c_master.R021 [fsm/derived]
@@ -1080,403 +1165,1233 @@
 
 ### i2c_master.R030 [timing/derived]
 
-- 陳述:clk 上升沿 成立後的下一拍,done 變為 1'b0
+- 陳述:!(!rst_n) 成立後的下一拍,done 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:93-93(process)
   ```verilog
         done <= 1'b0;
   ```
-- check(sequence):anchor(clk 上升沿) +1拍 → done=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|done||1'b0`
+- check(sequence):anchor(!(!rst_n)) +1拍 → done=1'b0 when !(!rst_n)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|done|!(!rst_n)|1'b0`
 
 ### i2c_master.R031 [timing/derived]
 
-- 陳述:we 且 cmd == CMD_WR 成立後的下一拍,pend_wr 變為 1'b1
+- 陳述:!(!rst_n) 且 we 且 cmd == CMD_WR 成立後的下一拍,pend_wr 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:98-98(process)
   ```verilog
             pend_wr <= 1'b1;
   ```
-- check(sequence):anchor(we 且 cmd == CMD_WR) +1拍 → pend_wr=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_wr||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 we 且 cmd == CMD_WR) +1拍 → pend_wr=1'b1 when !(!rst_n) 且 we 且 cmd == CMD_WR
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_wr|!(!rst_n) 且 we 且 cmd == CMD_WR|1'b1`
 
 ### i2c_master.R032 [timing/derived]
 
-- 陳述:we 且 cmd == CMD_WR 成立後的下一拍,tx 變為 din
+- 陳述:!(!rst_n) 且 we 且 cmd == CMD_WR 成立後的下一拍,tx 變為 din
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:99-99(process)
   ```verilog
             tx <= din;
   ```
-- check(sequence):anchor(we 且 cmd == CMD_WR) +1拍 → tx=din when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tx||din`
+- check(sequence):anchor(!(!rst_n) 且 we 且 cmd == CMD_WR) +1拍 → tx=din when !(!rst_n) 且 we 且 cmd == CMD_WR
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tx|!(!rst_n) 且 we 且 cmd == CMD_WR|din`
 
 ### i2c_master.R033 [timing/derived]
 
-- 陳述:we 且 cmd == CMD_RD 成立後的下一拍,pend_rd 變為 1'b1
+- 陳述:!(!rst_n) 且 we 且 cmd == CMD_RD 成立後的下一拍,pend_rd 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:101-101(process)
   ```verilog
           if (cmd == CMD_RD) pend_rd <= 1'b1;
   ```
-- check(sequence):anchor(we 且 cmd == CMD_RD) +1拍 → pend_rd=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_rd||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 we 且 cmd == CMD_RD) +1拍 → pend_rd=1'b1 when !(!rst_n) 且 we 且 cmd == CMD_RD
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_rd|!(!rst_n) 且 we 且 cmd == CMD_RD|1'b1`
 
 ### i2c_master.R034 [timing/derived]
 
-- 陳述:we 且 cmd == CMD_START 成立後的下一拍,pend_start 變為 1'b1
+- 陳述:!(!rst_n) 且 we 且 cmd == CMD_START 成立後的下一拍,pend_start 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:102-102(process)
   ```verilog
           if (cmd == CMD_START) pend_start <= 1'b1;
   ```
-- check(sequence):anchor(we 且 cmd == CMD_START) +1拍 → pend_start=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_start||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 we 且 cmd == CMD_START) +1拍 → pend_start=1'b1 when !(!rst_n) 且 we 且 cmd == CMD_START
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_start|!(!rst_n) 且 we 且 cmd == CMD_START|1'b1`
 
 ### i2c_master.R035 [timing/derived]
 
-- 陳述:we 且 cmd == CMD_STOP 成立後的下一拍,pend_stop 變為 1'b1
+- 陳述:!(!rst_n) 且 we 且 cmd == CMD_STOP 成立後的下一拍,pend_stop 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:103-103(process)
   ```verilog
           if (cmd == CMD_STOP) pend_stop <= 1'b1;
   ```
-- check(sequence):anchor(we 且 cmd == CMD_STOP) +1拍 → pend_stop=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_stop||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 we 且 cmd == CMD_STOP) +1拍 → pend_stop=1'b1 when !(!rst_n) 且 we 且 cmd == CMD_STOP
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_stop|!(!rst_n) 且 we 且 cmd == CMD_STOP|1'b1`
 
 ### i2c_master.R036 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,scl_oe 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,scl_oe 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:108-108(process)
   ```verilog
             scl_oe <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → scl_oe=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → scl_oe=1'b0 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_IDLE|1'b0`
 
 ### i2c_master.R037 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,sda_oe 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,sda_oe 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:109-109(process)
   ```verilog
             sda_oe <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → sda_oe=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → sda_oe=1'b0 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_IDLE|1'b0`
 
 ### i2c_master.R038 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,scl_o 變為 1'b1
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,scl_o 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:110-110(process)
   ```verilog
             scl_o <= 1'b1;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → scl_o=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → scl_o=1'b1 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o|!(!rst_n) 且 state == ST_IDLE|1'b1`
 
 ### i2c_master.R039 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,sda_o 變為 1'b1
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,sda_o 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:111-111(process)
   ```verilog
             sda_o <= 1'b1;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → sda_o=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → sda_o=1'b1 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_IDLE|1'b1`
 
 ### i2c_master.R040 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,busy 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,busy 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:112-112(process)
   ```verilog
             busy <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → busy=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|busy||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → busy=1'b0 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|busy|!(!rst_n) 且 state == ST_IDLE|1'b0`
 
 ### i2c_master.R041 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,tip 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,tip 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:113-113(process)
   ```verilog
             tip <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → tip=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tip||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → tip=1'b0 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tip|!(!rst_n) 且 state == ST_IDLE|1'b0`
 
 ### i2c_master.R042 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,cnt 變為 16'd0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,cnt 變為 16'd0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:114-114(process)
   ```verilog
             cnt <= 16'd0;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → cnt=16'd0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt||16'd0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_IDLE|16'd0`
 
 ### i2c_master.R043 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,half 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,half 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:115-115(process)
   ```verilog
             half <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → half=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → half=1'b0 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half|!(!rst_n) 且 state == ST_IDLE|1'b0`
 
 ### i2c_master.R044 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,bitcnt 變為 4'd0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,bitcnt 變為 4'd0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:116-116(process)
   ```verilog
             bitcnt <= 4'd0;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → bitcnt=4'd0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|bitcnt||4'd0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → bitcnt=4'd0 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|bitcnt|!(!rst_n) 且 state == ST_IDLE|4'd0`
 
 ### i2c_master.R045 [timing/derived]
 
-- 陳述:state == ST_IDLE 成立後的下一拍,step 變為 2'd0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 成立後的下一拍,step 變為 2'd0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:117-117(process)
   ```verilog
             step <= 2'd0;
   ```
-- check(sequence):anchor(state == ST_IDLE) +1拍 → step=2'd0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step||2'd0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE) +1拍 → step=2'd0 when !(!rst_n) 且 state == ST_IDLE
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_IDLE|2'd0`
 
 ### i2c_master.R046 [timing/derived]
 
-- 陳述:state == ST_IDLE 且 pend_start 成立後的下一拍,pend_start 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 且 pend_start 成立後的下一拍,pend_start 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:119-119(process)
   ```verilog
               pend_start <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_IDLE 且 pend_start) +1拍 → pend_start=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_start||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE 且 pend_start) +1拍 → pend_start=1'b0 when !(!rst_n) 且 state == ST_IDLE 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_start|!(!rst_n) 且 state == ST_IDLE 且 pend_start|1'b0`
 
 ### i2c_master.R047 [timing/derived]
 
-- 陳述:state == ST_IDLE 且 pend_start 成立後的下一拍,busy 變為 1'b1
+- 陳述:!(!rst_n) 且 state == ST_IDLE 且 pend_start 成立後的下一拍,busy 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:120-120(process)
   ```verilog
               busy <= 1'b1;
   ```
-- check(sequence):anchor(state == ST_IDLE 且 pend_start) +1拍 → busy=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|busy||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE 且 pend_start) +1拍 → busy=1'b1 when !(!rst_n) 且 state == ST_IDLE 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|busy|!(!rst_n) 且 state == ST_IDLE 且 pend_start|1'b1`
 
 ### i2c_master.R048 [timing/derived]
 
-- 陳述:state == ST_IDLE 且 pend_start 成立後的下一拍,rd_mode 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_IDLE 且 pend_start 成立後的下一拍,rd_mode 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:121-121(process)
   ```verilog
               rd_mode <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_IDLE 且 pend_start) +1拍 → rd_mode=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|rd_mode||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE 且 pend_start) +1拍 → rd_mode=1'b0 when !(!rst_n) 且 state == ST_IDLE 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|rd_mode|!(!rst_n) 且 state == ST_IDLE 且 pend_start|1'b0`
 
 ### i2c_master.R049 [timing/derived]
 
-- 陳述:state == ST_START 且 step == 2'd0 且 cnt_end 成立後的下一拍,step 變為 2'd1
+- 陳述:!(!rst_n) 且 state == ST_IDLE 且 pend_start 成立後的下一拍,step 變為 2'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:122-122(process)
+  ```verilog
+              step <= 2'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE 且 pend_start) +1拍 → step=2'd0 when !(!rst_n) 且 state == ST_IDLE 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_IDLE 且 pend_start|2'd0`
+
+### i2c_master.R050 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_IDLE 且 pend_start 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:123-123(process)
+  ```verilog
+              cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_IDLE 且 pend_start) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_IDLE 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_IDLE 且 pend_start|16'd0`
+
+### i2c_master.R051 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 step == 2'd0 成立後的下一拍,scl_oe 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:133-133(process)
+  ```verilog
+              scl_oe <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 step == 2'd0) +1拍 → scl_oe=1'b0 when !(!rst_n) 且 state == ST_START 且 step == 2'd0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_START 且 step == 2'd0|1'b0`
+
+### i2c_master.R052 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 step == 2'd0 成立後的下一拍,sda_oe 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:134-134(process)
+  ```verilog
+              sda_oe <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 step == 2'd0) +1拍 → sda_oe=1'b0 when !(!rst_n) 且 state == ST_START 且 step == 2'd0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_START 且 step == 2'd0|1'b0`
+
+### i2c_master.R053 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 step == 2'd0 成立後的下一拍,sda_o 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:135-135(process)
+  ```verilog
+              sda_o <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 step == 2'd0) +1拍 → sda_o=1'b1 when !(!rst_n) 且 state == ST_START 且 step == 2'd0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_START 且 step == 2'd0|1'b1`
+
+### i2c_master.R054 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 step == 2'd0 且 cnt_end 成立後的下一拍,step 變為 2'd1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:137-137(process)
   ```verilog
                 step <= 2'd1;
   ```
-- check(sequence):anchor(state == ST_START 且 step == 2'd0 且 cnt_end) +1拍 → step=2'd1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step||2'd1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 step == 2'd0 且 cnt_end) +1拍 → step=2'd1 when !(!rst_n) 且 state == ST_START 且 step == 2'd0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_START 且 step == 2'd0 且 cnt_end|2'd1`
 
-### i2c_master.R050 [counter/derived]
+### i2c_master.R055 [timing/derived]
 
-- 陳述:state == ST_START 且 step == 2'd0 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 陳述:!(!rst_n) 且 state == ST_START 且 step == 2'd0 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:138-138(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 step == 2'd0 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_START 且 step == 2'd0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_START 且 step == 2'd0 且 cnt_end|16'd0`
+
+### i2c_master.R056 [counter/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 step == 2'd0 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:139-139(process)
   ```verilog
               end else cnt <= cnt + 16'd1;
   ```
-- check(sequence):anchor(state == ST_START 且 step == 2'd0 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt||cnt + 16'd1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 step == 2'd0 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_START 且 step == 2'd0 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_START 且 step == 2'd0 且 !(cnt_end)|cnt + 16'd1`
 
-### i2c_master.R051 [timing/derived]
+### i2c_master.R057 [timing/derived]
 
-- 陳述:state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 成立後的下一拍,sda_o 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 成立後的下一拍,sda_o 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:141-141(process)
   ```verilog
               sda_o <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_START 且 !(step == 2'd0) 且 step == 2'd1) +1拍 → sda_o=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1) +1拍 → sda_o=1'b0 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1|1'b0`
 
-### i2c_master.R052 [timing/derived]
+### i2c_master.R058 [timing/derived]
 
-- 陳述:state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 成立後的下一拍,sda_oe 變為 1'b1
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 成立後的下一拍,sda_oe 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:142-142(process)
   ```verilog
               sda_oe <= 1'b1;
   ```
-- check(sequence):anchor(state == ST_START 且 !(step == 2'd0) 且 step == 2'd1) +1拍 → sda_oe=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1) +1拍 → sda_oe=1'b1 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1|1'b1`
 
-### i2c_master.R053 [timing/derived]
+### i2c_master.R059 [timing/derived]
 
-- 陳述:state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end 成立後的下一拍,step 變為 2'd2
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end 成立後的下一拍,step 變為 2'd2
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:144-144(process)
   ```verilog
                 step <= 2'd2;
   ```
-- check(sequence):anchor(state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end) +1拍 → step=2'd2 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step||2'd2`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end) +1拍 → step=2'd2 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end|2'd2`
 
-### i2c_master.R054 [timing/derived]
+### i2c_master.R060 [timing/derived]
 
-- 陳述:state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 成立後的下一拍,scl_oe 變為 1'b1
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:145-145(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end|16'd0`
+
+### i2c_master.R061 [counter/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:146-146(process)
+  ```verilog
+              end else cnt <= cnt + 16'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 step == 2'd1 且 !(cnt_end)|cnt + 16'd1`
+
+### i2c_master.R062 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 成立後的下一拍,scl_oe 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:148-148(process)
   ```verilog
               scl_oe <= 1'b1;
   ```
-- check(sequence):anchor(state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)) +1拍 → scl_oe=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)) +1拍 → scl_oe=1'b1 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)|1'b1`
 
-### i2c_master.R055 [timing/derived]
+### i2c_master.R063 [timing/derived]
 
-- 陳述:state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 成立後的下一拍,scl_o 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 成立後的下一拍,scl_o 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:149-149(process)
   ```verilog
               scl_o <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)) +1拍 → scl_o=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)) +1拍 → scl_o=1'b0 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)|1'b0`
 
-### i2c_master.R056 [timing/derived]
+### i2c_master.R064 [timing/derived]
 
-- 陳述:state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end 成立後的下一拍,tip 變為 1'b1
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 成立後的下一拍,sda_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:150-150(process)
+  ```verilog
+              sda_oe <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)) +1拍 → sda_oe=1'b1 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)|1'b1`
+
+### i2c_master.R065 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 成立後的下一拍,sda_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:151-151(process)
+  ```verilog
+              sda_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)) +1拍 → sda_o=1'b0 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1)|1'b0`
+
+### i2c_master.R066 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end 成立後的下一拍,step 變為 2'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:153-153(process)
+  ```verilog
+                step <= 2'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end) +1拍 → step=2'd0 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end|2'd0`
+
+### i2c_master.R067 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:154-154(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end|16'd0`
+
+### i2c_master.R068 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end 成立後的下一拍,half 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:155-155(process)
+  ```verilog
+                half <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end) +1拍 → half=1'b0 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end|1'b0`
+
+### i2c_master.R069 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end 成立後的下一拍,bitcnt 變為 4'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:156-156(process)
+  ```verilog
+                bitcnt <= 4'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end) +1拍 → bitcnt=4'd0 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|bitcnt|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end|4'd0`
+
+### i2c_master.R070 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end 成立後的下一拍,tip 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:157-157(process)
   ```verilog
                 tip <= 1'b1;
   ```
-- check(sequence):anchor(state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end) +1拍 → tip=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tip||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end) +1拍 → tip=1'b1 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tip|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 cnt_end|1'b1`
 
-### i2c_master.R057 [timing/derived]
+### i2c_master.R071 [counter/derived]
 
-- 陳述:state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode) 成立後的下一拍,sda_oe 變為 ~tx['sd7 - bitcnt['sd2:'sd0]]
+- 陳述:!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:159-159(process)
+  ```verilog
+              end else cnt <= cnt + 16'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_START 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(cnt_end)|cnt + 16'd1`
+
+### i2c_master.R072 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 成立後的下一拍,scl_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:166-166(process)
+  ```verilog
+              scl_oe <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0) +1拍 → scl_oe=1'b1 when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0|1'b1`
+
+### i2c_master.R073 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 成立後的下一拍,scl_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:167-167(process)
+  ```verilog
+              scl_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0) +1拍 → scl_o=1'b0 when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0|1'b0`
+
+### i2c_master.R074 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 rd_mode 成立後的下一拍,sda_oe 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:169-169(process)
+  ```verilog
+                sda_oe <= 1'b0;  // release for the slave to drive
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 rd_mode) +1拍 → sda_oe=1'b0 when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 rd_mode
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 rd_mode|1'b0`
+
+### i2c_master.R075 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 rd_mode 成立後的下一拍,sda_o 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:170-170(process)
+  ```verilog
+                sda_o <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 rd_mode) +1拍 → sda_o=1'b1 when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 rd_mode
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 rd_mode|1'b1`
+
+### i2c_master.R076 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode) 成立後的下一拍,sda_oe 變為 ~tx['sd7 - bitcnt['sd2:'sd0]]
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:172-172(process)
   ```verilog
                 sda_oe <= ~tx[7 - bitcnt[2:0]];
   ```
-- check(sequence):anchor(state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode)) +1拍 → sda_oe=~tx['sd7 - bitcnt['sd2:'sd0]] when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe||~tx['sd7 - bitcnt['sd2:'sd0]]`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode)) +1拍 → sda_oe=~tx['sd7 - bitcnt['sd2:'sd0]] when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode)|~tx['sd7 - bitcnt['sd2:'sd0]]`
 
-### i2c_master.R058 [timing/derived]
+### i2c_master.R077 [timing/derived]
 
-- 陳述:state == ST_SHIFT 且 half == 1'b0 且 cnt_end 成立後的下一拍,half 變為 1'b1
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode) 成立後的下一拍,sda_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:173-173(process)
+  ```verilog
+                sda_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode)) +1拍 → sda_o=1'b0 when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(rd_mode)|1'b0`
+
+### i2c_master.R078 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end 成立後的下一拍,half 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:176-176(process)
   ```verilog
                 half <= 1'b1;
   ```
-- check(sequence):anchor(state == ST_SHIFT 且 half == 1'b0 且 cnt_end) +1拍 → half=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end) +1拍 → half=1'b1 when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end|1'b1`
 
-### i2c_master.R059 [timing/derived]
+### i2c_master.R079 [timing/derived]
 
-- 陳述:state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 rd_mode 成立後的下一拍,tx 變為 {tx['sd6:'sd0], sda_i}
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end 成立後的下一拍,scl_oe 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:177-177(process)
+  ```verilog
+                scl_oe <= 1'b0;  // release: SCL rises
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end) +1拍 → scl_oe=1'b0 when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end|1'b0`
+
+### i2c_master.R080 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:178-178(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 cnt_end|16'd0`
+
+### i2c_master.R081 [counter/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:179-179(process)
+  ```verilog
+              end else cnt <= cnt + 16'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_SHIFT 且 half == 1'b0 且 !(cnt_end)|cnt + 16'd1`
+
+### i2c_master.R082 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:184-184(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end|16'd0`
+
+### i2c_master.R083 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,half 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:185-185(process)
+  ```verilog
+                half <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end) +1拍 → half=1'b0 when !(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half|!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end|1'b0`
+
+### i2c_master.R084 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,scl_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:186-186(process)
+  ```verilog
+                scl_oe <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end) +1拍 → scl_oe=1'b1 when !(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end|1'b1`
+
+### i2c_master.R085 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,scl_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:187-187(process)
+  ```verilog
+                scl_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end) +1拍 → scl_o=1'b0 when !(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o|!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end|1'b0`
+
+### i2c_master.R086 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 rd_mode 成立後的下一拍,tx 變為 {tx['sd6:'sd0], sda_i}
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:189-189(process)
   ```verilog
                   tx <= {tx[6:0], sda_i};
   ```
-- check(sequence):anchor(state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 rd_mode) +1拍 → tx={tx['sd6:'sd0], sda_i} when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tx||{tx['sd6:'sd0], sda_i}`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 rd_mode) +1拍 → tx={tx['sd6:'sd0], sda_i} when !(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 rd_mode
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tx|!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 rd_mode|{tx['sd6:'sd0], sda_i}`
 
-### i2c_master.R060 [counter/derived]
+### i2c_master.R087 [timing/derived]
 
-- 陳述:state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 !(bitcnt == 4'd7) 成立後的下一拍,bitcnt 變為 bitcnt + 4'd1(計數/環繞)
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 bitcnt == 4'd7 成立後的下一拍,bitcnt 變為 4'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:192-192(process)
+  ```verilog
+                  bitcnt <= 4'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 bitcnt == 4'd7) +1拍 → bitcnt=4'd0 when !(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 bitcnt == 4'd7
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|bitcnt|!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 bitcnt == 4'd7|4'd0`
+
+### i2c_master.R088 [counter/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 !(bitcnt == 4'd7) 成立後的下一拍,bitcnt 變為 bitcnt + 4'd1(計數/環繞)
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:195-195(process)
   ```verilog
                   bitcnt <= bitcnt + 4'd1;
   ```
-- check(sequence):anchor(state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 !(bitcnt == 4'd7)) +1拍 → bitcnt=bitcnt + 4'd1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|bitcnt||bitcnt + 4'd1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 !(bitcnt == 4'd7)) +1拍 → bitcnt=bitcnt + 4'd1 when !(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 !(bitcnt == 4'd7)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|bitcnt|!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 cnt_end 且 !(bitcnt == 4'd7)|bitcnt + 4'd1`
 
-### i2c_master.R061 [timing/derived]
+### i2c_master.R089 [counter/derived]
 
-- 陳述:state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode 成立後的下一拍,ack_rx 變為 sda_i
+- 陳述:!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:197-197(process)
+  ```verilog
+              end else cnt <= cnt + 16'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_SHIFT 且 !(half == 1'b0) 且 !(cnt_end)|cnt + 16'd1`
+
+### i2c_master.R090 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 成立後的下一拍,scl_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:205-205(process)
+  ```verilog
+              scl_oe <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0) +1拍 → scl_oe=1'b1 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0|1'b1`
+
+### i2c_master.R091 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 成立後的下一拍,scl_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:206-206(process)
+  ```verilog
+              scl_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0) +1拍 → scl_o=1'b0 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0|1'b0`
+
+### i2c_master.R092 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 rd_mode 成立後的下一拍,sda_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:208-208(process)
+  ```verilog
+                sda_oe <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 rd_mode) +1拍 → sda_oe=1'b1 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 rd_mode
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 rd_mode|1'b1`
+
+### i2c_master.R093 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 rd_mode 成立後的下一拍,sda_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:209-209(process)
+  ```verilog
+                sda_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 rd_mode) +1拍 → sda_o=1'b0 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 rd_mode
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 rd_mode|1'b0`
+
+### i2c_master.R094 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(rd_mode) 成立後的下一拍,sda_oe 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:211-211(process)
+  ```verilog
+                sda_oe <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(rd_mode)) +1拍 → sda_oe=1'b0 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(rd_mode)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(rd_mode)|1'b0`
+
+### i2c_master.R095 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(rd_mode) 成立後的下一拍,sda_o 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:212-212(process)
+  ```verilog
+                sda_o <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(rd_mode)) +1拍 → sda_o=1'b1 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(rd_mode)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(rd_mode)|1'b1`
+
+### i2c_master.R096 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end 成立後的下一拍,half 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:215-215(process)
+  ```verilog
+                half <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end) +1拍 → half=1'b1 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end|1'b1`
+
+### i2c_master.R097 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end 成立後的下一拍,scl_oe 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:216-216(process)
+  ```verilog
+                scl_oe <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end) +1拍 → scl_oe=1'b0 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end|1'b0`
+
+### i2c_master.R098 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:217-217(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 cnt_end|16'd0`
+
+### i2c_master.R099 [counter/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:218-218(process)
+  ```verilog
+              end else cnt <= cnt + 16'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_ACK 且 half == 1'b0 且 !(cnt_end)|cnt + 16'd1`
+
+### i2c_master.R100 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:222-222(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end|16'd0`
+
+### i2c_master.R101 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,half 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:223-223(process)
+  ```verilog
+                half <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end) +1拍 → half=1'b0 when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end|1'b0`
+
+### i2c_master.R102 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,scl_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:224-224(process)
+  ```verilog
+                scl_oe <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end) +1拍 → scl_oe=1'b1 when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end|1'b1`
+
+### i2c_master.R103 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,scl_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:225-225(process)
+  ```verilog
+                scl_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end) +1拍 → scl_o=1'b0 when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end|1'b0`
+
+### i2c_master.R104 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode 成立後的下一拍,ack_rx 變為 sda_i
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:227-227(process)
   ```verilog
                   ack_rx <= sda_i;
   ```
-- check(sequence):anchor(state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode) +1拍 → ack_rx=sda_i when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|ack_rx||sda_i`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode) +1拍 → ack_rx=sda_i when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|ack_rx|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode|sda_i`
 
-### i2c_master.R062 [timing/derived]
+### i2c_master.R105 [timing/derived]
 
-- 陳述:state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode 成立後的下一拍,dout 變為 tx
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode 成立後的下一拍,dout 變為 tx
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:228-228(process)
   ```verilog
                   dout <= tx;
   ```
-- check(sequence):anchor(state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode) +1拍 → dout=tx when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|dout||tx`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode) +1拍 → dout=tx when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|dout|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !rd_mode|tx`
 
-### i2c_master.R063 [timing/derived]
+### i2c_master.R106 [timing/derived]
 
-- 陳述:state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,done 變為 1'b1
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !(!rd_mode) 成立後的下一拍,dout 變為 tx
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:230-230(process)
+  ```verilog
+                  dout <= tx;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !(!rd_mode)) +1拍 → dout=tx when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !(!rd_mode)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|dout|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 且 !(!rd_mode)|tx`
+
+### i2c_master.R107 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,done 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:232-232(process)
   ```verilog
                 done <= 1'b1;
   ```
-- check(sequence):anchor(state == ST_ACK 且 !(half == 1'b0) 且 cnt_end) +1拍 → done=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|done||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end) +1拍 → done=1'b1 when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|done|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end|1'b1`
 
-### i2c_master.R064 [timing/derived]
+### i2c_master.R108 [timing/derived]
 
-- 陳述:state == ST_HOLD 且 pend_wr 成立後的下一拍,pend_wr 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end 成立後的下一拍,tip 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:233-233(process)
+  ```verilog
+                tip <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end) +1拍 → tip=1'b0 when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tip|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 cnt_end|1'b0`
+
+### i2c_master.R109 [counter/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:235-235(process)
+  ```verilog
+              end else cnt <= cnt + 16'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_ACK 且 !(half == 1'b0) 且 !(cnt_end)|cnt + 16'd1`
+
+### i2c_master.R110 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 成立後的下一拍,scl_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:242-242(process)
+  ```verilog
+            scl_oe <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD) +1拍 → scl_oe=1'b1 when !(!rst_n) 且 state == ST_HOLD
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_HOLD|1'b1`
+
+### i2c_master.R111 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 成立後的下一拍,scl_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:243-243(process)
+  ```verilog
+            scl_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD) +1拍 → scl_o=1'b0 when !(!rst_n) 且 state == ST_HOLD
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o|!(!rst_n) 且 state == ST_HOLD|1'b0`
+
+### i2c_master.R112 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 成立後的下一拍,sda_oe 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:244-244(process)
+  ```verilog
+            sda_oe <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD) +1拍 → sda_oe=1'b0 when !(!rst_n) 且 state == ST_HOLD
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_HOLD|1'b0`
+
+### i2c_master.R113 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 成立後的下一拍,sda_o 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:245-245(process)
+  ```verilog
+            sda_o <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD) +1拍 → sda_o=1'b1 when !(!rst_n) 且 state == ST_HOLD
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_HOLD|1'b1`
+
+### i2c_master.R114 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 pend_wr 成立後的下一拍,pend_wr 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:247-247(process)
   ```verilog
               pend_wr <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_HOLD 且 pend_wr) +1拍 → pend_wr=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_wr||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 pend_wr) +1拍 → pend_wr=1'b0 when !(!rst_n) 且 state == ST_HOLD 且 pend_wr
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_wr|!(!rst_n) 且 state == ST_HOLD 且 pend_wr|1'b0`
 
-### i2c_master.R065 [timing/derived]
+### i2c_master.R115 [timing/derived]
 
-- 陳述:state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,pend_rd 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 pend_wr 成立後的下一拍,rd_mode 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:248-248(process)
+  ```verilog
+              rd_mode <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 pend_wr) +1拍 → rd_mode=1'b0 when !(!rst_n) 且 state == ST_HOLD 且 pend_wr
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|rd_mode|!(!rst_n) 且 state == ST_HOLD 且 pend_wr|1'b0`
+
+### i2c_master.R116 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 pend_wr 成立後的下一拍,bitcnt 變為 4'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:249-249(process)
+  ```verilog
+              bitcnt <= 4'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 pend_wr) +1拍 → bitcnt=4'd0 when !(!rst_n) 且 state == ST_HOLD 且 pend_wr
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|bitcnt|!(!rst_n) 且 state == ST_HOLD 且 pend_wr|4'd0`
+
+### i2c_master.R117 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 pend_wr 成立後的下一拍,half 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:250-250(process)
+  ```verilog
+              half <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 pend_wr) +1拍 → half=1'b0 when !(!rst_n) 且 state == ST_HOLD 且 pend_wr
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half|!(!rst_n) 且 state == ST_HOLD 且 pend_wr|1'b0`
+
+### i2c_master.R118 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 pend_wr 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:251-251(process)
+  ```verilog
+              cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 pend_wr) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_HOLD 且 pend_wr
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_HOLD 且 pend_wr|16'd0`
+
+### i2c_master.R119 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 pend_wr 成立後的下一拍,tip 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:252-252(process)
+  ```verilog
+              tip <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 pend_wr) +1拍 → tip=1'b1 when !(!rst_n) 且 state == ST_HOLD 且 pend_wr
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tip|!(!rst_n) 且 state == ST_HOLD 且 pend_wr|1'b1`
+
+### i2c_master.R120 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,pend_rd 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:255-255(process)
   ```verilog
               pend_rd <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → pend_rd=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_rd||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → pend_rd=1'b0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_rd|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd|1'b0`
 
-### i2c_master.R066 [timing/derived]
+### i2c_master.R121 [timing/derived]
 
-- 陳述:state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,rd_mode 變為 1'b1
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,rd_mode 變為 1'b1
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:256-256(process)
   ```verilog
               rd_mode <= 1'b1;
   ```
-- check(sequence):anchor(state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → rd_mode=1'b1 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|rd_mode||1'b1`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → rd_mode=1'b1 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|rd_mode|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd|1'b1`
 
-### i2c_master.R067 [timing/derived]
+### i2c_master.R122 [timing/derived]
 
-- 陳述:state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,tx 變為 8'd0
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,tx 變為 8'd0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:257-257(process)
   ```verilog
               tx <= 8'd0;
   ```
-- check(sequence):anchor(state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → tx=8'd0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tx||8'd0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → tx=8'd0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tx|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd|8'd0`
 
-### i2c_master.R068 [timing/derived]
+### i2c_master.R123 [timing/derived]
 
-- 陳述:state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop 成立後的下一拍,pend_stop 變為 1'b0
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,bitcnt 變為 4'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:258-258(process)
+  ```verilog
+              bitcnt <= 4'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → bitcnt=4'd0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|bitcnt|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd|4'd0`
+
+### i2c_master.R124 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,half 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:259-259(process)
+  ```verilog
+              half <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → half=1'b0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|half|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd|1'b0`
+
+### i2c_master.R125 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:260-260(process)
+  ```verilog
+              cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd|16'd0`
+
+### i2c_master.R126 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd 成立後的下一拍,tip 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:261-261(process)
+  ```verilog
+              tip <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd) +1拍 → tip=1'b1 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tip|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 pend_rd|1'b1`
+
+### i2c_master.R127 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop 成立後的下一拍,pend_stop 變為 1'b0
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:264-264(process)
   ```verilog
               pend_stop <= 1'b0;
   ```
-- check(sequence):anchor(state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop) +1拍 → pend_stop=1'b0 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_stop||1'b0`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop) +1拍 → pend_stop=1'b0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_stop|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop|1'b0`
 
-### i2c_master.R069 [timing/derived]
+### i2c_master.R128 [timing/derived]
 
-- 陳述:state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end 成立後的下一拍,step 變為 2'd3
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop 成立後的下一拍,step 變為 2'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:265-265(process)
+  ```verilog
+              step <= 2'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop) +1拍 → step=2'd0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop|2'd0`
+
+### i2c_master.R129 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:266-266(process)
+  ```verilog
+              cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 pend_stop|16'd0`
+
+### i2c_master.R130 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start 成立後的下一拍,pend_start 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:269-269(process)
+  ```verilog
+              pend_start <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start) +1拍 → pend_start=1'b0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|pend_start|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start|1'b0`
+
+### i2c_master.R131 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start 成立後的下一拍,step 變為 2'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:270-270(process)
+  ```verilog
+              step <= 2'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start) +1拍 → step=2'd0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start|2'd0`
+
+### i2c_master.R132 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:271-271(process)
+  ```verilog
+              cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start|16'd0`
+
+### i2c_master.R133 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start 成立後的下一拍,sda_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:272-272(process)
+  ```verilog
+              sda_oe <= 1'b1;  // SDA back high for the restart sequence
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start) +1拍 → sda_oe=1'b1 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start|1'b1`
+
+### i2c_master.R134 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start 成立後的下一拍,sda_o 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:273-273(process)
+  ```verilog
+              sda_o <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start) +1拍 → sda_o=1'b1 when !(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_HOLD 且 !(pend_wr) 且 !(pend_rd) 且 !(pend_stop) 且 pend_start|1'b1`
+
+### i2c_master.R135 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 成立後的下一拍,sda_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:284-284(process)
+  ```verilog
+              sda_oe <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 step == 2'd0) +1拍 → sda_oe=1'b1 when !(!rst_n) 且 state == ST_STOP 且 step == 2'd0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_STOP 且 step == 2'd0|1'b1`
+
+### i2c_master.R136 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 成立後的下一拍,sda_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:285-285(process)
+  ```verilog
+              sda_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 step == 2'd0) +1拍 → sda_o=1'b0 when !(!rst_n) 且 state == ST_STOP 且 step == 2'd0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_STOP 且 step == 2'd0|1'b0`
+
+### i2c_master.R137 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 成立後的下一拍,scl_oe 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:286-286(process)
+  ```verilog
+              scl_oe <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 step == 2'd0) +1拍 → scl_oe=1'b1 when !(!rst_n) 且 state == ST_STOP 且 step == 2'd0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_STOP 且 step == 2'd0|1'b1`
+
+### i2c_master.R138 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 成立後的下一拍,scl_o 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:287-287(process)
+  ```verilog
+              scl_o <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 step == 2'd0) +1拍 → scl_o=1'b0 when !(!rst_n) 且 state == ST_STOP 且 step == 2'd0
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_o|!(!rst_n) 且 state == ST_STOP 且 step == 2'd0|1'b0`
+
+### i2c_master.R139 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 cnt_end 成立後的下一拍,step 變為 2'd1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:289-289(process)
+  ```verilog
+                step <= 2'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 cnt_end) +1拍 → step=2'd1 when !(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 cnt_end|2'd1`
+
+### i2c_master.R140 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:290-290(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 cnt_end|16'd0`
+
+### i2c_master.R141 [counter/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:291-291(process)
+  ```verilog
+              end else cnt <= cnt + 16'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_STOP 且 step == 2'd0 且 !(cnt_end)|cnt + 16'd1`
+
+### i2c_master.R142 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 成立後的下一拍,scl_oe 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:293-293(process)
+  ```verilog
+              scl_oe <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1) +1拍 → scl_oe=1'b0 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|scl_oe|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1|1'b0`
+
+### i2c_master.R143 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end 成立後的下一拍,step 變為 2'd2
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:295-295(process)
+  ```verilog
+                step <= 2'd2;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end) +1拍 → step=2'd2 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end|2'd2`
+
+### i2c_master.R144 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:296-296(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 cnt_end|16'd0`
+
+### i2c_master.R145 [counter/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:297-297(process)
+  ```verilog
+              end else cnt <= cnt + 16'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 step == 2'd1 且 !(cnt_end)|cnt + 16'd1`
+
+### i2c_master.R146 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 成立後的下一拍,sda_oe 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:299-299(process)
+  ```verilog
+              sda_oe <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2) +1拍 → sda_oe=1'b0 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_oe|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2|1'b0`
+
+### i2c_master.R147 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 成立後的下一拍,sda_o 變為 1'b1
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:300-300(process)
+  ```verilog
+              sda_o <= 1'b1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2) +1拍 → sda_o=1'b1 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|sda_o|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2|1'b1`
+
+### i2c_master.R148 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end 成立後的下一拍,step 變為 2'd3
 - 證據:corpus/e2e/59_i2c_master/i2c_master.v:302-302(process)
   ```verilog
                 step <= 2'd3;
   ```
-- check(sequence):anchor(state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end) +1拍 → step=2'd3 when -
-- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step||2'd3`
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end) +1拍 → step=2'd3 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|step|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end|2'd3`
+
+### i2c_master.R149 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end 成立後的下一拍,cnt 變為 16'd0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:303-303(process)
+  ```verilog
+                cnt <= 16'd0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end) +1拍 → cnt=16'd0 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|cnt|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 cnt_end|16'd0`
+
+### i2c_master.R150 [counter/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 !(cnt_end) 成立後的下一拍,cnt 變為 cnt + 16'd1(計數/環繞)
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:304-304(process)
+  ```verilog
+              end else cnt <= cnt + 16'd1;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 !(cnt_end)) +1拍 → cnt=cnt + 16'd1 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 !(cnt_end)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|counter|i2c_master|cnt|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 step == 2'd2 且 !(cnt_end)|cnt + 16'd1`
+
+### i2c_master.R151 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(step == 2'd2) 成立後的下一拍,busy 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:306-306(process)
+  ```verilog
+              busy <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(step == 2'd2)) +1拍 → busy=1'b0 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(step == 2'd2)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|busy|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(step == 2'd2)|1'b0`
+
+### i2c_master.R152 [timing/derived]
+
+- 陳述:!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(step == 2'd2) 成立後的下一拍,tip 變為 1'b0
+- 證據:corpus/e2e/59_i2c_master/i2c_master.v:307-307(process)
+  ```verilog
+              tip <= 1'b0;
+  ```
+- check(sequence):anchor(!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(step == 2'd2)) +1拍 → tip=1'b0 when !(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(step == 2'd2)
+- 指紋:`corpus/e2e/59_i2c_master/i2c_master.v|timing|i2c_master|tip|!(!rst_n) 且 state == ST_STOP 且 !(step == 2'd0) 且 !(step == 2'd1) 且 !(step == 2'd2)|1'b0`
 
 
 ### carryadd(yosys-simple,ISC;R1-3 放寬回歸錨)
@@ -1484,9 +2399,14 @@
 # 規則書:corpus-external/yosys-simple/carryadd.v
 
 - 模組數:1;規則總數:4
+- 聲明完備性 lint:懸空引用 0 條
 
 ## 模組 carryadd(4 條)
 
+- 接口契約:
+  - 參數: WIDTH='sd8
+  - 端口: a:input[parametric]; b:input[parametric]; y:output[parametric]
+  - 內部聲明: i:genvar[1]; IN1:wire[1]; IN2:wire[1]; C:wire[1]; Y:wire[1]
 ### carryadd.R001 [arithmetic/derived]
 
 - 陳述:C ≡ IN1 & IN2(逐拍組合)
@@ -1532,10 +2452,14 @@
 
 # 規則書:corpus/e2e/58_xls_acc_pipe/acc_pipe.v
 
-- 模組數:1;規則總數:7
+- 模組數:1;規則總數:9
+- 聲明完備性 lint:懸空引用 0 條
 
-## 模組 __acc_pipe__acc_pipe(7 條)
+## 模組 __acc_pipe__acc_pipe(9 條)
 
+- 接口契約:
+  - 端口: clk:input[1]; x:input[8]; y:input[8]; out:output[16]
+  - 內部聲明: x__input_flop:reg[8]; y__input_flop:reg[8]; p1_add_96_comb:wire[9]; p1_bit_slice_103_comb:wire[8]; p0_add_20:reg[9]; p0_bit_slice_48:reg[8]; p2_add_98_comb:wire[10]; p2_scaled_comb:wire[16]; out__output_flop:reg[16]
 ### __acc_pipe__acc_pipe.R001 [timing/derived]
 
 - 陳述:clk 上升沿 成立後的下一拍,x__input_flop 變為 x
@@ -1566,7 +2490,17 @@
 - check(relation):p1_add_96_comb ≡ {1'h0, x__input_flop} + {1'h0, y__input_flop} when -
 - 指紋:`corpus/e2e/58_xls_acc_pipe/acc_pipe.v|arithmetic|__acc_pipe__acc_pipe|p1_add_96_comb||{1'h0, x__input_flop} + {1'h0, y__input_flop}`
 
-### __acc_pipe__acc_pipe.R004 [timing/derived]
+### __acc_pipe__acc_pipe.R004 [arithmetic/derived]
+
+- 陳述:p1_bit_slice_103_comb ≡ p1_add_96_comb['sd8:'sd1](逐拍組合)
+- 證據:corpus/e2e/58_xls_acc_pipe/acc_pipe.v:22-22(assign)
+  ```verilog
+    assign p1_bit_slice_103_comb = p1_add_96_comb[8:1];
+  ```
+- check(relation):p1_bit_slice_103_comb ≡ p1_add_96_comb['sd8:'sd1] when -
+- 指紋:`corpus/e2e/58_xls_acc_pipe/acc_pipe.v|arithmetic|__acc_pipe__acc_pipe|p1_bit_slice_103_comb||p1_add_96_comb['sd8:'sd1]`
+
+### __acc_pipe__acc_pipe.R005 [timing/derived]
 
 - 陳述:clk 上升沿 成立後的下一拍,p0_add_20 變為 p1_add_96_comb
 - 證據:corpus/e2e/58_xls_acc_pipe/acc_pipe.v:28-28(process)
@@ -1576,7 +2510,7 @@
 - check(sequence):anchor(clk 上升沿) +1拍 → p0_add_20=p1_add_96_comb when -
 - 指紋:`corpus/e2e/58_xls_acc_pipe/acc_pipe.v|timing|__acc_pipe__acc_pipe|p0_add_20||p1_add_96_comb`
 
-### __acc_pipe__acc_pipe.R005 [timing/derived]
+### __acc_pipe__acc_pipe.R006 [timing/derived]
 
 - 陳述:clk 上升沿 成立後的下一拍,p0_bit_slice_48 變為 p1_bit_slice_103_comb
 - 證據:corpus/e2e/58_xls_acc_pipe/acc_pipe.v:29-29(process)
@@ -1586,7 +2520,7 @@
 - check(sequence):anchor(clk 上升沿) +1拍 → p0_bit_slice_48=p1_bit_slice_103_comb when -
 - 指紋:`corpus/e2e/58_xls_acc_pipe/acc_pipe.v|timing|__acc_pipe__acc_pipe|p0_bit_slice_48||p1_bit_slice_103_comb`
 
-### __acc_pipe__acc_pipe.R006 [arithmetic/derived]
+### __acc_pipe__acc_pipe.R007 [arithmetic/derived]
 
 - 陳述:p2_add_98_comb ≡ {2'h0, p0_bit_slice_48} + {1'h0, p0_add_20}(逐拍組合)
 - 證據:corpus/e2e/58_xls_acc_pipe/acc_pipe.v:35-35(assign)
@@ -1596,7 +2530,17 @@
 - check(relation):p2_add_98_comb ≡ {2'h0, p0_bit_slice_48} + {1'h0, p0_add_20} when -
 - 指紋:`corpus/e2e/58_xls_acc_pipe/acc_pipe.v|arithmetic|__acc_pipe__acc_pipe|p2_add_98_comb||{2'h0, p0_bit_slice_48} + {1'h0, p0_add_20}`
 
-### __acc_pipe__acc_pipe.R007 [timing/derived]
+### __acc_pipe__acc_pipe.R008 [arithmetic/derived]
+
+- 陳述:p2_scaled_comb ≡ {5'h00, p2_add_98_comb, p0_add_20['sd0]}(逐拍組合)
+- 證據:corpus/e2e/58_xls_acc_pipe/acc_pipe.v:36-36(assign)
+  ```verilog
+    assign p2_scaled_comb = {5'h00, p2_add_98_comb, p0_add_20[0]};
+  ```
+- check(relation):p2_scaled_comb ≡ {5'h00, p2_add_98_comb, p0_add_20['sd0]} when -
+- 指紋:`corpus/e2e/58_xls_acc_pipe/acc_pipe.v|arithmetic|__acc_pipe__acc_pipe|p2_scaled_comb||{5'h00, p2_add_98_comb, p0_add_20['sd0]}`
+
+### __acc_pipe__acc_pipe.R009 [timing/derived]
 
 - 陳述:clk 上升沿 成立後的下一拍,out__output_flop 變為 p2_scaled_comb
 - 證據:corpus/e2e/58_xls_acc_pipe/acc_pipe.v:41-41(process)

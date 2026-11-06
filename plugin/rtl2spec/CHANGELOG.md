@@ -6,6 +6,27 @@
 類別/破口類/工具);patch=缺陷修復與文檔。git tag 慣例=`rtl2spec-v<X.Y.Z>`
 (打 tag 由 user 定,弧內禁 commit 見 AGENTS)。
 
+## [0.3.0] - 2026-11-05
+
+### Added(復原力 MVP S0..S5;RTL2SPEC-MVP-NEXT R2)
+
+- 接口契約章(S1/N2):規則書新增 contract 節(端口/參數/內部聲明清單,結構投影直讀
+  +localparam AST 補收)+信號-聲明完備性 lint(N5,decl_lint 隨 rules.json 每輪重算);
+  i2c 盲寫 compiled=false(缺 reg [3:0] state)根因關閉。
+- 組合邏輯覆蓋放寬(S2/N3):relation 產出分界=結構形(PartSelect/Concat/Repeat)一律
+  +純常量限分支域內;無條件直賦/直通別名負 fixture 釘死(Daikon 教訓注釋)。
+- 復位語義承載(S3/N4):guard 載荷加 async 欄位(全邊收集分類)+敏感列表入第二證;
+  timing 指紋 when 維並入 conds(N1,i2c HOLD/IDLE 條件賦值去重復活);M3 else 臂
+  !(復位條件) 包膜。DEFAULT_MAX_RULES 128→256(i2c 152 條觸頂)。
+- 分支條件家族(S4/M1-M2)+破口三修(M4-M6):多標簽臂逐標簽展開/default 臂否定合取/
+  G8 展開 DelayCtrl-Wait(-EventCtrl)/missing_reset 無條件純常量約束/incomplete_case
+  n_labels≥total 守衛。
+- 復原對拍評測(S5):run-reimpl-eval.sh(iverilog 守衛 exit 2;23 場景 6+6+11;A/B 兩組
+  分列禁混報;消融點 S1/S2/S3 分段;直調不進 regress)+REIMPL-PROTOCOL.md 協議釘檔
+  (GLM-5.3-Flash max n=3)+fixtures/e1 裝備遷入。
+- 插件 semver 0.2.0→0.3.0(minor=contract 新能力;內核 ABI 軌 workspace 0.1.0 獨立
+  不動——vl-cli version golden 釘,§18 雙軌注記)。
+
 ## [0.2.0] — 2026-11-04
 
 ### Added

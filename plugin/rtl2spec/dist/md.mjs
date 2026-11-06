@@ -16,7 +16,7 @@ export function checkText(check) {
     case 'guard': {
       const t = p.trigger ? `${p.trigger.signal ?? '?'} ${p.trigger.edge ?? '?'}` : '-';
       const eff = (p.effects ?? []).map((e) => `${e.lhs}←${e.value}`).join('; ');
-      return `trigger=${t}; when=${p.when ?? '-'}; effects=${eff}`;
+      return `trigger=${t}; when=${p.when ?? '-'}; async=${p.async === true}; effects=${eff}`;
     }
     case 'transition':
       return `${p.state_reg}: ${p.from} → ${p.to} when ${p.when ?? '-'}`;
@@ -38,6 +38,40 @@ export function skipLabel(n) {
   return n.detail ? `${n.file}(${n.reason}: ${n.detail})` : `${n.file}(${n.reason})`;
 }
 
+// 接口契約塊渲染(S1;與 crates/rtl-spec/src/md.rs contract_markdown 同一
+// 定義):參數 `名=值` 帶 `(local)` 標;端口 `名:dir[width]`(parametric→
+// `[parametric]`;signed→` signed` 後綴);內部聲明 `名:kind[width]`(width
+// =0=參數化範圍佔位;unpacked>0 追加 `x<dims>`);空面省略;contract 缺席
+// (舊資料)回空串。
+export function renderContractMarkdown(c) {
+  if (!c) return '';
+  const lines = [];
+  lines.push('- 接口契約:');
+  if (c.params?.length) {
+    const items = c.params.map((p) =>
+      p.local ? `${p.name}=${p.value} (local)` : `${p.name}=${p.value}`,
+    );
+    lines.push(`  - 參數: ${items.join('; ')}`);
+  }
+  if (c.ports?.length) {
+    const items = c.ports.map((p) => {
+      const width = p.parametric ? '[parametric]' : `[${p.width}]`;
+      const signed = p.signed ? ' signed' : '';
+      return `${p.name}:${p.dir}${width}${signed}`;
+    });
+    lines.push(`  - 端口: ${items.join('; ')}`);
+  }
+  if (c.signals?.length) {
+    const items = c.signals.map((g) =>
+      g.unpacked_dims > 0
+        ? `${g.name}:${g.kind}[${g.width}]x${g.unpacked_dims}`
+        : `${g.name}:${g.kind}[${g.width}]`,
+    );
+    lines.push(`  - 內部聲明: ${items.join('; ')}`);
+  }
+  return lines.join('\n');
+}
+
 export function renderRulebookMarkdown(rb) {
   const lines = [];
   const total = sumRules(rb);
@@ -48,10 +82,15 @@ export function renderRulebookMarkdown(rb) {
   if (rb.skipped?.length)
     lines.push(`- 跳過注記:${rb.skipped.map((n) => skipLabel(n)).join(', ')}`);
   if (rb.truncated?.length) lines.push(`- 截斷模組:${rb.truncated.join(', ')}(超過模組內上限)`);
+  // N5 信號-聲明完備性 lint(S1;審讀 #6):與 rtl-spec md.rs 同一定義。
+  const dangling = rb.decl_lint?.dangling_refs ?? [];
+  if (dangling.length === 0) lines.push('- 聲明完備性 lint:懸空引用 0 條');
+  else lines.push(`- 聲明完備性 lint:懸空引用 ${dangling.length} 條:${dangling.join(', ')}`);
   lines.push('');
   for (const m of rb.modules ?? []) {
     lines.push(`## 模組 ${m.module}(${m.rules.length} 條)`);
     lines.push('');
+    lines.push(renderContractMarkdown(m.contract));
     for (const r of m.rules) {
       lines.push(`### ${r.id} [${r.category}/${r.qualifier}]`);
       lines.push('');

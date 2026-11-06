@@ -8,8 +8,11 @@
 //     手改檢測層;表≠檔→exit 1)。
 //   --record(錄製): 前置自檢(§16.1.4 實現形=進程內重複調用:每檔每模式
 //     3 跑 hash 必全等;任何檔不過→**全輪拒錄** exit 3,不寫任何盤——
-//     兩階段防部分錄製)→全過後統一寫 golden/<鏡像>…+全量機械重寫
-//     golden/PROVENANCE.md(命令/日期/bun/wasm sha256/74 份 sha256 表)。
+//     兩階段防部分錄製)→全過後統一寫 golden/<鏡像>…+重寫
+//     golden/PROVENANCE.md 元資料區(命令/日期/bun/wasm sha256/74 份 sha256 表);
+//     歷史區(## re-record 歷史 行→檔尾)解析-保留-追加(§5.2 S0;審讀 #7 M7):
+//     既有手記行原樣保留,新增錄製行 append 進歷史區(錄製行=機械時間戳+sha
+//     前 8 位;語義輪對帳手記由輪內補寫於其後,下次錄製保留)。
 //     錄後必讀 `git diff plugin/rtl2spec/golden` 逐案對帳——期望變了而
 //     提取器沒變=必須能解釋,否則停(§16.1.4 re-record=語義事件)。
 //
@@ -73,7 +76,8 @@ const artifacts = (rel) => {
   return [`${m}.rules.json`, `${m}.gaps.json`];
 };
 const runPair = (rel, src) => [
-  glue.rtl_extract_rules_sv(rel, src, 128),
+  // S3:預算隨 DEFAULT_MAX_RULES 上調 128→256(i2c 去重復活 152 觸頂)。
+  glue.rtl_extract_rules_sv(rel, src, 256),
   glue.rtl_scan_gaps_sv(rel, src),
 ];
 
@@ -146,7 +150,7 @@ if (record) {
     console.log(`== --record 拒錄: ${selfcheckFail.length} 檔自檢不過(exit 3;不寫任何盤) ==`);
     process.exit(3);
   }
-  // 階段 2:統一寫盤+PROVENANCE 全量機械重寫
+  // 階段 2:統一寫盤+PROVENANCE 元資料區重寫+歷史區解析-保留-追加(S0)
   const provRows = [];
   for (const rel of files) {
     const [rulesStr, gapsStr] = outputs.get(rel);
@@ -162,13 +166,43 @@ if (record) {
     }
   }
   const wasmSha = sha(readFileSync(join(wasmDir, 'rtl_spec_wasm_bg.wasm')));
+  // S0(M7 修復;§5.2;審讀 #7):歷史區解析-保留-追加——元資料區模板機械重寫;
+  // 歷史區(## re-record 歷史 行→檔尾)自既有 PROVENANCE.md 原樣保留,
+  // 新增錄製行 append 進歷史區,語義輪手記不被錄製覆蓋。
+  const nowIso = new Date().toISOString();
+  const HIST_HEADER = '## re-record 歷史';
+  const SEED_HISTORY = [
+    '## re-record 歷史(語義事件日志;語義輪手記逐行)',
+    '',
+    '- (首錄 2026-11-04,S9;F1a/F1b+F2 確定性修復後基線,§16.6 S9①對帳=全部可解釋首錄)',
+  ].join('\n');
+  const provPath = join(goldenRoot, 'PROVENANCE.md');
+  let historyText;
+  if (existsSync(provPath)) {
+    const oldLines = readFileSync(provPath, 'utf8').split('\n');
+    const histHits = [];
+    for (let i = 0; i < oldLines.length; i++) {
+      if (oldLines[i].startsWith(HIST_HEADER)) histHits.push(i);
+    }
+    if (histHits.length > 1) {
+      console.error(`FAIL: 既有 PROVENANCE.md 歷史區標頭命中 ${histHits.length} 處(預期 ≤1;拒錄保盤)`);
+      process.exit(3);
+    }
+    // 命中 1=該行→檔尾原樣保留;命中 0(舊格式/空)=seed 起始歷史(同舊模板形)。
+    historyText =
+      histHits.length === 1
+        ? oldLines.slice(histHits[0]).join('\n').replace(/\n$/, '')
+        : SEED_HISTORY;
+  } else {
+    historyText = SEED_HISTORY;
+  }
   const prov = [
-    '# golden PROVENANCE(機械生成禁手改;run-golden-regression.sh --record 全量重寫本檔)',
+    '# golden PROVENANCE(機械生成禁手改;--record 機械重寫元資料區+歷史區保留追加錄製行;語義輪手記入歷史區)',
     '',
     '## 正式釘選集 37 檔×2 模式(§16.1.2)',
     '',
     `- 錄製命令: bash plugin/rtl2spec/run-golden-regression.sh --record`,
-    `- 錄製時間: ${new Date().toISOString()}`,
+    `- 錄製時間: ${nowIso}`,
     `- bun: ${process.version}; wasm ABI: ${glue.rtl_spec_version()}; wasm sha256: ${wasmSha}`,
     `- 錄製來源: 提取器真實運行輸出(禁手寫);re-record=語義事件,錄後必讀`,
     `  git diff plugin/rtl2spec/golden 逐案對帳——期望變了而提取器沒變=必須能解釋,`,
@@ -184,13 +218,12 @@ if (record) {
     '- golden/plugin-fixtures/ 域=§17 G8 實證 demo(record-golden.mjs 錄製),',
     '  歷史=golden/plugin-fixtures/PROVENANCE.md;run-plugin-check ④d 對其 byte-diff。',
     '',
-    '## re-record 歷史(語義事件日志;語義輪手記逐行)',
-    '',
-    '- (首錄 2026-11-04,S9;F1a/F1b+F2 確定性修復後基線,§16.6 S9①對帳=全部可解釋首錄)',
+    historyText,
+    `- (re-record ${nowIso}; wasm sha256 ${wasmSha.slice(0, 8)}…)`,
     '',
   ].join('\n');
-  writeFileSync(join(goldenRoot, 'PROVENANCE.md'), prov);
-  console.log(`== --record: ${files.length} 檔×2 模式錄製完成(+PROVENANCE 機械重寫) ==`);
+  writeFileSync(provPath, prov);
+  console.log(`== --record: ${files.length} 檔×2 模式錄製完成(+PROVENANCE 元資料區重寫;歷史區保留追加) ==`);
   console.log('== 錄後必讀: git diff plugin/rtl2spec/golden 逐案對帳(§16.1.4) ==');
   process.exit(0);
 }

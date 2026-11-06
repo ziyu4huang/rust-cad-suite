@@ -87,6 +87,33 @@ const TABLE = [
       ['gap_missing_reset_no_arm', 'suggested_test', 'rb', false],
     ],
   },
+  {
+    // S4/M4 正樣:DelayCtrl/Wait 容器內死分支命中(觸發形 always #1 if(1'b0))。
+    file: 'plugin/rtl2spec/fixtures/gap_delay_dead.v',
+    desc: 'G8 容器展開正樣(DelayCtrl/Wait 內死分支)',
+    expected: [
+      ['delay_dead', 'dead_branch', 'certain'],
+      ['wait_dead', 'dead_branch', 'certain'],
+    ],
+  },
+  {
+    // S4/M4 負樣:容器內可變條件=零死分支。
+    file: 'plugin/rtl2spec/fixtures/gap_delay_live.v',
+    desc: 'G8 容器展開負樣(容器內可變條件零命中)',
+    expected: [],
+  },
+  {
+    // S4/M5:真缺口 certain+無條件純常量逐拍清除(strobe)不報(誤報形紅路面)。
+    file: 'plugin/rtl2spec/fixtures/gap_missing_reset_strobe.v',
+    desc: 'G4 分級正確(M5 約束:mr_data certain+mr_strobe 不報)',
+    expected: [['mr_data', 'missing_reset', 'certain']],
+  },
+  {
+    // S4/M6:4/4 覆蓋樣不報+稀疏樣仍報 heuristic。
+    file: 'plugin/rtl2spec/fixtures/gap_case_covered.v',
+    desc: 'G2 覆蓋守衛(M6:case_covered 不報+case_sparse 仍報)',
+    expected: [['case_sparse', 'incomplete_case', 'heuristic']],
+  },
 ];
 
 const fail = (msg) => {
@@ -179,5 +206,120 @@ for (const row of TABLE) {
   }
 }
 
-console.log(`== gap-fixture-check: ${process.exitCode === 1 ? 'FAIL' : 'ALL PASS'}(檔級矩陣 ${TABLE.length + 1} 行) ==`);
+// ---- S2 規則面矩陣(N3;§5.2 S2)——extract_rules 腿(與 gap 檔級矩陣同形:
+// 正樣條級 multiset 相等+負樣零規則+selfcheck 判別力;fixture=自著 MIT)。
+{
+  const extract = (f) => {
+    try {
+      return JSON.parse(
+        glue.rtl_extract_rules_sv(f, readFileSync(join(repoRoot, f), 'utf8'), 128),
+      );
+    } catch (e) {
+      fail(`${f} wasm trap/解析敗: ${String(e).slice(0, 120)}`);
+      return { modules: [] };
+    }
+  };
+  const relSig = (rb) =>
+    (rb.modules ?? []).flatMap((m) =>
+      (m.rules ?? [])
+        .filter((r) => r.check?.form === 'relation')
+        .map((r) => `${r.module}|${r.check.lhs}|${r.check.rhs}`),
+    );
+  const POS2 = 'plugin/rtl2spec/fixtures/rel_positive.v';
+  const NEG2 = 'plugin/rtl2spec/fixtures/rel_negative.v';
+  {
+    const rb = extract(POS2);
+    const actual = relSig(rb).sort();
+    const want = [
+      "rel_positive|arm_c|4'd1",
+      "rel_positive|arm_c|4'd2", // S4/M2:default 臂=未被覆蓋域
+      "rel_positive|scaled|{1'b0, b['sd7:'sd3]}",
+      "rel_positive|slice|a['sd7:'sd3]",
+    ].sort();
+    if (JSON.stringify(actual) === JSON.stringify(want)) {
+      console.log(`PASS S2 正樣 條級 multiset (rel_positive.v relations=${actual.length})`);
+    } else {
+      fail(`S2 正樣集合不等:\n  want=${JSON.stringify(want)}\n  actual=${JSON.stringify(actual)}`);
+    }
+    const armc = (rb.modules ?? [])
+      .flatMap((m) => m.rules ?? [])
+      .find((r) => r.check?.lhs === 'arm_c');
+    if (armc && armc.check.when === "sel == 1'b0") {
+      console.log(`PASS S2 分支域 when (arm_c 攜 sel == 1'b0)`);
+    } else {
+      fail(`S2 arm_c when 期望 sel == 1'b0,實得 ${JSON.stringify(armc?.check?.when)}`);
+    }
+  }
+  {
+    const rb = extract(NEG2);
+    const total = (rb.modules ?? []).reduce((n, m) => n + (m.rules?.length ?? 0), 0);
+    if (total === 0) {
+      console.log('PASS S2 負樣 零規則 (rel_negative.v:純常量直賦/直通別名/無條件行程常量)');
+    } else {
+      fail(`S2 負樣應零規則,實得 ${total}`);
+    }
+  }
+  // selfcheck:正樣單條期望誤配負樣必紅(斷言表判別力自證)。
+  {
+    const actual = relSig(extract(NEG2)).sort();
+    const wouldPass = JSON.stringify(actual) === JSON.stringify(["rel_positive|slice|a['sd7:'sd3]"]);
+    if (!wouldPass) {
+      console.log('PASS S2 selfcheck 正樣期望誤配負樣必紅');
+    } else {
+      fail('S2 selfcheck:負樣竟通過正樣單條期望=斷言表恆真,紅路失效');
+    }
+  }
+  // S4/M1 正樣:多標簽臂逐標簽展開(2'b01 觸發域可見)+M3 包膜。
+  // (時序行程→sequence 形;sig=form 無關:module|lhs/signal|rhs/becomes)
+  {
+    const rb = extract('plugin/rtl2spec/fixtures/m1_min_case.v');
+    const rules = (rb.modules ?? []).flatMap((m) => (m.rules ?? []));
+    const sig = (r) => {
+      const lhs = r.check.effects?.[0]?.lhs ?? r.check.lhs ?? r.check.signal;
+      const rhs = r.check.effects?.[0]?.value ?? r.check.rhs ?? r.check.becomes;
+      return `${r.module}|${lhs}|${rhs}`;
+    };
+    const actual = rules.map(sig).sort();
+    const want = [
+      "m1min|y|1'b0", // guard:復位臂 y<=1'b0
+      "m1min|s|2'b00", // guard:復位臂 s<=2'b00
+      "m1min|y|1'b1", // sequence 2'b00 臂
+      "m1min|y|1'b1", // sequence 2'b01 臂(M1)
+      "m1min|y|din['sd0]", // sequence 2'b10 臂
+      "m1min|y|1'b1", // sequence default 臂(M2)
+    ].sort();
+    const whens = rules.map((r) => `${r.check.form}:${r.check.when ?? ''}`);
+    const whenOk =
+      whens.filter((w) => w === `guard:rst`).length === 2 &&
+      whens.filter((w) => w === `sequence:!(rst) 且 s == 2\'b00`).length === 1 &&
+      whens.filter((w) => w === `sequence:!(rst) 且 s == 2\'b01`).length === 1 && // M1:2'b01 觸發域
+      whens.filter((w) => w === `sequence:!(rst) 且 s == 2\'b10`).length === 1 &&
+      whens.filter((w) => w === `sequence:!(rst) 且 !(s == 2\'b00) 且 !(s == 2\'b01) 且 !(s == 2\'b10)`).length === 1; // M2 default 臂
+    if (JSON.stringify(actual) === JSON.stringify(want) && whenOk) {
+      console.log('PASS S4/M1+M2 正樣 條級 multiset+逐標簽觸發域+default 臂否定合取 (m1_min_case.v)');
+    } else {
+      fail(`S4/M1+M2 集合不等:\n  actual=${JSON.stringify(actual)}\n  whens=${JSON.stringify(whens)}`);
+    }
+  }
+  // S4/M1+M2 負樣:單標簽臂不增殖(4 條,各攜自身標簽域)+無 default 不產
+  // default 臂規則(僅顯式臂 2 條,無否定合取 when)。
+  {
+    const rb = extract('plugin/rtl2spec/fixtures/m12_negative.v');
+    const rules = (rb.modules ?? []).flatMap((m) => (m.rules ?? [])).filter((r) => r.check.form === 'sequence');
+    const m1neg = rules.filter((r) => r.module === 'm1neg');
+    const m2neg = rules.filter((r) => r.module === 'm2neg');
+    const ok =
+      m1neg.length === 4 &&
+      m2neg.length === 2 &&
+      m1neg.every((r) => ['2\'b00', '2\'b01', '2\'b10', '2\'b11'].every((l) => !(r.check.when ?? '').includes(`!(sel == ${l})`)) && ['2\'b00', '2\'b01', '2\'b10', '2\'b11'].some((l) => (r.check.when ?? '') === `sel == ${l}`)) &&
+      m2neg.every((r) => !(r.check.when ?? '').includes('!('));
+    if (ok) {
+      console.log('PASS S4/M1+M2 負樣 單標簽不增殖+無 default 零規則 (m12_negative.v)');
+    } else {
+      fail(`S4/M1+M2 負樣形不符: m1neg=${m1neg.length} m2neg=${m2neg.length} ${JSON.stringify(rules.map((r) => [r.module, r.check.when]))}`);
+    }
+  }
+}
+
+console.log(`== gap-fixture-check: ${process.exitCode === 1 ? 'FAIL' : 'ALL PASS'}(檔級矩陣 ${TABLE.length + 1} 行+S2 規則面) ==`);
 process.exit(process.exitCode ?? 0);

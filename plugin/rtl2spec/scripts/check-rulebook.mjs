@@ -36,7 +36,7 @@ await glue.default({
   module_or_path: new Uint8Array(readFileSync(join(wasmDir, 'rtl_spec_wasm_bg.wasm'))),
 });
 
-const rb = JSON.parse(glue.rtl_extract_rules_sv(name, source, 128));
+const rb = JSON.parse(glue.rtl_extract_rules_sv(name, source, 256));
 const gr = JSON.parse(glue.rtl_scan_gaps_sv(name, source));
 
 const failures = [];
