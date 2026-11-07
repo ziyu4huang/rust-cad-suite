@@ -25,8 +25,8 @@ use crate::expr::{lvalue_base, render, walk_expr};
 use crate::schema::{
     Confidence, Evidence, EvidenceClass, GapClass, GapItem, GapReport, SkippedNote, SkipReason,
 };
-use crate::sv::{classify_proc, extract_parse_errors, is_tb_file, reset_cond_signal, split_lines,
-                walk_items, walk_stmt, Ctx, FlatAssign, ProcClass};
+use crate::sv::{classify_proc, extract_parse_errors, is_tb_file, reset_cond_signal, select_trigger,
+                split_lines, walk_items, walk_stmt, Ctx, FlatAssign, ProcClass};
 
 enum DriverSource {
     ContAssign,
@@ -191,21 +191,16 @@ fn build_scan<'a>(m: &'a Module) -> ModuleScan<'a> {
             let mut reset: Option<(&Stmt, Vec<&Stmt>)> = None;
             if let Some(Stmt::If { cond, then, els, .. }) = top.first() {
                 if let Some(sig) = reset_cond_signal(cond) {
-                    // 觸發訊號=首個 pos/neg 邊(時鐘);異步復位邊不在其列
-                    // (與規則提取面同一判準)。
-                    let trig_is_sig = ctrl
+                    // 觸發沿=select_trigger(與規則提取面同一函數=單一語義源;
+                    // D-r1c §19.2 C-S1):首個訊號 ≠復位候選的 pos/neg 沿,無則回退
+                    // 首沿。修前取首沿→復位前置序把復位沿誤作觸發→報「邊沿行程完全
+                    // 無復位臂」G4 certain 假陽性(mem_arst 實錄),與規則面兩面自相矛盾。
+                    let edges: Vec<&ast::EventEdge> = ctrl
                         .as_ref()
-                        .and_then(|c| {
-                            c.edges
-                                .iter()
-                                .find(|e| {
-                                    matches!(
-                                        e.kind,
-                                        ast::EdgeKind::Posedge | ast::EdgeKind::Negedge
-                                    )
-                                })
-                                .map(|e| lvalue_base(&e.expr).as_deref() == Some(sig))
-                        })
+                        .map(|c| c.edges.iter().collect())
+                        .unwrap_or_default();
+                    let trig_is_sig = select_trigger(&edges, Some(sig))
+                        .map(|e| render(&e.expr) == sig)
                         .unwrap_or(false);
                     if !trig_is_sig {
                         let mut cont = Vec::new();

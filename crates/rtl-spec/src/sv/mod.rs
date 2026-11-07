@@ -749,15 +749,25 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
     let edges: Vec<&ast::EventEdge> = ctrl
         .map(|c| c.edges.iter().collect())
         .unwrap_or_default();
-    let trigger = edges.iter().find_map(|e| match e.kind {
-        EdgeKind::Posedge | EdgeKind::Negedge => Some(Trigger {
-            edge: Some(match e.kind {
-                EdgeKind::Posedge => "posedge".to_string(),
-                _ => "negedge".to_string(),
-            }),
-            signal: Some(render(&e.expr)),
-        }),
+    // 頂層解 Block。
+    let top: Vec<&Stmt> = match body {
+        Stmt::Block { body, .. } => body.iter().collect(),
+        s => vec![s],
+    };
+    // D-r1c(§19.2 C-S1):先由頂層 If 求復位候選,再取觸發沿=敏感列表中首個
+    // 訊號 ≠復位候選的 pos/neg 沿(無則回退首沿);select_trigger=規則面與破口面
+    // (gaps.rs 復位臂識別)的單一語義源。修前取首沿:復位前置序
+    // `@(negedge rst_n or posedge clk)` 把復位沿誤作觸發→復位臂失明(mem_arst 實錄)。
+    let reset_cand: Option<&str> = match top.first() {
+        Some(Stmt::If { cond, .. }) => reset_cond_signal(cond),
         _ => None,
+    };
+    let trigger = select_trigger(&edges, reset_cand).map(|e| Trigger {
+        edge: Some(match e.kind {
+            EdgeKind::Posedge => "posedge".to_string(),
+            _ => "negedge".to_string(),
+        }),
+        signal: Some(render(&e.expr)),
     });
     let trigger_text = trigger
         .as_ref()
@@ -773,12 +783,6 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
             )
         })
         .unwrap_or_else(|| "時鐘沿".to_string());
-
-    // 頂層解 Block。
-    let top: Vec<&Stmt> = match body {
-        Stmt::Block { body, .. } => body.iter().collect(),
-        s => vec![s],
-    };
 
     // 復位臂:首層 If 且 cond=單訊號(±否定);復位訊號≠觸發訊號。
     // M3(§5.2):else 臂賦值補 !(reset 條件) 包裹——非復位行為的適用域
@@ -1017,6 +1021,30 @@ fn extract_edge_process(ctx: &Ctx, ctrl: Option<&EventCtrl>,
                 },
             });
         }
+    }
+}
+
+/// 觸發沿選取(D-r1c,§19.2 C-S1)——規則面 `extract_edge_process` 與破口面
+/// `gaps.rs` 復位臂識別的**單一語義源**(C-S2 tb_plan 時鐘識別復用同一函數)。
+/// trigger=敏感列表中第一個訊號 ≠ 復位候選 `reset_sig` 的 posedge/negedge;
+/// 無此邊沿(或無復位候選)時回退首個 pos/neg 邊沿——回退保證既有形零漂移:
+/// 單沿 `@(negedge rst_n) if (!rst_n)` 仍取 rst_n(is_trigger→無復位臂)。
+/// 訊號比較鍵=`render(邊沿表達式)`(與 Trigger.signal 同一渲染,規則面判準;
+/// 破口面舊用 lvalue_base,對裸標識符兩者恆同——in-git 語料 rg 普查非標識符
+/// 邊沿表達式 0 例)。
+pub(crate) fn select_trigger<'a>(
+    edges: &[&'a ast::EventEdge],
+    reset_sig: Option<&str>,
+) -> Option<&'a ast::EventEdge> {
+    let is_edge = |e: &ast::EventEdge| matches!(e.kind, EdgeKind::Posedge | EdgeKind::Negedge);
+    let first = edges.iter().copied().find(|e| is_edge(e));
+    match reset_sig {
+        Some(rs) => edges
+            .iter()
+            .copied()
+            .find(|e| is_edge(e) && render(&e.expr) != rs)
+            .or(first),
+        None => first,
     }
 }
 

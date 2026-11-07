@@ -17,8 +17,11 @@ pub mod rtlil;
 pub mod schema;
 pub mod sv;
 pub mod summary;
+pub mod tbplan;
 
 pub use analyzer_core::{RtlilInput, SourceInput, SvInput};
+pub use tbplan::{tb_plan_frame, tb_plan_json, tb_template_v, TbError, TbOpts, TbPlan, DEFAULT_CYCLES,
+    DEFAULT_FLUSH, DEFAULT_SEED};
 pub use schema::{
     AnalysisSummary, Category, Check, CheckForm, CheckPayload, Confidence, Contract, ContractParam,
     ContractPort, ContractSignal, DeclLint, Effect, Evidence, EvidenceClass, GapClass, GapItem,
@@ -51,6 +54,11 @@ pub fn analyze_summary(input: &SourceInput) -> AnalysisSummary {
 /// JSON 寫出(手寫,鍵序=寫出序 byte-exact 契約)。
 pub fn rulebook_json(rb: &Rulebook) -> String {
     json::rulebook_json(rb)
+}
+
+/// 測試計劃(規則書→tb_plan;§19.3.2 C-S2;計劃期錯誤=TbError)。
+pub fn tb_plan(input: &SourceInput, module: Option<&str>) -> Result<TbPlan, TbError> {
+    tbplan::tb_plan(input, module)
 }
 
 pub fn gap_report_json(gr: &GapReport) -> String {

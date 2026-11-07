@@ -129,7 +129,8 @@ fn project_module(m: &ast::Module, sm: &rcs_diag::SourceMap) -> ModuleInfo {
     let mut ports = Vec::with_capacity(m.ports.len());
     let mut last_dir: Option<ast::Direction> = None;
     for p in &m.ports {
-        // ANSI 腿:parser 已按 LRM §12.3.3 繼承(ast.rs:94-96 doc);投影端
+        // ANSI 腿:parser 已按組重置 net/reg/signed/range、僅方向跨組繼承
+        // (IEEE 1800-2017 §23.2.2.3 同向;ast.rs Port doc;D-c2 修復);投影端
         // 再攜帶 last_dir 保底。非 ANSI 腿:回填映射。孤兒(兩腿皆無證據)
         // → Inout + width 0 佔位(§4.2 佔位語義收窄版)。
         let bf = decl_dir_map.get(p.name.as_str());

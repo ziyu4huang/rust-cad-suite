@@ -7,9 +7,10 @@
 //! --out-dir pkg`; loaded from JS/Bun with explicit bytes:
 //! `init({ module_or_path: new Uint8Array(readFileSync(...)) })`.
 //!
-//! Export face (7 fns = §6.1 four MCP tools closed on both langs):
-//! analyze/extract/scan × {sv, rtlil} + version. Errors are embedded as
-//! `{"error": ...}` JSON, never thrown across the boundary.
+//! Export face (9 fns = §6.1 five MCP tools closed on both langs; C-S2
+//! adds tb_plan): analyze/extract/scan × {sv, rtlil} + tb_plan × {sv, rtlil}
+//! + version. Errors are embedded as `{"error"/"ok":false, ...}` JSON,
+//! never thrown across the boundary.
 
 use wasm_bindgen::prelude::*;
 
@@ -78,10 +79,28 @@ pub fn rtl_scan_gaps_rtlil(name: &str, source: &str) -> String {
     rtl_spec::gap_report_json(&rtl_spec::scan_gaps(&rtlil_input(name, source)))
 }
 
+/// tb_plan sv 面(RV1-11/RV2-8):`module==""`=未指定(單模組自動選取);
+/// seed/cycles/flush==0=核心默認(TbOpts::resolve,與 max_rules==0 同約定);
+/// 回傳幀=`{"ok":true,"plan":{…},"template_v":"…"}` 或
+/// `{"ok":false,"error":"…(milestone TB1)"}`(錯誤走資料,不 trap)。
+#[wasm_bindgen]
+pub fn rtl_tb_plan_sv(name: &str, source: &str, module: &str, seed: u32, cycles: u32, flush: u32) -> String {
+    let m = if module.is_empty() { None } else { Some(module) };
+    rtl_spec::tb_plan_frame(&sv_input(name, source), m, seed, cycles, flush)
+}
+
+/// tb_plan rtlil 面(RV2-8:恆 TB1 錯誤幀;硬錯文案由核心產生,本面零語義)。
+#[wasm_bindgen]
+pub fn rtl_tb_plan_rtlil(name: &str, source: &str, module: &str, seed: u32, cycles: u32, flush: u32) -> String {
+    let m = if module.is_empty() { None } else { Some(module) };
+    rtl_spec::tb_plan_frame(&rtlil_input(name, source), m, seed, cycles, flush)
+}
+
 #[cfg(test)]
 mod tests {
     // host 面:導出函數在非 wasm 目標直呼(wasm-bindgen 宏對宿主編譯為
-    // 普通函數);7 導出回合法 JSON 且無 {"error"}。
+    // 普通函數);9 導出回合法 JSON(sv 面 7 導出無 {"error"};tb_plan 恆
+    // {"ok":…} 幀)。
     const SV: &str = "module m(input wire clk, input wire d, output reg q);\n  always @(posedge clk) q <= d;\nendmodule\n";
     const IL: &str = "module \\m\n  wire width 1 input 0 \\clk\n  wire width 1 output 1 \\q\n  wire width 1 \\n0\n  process $p\n    assign \\n0 \\q\n    sync posedge \\clk\n      update \\q \\n0\n  end\nend\n";
 
@@ -91,7 +110,7 @@ mod tests {
     }
 
     #[test]
-    fn seven_exports_return_valid_json_on_host() {
+    fn nine_exports_return_valid_json_on_host() {
         assert!(!super::rtl_spec_version().is_empty());
         for s in [
             super::rtl_analyze_sv("m.v", SV),
@@ -103,6 +122,12 @@ mod tests {
         ] {
             assert_no_error(&s);
         }
+        // tb_plan sv 正樣:{"ok":true,...};rtlil 面:恆 {"ok":false,...}(RV2-8)。
+        let tb_ok = super::rtl_tb_plan_sv("m.v", SV, "", 0, 0, 0);
+        assert!(tb_ok.starts_with("{\"ok\":true,"), "{tb_ok}");
+        assert!(tb_ok.contains("\"template_v\":"), "{tb_ok}");
+        let tb_il = super::rtl_tb_plan_rtlil("m.il", IL, "", 0, 0, 0);
+        assert!(tb_il.starts_with("{\"ok\":false,") && tb_il.contains("milestone TB1"), "{tb_il}");
     }
 
     #[test]

@@ -7,3 +7,6 @@ license.workspace = true
 
 [dependencies]
 rcs-diag = { workspace = true }
+
+[dev-dependencies]
+analyzer-core = { workspace = true }

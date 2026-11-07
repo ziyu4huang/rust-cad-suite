@@ -129,15 +129,19 @@ impl<'d> Parser<'d> {
         let ansi = self.peek_starts_port_spec();
         let mut ports = Vec::new();
         if ansi {
+            // D-c2(§19.3.2 C-S2):方向是唯一跨組繼承者(IEEE 1800-2017
+            // §23.2.2.3 同向:方向/種類/型別全省略才整體繼承——本語法把
+            // 「整體繼承」形視為同組逗號連名,任何新組限定詞都開新組)。
             let mut cur_dir: Option<Direction> = None;
-            let mut cur_net: Option<ast::NetKind> = None;
-            let mut cur_reg = false;
-            let mut cur_signed = false;
-            let mut cur_range: Option<ast::Range> = None;
             'groups: loop {
                 self.skip_attrs(); // attributes may precede each port group
-                // Group specifiers; omitted ones inherit the previous group
-                // (LRM §12.3.3).
+                // New group: reset net/reg/signed/range; only `dir` rolls
+                // over from the previous group (oracle iverilog 13.0 /
+                // verilator 5.052 七向量見 RTL2SPEC-PLUGIN §19.3.2)。
+                let mut cur_net: Option<ast::NetKind> = None;
+                let mut cur_reg = false;
+                let mut cur_signed = false;
+                let mut cur_range: Option<ast::Range> = None;
                 loop {
                     match self.peek().kind {
                         Tok::Keyword(Kw::Input) => {

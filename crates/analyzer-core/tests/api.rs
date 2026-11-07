@@ -55,7 +55,8 @@ endmodule
     assert_eq!(m.params[1].name, "BASE");
     assert_eq!(m.params[1].value, "4'sd5");
 
-    // 端口:ANSI 腿(parser 依 LRM §12.3.3 繼承;投影端攜帶保底)。
+    // 端口:ANSI 腿(parser 新組重置 net/reg/signed/range、僅方向跨組繼承;
+    // 投影端攜帶保底;D-c2 語義,oracle 見 RTL2SPEC-PLUGIN §19.3.2)。
     assert_eq!(m.ports.len(), 5);
     let p = |n: &str| m.ports.iter().find(|p| p.name == n).unwrap();
     assert_eq!(p("clk").dir, Dir::Input);
@@ -108,7 +109,11 @@ endmodule
     assert_eq!(a.line_col(analyzer_core::rcs_diag::FileId(0), 0).unwrap(), (1, 1));
 }
 
-/// S1 正例 2:ANSI 繼承腿(顯式樣例:組規格省略繼承前組,R1-8/R2-1)。
+/// S1 正例 2:ANSI 繼承腿(D-c2 訂正 2026-11-07:方向唯一跨組繼承,新組
+/// net/reg/signed/range 重置——oracle=iverilog 13.0(-g2005/-g2012)與
+/// verilator 5.052 對 `module m(input [3:0] a, b, c, output d)` 三方皆
+/// d=1(§23.2.2.3 同向;RTL2SPEC-PLUGIN §19.3.2 七向量 v1)。舊期望
+/// d=4 是把缺陷語義釘成正確,由 ADR-0013 D-C13 顯式修訂 ADR-0012 D1。
 #[test]
 fn sv_ansi_inheritance_leg() {
     let src = "module m(input [3:0] a, b, c, output d);\nendmodule\n";
@@ -116,16 +121,13 @@ fn sv_ansi_inheritance_leg() {
     assert!(!a.has_errors(), "diag_text={}", a.diag_text);
     let m = a.module("m").unwrap();
     let port = |n: &str| m.ports.iter().find(|p| p.name == n).unwrap();
-    // a/b/c 同組繼承 input [3:0];d 為新組 output——組規格省略範圍,依
-    // LRM §12.3.3 繼承前組 [3:0](parser 顯式實現:module.rs 組循環註釋),
-    // 投影如實呈現寬度 4。
     for n in ["a", "b", "c"] {
         assert_eq!(port(n).dir, Dir::Input, "port {n}");
         assert_eq!(port(n).width, 4, "port {n}");
         assert!(!port(n).parametric, "port {n}");
     }
     assert_eq!(port("d").dir, Dir::Output);
-    assert_eq!(port("d").width, 4);
+    assert_eq!(port("d").width, 1);
 }
 
 /// S1 正例 3:非 ANSI 回填腿(探針實證源;R2-1)。Port.dir 恆 None,

@@ -448,3 +448,129 @@ fn unsized_literal_parse() {
     assert!(matches!(&**lhs, Expr::NumLit(n) if n.width == Some(4) && n.signed && n.digits == "15"));
     assert!(matches!(&**rhs, Expr::NumLit(n) if n.width.is_none() && n.digits == "3x"));
 }
+
+// ---- D-c2 ANSI 端口組重置七向量(§19.3.2 C-S2;oracle=iverilog 13.0
+// -g2005/-g2012 與 verilator 5.052 三方一致,RTL2SPEC-PLUGIN §19.3.2 表)。
+// 斷言面=analyzer-core 投影(width/parametric/signed/dir);iverilog -g2005
+// 對 v4/v5/v6 的「Partial ANSI … requires SystemVerilog」拒收屬模擬器語言
+// 模式差異,不進斷言(本前端按組規格語法接受,投影語義以三方一致為準)。
+use analyzer_core::{analyze, SourceInput};
+
+fn proj(src: &str, ports: &[&str]) -> Vec<(String, u32, bool, bool, &'static str)> {
+    let input = SourceInput::Sv(analyzer_core::SvInput {
+        name: "ansi_vec.v".to_string(),
+        source: src.to_string(),
+        ..Default::default()
+    });
+    let a = analyze(&input);
+    assert!(
+        !a.diagnostics.iter().any(|d| d.severity == rcs_diag::Severity::Error),
+        "unexpected errors: {}",
+        a.diag_text
+    );
+    let m = a.modules.iter().find(|m| m.name == "m").unwrap();
+    ports
+        .iter()
+        .map(|n| {
+            let p = m.ports.iter().find(|p| &p.name == n).unwrap();
+            (
+                p.name.clone(),
+                p.width,
+                p.parametric,
+                p.signed,
+                match p.dir {
+                    analyzer_core::view::Dir::Input => "input",
+                    analyzer_core::view::Dir::Output => "output",
+                    analyzer_core::view::Dir::Inout => "inout",
+                },
+            )
+        })
+        .collect()
+}
+
+#[test]
+fn d_c2_ansi_group_reset_seven_vectors() {
+    // v1:input [3:0] a, b, c, output d —— d 新組重置範圍(舊實錯 d=4)。
+    let got = proj(
+        "module m(input [3:0] a, b, c, output d); endmodule\n",
+        &["a", "b", "c", "d"],
+    );
+    let want = [
+        ("a".to_string(), 4, false, false, "input"),
+        ("b".to_string(), 4, false, false, "input"),
+        ("c".to_string(), 4, false, false, "input"),
+        ("d".to_string(), 1, false, false, "output"),
+    ];
+    assert_eq!(got, want, "v1");
+    // v2:output reg [3:0] count, output reg busy —— busy 重置(舊實錯 4)。
+    let got = proj(
+        "module m(output reg [3:0] count, output reg busy); endmodule\n",
+        &["count", "busy"],
+    );
+    assert_eq!(
+        got,
+        [
+            ("count".to_string(), 4, false, false, "output"),
+            ("busy".to_string(), 1, false, false, "output")
+        ],
+        "v2"
+    );
+    // v3:input [7:0] a, input b —— b 新組重置(舊實錯 8)。
+    let got = proj("module m(input [7:0] a, input b); endmodule\n", &["a", "b"]);
+    assert_eq!(
+        got,
+        [
+            ("a".to_string(), 8, false, false, "input"),
+            ("b".to_string(), 1, false, false, "input")
+        ],
+        "v3"
+    );
+    // v4:input [7:0] a, wire b —— net 種類開新組,b 重置(舊實錯 8)。
+    let got = proj("module m(input [7:0] a, wire b); endmodule\n", &["a", "b"]);
+    assert_eq!(
+        got,
+        [
+            ("a".to_string(), 8, false, false, "input"),
+            ("b".to_string(), 1, false, false, "input")
+        ],
+        "v4"
+    );
+    // v5:output reg [7:0] a, reg b —— reg 種類開新組(舊實錯 8)。
+    let got = proj("module m(output reg [7:0] a, reg b); endmodule\n", &["a", "b"]);
+    assert_eq!(
+        got,
+        [
+            ("a".to_string(), 8, false, false, "output"),
+            ("b".to_string(), 1, false, false, "output")
+        ],
+        "v5"
+    );
+    // v6:input signed [7:0] a, [3:0] b —— [範圍] 開新組,signed 重置:
+    // b 寬 4 無號(舊實錯 signed=true)。
+    let got = proj(
+        "module m(input signed [7:0] a, [3:0] b); endmodule\n",
+        &["a", "b"],
+    );
+    assert_eq!(
+        got,
+        [
+            ("a".to_string(), 8, false, true, "input"),
+            ("b".to_string(), 4, false, false, "input")
+        ],
+        "v6"
+    );
+    // v7:partsel_test004 形(input signed [4:0] n, output reg [31:0] dout)
+    // —— dout 無號寬 32(舊實錯 signed=true;golden partsel 16 葉同族)。
+    let got = proj(
+        "module m(input signed [4:0] n, output reg [31:0] dout); endmodule\n",
+        &["n", "dout"],
+    );
+    assert_eq!(
+        got,
+        [
+            ("n".to_string(), 5, false, true, "input"),
+            ("dout".to_string(), 32, false, false, "output")
+        ],
+        "v7"
+    );
+}

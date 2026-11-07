@@ -94,7 +94,9 @@ impl NetKind {
 pub struct Port {
     pub span: Span,
     pub name: String,
-    /// ANSI header info (None entries inherit the previous port's).
+    /// ANSI header info. Direction rolls over across groups (IEEE 1800-2017
+    /// §23.2.2.3, same-direction); net/reg/signed/range reset per group
+    /// (D-c2 fix, RTL2SPEC-PLUGIN §19.3.2 C-S2; oracle-backed).
     pub dir: Option<Direction>,
     pub net: Option<NetKind>,
     pub is_reg: bool,

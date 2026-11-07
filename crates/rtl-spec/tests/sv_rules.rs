@@ -1401,3 +1401,100 @@ fn s4_m5_missing_reset_constraint() {
     assert_eq!(g4.confidence.as_str(), "certain");
     assert!(g4.message.contains("hold"), "{}", g4.message);
 }
+
+/// C-S1 D-r1c 助手:guard 規則清單(按規則序)。
+fn c_s1_guards(rb: &Rulebook) -> Vec<&Rule> {
+    rb.modules
+        .iter()
+        .flat_map(|m| &m.rules)
+        .filter(|r| matches!(r.check.payload, CheckPayload::Guard { .. }))
+        .collect()
+}
+
+/// C-S1 D-r1c 助手:破口面 (module|class|confidence) 條級簽名(排序)。
+fn c_s1_gap_sigs(src_name: &str, src: &str) -> Vec<String> {
+    let mut v: Vec<String> = scan_gaps(&sv(src_name, src))
+        .items
+        .iter()
+        .map(|g| format!("{}|{}|{}", g.module, g.class.as_str(), g.confidence.as_str()))
+        .collect();
+    v.sort();
+    v
+}
+
+#[test]
+fn c_s1_d_r1c_reset_first_sensitivity_is_async_guard() {
+    // D-r1c(§19.2 C-S1)正樣:復位前置敏感列表 `@(negedge rst_n or posedge clk)`
+    // ——觸發沿=select_trigger 取首個 ≠復位候選的沿(clk posedge)。規則面:
+    // guard×1 async=true;破口面:零 G4(修前=零 guard+G4 certain 假陽性,
+    // 兩面自相矛盾;dist wasm 修前實探在檔 build/c-s1/probe-pre.txt)。
+    let src = fixture_src("rst_first_async");
+    let rb = extract_rules(&sv("rst_first_async.v", &src), DEFAULT_MAX_RULES);
+    assert!(rb.parse_errors.is_empty(), "{:?}", rb.parse_errors);
+    let guards = c_s1_guards(&rb);
+    assert_eq!(guards.len(), 1, "{:?}", rb.modules);
+    match &guards[0].check.payload {
+        CheckPayload::Guard { trigger, when, r#async, effects } => {
+            assert_eq!(
+                trigger.as_ref(),
+                Some(&Trigger {
+                    edge: Some("posedge".to_string()),
+                    signal: Some("clk".to_string()),
+                })
+            );
+            assert_eq!(when.as_deref(), Some("!rst_n"));
+            assert!(*r#async, "復位沿在敏感列表=異步");
+            assert_eq!(
+                effects,
+                &vec![Effect {
+                    lhs: "q".to_string(),
+                    value: "1'b0".to_string(),
+                }]
+            );
+        }
+        other => panic!("not guard: {other:?}"),
+    }
+    let sigs = c_s1_gap_sigs("rst_first_async.v", &src);
+    assert!(
+        sigs.iter().all(|s| !s.contains("|missing_reset|")),
+        "復位臂已識別,不應報 G4: {sigs:?}"
+    );
+    // 負樣(內聯):單沿純復位行程——無 ≠復位候選的沿→回退首沿→觸發=rst_n 自身
+    // →無復位臂(舊行為釘死):規則面零 guard,破口面 G4 certain 照報。
+    let neg = "module n (input wire rst_n, output reg q);\n  always @(negedge rst_n)\n    if (!rst_n) q <= 1'b0;\nendmodule\n";
+    let rbn = extract_rules(&sv("neg_inline.v", neg), DEFAULT_MAX_RULES);
+    assert!(rbn.parse_errors.is_empty(), "{:?}", rbn.parse_errors);
+    assert!(c_s1_guards(&rbn).is_empty(), "{:?}", rbn.modules);
+    assert_eq!(
+        c_s1_gap_sigs("neg_inline.v", neg),
+        vec!["n|missing_reset|certain".to_string()]
+    );
+}
+
+#[test]
+fn c_s1_d_r1c_sensitivity_order_invariance() {
+    // D-r1c 順序不變性:復位前置 vs 時鐘前置孿生——規則面 check 載荷逐條相等
+    // (evidence 文本/行號必然不同:guard 的 evidence[1]=敏感列表原文,§19 RV1-10);
+    // 破口面條級簽名集合相等(兩者皆零)。
+    let a = fixture_src("rst_first_async");
+    let b = fixture_src("rst_first_twin");
+    let ra = extract_rules(&sv("rst_first_async.v", &a), DEFAULT_MAX_RULES);
+    let rt = extract_rules(&sv("rst_first_twin.v", &b), DEFAULT_MAX_RULES);
+    let checks = |rb: &Rulebook| -> Vec<rtl_spec::Check> {
+        rb.modules
+            .iter()
+            .flat_map(|m| &m.rules)
+            .map(|r| r.check.clone())
+            .collect()
+    };
+    assert_eq!(checks(&ra).len(), 2, "{:?}", ra.modules);
+    assert_eq!(checks(&ra), checks(&rt));
+    let ev1 = |rb: &Rulebook| -> String { c_s1_guards(rb)[0].evidence[1].snippet.clone() };
+    assert_eq!(ev1(&ra), "  always @(negedge rst_n or posedge clk)");
+    assert_eq!(ev1(&rt), "  always @(posedge clk or negedge rst_n)");
+    assert_eq!(
+        c_s1_gap_sigs("rst_first_async.v", &a),
+        c_s1_gap_sigs("rst_first_twin.v", &b)
+    );
+    assert!(c_s1_gap_sigs("rst_first_twin.v", &b).is_empty());
+}
