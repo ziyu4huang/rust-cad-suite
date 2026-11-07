@@ -38,7 +38,7 @@
 4. **P3.7 統一分析器服務弧(2026-11-02 立案落地,ADR-0011)**——模組化:Verilog/SystemVerilog 分析器拆為獨立可用高效組件(`analyzer-core` 庫,SV=vl-syntax 全管線直呼、RTLIL=ry-ir 直呼,統一 `Analysis` 視圖+原生 IR 逃逸口,零新語義引擎);client/server(`analyzerd` UDS 服務+`clients/analyzer-ts` 純 Bun 零依賴客戶端,協議=ASP/1 幀+JSON 子集);正典=docs/ANALYZER-SERVICE.md(§17 實作記錄=日誌 SSOT);新基礎設施無 oracle,行為契約=普通單測/集成測試+25 條自建編解碼向量;既有 e2e 語料與 SUMMARY 基線凍結零接觸。
 4. **P3.8 rtl-to-spec 插件弧(2026-11-03 立案,ADR-0012)**——RTL 行為規則書提取+破口掃描:
    Rust 核心(`rtl-spec`,走 analyzer-core 逃逸口,不擴前弧)→ wasm 面(`rtl-spec-wasm`,
-   --target web 顯式位元組 init)→ MCP server(手寫純 JS .mjs,stdio JSON-RPC 四工具)→
+   --target web 顯式位元組 init)→ MCP server(手寫純 JS .mjs,stdio JSON-RPC 五工具)→
    zcode plugin 包(`plugin/rtl2spec/`:manifest+skills×3+閘腳本×2);反 doc-dump 三鎖
    (生成端只由行為構造 spawning/資料端 check.form 五形+指紋去重/閘端 V1..V6 機械判據);
    正典=docs/RTL2SPEC-PLUGIN.md(§實作記錄=日誌 SSOT);無 oracle 契約,質量閘=機械判據
@@ -109,6 +109,9 @@ SV 階梯:M8 = logic/always_ff-comb-latch/typedef-enum-struct/packages;interface
 | M9 | tier B `--gen-rust`(編譯設計,Verilator 同構;ADR-0002=docs/adr/0002) | 10-100× 提速錨 | ◐ slice-1 2026-10-26:單 initial 直線子集 4 案例 byte-exact(riv-gen+--gen-rust);多線程/跳轉/always=後續切片 |
 | AN1..AN5 | 統一分析器+ASP/1 服務(analyzer-core/analyzerd/clients/analyzer-ts;正典=docs/ANALYZER-SERVICE.md,ADR-0011) | 總閘四條;run-smoke PASS;基線 469/479+456/456 逐字不動 | ✅ 2026-11-02(S1..S5 一弧收網;analyzer-core 34 測試+1 ignored 生成器+analyzer-server 15 測試[單測 3+回環 12]+bun 12 向量測試+smoke 八項斷言;計數=2026-11-03 收平輪實測刷新,原錄 36/10 回環過時,見 ANALYZER-SERVICE §17 收平條) |
 | RTL1..RTL5 | rtl-to-spec 插件弧(rtl-spec/rtl-spec-wasm/plugin/rtl2spec;正典=docs/RTL2SPEC-PLUGIN.md,ADR-0012) | 總閘四件套(cargo test --workspace+regress.sh+run-mcp-e2e.sh+run-rtl-validation.sh);run-mcp-e2e PASS;run-rtl-validation PASS(V1..V6);基線 469/479+456/456 逐字不動 | 🔶 S1..S7 2026-11-03(核心+wasm+插件包+兩閘全綠;Σrules=325;評審員區=S7 同輪自評,見報告;總閘四件套實測見本檔 §5 RTL 行與 RTL2SPEC-PLUGIN §15) |
+| C-S1..C-S6 / TB1 族 | C 閉環全量化弧(tb_plan TB 生成+conformance 評測+診斷回灌;ADR-0013;正典=docs/RTL2SPEC-PLUGIN.md §19) | 總閘 11 命令(8 現役插件閘+run-conformance-eval+cargo test --workspace+regress.sh 最後);run-conformance-eval exit 0(SUMMARY designs=6/6 admitted=6);基線 469/479+456/456 逐字不動 | ✅ 2026-11-07 一弧收網(C-S1=D-r1a/b/c 收平+golden 重錄 2 檔;C-S2=D-c2 ANSI 修復[golden 4 檔 24 葉]+核心 tb_plan+wasm 7→9 導出+MCP 五工具 0.4.0;C-S3=conformance 確定性床 6/6 ADMITTED killed=210;C-S4=D 腿 4 設計入庫 killed=347 gain+137;C-S5=診斷回灌+留一法+F1 演示全配;C-S6=本行立法;逐片機械門檻實跑數字=§19.18..19.23;TB1=tb_plan 十一條硬錯里程碑族,M7 形) |
+| C 收尾弧 S0..S4 | C 閉環未覆蓋項收尾(終審 2 medium/等價裁決腿/波形幀診斷腿/T 腿擴面/收尾;方案=docs/RTL2SPEC-FINISH-PLAN.md;記錄=docs/RTL2SPEC-PLUGIN.md §20) | 總閘 12 命令(契約 11 條+cargo build)全 exit 0;run-conformance-eval 默認模式零 yosys 依賴(SUMMARY designs=34/34 admitted=34 mutants=863 eligible=794 killed=544 equivalent=69);golden 98/98;插件 0.5.0 | ✅ 2026-11-07(工作樹,未 commit;遺留 D-c5/D-c6、operators 政策待裁、RY-EQUIV 僅註冊) |
+| RY-EQUIV(編號未承諾) | ryosys equiv_* 核心實現(equiv_make/equiv_simple/equiv_induct/equiv_status 族;收尾弧 S1 註冊) | 落地判據=可替代等價裁決腿的 yosys oracle,逐變異與 oracle 對拍(CONFORMANCE-PROTOCOL §7 生產命令形) | ⬜ **僅註冊,未實現**:現狀=registry 層硬錯(crates/ry-cli/src/registry.rs:76-86;實跑 `ERROR: equiv_make: not implemented in ryosys (milestone Y0)`);本弧禁實現、禁空實現或 stub 過閘。已見邊界:`$pow` `No SAT model available`(最小構造實跑,flatten 不解);另 proc 對 OP-POL 異步復位形報 non-constant(i2c m0011,屬 proc 前端非證明器) |
 | M8-M9 | 語言廣度/SV 階梯/perf gate + tier-B ADR | 見 PLAN-DRAFT §5;M8 首批候補=層級引用深化(unnamed genblk 鏈×5 檔)、SV fill literals '0/'1(≈11 檔)、>128-bit 多 limb(×6,u128 後餘族)、intra-assign delay、reals、>8 字元字串、宏貼字面量(`SIZE'ha) | |
 
 ## 6. CLI 契約(對抗審 #7/#8 修訂)

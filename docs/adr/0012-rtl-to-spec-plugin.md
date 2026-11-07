@@ -177,3 +177,36 @@ golden/MCP 只 stdio+四工具/不採 --target bun/不做 GUI/不做 4-state
   fixture 兩處路徑/counter.v 全路徑)+§16.9 修訂記錄節+本 D14 修訂;
   12 檔 flapper 12/12 全量復驗(wasm 同進程 12 跑)+跨進程一致/
   同進程抖雙腿實證+scopes.v wasm trap 秒級實證。
+- 2026-11-06 C 閉環弧規劃輪(指針;本 ADR 既有條文零改):新立 ADR-0013(D-C1..D-C12:TB 生成雙腿
+  [核心 tb_plan 模板腿+LLM 定向腿]/TB 協議 v1/判別力雙 fixture[規則錨定變異+P-unruled 池+yosys
+  僅錄製期存活裁決]/conformance 閘 run-conformance-eval.sh[規劃閘,總閘直調不進 regress]/診斷回灌
+  ≤3 輪/採樣 6 設計/插件 0.4.0);本 ADR 機械閘第 4 條總閘序列由 ADR-0013「機械閘」延伸;復原力弧
+  終審三缺陷 D-r1a/r1b/r1c 收平歸 ADR-0013 D-C12(C-S1);企劃=RTL2SPEC-PLUGIN §19。
+- 2026-11-07 C 閉環弧復審修訂指針(本 ADR 既有條文零改;修訂關係=ADR-0013 D-C11/機械閘 1):①D4「四工具」
+  與非目標「MCP 只 stdio+四工具」由 ADR-0013 D-C11 修訂為五工具(新增 rtl_tb_plan,C-S2 生效;stdio 單
+  傳輸與零 HTTP/WS/sampling/resources/prompts 面不變);②機械閘 1 的「七斷言/恰 4 工具」自 C-S1(⑧)/
+  C-S2(②⑨⑩)起以 ADR-0013 機械閘 2 與該片實跑 PASS 行數為準(現狀定義已三分:本檔 :106 七斷言/
+  mcp-client.mjs 實有 10 個 check 呼叫點/OKR.md:62 十一斷言);③機械閘 4 的現役 8 條即 ADR-0013 機械閘 1
+  的「ADR 現役交付閘 8」,run-reimpl-eval/s6 run.sh 屬環境依賴直調、非本 ADR 交付閘。
+- 2026-11-07 C 閉環弧復審 R2 修訂指針(本 ADR 既有條文零改;修訂關係=ADR-0013 D-C13):D1 的弧約束「禁破壞
+  analyzer-core 測試與 API」有一處由 oracle 證據覆蓋——crates/analyzer-core/tests/api.rs:128
+  `sv_ansi_inheritance_leg` 斷言 `module m(input [3:0] a, b, c, output d)` 的 d 寬 4(:119-121 註釋稱依 LRM
+  §12.3.3 繼承前組),而 iverilog 13.0(-g2005/-g2012)與 verilator 5.052 三方皆 d=1;C 弧 C-S2 首步修正
+  vl-syntax ANSI 新組重置(D-c2)時同片把該期望改為 1 並改寫相關註釋,API 簽名零改;此為 D1 唯一例外
+  (AGENTS §1 oracle 即 spec;證據=RTL2SPEC-PLUGIN §19.3.2 七向量表與 §19.17 RV2-1)。
+- 2026-11-07 C 閉環弧 C-S1 實作記錄指針(本 ADR 既有條文零改;修訂關係=ADR-0013 D-C12/機械閘 2):機械閘 1
+  run-mcp-e2e 的斷言數於 C-S1 加 ⑧(D-r1a max_rules 效果四調用)後實跑 PASS 行數=**14**(①②③③b④④b⑤⑥⑦
+  ⑧a⑧b⑧c⑧d+ping;:106「七斷言」原文按 append-only 不改,現役定義以此為準,C-S2 改 ② 並加 ⑨⑩⑪ 後再同步);
+  機械閘 4 的 run-plugin-check 新增判據 ⑤ SSOT 漂移(scripts/ssot-drift-check.mjs)、run-golden-regression
+  尾部新增 STATS 資訊行(不斷言)、run-gap-fixtures 矩陣 8→13 行(+D-r1c 五檔)——均屬既有閘的判據增補,
+  ADR 現役交付閘數仍 8;詳證=RTL2SPEC-PLUGIN §19 C-S1 實作記錄。
+- 2026-11-07 C 閉環弧 C-S2 實作記錄指針(本 ADR 既有條文零改;修訂關係=ADR-0013 D-C11/D-C13):D4「四工具」→五工具
+  生效(rtl_tb_plan 落地;stdio 單傳輸不變);機械閘 1 斷言數=**19**(實跑 PASS 行數,iverilog 在場時;①②③③b④④b⑤⑥⑦
+  ⑧a..d⑨a..c⑩⑪+ping,不在場時 ⑨c=SKIP 行);D1 例外生效(api.rs:128 期望 4→1,oracle 三方 d=1,API 簽名零改);
+  wasm 導出 7→9;插件 semver 0.3.0→0.4.0(四點一致,EXPECTED_ABI 仍 ['0.1.0']);run-plugin-check 新增 ③c 導出面+⑥ skill
+  零語義判據,均屬既有閘的判據增補,ADR 現役交付閘數仍 8;詳證=RTL2SPEC-PLUGIN §19.19。
+- 2026-11-07 收尾弧 S3 釘選集擴檔指針(本 ADR 既有條文零改):D14 golden 釘選集 37→49 檔(+12 個 conformance staging ADMITTED
+  設計;golden 74→98 份;`run-golden-regression.sh --record` 實跑既有 74 份 sha 逐值不變);入選依據由「≥3 條規則」改為「TB 實殺變異的
+  直接證據」;golden-check 新增 EXPECTED_PINNED=49 精確數斷言;§16.1.1 表欠 S4 §20 清償(RTL2SPEC-FINISH-PLAN §11)。現役交付閘數不變。
+- 2026-11-07 收尾弧 S4 指針(本 ADR 既有條文零改):D14 golden 釘選集的 SSOT 由 RTL2SPEC-PLUGIN §16.1.1 表移至 §20.5 全表(49 檔),
+  run-plugin-check ⑤e 逐檔名對拍、⑤f 收尾弧欠條已清;插件 semver 0.4.0→0.5.0(四點一致,MCP 工具面與 EXPECTED_ABI 不變)。現役交付閘數不變。

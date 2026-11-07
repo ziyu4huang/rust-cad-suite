@@ -59,11 +59,17 @@
 
 - **KR1.11 rtl-to-spec 插件(ADR-0012,2026-11-03 立)**:RTL 行為規則書提取
   +破口掃描,完整一路 Rust 核心→wasm→MCP→zcode plugin。
-  證據:`bash plugin/rtl2spec/run-mcp-e2e.sh`(exit 0,回環 11 斷言);
+  證據:`bash plugin/rtl2spec/run-mcp-e2e.sh`(exit 0,回環 19 斷言=實跑 PASS 行數,§19 C-S2 起);
   `bash plugin/rtl2spec/run-rtl-validation.sh`(exit 0,V1..V6 全過:Σrules
   325≥50/行為占比 100%/5 類≥4/指紋 325 零重複/13 檔 13 過);報告=
   plugin/rtl2spec/validation-report.md(機械生成證據頁);正典=
   docs/RTL2SPEC-PLUGIN.md;regress.sh 雙守衛插件塊。
+- **KR1.12 C 閉環全量化(ADR-0013,2026-11-07 立;C-S1..C-S6 一弧)**:規則書→tb_plan TB 生成+
+  conformance 評測+診斷回灌,行為復原力度量(非意圖正確性)。
+  證據:`bash plugin/rtl2spec/run-conformance-eval.sh`(exit 0,SUMMARY designs=34/34 admitted=34
+  killed=544/eligible=794;收尾弧 S3 擴面前=6 設計 killed=347/eligible=412;收尾弧記錄=docs/RTL2SPEC-PLUGIN.md §20;selfcheck+留一法+F3 斷言+等價裁決 SUMMARY-EQ);證據頁=plugin/rtl2spec/conformance-report.md
+  (機械生成禁手改);D 腿協議=plugin/rtl2spec/CONFORMANCE-PROTOCOL.md;正典=docs/RTL2SPEC-PLUGIN.md §19;
+  基線 469/479+456/456 逐字不動。
 
 ## O2: 開發 agent 能力硬化(EDA 工具域)
 

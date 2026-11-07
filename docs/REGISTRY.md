@@ -10,9 +10,9 @@
 | `rcs-diag` | spans/source map/診斷/caret 渲染(suite 共享) | 0 | verilator 的 %Error 輸出層 | 渲染 golden 測試 |
 | `analyzer-core` | 統一分析 API(`analyze`+`Analysis` 投影視圖)+ASP/1 codec+§13 報告編碼(10.7 core-first 語義層) | vl-syntax,ry-ir,rcs-diag | —(自建,無 oracle) | `cargo test -p analyzer-core` 34 pass+1 ignored(json 17+api 13+codec 向量 4;2026-11-03 收平輪實測);`bun test`(同 fixtures 12);ADR-0011 |
 | `analyzer-server` | bin `analyzerd`:UDS 面(握手/幀循環/ops/停機/殘留清理),零語義 | analyzer-core | —(自建) | `cargo test -p analyzer-server` 15 測(單測 3+回環 12;2026-11-03 收平輪實測);regress S5 `analyzer smoke` 塊 |
-| `rtl-spec` | RTL 行為規則書提取(reset/fsm/handshake/timing/arithmetic/counter/memory/protocol/param 九類)+破口掃描 G1..G7+結構投影摘要+手寫 JSON writer(只寫不讀,鍵序=寫出序 byte-exact)+markdown 渲染;語義姿態=永不 panic、錯誤進結果;走 analyzer-core 逃逸口,**不擴前弧**(ADR-0012 D1) | analyzer-core,vl-syntax,ry-ir,rcs-diag | —(自建,無 oracle;質量閘=V1..V6 機械判據+獨立評審員) | `cargo test -p rtl-spec` 26 測(sv 22+rtlil 2+lib 2;2026-11-04 S9..S12 輪實測,含 G8 dead_branch/S8 確定性錨);`bash plugin/rtl2spec/run-rtl-validation.sh`(13 檔 V1..V6 全過,Σrules=325);`bash plugin/rtl2spec/run-golden-regression.sh`(37 檔×2 golden 逐位元組)+`bash plugin/rtl2spec/run-gap-fixtures.sh`(G1..G7 矩陣;兩閘 regress S11 收編)+`bash plugin/rtl2spec/run-realworld-eval.sh`(353 檔分層評測→docs/RTL2SPEC-EVAL.md);正典=docs/RTL2SPEC-PLUGIN.md |
-| `rtl-spec-wasm` | wasm face(cdylib):7 導出(JSON 字串進出,analyze/extract/scan×sv|rtlil 面),零 js_sys,`--target web`+顯式位元組 init(ADR-0012 D3) | rtl-spec,wasm-bindgen | —(自建) | `cargo test -p rtl-spec-wasm` 2 測(host 面);smoke.mjs bun+node 雙運行時各 15 斷言、6 路 wasm↔native byte parity(2026-11-03 實測);dist 裝載由兩插件閘驗(D8:閘驗出貨物) |
-| `vl-syntax` | pp+lexer+parser+AST(V2005) | rcs-diag | VPreproc/V3Parser | lexer 12 + frontend 17 測試;E2E 全語料過解析閘 |
+| `rtl-spec` | RTL 行為規則書提取(reset/fsm/handshake/timing/arithmetic/counter/memory/protocol/param 九類)+破口掃描 G1..G7+結構投影摘要+測試計劃 tb_plan 與模板 TB(tbplan.rs,C 弧 C-S2;TbError 十一條硬錯 milestone TB1)+手寫 JSON writer(只寫不讀,鍵序=寫出序 byte-exact)+markdown 渲染;語義姿態=永不 panic、錯誤進結果;走 analyzer-core 逃逸口,**不擴前弧**(ADR-0012 D1) | analyzer-core,vl-syntax,ry-ir,rcs-diag | —(自建,無 oracle;質量閘=V1..V6 機械判據+獨立評審員) | `cargo test -p rtl-spec` 59 pass(2026-11-07 C-S6 實跑套件行:unit 5[含 lint 3]+rtlil 2+sv_rules 41[含 C-S1 兩測]+tbplan 11;2026-11-04 版本 26 測已過時),含 G8 dead_branch/S8 確定性錨);`bash plugin/rtl2spec/run-rtl-validation.sh`(13 檔 V1..V6 全過,Σrules=325);`bash plugin/rtl2spec/run-golden-regression.sh`(37 檔×2 golden 逐位元組)+`bash plugin/rtl2spec/run-gap-fixtures.sh`(G1..G7 矩陣;兩閘 regress S11 收編)+`bash plugin/rtl2spec/run-realworld-eval.sh`(353 檔分層評測→docs/RTL2SPEC-EVAL.md);正典=docs/RTL2SPEC-PLUGIN.md |
+| `rtl-spec-wasm` | wasm face(cdylib):9 導出(JSON 字串進出,analyze/extract/scan/tb_plan×sv|rtlil 面+version;C-S2 7→9),零 js_sys,`--target web`+顯式位元組 init(ADR-0012 D3) | rtl-spec,wasm-bindgen | —(自建) | `cargo test -p rtl-spec-wasm` 2 測(host 面);smoke.mjs bun+node 雙運行時各 18 斷言、9 路 wasm↔native byte parity(2026-11-07 C-S2 實測:新增 tb_plan sv 正樣/TB1 負樣/.il 三路);dist 裝載由兩插件閘驗(D8:閘驗出貨物) |
+| `vl-syntax` | pp+lexer+parser+AST(V2005);ANSI 端口組解析=新組重置 net/reg/signed/range、僅方向跨組繼承(D-c2 修復,ADR-0013 D-C13;七向量前端單測 frontend.rs) | rcs-diag | VPreproc/V3Parser | lexer 12 + frontend 18 測試(含 d_c2_ansi_group_reset_seven_vectors;2026-11-07 C-S2 實測);E2E 全語料過解析閘 |
 | `vl-sim` | 4-state 值/求值/展開/事件調度器(值域已提取=`vl-values`,src/value.rs 為 shim re-export;wait/fork/force 族硬錯自 parse 級遷 build 級,M7/M8 文字逐臂保留 interp.rs:1767-1785) | vl-syntax, rcs-diag, vl-values | VCSD/eval/scheduling | value 8 測試;sim_gate 2(counter8+fulladd byte-diff);e2e 59/59 零漂移 |
 | `vl-cli` | bin `rverilator`(--version/-E/--lint-only/--dump-ast/--binary/--top-module) | 上全部 | verilator driver | 未知旗標=錯 exit1(對抗審 #8) |
 | `rv-xls-sim` | XLS `VerilogSimulator` 形進程適配器:argv 與 stdin-JSON 兩入口共用 `vl_sim::USim`;stdout=設計輸出/stderr=診斷(CLI 的 Verilator 全-stdout 慣例不變);`.sv` 明確拒收;in-memory 文字落 scratch 目錄(相對 include/readmem 同真檔);JSON 子集零 serde | vl-syntax, vl-sim, vl-cli, rcs-diag | XLS `VerilogSimulator`(`iverilog_simulator.cc` 的同位插槽) | `cargo test -p rv-xls-sim`(10 unit+11 contract:add3/acc_pipe byte-equal×2、巨集、include、語法錯分流、`.sv`、JSON round-trip);regress「xls adapter」行;上游子類 `cpp/xls/simulation/simulators/`(對真 header 編譯,scripts/xls-cpp-gate.sh 10 項 harness);收割鏈=scripts/xls_harvest_manifest.py+xls_adopt.py(regress selftest);正典=docs/XLS-ADAPTER.md |
@@ -81,10 +81,12 @@
 | `bun crates/vl-wasm/wasm-test/spec.mjs` | regress.sh | spec 層 wasm 閉環(ADR-0007):correct 0 違例/LSB-first+no-ack 負向指名/BigInt 跨界/雙跑 byte 確定性/未知變體硬錯 |
 | `bun crates/vl-ffi/bun-example/vcd_svg.mjs` | regress.sh | agent 產波形:run→dump→rcs_vcd_svg→svg 形狀+q 終值 title 斷言 |
 | `cargo test -p vl-vcd --test render_golden` | 每次提交 | render golden byte-diff+CLI stdout golden+未知旗標 exit1+VL-E101 |
-| `bash plugin/rtl2spec/run-mcp-e2e.sh`(總閘成員;regress S7 起雙守衛塊) | 每次交付 | MCP stdio 回環七斷言:initialize 回顯/tools list 恰 4 工具/extract_rules 正樣(rules≥3)/scan_gaps Latch 正樣(@* 形)/負樣三形(檔案缺失 isError+path,source 雙缺 isError+未知名 -32601);wasm 陳舊檢查含全部傳遞依賴目錄 | 
+| `bash plugin/rtl2spec/run-mcp-e2e.sh`(總閘成員;regress S7 起雙守衛塊) | 每次交付 | MCP stdio 回環 19 斷言(=實跑 PASS 行數,iverilog 在場時,§19 C-S2 起;定義點同步=AGENTS 10.10/OKR KR1.11/run-mcp-e2e.sh/mcp-client 頭注):initialize 回顯/tools list 恰 5 工具/extract_rules 正樣(rules≥3)/scan_gaps Latch 正樣(@* 形)/負樣三形(檔案缺失 isError+path,source 雙缺 isError+未知名 -32601)/⑧ D-r1a max_rules 效果四調用(i2c 不傳/顯式 0→152 零截斷、顯式 100→100+truncated、batch→152)/⑨ rtl_tb_plan 正樣(ok+clocks/resets≥1+協議標記+模板與 fixture `iverilog -g2005 -t null` 同編零警告,iverilog 不在場 SKIP)/⑩ parametric→TB1/⑪ .il→TB1;wasm 陳舊檢查含全部傳遞依賴目錄 | 
 | `bash plugin/rtl2spec/run-rtl-validation.sh`(總閘成員;regress S7 起雙守衛塊) | 每次交付 | 13 檔 in-git 語料 V1..V6 機械判據全過(反 doc-dump 三鎖閘端鎖;snippet 逐位元組對拍=checker 重讀源檔);validation-report.md 機械生成入庫=證據頁 |
-| `bash plugin/rtl2spec/run-golden-regression.sh`(總閘成員;regress S11 起雙守衛塊,S9 實作) | 每次交付 | 釘選 37 檔×rules+gaps=74 份 golden 逐位元組比對(wasm 腿=dist 同一產物,D8);--record 顯式重錄(錄前進程內每檔每模式 3 跑自檢,兩階段防部分錄製)+PROVENANCE.md 機械重寫;re-record=語義事件,錄後 git diff golden/ 逐案對帳;紅路實證=golden 篡一字節必紅(DIFF+PROV-DIFF 雙層)+提取器 message 改一字必紅(S9 輪在案) |
-| `bash plugin/rtl2spec/run-gap-fixtures.sh`(總閘成員;regress S11 起雙守衛塊,S10 實作) | 每次交付 | G1..G7 正負樣**條級 (module,class,confidence) multiset 集合相等**(正樣 14 條含 G6/G7 共報全集+G4 無復位臂新檔 suggested_test 逐字名 ra)+msgSubs 關鍵詞抽點+終止性守衛(gap_hang_repro.v 12 跑逐字不變+G5 恰 4 條)+selfcheck 判別力自證(正樣誤配負樣必紅);expected findings=斷言規格手寫合法,與 golden 快照劃界(D15) |
+| `bash plugin/rtl2spec/run-golden-regression.sh`(總閘成員;regress S11 起雙守衛塊,S9 實作) | 每次交付 | 釘選 49 檔×rules+gaps=98 份 golden 逐位元組比對(收尾弧 S3 起 37→49:+12 個 conformance staging ADMITTED 設計;釘選集 SSOT=RTL2SPEC-PLUGIN §20.5 全表(S4 清償 §16.1.1 欠條),run-plugin-check ⑤e 逐檔名對拍、⑤f 欠條已清;golden-check `EXPECTED_PINNED=49` 精確數斷言,清單增刪未同輪上調=exit 2)(wasm 腿=dist 同一產物,D8);--record 顯式重錄(錄前進程內每檔每模式 3 跑自檢,兩階段防部分錄製)+PROVENANCE.md 機械重寫;re-record=語義事件,錄後 git diff golden/ 逐案對帳;紅路實證=golden 篡一字節必紅(DIFF+PROV-DIFF 雙層)+提取器 message 改一字必紅(S9 輪在案);§19 C-S1 起尾部打印 `STATS …` 資訊行(scripts/golden-stats.mjs,不斷言;文檔對賬數字一律引此行)+golden 重錄片標準程序 G0..G5(G3 對賬工具 scripts/golden-leafdiff.mjs 葉級 diff+--allow 越界斷言) |
+| `bash plugin/rtl2spec/run-gap-fixtures.sh`(總閘成員;regress S11 起雙守衛塊,S10 實作) | 每次交付 | G1..G7 正負樣**條級 (module,class,confidence) multiset 集合相等**(正樣 14 條含 G6/G7 共報全集+G4 無復位臂新檔 suggested_test 逐字名 ra)+msgSubs 關鍵詞抽點+終止性守衛(gap_hang_repro.v 12 跑逐字不變+G5 恰 4 條)+selfcheck 判別力自證(正樣誤配負樣必紅);expected findings=斷言規格手寫合法,與 golden 快照劃界(D15);§19 C-S1 起 +D-r1c 五檔(rst_first_async/twin/compound/loadsig/rst_only_edge)破口面檔級+規則面 guard 兩矩陣各一行+順序不變性+兩 selfcheck(修前 wasm 紅路 4 FAIL 在案),檔級矩陣 13 行 |
+| `bash plugin/rtl2spec/run-conformance-eval.sh`(C 閉環弧 C-S3 交付;總閘直調**不進 regress**,評測層分鐘級;條文四層=§19 C-S6) | 每次交付(直調) | 六設計 T 腿 Q1..Q9(編譯零警告/原版 2 跑==expected.txt/DONE 收尾零 WATCHDOG/X-clean/協議文法/靜態約束含 TB-R1x/verilator 跨模擬器/判別力鐵則 P-rule≥1 killed+控制組存活+record 雙向 DRIFT/覆蓋聲明)+selfcheck(分腿正規化敵意向量、X 掃描、同檔 R1 三向量 parity、TB-R1x 跨檔五向量 fixtures/conformance-lint/、手術 count==1)+證據頁 conformance-report.md byte 比對;`--record --slice <C-Sn>`=錄前快照+record-diff+yosys 僅錄製期存活裁決;首錄(C-S3)SUMMARY designs=6/6 admitted=6 mutants=439 eligible=412 killed=210 equivalent=27 unruled_killed=13;C-S4 起 4 設計 tb_leg=directed(凍結 LLM 產物,協議=CONFORMANCE-PROTOCOL.md;T 腿模板轉基線腿同矩陣,D/T 分列禁合併;入庫門=形族底線+不劣於基線;C-S4 SUMMARY killed=347 gain +137:i2c 201/255、fsm 42/42、sincos 76/82、acc_pipe 10/10;收尾弧 S3 起 T 腿擴面到 34 設計(staging `--fixtures-root` 預錄 51 候選→ADMITTED 28 收編,REJECTED 23 登記於 CONFORMANCE-PROTOCOL §9;主根斷言 specPath∈golden 釘選集;C-S8-2 SUMMARY designs=34/34 admitted=34 mutants=863 eligible=794 killed=544 equivalent=69 unruled_killed=84;SUMMARY-EQ adjudicated=311 equivalent=69 unproven=242 adjudication_failed=0 killed_selfcheck total=552 equivalent=0;默認模式 3:08;收尾弧 S4 起默認模式另斷言入庫 record 的 provenance.wasmSha256==dist wasm,不等=DRIFT);C-S5 起診斷層入閘(record 新增 rulebookDefects.defLint+leaveOneOut 欄=DRIFT 比對;F3 閘斷言 i2c 缺陷必含 cnt_end;rulebook-defects.{json,md} 全集跑生成;LOO rate 實測 acc 3/10 fsm 6/42 i2c 8/201 se 7/10 sincos 9/76 subbytes 3/8,v1 無下限);sincos 76/82、acc_pipe 10/10);紅路四路(expected 篡一字節→Q2/killed 錄改 survived→Q8 DRIFT/刪 SCENE 頭→Q5/手改 tb.v 含註釋→TB-SHA-ALARM)在案;收尾弧 S0 起 TB-SHA-ALARM=record.tb.sha256/磁碟 tb.v/本輪主腿 TB 三方核對(默認 REJECTED、錄製拒錄,exit 1;換檔唯一路徑 --promote,CONFORMANCE-PROTOCOL §5)+WAIVE 標籤集 tblint WAIVE_LABELS(補 unadjudicated,集外 Q9 硬紅)+協議模板硬同步(proto-template.mjs,v2 104d13f1…;selfcheck 加枚舉逐集合核對與篡改負向量);收尾弧 S1 起等價裁決腿(協議 §7;--record 專屬,默認模式零 yosys 依賴):強形命令+輸出位數空真守衛+eqverdict 三值+gold-vs-gold/空真探針/地面真值/killed 全母體/存量重驗任一不過=拒錄+WAIVE↔record 併入 Q9;默認模式 eq-verify(schema+counts+waiveTable);C-S7 重錄 SUMMARY-EQ adjudicated=84 equivalent=27 unproven=57 adjudication_failed=0 killed_selfcheck total=355 main=347 unproven=354 failed=1 equivalent=0,主 SUMMARY 逐值不變,expected.txt 0 行差;度量行為復原力,非意圖正確性 |
+| `bash plugin/rtl2spec/run-frame-diag.sh`(收尾弧 S2;**輔助腿,非閘**,不入總閘;`--validate` 驗診斷工件) | 需要波形診斷時直調 | counterexample VCD(wavecap 第二 top,tb.v 零改,帶探針輸出==expected.txt 硬斷言)→ vl-vcd vcd2svg 統一窗 SVG → sips/qlmanage PNG(查看手段,SVG 仍是交付形)→ 剝 title 畫布+PNG 雙檢定 modality → 視覺 LLM 讀幀或機械 text-fallback;寫面=build/conformance/{frames,diag-vision}/;條文=CONFORMANCE-PROTOCOL §8;2026-11-07 六設計雙檢:fsm/sincos/acc_pipe/i2c_master 可 vision,subbytes/signedexpr 強制 text-fallback |
 | `bash plugin/rtl2spec/run-realworld-eval.sh`(總閘成員直調,**不進 regress**;S12 實作) | 每次交付 | 353 檔分層評測(L1=93 全提取+破口/L2=sv-tests 260 容錯面);閘級硬 FAIL=trap/V4/V5-①②④/V5-③ 指紋重複/V6 覆蓋;報告=docs/RTL2SPEC-EVAL.md 機械生成+自洽斷言(判定與 failures 同源,gen-report R3-③ 先例);首錄實測=37 design-rules/117 sparse/193 skip-perr/6 skip-tb/trap=0/指紋 672 unique/80ms |
 
 ## Divergence register(我方 vs oracle 已知且接受的差異 — 新分歧先登記再動工)
@@ -163,6 +165,15 @@
 | 10-27 | ryosys 上輪自動化中斷留下 ys-e2e 265/314 紅燈(49 例全 stdout FAIL;regress 基線已寫 314/314=必紅) | 環偵測初版只認六種簡式 cell、其餘全走 fallback 全連通——`$sdff` 的 D→Q 被建邊,next-state 回授(`count<=count+1`)誤判組合環,16 base 案例×3 層報假環+`Warnings:` 彙總行;另 log_signal_bit「offset 0=裸名」規則錯,寬 32 的 `\out3 [0]` 誤印裸名 | ①check.cc:352 參與條件(cell_evaluable||mem/barrier||is_builtin_ff,不滿足不建邊)+celledges.cc 全 dispatch(ff_op 邊緣觸發 ff **不建 D→Q 邊**;arith/shift/mux/compare/mem 精確;detail_costly≥1024 fallback);②log_signal_bit 裸名僅當 wire 寬 1(dump_sigchunk:chunk 寬==wire 寬&&offset 0);cells.rs 增 cell_evaluable/cell_is_builtin_ff(newcelltypes.h 機械轉錄) | SUMMARY 精確數基線 grep(錯即紅)+LIVE 腿雙向釘(修復後 ys=314/314、LIVE ys=314/314);PROVENANCE 補完實錄 |
 | 10-27 | regress 裸跑 FAIL(rv-diff smoke×2+agent toolbox;e2e 59/59 與 ys 314/314+live 均綠——紅面恰全在需 C++ 鏈接的腿;RYOSYS-MVP §7.0-4 實錄:修法前 FAIL/DEVELOPER_DIR=CLT 對齊後同命令 PASS) | 默認 `xcode-select` 指向 Xcode 26.6(17F113)、CLT 27.0.0.0 並存:Xcode 26.x 的 ld 不認 CLT 27 SDK .tbd 的新架構 token(arm64e.x1 等),`verilator --binary` 的 make 鏈接段報 `ld: multiple errors: tapi error: malformed file … MacOSX27.0.sdk/usr/lib/libSystem.B.tbd:4:20: unknown architecture`;`--lint-only` 無需鏈接故 lint parity 不受累 | regress.sh 頂部 3 行防禦:`DEVELOPER_DIR` 未設且 `/Library/Developer/CommandLineTools/usr/bin` 在場才 export CLT(顯式設置尊重不覆蓋=用戶主權;無 CLT 機器 `[ -d ]` 短路零影響,RM1-6 未模擬設計保證);驗收兩路徑=裸跑+`env -u DEVELOPER_DIR` 形(RM1-5:顯式設壞鏈=預期 FAIL 非 bug;RM1-7:半損壞 CLT 被 `-d` 判定誤選=紅燈可診斷非假綠,登記在案) | regress.sh 本身(閘)+SKILL ryosys 節工具鏈條目(正典)+AGENTS 10.9-r 工具鏈對齊條(對應節)+本行(證據頁) |
 | 11-03 | rtl-spec G5 掃描 scopes.v(63 行小檔)雙面掛死:native emit 4s+ 未終止(sample 棧=bfs_path→HashMap::get)、wasm 腿秒級 `RuntimeError: Unreachable` trap;開弧規劃誤判為「圖規模爆炸」 | **bfs_path 死循環真 bug**:防重用 prev.contains_key 但 start 不在 prev——組合圖含自環邊(adj[start] 含 start,scopes.v 函數/命名塊遮蔽產生自賦值)時 prev[start]=start 自映射,路徑重建 `while let Some(&p)=prev.get(cur)` 沿自映射永不停;實測圖僅 nodes=2/edges=7(規模假說證偽) | bfs_path 加 visited 集(起點入 visited=永無 prev 映射,重建 `while cur!=start` 必終止);wasm32 腿的 panic(unreachable)=死循環在 wasm 的表現形,兩腿同根因;gap_hang_repro.v 最小復現形入 plugin/rtl2spec/fixtures,單測 gap_comb_loop_self_edges_terminate_and_report 釘死(自環×2+雙向環×2 精確+3 跑 byte-identical) | rtl-spec S8(gaps.rs bfs 修復+單測)+probe-determinism.mjs(37 檔×12 跑+調用序擾動,flapper 12 檔清零)+§16.0 F2 記錄勘正(真根因=死循環非規模,守衛保留防未來真大圖) |
+| 11-07 | 終審 R5-1/R5-3:fixtures/conformance/ 內滯留 4 個未登記 LLM 盲寫 TB 殘留目錄
+  (目錄名=描述串含 `/` 被建為嵌套路徑;各僅 tb.v 222/377/707/270 行;無 case.json 不入閘枚舉;
+  mtime 09:07-09:28=C-S6 窗口;與已登記腿產物均不匹配=無來源樣本)滯留 10.12 授權入庫子樹 | 
+  寫面衛生:某輪腳本以描述串當路徑建目錄且未經 try/record 對賬流程;寫面聲明審計缺
+  「fixtures/ 樹逐輪 find 差分」步 | 刪除 4 目錄(證據已固定於終審報告與 /tmp/r5-evidence/*.tgz;
+  修後 find 零殘留);閘不受影響實證=run-conformance-eval PASS 6/6(殘留無 case.json 不進枚舉) |
+  AGENTS 10.12 寫面聲明+§19.24 補記;終審報告為源記錄 |
+| 11-07 | 終審 medium(收尾弧 S0):入庫 directed 腿 tb.v 手改後閘仍全綠(實錄:fsm/tb.v 追加一行註釋,磁碟 sha 1871b0…≠record 6792d5…,`run-conformance-eval.sh fsm` exit 0) | 默認模式只比模擬輸出與變異矩陣,對註釋無感;record.tb.sha256 只寫不驗。同族洞:WAIVE 標籤錯字在該規則另有 COVERS 時被舊正則靜默略過 | TB-SHA-ALARM 三方核對(record.tb.sha256/磁碟 tb.v/本輪主腿 TB;默認 REJECTED、錄製拒錄、寫後核對,皆 exit 1;--promote 不洗白)+tblint WAIVE 行文法外 Q9 硬紅 | conformance-eval selfcheck(TB-SHA 12 向量、WAIVE 一正一負)+端到端驗收實跑(手改紅/還原綠/promote 不誤報)+AGENTS 10.12+CONFORMANCE-PROTOCOL §5 |
+| 11-07 | 收尾弧 S3:conformance 主根新增的「specPath 必在 golden 釘選集」斷言是空操作——負向探針把 always01 的 specPath 換成 staging 快照、或把它移出釘選清單,默認模式仍 ADMITTED exit 0 | 斷言只 `reasons.push`,沒有進 `admitted` 判定(admitted 只看 Q1..Q9/deterministic/tLegCheck/dGate/TB-SHA/等價失敗/eq-verify 旗標) | 新增 `specPinned` 旗標並併入 admitted;同輪逐條核對其餘 reasons.push 皆有對應旗標或提前返回 | finish-s3 驗收 P1/P2 實跑必紅(REJECTED exit 1)+AGENTS 10.12「判定旗標必須進 admitted,新斷言配負向探針」 |
 | `vl-difftest --html` | 報告需求 | 生成 docs/e2e-report/index.html |
 | `vl-difftest --record` | 語義變更後 | 重錄 oracle 期望(人工讀 diff) |
 
@@ -171,7 +182,9 @@
 - **新閘行**:run-reimpl-eval.sh(復原對拍評測;iverilog 守衛缺場 exit 2;
   23 場景 6+6+11;A/B 兩組分列禁混報;寫只落 build/reimpl-eval/;直調不進
   regress——盲寫腿=輔助證據永不進確定性閘,機械面=編譯成敗+TB 逐場景 diff;
-  裝備=fixtures/e1+fixtures/e1-reimpl,協議=REIMPL-PROTOCOL.md)。
+  裝備=fixtures/e1+fixtures/e1-reimpl,協議=REIMPL-PROTOCOL.md)。C-S3(2026-11-07)起場景切塊與子進程執行遷用
+  scripts/lib/tbproto.mjs(帶看門狗);verdict.json 結構/matched/exit 凍結,同時刻 parity=legs/segments 深等+runs/out_*
+  14 檔 byte 相等;scenesParsed 只落 sidecar build/reimpl-eval/scene-protocol.json。
 - **M7/M8 編號命名空間注記**:MVP-NEXT R2 的 M1..M8=復原力弧提案材料編號
   (M1 多標簽臂/M2 default 臂/M3 else 包膜/M4 G8 容器/M5 missing_reset/
   M6 incomplete_case/M7=PROVENANCE 手記抹除/M8=殘文候選十行),與 AGENTS
@@ -194,11 +207,31 @@
   漏改)。後果=i2c_master(152 條)經 MCP 默認/batch 仍截 152→128;上行
   「四處調用點」計數以此實況為準訂正。修法=server.mjs 兩處與
   gap-fixture-check 對齊 SSOT(面隨核心對齊,非語義新增)。
+  - **關閉(2026-11-07,§19 C-S1;工作樹未提交)**:普查口徑=`rg -n '\b(128|256)\b'`
+    插件面(dist/server.mjs+scripts+skills)+native emit.rs+wasm crate——修前插件面 128 實為
+    5 處(server.mjs:139 描述/:150 回退/:219 batch、gap-fixture-check.mjs:215、
+    rtl-rulebook SKILL.md:15 文案;上行「3 處」漏列 :139 與 SKILL)+native 面
+    emit.rs:10/:16 兩處(§19 RV2-10);修後插件面 128=0 處。修法=server.mjs 回退與 batch
+    傳 0(wasm 契約 max_rules==0 取核心默認,面委託核心不複製常量)、:139/SKILL 文案
+    改「省略或 0=核心默認 256」、gap-fixture-check→256、emit.rs 改引
+    rtl_spec::DEFAULT_MAX_RULES;非面(rtl-spec-wasm lib.rs:98/110/111 單測、smoke.mjs:53/:80
+    對稱 parity)按 §19.2 不改。機械防回歸=run-plugin-check ⑤(新 scripts/ssot-drift-check.mjs:
+    (a) 字面量∈{0,N} 8 處/(b) 文案數字==N/(c) 回退 token 錨/(d) emit.rs 常量名+分派段無數字缺省;
+    紅路 5 路各 exit 1、原樣 exit 0 在案)+mcp-client ⑧ 四調用(i2c 不傳/顯式 0→152 零截斷、
+    顯式 100→100+truncated=[i2c_master]、batch→152;HEAD server.mjs 副本紅路 ⑧a/⑧b/⑧d FAIL
+    =128+truncated 現形在案)。驗收命令實跑:run-plugin-check PASS、run-mcp-e2e PASS(14 斷言)、
+    run-gap-fixtures PASS(既有 24 行輸出與 HEAD 腳本[:215=128]逐行相等)。
 - **D-r1b PLUGIN §18.2 S3 對賬數字不可復算**:文檔稱 guard+async=12/
   敏感列表證=29/seq+when=296/去重復活=175;2026-11-05 終審+主會話實測
   golden 全樹=async:true 59、guard 帶敏感列表第二證 85、sequence+when 476
   ——無口徑能對上,疑為 delta/子集口徑未注明(計數一律實測條違例)。
   修法=C 弧內按實測口徑重算訂正或注明統計口徑。
+  - **關閉(2026-11-07,§19 C-S1)**:勘誤表=RTL2SPEC-PLUGIN §19.2 D-r1b 表(§18.2 原文按
+    歷史快照保留不改,讀者以該表為準)。防復發=新 scripts/golden-stats.mjs(唯讀單行
+    `STATS …`,run-golden-regression.sh 尾部資訊行,不斷言);D-r1c 修前實跑(HEAD golden 與
+    G0 副本)=`STATS rules=843 seq=539 rel=196 guard=85 trans=23 async_true=59 guard_2ev=85
+    seq_when=476 truncated=0`,與勘誤表 HEAD 列逐值相等;D-r1c 重錄後位移見 §19 C-S1 實作記錄
+    (勘誤表不回改)。此後文檔對賬數字一律引 STATS 行原文。
 - **D-r1c mem_arst 復位前置敏感列表 async 分類洞**:`always @(negedge
   Reset_n_i or posedge Clk_i)`(首沿=復位信號)形 async 分類整類失明——
   sv/mod.rs:752 `trigger = edges.iter().find_map` 取敏感列表首個沿,而復位臂
@@ -208,3 +241,77 @@
   =僅 mem_arst 1 檔(其餘 11 檔雙沿形 clk 前置分類正確)。修法=trigger 改取
   「非復位信號的邊沿」+run-gap-fixtures 補 mem_arst 形正負 fixture+同輪
   golden 重錄對賬。
+  - **關閉(2026-11-07,§19 C-S1;兩面同片同改)**:共用函數 `select_trigger(edges,
+    reset_sig)`(crates/rtl-spec/src/sv/mod.rs,緊鄰 reset_cond_signal)=單一語義源,
+    規則面 extract_edge_process 與破口面 gaps.rs 復位臂識別皆只調它(修前破口面註釋
+    自述「與規則提取面同一判準」實為各寫一份,正是洞根);語義=首個訊號 ≠復位候選的
+    pos/neg 沿、無則回退首沿(既有形零漂移);訊號比較鍵兩面統一=render(邊沿表達式)
+    (破口面舊用 lvalue_base,裸標識符恆同;in-git 語料 rg 非標識符邊沿表達式 0 例)。
+    受害面普查訂正【實跑 rg 釘選 37 檔】:雙沿 always=11 檔 18 行,復位前置**僅
+    mem_arst.v:20**,其餘 10 檔時鐘前置(上行「其餘 11 檔」多計 1;fsm.v:16 位於
+    未定義 `ifdef ASYNC_RESET 分支,文本命中不入解析)。紅綠路實證:2 單測
+    (c_s1_d_r1c_reset_first_sensitivity_is_async_guard/c_s1_d_r1c_sensitivity_order_
+    invariance)對 HEAD 工作樹副本跑=2/2 FAIL、對修後碼=2/2 PASS;gap-fixture-check
+    兩矩陣各+5 行(規則面 guard multiset+破口面檔級,期望以 dist wasm 修前實探定案
+    build/c-s1/probe-pre.txt)+兩 selfcheck+順序不變性斷言,對修前 wasm 紅路 4 FAIL、
+    修後 41 PASS;golden G0..G5 重錄(允許清單恰 mem_arst.rules+gaps 兩檔:R001/R002
+    sequence→guard×2 async=true trigger=Clk_i[mem_arst 非 TB 樣,'bx 值如實保留]、
+    G4-MyMem-001 消失、G3 不變,leafdiff 40 葉在檔 build/golden-leafdiff-C-S1.txt)。
+    **RTLIL 面 rtlil.rs:197-209=潛在同形第三處,本弧不改**(兩序 .il 樣皆 0 規則無現形;
+    改動無判別力 fixture 違鐵則)——留待有現形樣的弧配正負 fixture 修。
+
+### C 弧已知未決(2026-11-07 §19 C-S1 首錄;10.5 先登記再繼續;企劃=RTL2SPEC-PLUGIN §19,決策=ADR-0013)
+
+- **D-c1 net 宣告賦值未提取(i2c `cnt_end`)**:`wire cnt_end = (cnt >= prescale - 1);`
+  (corpus/e2e/59_i2c_master/i2c_master.v:68)落入 `extract_module`
+  (crates/rtl-spec/src/sv/mod.rs:641)的 `_ => {}` 臂(:686;只認 Always/Initial/
+  ContAssign)——規則書對該 net 零規則;復原力弧 post-S4 i2c 重寫腿 e1 TB 全 11/11 而
+  yosys equiv 留 `cnt_end` unproven 的根因(§19.0-3,【材料】)。狀態=未修;修復立項時點
+  =用戶裁決(§19.13-6)。**證據已補強(2026-11-07 C-S5)**:conformance 閘 F3 斷言
+  (i2c_master 缺陷必含 cnt_end)PASS;build/conformance/rulebook-defects.{json,md} 收 P-unruled killed
+  兩變異(OP-HOLD/OP-ARITH@:68,D 腿 TB 六場景全殺)+def_lint-U1 分類(net 宣告賦值洞,
+  extract_module `_ => {}` 臂同形)。
+- **D-c2 ANSI 端口宣告屬性跨組繼承**:crates/vl-syntax/src/parser/module.rs:132-171 的
+  ANSI 端口組解析把 cur_net/cur_reg/cur_signed/cur_range 綁在組循環外,新組(任一
+  宣告限定詞開頭,parser/mod.rs:449 peek_starts_port_spec)不重置——範圍/符號/種類
+  三族屬性跨組繼承;oracle=IEEE 1800-2017 §23.2.2.3 同向,iverilog 13.0(-g2005/-g2012)
+  與 verilator 5.052 七向量三方一致(§19.3.2 表,規劃輪實跑)。現形【本輪 dist wasm 實探
+  f689132b…】:fixtures/fsm_counter.v contract `busy` 報寬 4(源碼 `output reg busy`
+  1 位,繼承前組 `[3:0]`);partsel_test006/007 `dout` 報 signed=true(繼承前組
+  `input signed [4:0] n`)。定量普查(規劃輪 /tmp 補丁實驗,【材料】)=釘選 37×2 same 70
+  diff 4=24 葉(loops 4/mem_arst 2/memory 2/partsel 16)+L1 非釘選 retime 1 葉;
+  analyzer-core tests/api.rs:128 把缺陷語義釘成正確(ADR-0013 D-C13 修訂 ADR-0012 D1)。
+  狀態=未修;修復=§19 C-S2 首步(步 a,G0..G5)。
+  - **關閉(2026-11-07,§19 C-S2 步 a;工作樹未提交)**:crates/vl-syntax/src/parser/module.rs 組循環頂
+    重新綁定 cur_net/cur_reg/cur_signed/cur_range(新組四變量重置,僅 cur_dir 跨組);七向量前端單測
+    d_c2_ansi_group_reset_seven_vectors(crates/vl-syntax/tests/frontend.rs,斷言到 analyzer-core 投影;
+    vl-syntax 新增 analyzer-core dev-dependency=僅測試面的 dev 環)對 HEAD 解析器副本 FAILED(v1 d=4)、
+    修後 PASS;api.rs:128 期望 4→1 與 :119-121/:58、module.rs、ast.rs Port doc、sv.rs:132-134 註釋同片訂正
+    (ADR-0013 D-C13,D1 唯一例外;API 簽名零改)。golden G0..G5:G2 DIFF 恰 {loops,memory,mem_arst,
+    partsel}.rules.json、PROV-DIFF 0;G3 leafdiff=24 規則書葉(loops 4/memory 2/mem_arst 2[ports/5 WR_i
+    width 0→1+parametric true→false]/partsel 16[全 signed true→false])+PROVENANCE 13 行,對賬工件
+    build/golden-leafdiff-C-S2.txt;gaps 37 檔零變;G4 74/74;STATS 零位移(contract 面不入規則計數)。
+    L1 非釘選 retime 1 葉與 corpus/sv-tests 零差=規劃輪材料,本片未單獨複核(EVAL 指紋 1212/dup=0 不變)。
+- **D-c3 corpus_lint R1 同行 `#` 不關窗**:crates/vl-difftest/tests/corpus_lint.rs:80-95
+  的 `closed` 為空操作(`let closed = true; if closed { }`),`@(posedge ..)` 後同行
+  `#1;` 不終止競爭窗=換行形假陽性(§19.3.3 TB-R1x 條實跑證據)。corpus 現狀零違例不受
+  影響;改的是 vl-difftest 測試側 lint,本弧範圍外不修 Rust 側(§19.13-8,用戶裁決);
+  C 弧 TB lint 自帶 TB-R1x 判據。
+- **D-c4 contract 負數下標定寬範圍報 parametric**:partsel_test006/007 的 `[31:-32]`
+  (corpus-external/yosys-simple/partsel.v:92/:94/:104)在 contract 報 `width 0+
+  parametric:true`(實為 64 位定寬)【本輪 dist wasm 實探】;tb_plan 對其以 TB1 拒收=
+  安全側(§19.3.2)。狀態=未修;修正時點=用戶裁決(§19.13-9)。
+- **D-c5 等價裁決的 X 語義盲區(收尾弧 S3 實錄)**:constmuldivmod 的 3 個變異(m0003 `A % 8'd0`→`A % 8'd1`,m0033/m0064 同形)
+  TB 殺得掉,yosys 強形卻證 equivalent——除零在 iverilog 是 x,yosys 把未定義當任意值,1 是合法取值。killed 全母體自檢當場報紅
+  (equivalent=3),該設計另因 Q4/Q7 被拒,未入庫。含義:proven≠無條件行為等價有了實例;含 x 行為的設計若入場,等價腿需先區分
+  X-refinement 類 proven。狀態=未修,交等價裁決腿 eqverdict 分類面(RTL2SPEC-FINISH-PLAN §11)。
+- **D-c6 空真探針的 memory 盲區(收尾弧 S3 實錄)**:探針全名單取自 `proc; flatten; write_json`(未跑 memory),記憶體映射後的
+  FF 名不在名單,arrays01 探針留下 64 個 unproven 而非 `No $equiv cells`,偵測力斷言因此紅。方向保守(拒設計,不假放行);
+  arrays01 另因 Q4/Q7 被拒。狀態=未修;memory 類設計入場前修探針名單(探針模板=CONFORMANCE-PROTOCOL §7,改動=協議事件)。
+- **D-c7 行內賦值延遲抽象等價=已入庫設計的 TB 強化死鎖(收尾弧終審實錄,主會話登記)**:yosys 視行內賦值 `#delay`
+  為不可觀測抽象,oracle(iverilog)有可觀測差異——i2c_master_tests 的 5 個 OP-CONST 變異(m0002/m0004/m0006/m0008/m0010,
+  record.json eqverdict=equivalent eqCells=2[主會話已核])被等價腿判 equivalent;終審員以 iverilog 13.0 最小 TB 證可觀測
+  (gold t=17000 al=1 vs mut al=0;/tmp 探針已清,未主會話復現,標 unconfirmed),並實錄「強化 TB 經 --record --promote
+  提交→killed 全母體自檢紅(REJECTED exit 1)」——與 eqverdict 恆矛盾的變異永不可殺,**已入庫設計的 TB 永久不可強化**
+  (殺傷率表面 3/5、實際可殺 3/10)。與 §20.8 operators `$pow` 待裁是同一政策問題(能力邊界時等價腿是否不適用)且多出
+  「入庫後凍結」維度。狀態=未裁,方向保守(不假放行);裁決前該類設計維持現狀,新強化 TB 逐案對賬。

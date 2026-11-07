@@ -1,9 +1,9 @@
 # rtl2spec 真實評測擴面報告(§16.4;機械生成禁手改)
 
-- 日期:2026-11-05
+- 日期:2026-11-07
 - 命令行:`bash plugin/rtl2spec/run-realworld-eval.sh`(機械生成禁手改)
-- 工具鏈:bun v26.3.0、wasm ABI 0.1.0、wasm sha256 `23af31de63d6580c01d4df81d4c467297180b1f71e091f4d4ac0f06556b92c74`
-- 耗時:165ms(單 bun 進程循環 353 檔);語料零 GPL(yosys-simple/sv-tests=ISC、corpus=repo MIT、spec-i2c=MIT 乾淨室、xls=Apache-2.0 載體)
+- 工具鏈:bun v26.3.0、wasm ABI 0.1.0、wasm sha256 `66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d`
+- 耗時:98ms(單 bun 進程循環 353 檔);語料零 GPL(yosys-simple/sv-tests=ISC、corpus=repo MIT、spec-i2c=MIT 乾淨室、xls=Apache-2.0 載體)
 - 判據鏈:per-file 三檔分類(design-rules/design-sparse/skip-perr/skip-tb);閘級硬 FAIL=trap/JSON 不可解析/design-rules 檔 V4/V5-①②④ 敗/V5-③ 指紋重複(L1+L2 全量)/成功呼叫≠檔數。V1(≥3)/V2/V3 為報告列不設單檔 FAIL(擴面集失敗條件=結構性違例而非產量);13 檔驗證集 V1..V6 閾值閘另行執法不動(run-rtl-validation.sh)。
 
 ## 閘級判據表
@@ -80,7 +80,7 @@
 | corpus-external/yosys-simple/loops.v | ISC(COPYING 隨附) | 79 | 11 | 1 | latch=3 | PASS |
 | corpus-external/yosys-simple/macro_arg_surrounding_spaces.v | ISC(COPYING 隨附) | 21 | 0 | 0 | 0 | OK-sparse |
 | corpus-external/yosys-simple/macros.v | ISC(COPYING 隨附) | 245 | 5 | 1 | comb_loop=1 | PASS |
-| corpus-external/yosys-simple/mem_arst.v | ISC(COPYING 隨附) | 41 | 4 | 1 | undriven_read=1 missing_reset=1 | PASS |
+| corpus-external/yosys-simple/mem_arst.v | ISC(COPYING 隨附) | 41 | 4 | 2 | undriven_read=1 | PASS |
 | corpus-external/yosys-simple/mem2reg_bounds_tern.v | ISC(COPYING 隨附) | 20 | 2 | 1 | missing_reset=2 | OK-sparse |
 | corpus-external/yosys-simple/mem2reg.v | ISC(COPYING 隨附) | 117 | 5 | 3 | undriven_read=1 missing_reset=1 | PASS |
 | corpus-external/yosys-simple/memory.v | ISC(COPYING 隨附) | 320 | 59 | 2 | missing_reset=15 undriven_read=4 multi_driver=1 | PASS |
@@ -335,8 +335,8 @@
 | arithmetic | 39 | 506 |
 | counter | 10 | 47 |
 | fsm | 3 | 23 |
-| reset | 20 | 92 |
-| timing | 36 | 507 |
+| reset | 21 | 94 |
+| timing | 36 | 505 |
 | **Σ** | — | **1175** |
 
 ## 評審員區(R5 分層抽樣 5 檔定性複評;人工區,機械內聯自 eval-review-notes.md)
