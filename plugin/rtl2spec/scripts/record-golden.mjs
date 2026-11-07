@@ -3,7 +3,7 @@
 //       golden 落點=golden/plugin-fixtures/<stem>.<mode>.json)
 // 域界定(S9 起釘明):本器只管 plugin-fixtures demo 域(§17 G8 實證樣例),
 //   PROVENANCE=golden/plugin-fixtures/PROVENANCE.md(追加式歷史日志);
-//   正式釘選集 37 檔 golden/ 樹與 golden/PROVENANCE.md(全量重寫形)歸
+//   正式釘選集(檔數=pinned-files.list)golden/ 樹與 golden/PROVENANCE.md(全量重寫形)歸
 //   run-golden-regression.sh --record 管轄,兩域互不覆蓋。
 // 契約(§16.1.4/--record 前置自檢):錄製=真實運行,禁手寫;每檔先進程內
 // 12 跑 hash 自檢(§16.1.4 實現形=進程內重複調用),不唯一→拒錄 exit 3;

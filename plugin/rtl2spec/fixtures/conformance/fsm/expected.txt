@@ -1,0 +1,86 @@
+SCENE1 reset_and_idle
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+SCENE2 a_arm_full
+  ra=0 ga=1 rb=1 gb=0
+  ra=0 ga=1 rb=1 gb=0
+  ra=0 ga=1 rb=1 gb=0
+  ra=0 ga=1 rb=1 gb=0
+  ra=0 ga=1 rb=1 gb=0
+  ra=0 ga=1 rb=1 gb=0
+  ra=0 ga=0 rb=1 gb=0
+  ra=0 ga=1 rb=1 gb=0
+  ra=0 ga=0 rb=1 gb=0
+  ra=0 ga=1 rb=1 gb=0
+  ra=0 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+SCENE3 b_arm_full
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=0
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=0
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+SCENE4 both_neither
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+SCENE5 mid_arm_reset
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+SCENE6 random_buttons
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=0
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=0
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=0
+  ra=1 ga=0 rb=1 gb=0
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=0
+  ra=1 ga=0 rb=0 gb=1
+  ra=1 ga=0 rb=0 gb=0
+DONE

@@ -1,0 +1,287 @@
+{
+  "design": "attrib01_module",
+  "src": "corpus-external/yosys-simple/attrib01_module.v",
+  "top": "attrib01_bar",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/attrib01_module.rules.json",
+  "rules": 2,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "f1964eae555da98e5f088abb8d8ebdda67f9e1210e136078c82c135356fd678c",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 5
+  },
+  "expected": {
+    "sha256": "59f1f2ec9b652776faf5ebf8ee56bcbbc5227f5a55c5c9f57b6f4e5c28fcfb4b",
+    "lines": 107
+  },
+  "numbers": {
+    "generated": 3,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 3,
+    "killed": 2,
+    "survived": 1,
+    "timeout": 0,
+    "rate": "2/3",
+    "ruleVerified": {
+      "exclusive": "2/2",
+      "shared": "0/2"
+    },
+    "catalogCoverage": "2/2",
+    "unruled": {
+      "generated": 0,
+      "killed": 0
+    },
+    "controlsSurvived": "2/2",
+    "ambiguous": 0,
+    "na": 6
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 4,
+      "out": 1
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 1
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 1,
+      "equivalent": 0,
+      "unproven": 1,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 2,
+      "mainKilled": 2,
+      "unproven": 2,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "guard": {
+      "total": 1,
+      "unique": 1
+    },
+    "sequence": {
+      "total": 1,
+      "unique": 1
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "attrib01_bar.R001",
+      "op": "OP-ASYNC",
+      "status": "n/a",
+      "reason": "async=false",
+      "line": null
+    },
+    {
+      "ruleId": "attrib01_bar.R002",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 9
+    },
+    {
+      "ruleId": "attrib01_bar.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 9
+    },
+    {
+      "ruleId": "attrib01_bar.R002",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 9
+    },
+    {
+      "ruleId": "attrib01_bar.R002",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 9
+    },
+    {
+      "ruleId": "attrib01_bar.R002",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 9
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "8|    if (rst) out <= 1'd1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 8,
+      "before": "    if (rst) out <= 1'd0;",
+      "after": "    if (rst) out <= 1'd1;",
+      "detail": "1'd0→1'd1",
+      "ruleIds": [
+        "attrib01_bar.R001"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 1,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "out"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "8|    if (!rst) out <= 1'd0;",
+      "pool": "rule",
+      "op": "OP-POL",
+      "line": 8,
+      "before": "    if (rst) out <= 1'd0;",
+      "after": "    if (!rst) out <= 1'd0;",
+      "detail": "if (rst)→if (!rst)",
+      "ruleIds": [
+        "attrib01_bar.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rst_rst",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "9|    else     out <= out;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 9,
+      "before": "    else     out <= ~inp;",
+      "after": "    else     out <= out;",
+      "detail": "rhs→out",
+      "ruleIds": [
+        "attrib01_bar.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rst_rst",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "8|    if (rst) out <= 1'd0; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 8,
+      "before": "    if (rst) out <= 1'd0;",
+      "after": "    if (rst) out <= 1'd0; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "attrib01_bar.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0005",
+      "key": "9|    else     out <= ~inp; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 9,
+      "before": "    else     out <= ~inp;",
+      "after": "    else     out <= ~inp; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "attrib01_bar.R002"
+      ],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 2,
+      "hit": 2,
+      "rate": "2/2"
+    }
+  }
+}

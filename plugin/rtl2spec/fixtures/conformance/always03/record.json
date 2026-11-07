@@ -1,0 +1,512 @@
+{
+  "design": "always03",
+  "src": "corpus-external/yosys-simple/always03.v",
+  "top": "uut_always03",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/always03.rules.json",
+  "rules": 7,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "9df9afc7806d6ea49496ff6303c07c2a873f29ec7e1198a132796bde298adb30",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 5
+  },
+  "expected": {
+    "sha256": "9240615d5d80ef24468a8be74e4bc932cac0d7f53127e8dbffe1fc8d4f67af3f",
+    "lines": 299
+  },
+  "numbers": {
+    "generated": 7,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 7,
+    "killed": 7,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "7/7",
+    "ruleVerified": {
+      "exclusive": "6/6",
+      "shared": "0/6"
+    },
+    "catalogCoverage": "6/7",
+    "unruled": {
+      "generated": 0,
+      "killed": 0
+    },
+    "controlsSurvived": "1/1",
+    "ambiguous": 0,
+    "na": 31
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 11,
+      "out": 3
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 3
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 0,
+      "equivalent": 0,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 7,
+      "mainKilled": 7,
+      "unproven": 7,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "sequence": {
+      "total": 7,
+      "unique": 7
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "uut_always03.R001",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 8
+    },
+    {
+      "ruleId": "uut_always03.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 8
+    },
+    {
+      "ruleId": "uut_always03.R001",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 8
+    },
+    {
+      "ruleId": "uut_always03.R001",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 8
+    },
+    {
+      "ruleId": "uut_always03.R001",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 8
+    },
+    {
+      "ruleId": "uut_always03.R002",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 10
+    },
+    {
+      "ruleId": "uut_always03.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 10
+    },
+    {
+      "ruleId": "uut_always03.R002",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 10
+    },
+    {
+      "ruleId": "uut_always03.R002",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 10
+    },
+    {
+      "ruleId": "uut_always03.R002",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 10
+    },
+    {
+      "ruleId": "uut_always03.R003",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 11
+    },
+    {
+      "ruleId": "uut_always03.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 11
+    },
+    {
+      "ruleId": "uut_always03.R003",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 11
+    },
+    {
+      "ruleId": "uut_always03.R003",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 11
+    },
+    {
+      "ruleId": "uut_always03.R003",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 11
+    },
+    {
+      "ruleId": "uut_always03.R004",
+      "op": "OP-HOLD",
+      "status": "n/a",
+      "reason": "RHS 已是自身",
+      "line": 13
+    },
+    {
+      "ruleId": "uut_always03.R004",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 13
+    },
+    {
+      "ruleId": "uut_always03.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 13
+    },
+    {
+      "ruleId": "uut_always03.R004",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 13
+    },
+    {
+      "ruleId": "uut_always03.R004",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 13
+    },
+    {
+      "ruleId": "uut_always03.R004",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 13
+    },
+    {
+      "ruleId": "uut_always03.R005",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 16
+    },
+    {
+      "ruleId": "uut_always03.R005",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 16
+    },
+    {
+      "ruleId": "uut_always03.R005",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 16
+    },
+    {
+      "ruleId": "uut_always03.R005",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 16
+    },
+    {
+      "ruleId": "uut_always03.R005",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 16
+    },
+    {
+      "ruleId": "uut_always03.R006",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 18
+    },
+    {
+      "ruleId": "uut_always03.R006",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 18
+    },
+    {
+      "ruleId": "uut_always03.R006",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 18
+    },
+    {
+      "ruleId": "uut_always03.R006",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 18
+    },
+    {
+      "ruleId": "uut_always03.R006",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 18
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "8|\tout1 = out1;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 8,
+      "before": "\tout1 = in1;",
+      "after": "\tout1 = out1;",
+      "detail": "rhs→out1",
+      "ruleIds": [
+        "uut_always03.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "10|\t\tout1 = out1;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 10,
+      "before": "\t\tout1 = !out1;",
+      "after": "\t\tout1 = out1;",
+      "detail": "rhs→out1",
+      "ruleIds": [
+        "uut_always03.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "11|\tout2 <= out2;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 11,
+      "before": "\tout2 <= out1;",
+      "after": "\tout2 <= out2;",
+      "detail": "rhs→out2",
+      "ruleIds": [
+        "uut_always03.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "16|\t\t\tout3 <= out3;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 16,
+      "before": "\t\t\tout3 <= in6;",
+      "after": "\t\t\tout3 <= out3;",
+      "detail": "rhs→out3",
+      "ruleIds": [
+        "uut_always03.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "18|\t\t\tout3 <= out3;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 18,
+      "before": "\t\t\tout3 <= in7;",
+      "after": "\t\t\tout3 <= out3;",
+      "detail": "rhs→out3",
+      "ruleIds": [
+        "uut_always03.R006"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "19|\tout1 = out1;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 19,
+      "before": "\tout1 = out1 ^ out2;",
+      "after": "\tout1 = out1;",
+      "detail": "rhs→out1",
+      "ruleIds": [
+        "uut_always03.R007"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "19|\tout1 = out1 | out2;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 19,
+      "before": "\tout1 = out1 ^ out2;",
+      "after": "\tout1 = out1 | out2;",
+      "detail": "^→|",
+      "ruleIds": [
+        "uut_always03.R007"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "8|\tout1 = in1; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 8,
+      "before": "\tout1 = in1;",
+      "after": "\tout1 = in1; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "uut_always03.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 7,
+      "hit": 4,
+      "rate": "4/7"
+    }
+  }
+}

@@ -1,0 +1,530 @@
+{
+  "design": "add3",
+  "src": "corpus/e2e/57_xls_add3/add3.v",
+  "top": "__add3__add3",
+  "specPath": "plugin/rtl2spec/golden/corpus/e2e/57_xls_add3/add3.rules.json",
+  "rules": 6,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "4950c3318b969ae63e57d4a939c9b83ed0d523d9bc592a2c6ddbd1f9dae0d9c3",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 5
+  },
+  "expected": {
+    "sha256": "eab5e13497c1384b3e8dd92694f0a7a93ba78028ed57b5c818b2931e54d94dbc",
+    "lines": 103
+  },
+  "numbers": {
+    "generated": 7,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 7,
+    "killed": 7,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "7/7",
+    "ruleVerified": {
+      "exclusive": "6/6",
+      "shared": "0/6"
+    },
+    "catalogCoverage": "6/6",
+    "unruled": {
+      "generated": 1,
+      "killed": 1
+    },
+    "controlsSurvived": "2/2",
+    "ambiguous": 2,
+    "na": 23
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 34,
+      "out": 9
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 60
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 0,
+      "equivalent": 0,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 7,
+      "mainKilled": 7,
+      "unproven": 7,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "sequence": {
+      "total": 4,
+      "unique": 4
+    },
+    "relation": {
+      "total": 2,
+      "unique": 2
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "__add3__add3.R001",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 16
+    },
+    {
+      "ruleId": "__add3__add3.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 16
+    },
+    {
+      "ruleId": "__add3__add3.R001",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 16
+    },
+    {
+      "ruleId": "__add3__add3.R001",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 16
+    },
+    {
+      "ruleId": "__add3__add3.R001",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 16
+    },
+    {
+      "ruleId": "__add3__add3.R002",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 17
+    },
+    {
+      "ruleId": "__add3__add3.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 17
+    },
+    {
+      "ruleId": "__add3__add3.R002",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 17
+    },
+    {
+      "ruleId": "__add3__add3.R002",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 17
+    },
+    {
+      "ruleId": "__add3__add3.R002",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 17
+    },
+    {
+      "ruleId": "__add3__add3.R003",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 18
+    },
+    {
+      "ruleId": "__add3__add3.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 18
+    },
+    {
+      "ruleId": "__add3__add3.R003",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 18
+    },
+    {
+      "ruleId": "__add3__add3.R003",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 18
+    },
+    {
+      "ruleId": "__add3__add3.R003",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 18
+    },
+    {
+      "ruleId": "__add3__add3.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 24
+    },
+    {
+      "ruleId": "__add3__add3.R004",
+      "op": "OP-CONST",
+      "status": "ambiguous",
+      "reason": "字面量 1'h0 行內計數≠1",
+      "line": 24
+    },
+    {
+      "ruleId": "__add3__add3.R004",
+      "op": "OP-SIGN",
+      "status": "ambiguous",
+      "reason": "字面量 1'h0 行內計數≠1",
+      "line": 24
+    },
+    {
+      "ruleId": "__add3__add3.R004",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 24
+    },
+    {
+      "ruleId": "__add3__add3.R005",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 25
+    },
+    {
+      "ruleId": "__add3__add3.R006",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 30
+    },
+    {
+      "ruleId": "__add3__add3.R006",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 30
+    },
+    {
+      "ruleId": "__add3__add3.R006",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 30
+    },
+    {
+      "ruleId": "__add3__add3.R006",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 30
+    },
+    {
+      "ruleId": "__add3__add3.R006",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 30
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "16|    x__input_flop <= x__input_flop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 16,
+      "before": "    x__input_flop <= x;",
+      "after": "    x__input_flop <= x__input_flop;",
+      "detail": "rhs→x__input_flop",
+      "ruleIds": [
+        "__add3__add3.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "17|    y__input_flop <= y__input_flop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 17,
+      "before": "    y__input_flop <= y;",
+      "after": "    y__input_flop <= y__input_flop;",
+      "detail": "rhs→y__input_flop",
+      "ruleIds": [
+        "__add3__add3.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "18|    z__input_flop <= z__input_flop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 18,
+      "before": "    z__input_flop <= z;",
+      "after": "    z__input_flop <= z__input_flop;",
+      "detail": "rhs→z__input_flop",
+      "ruleIds": [
+        "__add3__add3.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "24|  assign p1_add_38_comb = {1'h0, x__input_flop} - {1'h0, y__input_flop};",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 24,
+      "before": "  assign p1_add_38_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop};",
+      "after": "  assign p1_add_38_comb = {1'h0, x__input_flop} - {1'h0, y__input_flop};",
+      "detail": "+→-",
+      "ruleIds": [
+        "__add3__add3.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "25|  assign p1_add_45_comb = p1_add_38_comb - {1'h0, z__input_flop};",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 25,
+      "before": "  assign p1_add_45_comb = p1_add_38_comb + {1'h0, z__input_flop};",
+      "after": "  assign p1_add_45_comb = p1_add_38_comb - {1'h0, z__input_flop};",
+      "detail": "+→-",
+      "ruleIds": [
+        "__add3__add3.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "25|  assign p1_add_45_comb = p1_add_38_comb + {1'h1, z__input_flop};",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 25,
+      "before": "  assign p1_add_45_comb = p1_add_38_comb + {1'h0, z__input_flop};",
+      "after": "  assign p1_add_45_comb = p1_add_38_comb + {1'h1, z__input_flop};",
+      "detail": "1'h0→1'h1",
+      "ruleIds": [
+        "__add3__add3.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "30|    out__output_flop <= out__output_flop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 30,
+      "before": "    out__output_flop <= p1_add_45_comb;",
+      "after": "    out__output_flop <= out__output_flop;",
+      "detail": "rhs→out__output_flop",
+      "ruleIds": [
+        "__add3__add3.R006"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "16|    x__input_flop <= x; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 16,
+      "before": "    x__input_flop <= x;",
+      "after": "    x__input_flop <= x; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "__add3__add3.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0009",
+      "key": "24|  assign p1_add_38_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop}; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 24,
+      "before": "  assign p1_add_38_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop};",
+      "after": "  assign p1_add_38_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop}; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "__add3__add3.R004"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0010",
+      "key": "32|  assign out = out;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 32,
+      "before": "  assign out = out__output_flop;",
+      "after": "  assign out = out;",
+      "detail": "rhs→out",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 32,
+        "op": "OP-HOLD",
+        "before": "assign out = out__output_flop;",
+        "after": "assign out = out;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [
+        {
+          "signal": "out",
+          "class": "U2",
+          "policy": true,
+          "line": 32,
+          "snippet": "assign out = out__output_flop;"
+        }
+      ],
+      "summary": {
+        "uncovered": 1,
+        "byClass": {
+          "U2": 1
+        },
+        "policyExcluded": 1,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 7,
+      "hit": 0,
+      "rate": "0/7"
+    }
+  }
+}

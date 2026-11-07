@@ -12,7 +12,7 @@ description: 從 RTL 提取可檢驗的行為規則書(reset/fsm/timing/arithmet
 ## 流程
 
 1. 呼叫 MCP 工具 `rtl_extract_rules`(`path`|`source`/`lang`/`format`
-   json|markdown|both 默認 both/`max_rules_per_module` 默認 128)。
+   json|markdown|both 默認 both/`max_rules_per_module` 省略或 0=核心默認 256)。
 2. **自查資料健康**:structuredContent.rulebook 的 parse_errors 與
    skipped(tb_file=測試平台檔,不是提取對象)、truncated 非空=該模組
    規則被截斷(注水防護有閘性)。

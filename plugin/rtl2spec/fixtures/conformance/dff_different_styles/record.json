@@ -1,0 +1,569 @@
+{
+  "design": "dff_different_styles",
+  "src": "corpus-external/yosys-simple/dff_different_styles.v",
+  "top": "dff",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/dff_different_styles.rules.json",
+  "rules": 1,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "981e213c1c501ad54fa844533db5f386410c05030b576c6fe5c066e67923c6ae",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 5
+  },
+  "expected": {
+    "sha256": "c862c6bda6caa758a29dfe9352515af80b6c3652b484f85d0ab3333e8ae20809",
+    "lines": 103
+  },
+  "numbers": {
+    "generated": 1,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 1,
+    "killed": 1,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "1/1",
+    "ruleVerified": {
+      "exclusive": "1/1",
+      "shared": "0/1"
+    },
+    "catalogCoverage": "1/1",
+    "unruled": {
+      "generated": 27,
+      "killed": 0
+    },
+    "controlsSurvived": "1/1",
+    "ambiguous": 0,
+    "na": 5
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 3,
+      "out": 1
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 1
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 0,
+      "equivalent": 0,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 1,
+      "mainKilled": 1,
+      "unproven": 1,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "sequence": {
+      "total": 1,
+      "unique": 1
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "dff.R001",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 6
+    },
+    {
+      "ruleId": "dff.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 6
+    },
+    {
+      "ruleId": "dff.R001",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 6
+    },
+    {
+      "ruleId": "dff.R001",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 6
+    },
+    {
+      "ruleId": "dff.R001",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 6
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "6|\tq <= q;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 6,
+      "before": "\tq <= d;",
+      "after": "\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [
+        "dff.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "6|\tq <= d; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 6,
+      "before": "\tq <= d;",
+      "after": "\tq <= d; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "dff.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0003",
+      "key": "14|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 14,
+      "before": "\t\tq <= 1;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0004",
+      "key": "14|\t\tq <= 2;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 14,
+      "before": "\t\tq <= 1;",
+      "after": "\t\tq <= 2;",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0005",
+      "key": "16|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 16,
+      "before": "\t\tq <= d;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0006",
+      "key": "25|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 25,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0007",
+      "key": "25|\t\tq <= 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 25,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0008",
+      "key": "27|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 27,
+      "before": "\t\tq <= d;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0009",
+      "key": "36|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 36,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0010",
+      "key": "36|\t\tq <= 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 36,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0011",
+      "key": "38|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 38,
+      "before": "\t\tq <= d;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0012",
+      "key": "47|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 47,
+      "before": "\t\tq <= d;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0013",
+      "key": "49|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 49,
+      "before": "\t\tq <= 1;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0014",
+      "key": "49|\t\tq <= 2;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 49,
+      "before": "\t\tq <= 1;",
+      "after": "\t\tq <= 2;",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0015",
+      "key": "58|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 58,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0016",
+      "key": "58|\t\tq <= 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 58,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0017",
+      "key": "60|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 60,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0018",
+      "key": "60|\t\tq <= 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 60,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0019",
+      "key": "62|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 62,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0020",
+      "key": "62|\t\tq <= 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 62,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0021",
+      "key": "64|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 64,
+      "before": "\t\tq <= d;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0022",
+      "key": "77|\t\tq <= q; // constant expression -- but the frontend optimizer does not know that..",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 77,
+      "before": "\t\tq <= d^d; // constant expression -- but the frontend optimizer does not know that..",
+      "after": "\t\tq <= q; // constant expression -- but the frontend optimizer does not know that..",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0023",
+      "key": "77|\t\tq <= d|d; // constant expression -- but the frontend optimizer does not know that..",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 77,
+      "before": "\t\tq <= d^d; // constant expression -- but the frontend optimizer does not know that..",
+      "after": "\t\tq <= d|d; // constant expression -- but the frontend optimizer does not know that..",
+      "detail": "^→|",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0024",
+      "key": "79|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 79,
+      "before": "\t\tq <= d;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0025",
+      "key": "97|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 97,
+      "before": "\t\tq <= 1;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0026",
+      "key": "97|\t\tq <= 2;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 97,
+      "before": "\t\tq <= 1;",
+      "after": "\t\tq <= 2;",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0027",
+      "key": "99|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 99,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0028",
+      "key": "99|\t\tq <= 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 99,
+      "before": "\t\tq <= 0;",
+      "after": "\t\tq <= 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0029",
+      "key": "101|\t\tq <= q;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 101,
+      "before": "\t\tq <= d;",
+      "after": "\t\tq <= q;",
+      "detail": "rhs→q",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 1,
+      "hit": 1,
+      "rate": "1/1"
+    }
+  }
+}

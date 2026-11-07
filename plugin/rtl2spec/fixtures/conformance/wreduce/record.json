@@ -1,0 +1,325 @@
+{
+  "design": "wreduce",
+  "src": "corpus-external/yosys-simple/wreduce.v",
+  "top": "wreduce_test0",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/wreduce.rules.json",
+  "rules": 3,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "67e26a342b0388959eca0e33a7e710df99fef8f2f67c7b05bb644a1adbb29b5c",
+    "scenes": 2,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 3
+    },
+    "simMs": 8
+  },
+  "expected": {
+    "sha256": "d6e5f858b4fd1fbd8e95b93cadfd423e769d27425097d55b319ba5200b70b66f",
+    "lines": 1539
+  },
+  "numbers": {
+    "generated": 4,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 4,
+    "killed": 4,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "4/4",
+    "ruleVerified": {
+      "exclusive": "3/3",
+      "shared": "0/3"
+    },
+    "catalogCoverage": "3/3",
+    "unruled": {
+      "generated": 2,
+      "killed": 0
+    },
+    "controlsSurvived": "1/1",
+    "ambiguous": 2,
+    "na": 7
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 64,
+      "out": 48
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 48
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 0,
+      "equivalent": 0,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 4,
+      "mainKilled": 4,
+      "unproven": 4,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "relation": {
+      "total": 3,
+      "unique": 3
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "wreduce_test0.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 2
+    },
+    {
+      "ruleId": "wreduce_test0.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 3
+    },
+    {
+      "ruleId": "wreduce_test0.R002",
+      "op": "OP-CONST",
+      "status": "ambiguous",
+      "reason": "字面量 1'b0 行內計數≠1",
+      "line": 3
+    },
+    {
+      "ruleId": "wreduce_test0.R002",
+      "op": "OP-SIGN",
+      "status": "ambiguous",
+      "reason": "字面量 1'b0 行內計數≠1",
+      "line": 3
+    },
+    {
+      "ruleId": "wreduce_test0.R002",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 3
+    },
+    {
+      "ruleId": "wreduce_test0.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 4
+    },
+    {
+      "ruleId": "wreduce_test0.R003",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 4
+    },
+    {
+      "ruleId": "wreduce_test0.R003",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 4
+    },
+    {
+      "ruleId": "wreduce_test0.R003",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 4
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "2|  assign x = +$signed({1'b0, a});",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 2,
+      "before": "  assign x = -$signed({1'b0, a});",
+      "after": "  assign x = +$signed({1'b0, a});",
+      "detail": "-→+",
+      "ruleIds": [
+        "wreduce_test0.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "2|  assign x = -$signed({1'b1, a});",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 2,
+      "before": "  assign x = -$signed({1'b0, a});",
+      "after": "  assign x = -$signed({1'b1, a});",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "wreduce_test0.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "3|  assign y = $signed({1'b0, a}) - $signed({1'b0, b});",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 3,
+      "before": "  assign y = $signed({1'b0, a}) + $signed({1'b0, b});",
+      "after": "  assign y = $signed({1'b0, a}) - $signed({1'b0, b});",
+      "detail": "+→-",
+      "ruleIds": [
+        "wreduce_test0.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "4|  assign z = x | y;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 4,
+      "before": "  assign z = x ^ y;",
+      "after": "  assign z = x | y;",
+      "detail": "^→|",
+      "ruleIds": [
+        "wreduce_test0.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "2|  assign x = -$signed({1'b0, a}); // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 2,
+      "before": "  assign x = -$signed({1'b0, a});",
+      "after": "  assign x = -$signed({1'b0, a}); // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "wreduce_test0.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0006",
+      "key": "8|  assign x = x;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 8,
+      "before": "  assign x = a - b, y = a * b, z = a >> b, w = a << b;",
+      "after": "  assign x = x;",
+      "detail": "rhs→x",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0007",
+      "key": "8|  assign x = a + b, y = a * b, z = a >> b, w = a << b;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 8,
+      "before": "  assign x = a - b, y = a * b, z = a >> b, w = a << b;",
+      "after": "  assign x = a + b, y = a * b, z = a >> b, w = a << b;",
+      "detail": "-→+",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 4,
+      "hit": 4,
+      "rate": "4/4"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # run-golden-regression.sh — golden 回歸閘(總閘成員;§16.1.3 五段形)。
-# ①守衛=bun/wasm-pack 在場+37 檔釘選清單在場(缺→exit 2 逐一列出)
+# ①守衛=bun/wasm-pack 在場+釘選清單全檔在場(缺→exit 2 逐一列出;條目數精確數斷言在 golden-check.mjs)
 # ②pkg 陳舊檢查+同步 dist/wasm(6 個傳遞依賴目錄 find -newer,D8 同形)
 # ③逐檔跑 extract_rules+rtl_scan_gaps(wasm;單 bun 進程內循環,
 #   scripts/golden-check.mjs),產物寫 build/golden-current/(gitignored)
@@ -84,6 +84,10 @@ echo "PASS sync dist/wasm"
 cd "$REPO_ROOT"
 bun "$PLUGIN_ROOT/scripts/golden-check.mjs" $RECORD_FLAG
 rc=$?
+
+# 資訊行(§19.2 D-r1b;不斷言,不影響 exit):golden/ 規則書計數,文檔對賬一律引此行原文。
+bun "$PLUGIN_ROOT/scripts/golden-stats.mjs" "$PLUGIN_ROOT/golden" \
+  || echo "INFO golden-stats unavailable (informational only)"
 
 if [ "$rc" -ne 0 ]; then
   echo "== run-golden-regression FAIL (exit $rc) =="

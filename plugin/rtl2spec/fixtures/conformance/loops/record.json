@@ -1,0 +1,1164 @@
+{
+  "design": "loops",
+  "src": "corpus-external/yosys-simple/loops.v",
+  "top": "aes",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/loops.rules.json",
+  "rules": 11,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "6e14a322fc61502edcf58244d4e14e0a51fc62e0f507ae8521e9042f8132a676",
+    "scenes": 2,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 2
+    },
+    "simMs": 8
+  },
+  "expected": {
+    "sha256": "d1fef7682e25328a8ecc0c06fa0cc5e226a2f8b5dcc0a5af7447eef8bd1ef169",
+    "lines": 3587
+  },
+  "numbers": {
+    "generated": 13,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 13,
+    "killed": 13,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "13/13",
+    "ruleVerified": {
+      "exclusive": "11/11",
+      "shared": "0/11"
+    },
+    "catalogCoverage": "11/11",
+    "unruled": {
+      "generated": 18,
+      "killed": 18
+    },
+    "controlsSurvived": "1/1",
+    "ambiguous": 0,
+    "na": 38
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 48,
+      "out": 22
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 22
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 0,
+      "equivalent": 0,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 13,
+      "mainKilled": 13,
+      "unproven": 13,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "relation": {
+      "total": 11,
+      "unique": 11
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "aes.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 49
+    },
+    {
+      "ruleId": "aes.R001",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 49
+    },
+    {
+      "ruleId": "aes.R001",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 49
+    },
+    {
+      "ruleId": "aes.R001",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 49
+    },
+    {
+      "ruleId": "aes.R002",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 51
+    },
+    {
+      "ruleId": "aes.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 51
+    },
+    {
+      "ruleId": "aes.R002",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 51
+    },
+    {
+      "ruleId": "aes.R002",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 51
+    },
+    {
+      "ruleId": "aes.R003",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 56
+    },
+    {
+      "ruleId": "aes.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 56
+    },
+    {
+      "ruleId": "aes.R003",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 56
+    },
+    {
+      "ruleId": "aes.R003",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 56
+    },
+    {
+      "ruleId": "aes.R004",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 57
+    },
+    {
+      "ruleId": "aes.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 57
+    },
+    {
+      "ruleId": "aes.R004",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 57
+    },
+    {
+      "ruleId": "aes.R004",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 57
+    },
+    {
+      "ruleId": "aes.R005",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 58
+    },
+    {
+      "ruleId": "aes.R005",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 58
+    },
+    {
+      "ruleId": "aes.R005",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 58
+    },
+    {
+      "ruleId": "aes.R005",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 58
+    },
+    {
+      "ruleId": "aes.R006",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 62
+    },
+    {
+      "ruleId": "aes.R007",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 64
+    },
+    {
+      "ruleId": "aes.R007",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 64
+    },
+    {
+      "ruleId": "aes.R007",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 64
+    },
+    {
+      "ruleId": "aes.R007",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 64
+    },
+    {
+      "ruleId": "aes.R008",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 65
+    },
+    {
+      "ruleId": "aes.R009",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 71
+    },
+    {
+      "ruleId": "aes.R009",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 71
+    },
+    {
+      "ruleId": "aes.R009",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 71
+    },
+    {
+      "ruleId": "aes.R009",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 71
+    },
+    {
+      "ruleId": "aes.R010",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 73
+    },
+    {
+      "ruleId": "aes.R010",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 73
+    },
+    {
+      "ruleId": "aes.R010",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 73
+    },
+    {
+      "ruleId": "aes.R010",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 73
+    },
+    {
+      "ruleId": "aes.R011",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 74
+    },
+    {
+      "ruleId": "aes.R011",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 74
+    },
+    {
+      "ruleId": "aes.R011",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 74
+    },
+    {
+      "ruleId": "aes.R011",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 74
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "49|\t\tround_data_var = round_key_var | data_var;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 49,
+      "before": "\t\tround_data_var = round_key_var ^ data_var;",
+      "after": "\t\tround_data_var = round_key_var | data_var;",
+      "detail": "^→|",
+      "ruleIds": [
+        "aes.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "51|\t\tnext_addroundkey_ready_o = 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 51,
+      "before": "\t\tnext_addroundkey_ready_o = 1;",
+      "after": "\t\tnext_addroundkey_ready_o = 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "aes.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "56|\t\tkeysched_start_i = 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 56,
+      "before": "\t\tkeysched_start_i = 1;",
+      "after": "\t\tkeysched_start_i = 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "aes.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "57|\t\tkeysched_round_i = 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 57,
+      "before": "\t\tkeysched_round_i = 1;",
+      "after": "\t\tkeysched_round_i = 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "aes.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "58|\t\tnext_addroundkey_round = 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 58,
+      "before": "\t\tnext_addroundkey_round = 1;",
+      "after": "\t\tnext_addroundkey_round = 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "aes.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "62|\t\tnext_addroundkey_round = addroundkey_round - 1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 62,
+      "before": "\t\tnext_addroundkey_round = addroundkey_round + 1;",
+      "after": "\t\tnext_addroundkey_round = addroundkey_round - 1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "aes.R006"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "62|\t\tnext_addroundkey_round = addroundkey_round + 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 62,
+      "before": "\t\tnext_addroundkey_round = addroundkey_round + 1;",
+      "after": "\t\tnext_addroundkey_round = addroundkey_round + 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "aes.R006"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "64|\t\tkeysched_start_i = 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 64,
+      "before": "\t\tkeysched_start_i = 1;",
+      "after": "\t\tkeysched_start_i = 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "aes.R007"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0009",
+      "key": "65|\t\tkeysched_round_i = addroundkey_round - 1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 65,
+      "before": "\t\tkeysched_round_i = addroundkey_round + 1;",
+      "after": "\t\tkeysched_round_i = addroundkey_round - 1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "aes.R008"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "65|\t\tkeysched_round_i = addroundkey_round + 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 65,
+      "before": "\t\tkeysched_round_i = addroundkey_round + 1;",
+      "after": "\t\tkeysched_round_i = addroundkey_round + 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "aes.R008"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0011",
+      "key": "71|\t\tround_data_var = round_key_var | data_var;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 71,
+      "before": "\t\tround_data_var = round_key_var ^ data_var;",
+      "after": "\t\tround_data_var = round_key_var | data_var;",
+      "detail": "^→|",
+      "ruleIds": [
+        "aes.R009"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "73|\t\tnext_addroundkey_ready_o = 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 73,
+      "before": "\t\tnext_addroundkey_ready_o = 1;",
+      "after": "\t\tnext_addroundkey_ready_o = 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "aes.R010"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0013",
+      "key": "74|\t\tnext_addroundkey_round = 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 74,
+      "before": "\t\tnext_addroundkey_round = 0;",
+      "after": "\t\tnext_addroundkey_round = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "aes.R011"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0014",
+      "key": "49|\t\tround_data_var = round_key_var ^ data_var; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 49,
+      "before": "\t\tround_data_var = round_key_var ^ data_var;",
+      "after": "\t\tround_data_var = round_key_var ^ data_var; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "aes.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0015",
+      "key": "33|\tkeysched_start_i = keysched_start_i;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 33,
+      "before": "\tkeysched_start_i = 0;",
+      "after": "\tkeysched_start_i = keysched_start_i;",
+      "detail": "rhs→keysched_start_i",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0016",
+      "key": "33|\tkeysched_start_i = 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 33,
+      "before": "\tkeysched_start_i = 0;",
+      "after": "\tkeysched_start_i = 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0017",
+      "key": "34|\tkeysched_round_i = keysched_round_i;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 34,
+      "before": "\tkeysched_round_i = addroundkey_round;",
+      "after": "\tkeysched_round_i = keysched_round_i;",
+      "detail": "rhs→keysched_round_i",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0018",
+      "key": "35|\tround_data_var = round_data_var;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 35,
+      "before": "\tround_data_var = addroundkey_data_reg;",
+      "after": "\tround_data_var = round_data_var;",
+      "detail": "rhs→round_data_var",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0019",
+      "key": "36|\tnext_addroundkey_data_reg = next_addroundkey_data_reg;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 36,
+      "before": "\tnext_addroundkey_data_reg = addroundkey_data_reg;",
+      "after": "\tnext_addroundkey_data_reg = next_addroundkey_data_reg;",
+      "detail": "rhs→next_addroundkey_data_reg",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0020",
+      "key": "37|\tnext_addroundkey_ready_o = next_addroundkey_ready_o;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 37,
+      "before": "\tnext_addroundkey_ready_o = 0;",
+      "after": "\tnext_addroundkey_ready_o = next_addroundkey_ready_o;",
+      "detail": "rhs→next_addroundkey_ready_o",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0021",
+      "key": "37|\tnext_addroundkey_ready_o = 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 37,
+      "before": "\tnext_addroundkey_ready_o = 0;",
+      "after": "\tnext_addroundkey_ready_o = 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0022",
+      "key": "38|\tnext_addroundkey_round = next_addroundkey_round;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 38,
+      "before": "\tnext_addroundkey_round = addroundkey_round;",
+      "after": "\tnext_addroundkey_round = next_addroundkey_round;",
+      "detail": "rhs→next_addroundkey_round",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0023",
+      "key": "41|\t\tkeysched_last_key_i = keysched_last_key_i;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 41,
+      "before": "\t\tkeysched_last_key_i = key_i;",
+      "after": "\t\tkeysched_last_key_i = keysched_last_key_i;",
+      "detail": "rhs→keysched_last_key_i",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0024",
+      "key": "43|\t\tkeysched_last_key_i = keysched_last_key_i;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 43,
+      "before": "\t\tkeysched_last_key_i = keysched_new_key_o;",
+      "after": "\t\tkeysched_last_key_i = keysched_last_key_i;",
+      "detail": "rhs→keysched_last_key_i",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0025",
+      "key": "47|\t\tdata_var = data_var;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 47,
+      "before": "\t\tdata_var = addroundkey_data_i;",
+      "after": "\t\tdata_var = data_var;",
+      "detail": "rhs→data_var",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0026",
+      "key": "48|\t\tround_key_var = round_key_var;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 48,
+      "before": "\t\tround_key_var = key_i;",
+      "after": "\t\tround_key_var = round_key_var;",
+      "detail": "rhs→round_key_var",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0027",
+      "key": "50|\t\tnext_addroundkey_data_reg = next_addroundkey_data_reg;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 50,
+      "before": "\t\tnext_addroundkey_data_reg = round_data_var;",
+      "after": "\t\tnext_addroundkey_data_reg = next_addroundkey_data_reg;",
+      "detail": "rhs→next_addroundkey_data_reg",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0028",
+      "key": "55|\t\tkeysched_last_key_i = keysched_last_key_i;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 55,
+      "before": "\t\tkeysched_last_key_i = key_i;",
+      "after": "\t\tkeysched_last_key_i = keysched_last_key_i;",
+      "detail": "rhs→keysched_last_key_i",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0029",
+      "key": "63|\t\tkeysched_last_key_i = keysched_last_key_i;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 63,
+      "before": "\t\tkeysched_last_key_i = keysched_new_key_o;",
+      "after": "\t\tkeysched_last_key_i = keysched_last_key_i;",
+      "detail": "rhs→keysched_last_key_i",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0030",
+      "key": "69|\t\tdata_var = data_var;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 69,
+      "before": "\t\tdata_var = addroundkey_data_i;",
+      "after": "\t\tdata_var = data_var;",
+      "detail": "rhs→data_var",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0031",
+      "key": "70|\t\tround_key_var = round_key_var;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 70,
+      "before": "\t\tround_key_var = keysched_new_key_o;",
+      "after": "\t\tround_key_var = round_key_var;",
+      "detail": "rhs→round_key_var",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0032",
+      "key": "72|\t\tnext_addroundkey_data_reg = next_addroundkey_data_reg;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 72,
+      "before": "\t\tnext_addroundkey_data_reg = round_data_var;",
+      "after": "\t\tnext_addroundkey_data_reg = next_addroundkey_data_reg;",
+      "detail": "rhs→next_addroundkey_data_reg",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 33,
+        "op": "OP-HOLD",
+        "before": "keysched_start_i = 0;",
+        "after": "keysched_start_i = keysched_start_i;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 33,
+        "op": "OP-CONST",
+        "before": "keysched_start_i = 0;",
+        "after": "keysched_start_i = 1;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 34,
+        "op": "OP-HOLD",
+        "before": "keysched_round_i = addroundkey_round;",
+        "after": "keysched_round_i = keysched_round_i;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 35,
+        "op": "OP-HOLD",
+        "before": "round_data_var = addroundkey_data_reg;",
+        "after": "round_data_var = round_data_var;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 36,
+        "op": "OP-HOLD",
+        "before": "next_addroundkey_data_reg = addroundkey_data_reg;",
+        "after": "next_addroundkey_data_reg = next_addroundkey_data_reg;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 37,
+        "op": "OP-HOLD",
+        "before": "next_addroundkey_ready_o = 0;",
+        "after": "next_addroundkey_ready_o = next_addroundkey_ready_o;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 37,
+        "op": "OP-CONST",
+        "before": "next_addroundkey_ready_o = 0;",
+        "after": "next_addroundkey_ready_o = 1;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 38,
+        "op": "OP-HOLD",
+        "before": "next_addroundkey_round = addroundkey_round;",
+        "after": "next_addroundkey_round = next_addroundkey_round;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 41,
+        "op": "OP-HOLD",
+        "before": "keysched_last_key_i = key_i;",
+        "after": "keysched_last_key_i = keysched_last_key_i;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 43,
+        "op": "OP-HOLD",
+        "before": "keysched_last_key_i = keysched_new_key_o;",
+        "after": "keysched_last_key_i = keysched_last_key_i;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 47,
+        "op": "OP-HOLD",
+        "before": "data_var = addroundkey_data_i;",
+        "after": "data_var = data_var;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 48,
+        "op": "OP-HOLD",
+        "before": "round_key_var = key_i;",
+        "after": "round_key_var = round_key_var;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 50,
+        "op": "OP-HOLD",
+        "before": "next_addroundkey_data_reg = round_data_var;",
+        "after": "next_addroundkey_data_reg = next_addroundkey_data_reg;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 55,
+        "op": "OP-HOLD",
+        "before": "keysched_last_key_i = key_i;",
+        "after": "keysched_last_key_i = keysched_last_key_i;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 63,
+        "op": "OP-HOLD",
+        "before": "keysched_last_key_i = keysched_new_key_o;",
+        "after": "keysched_last_key_i = keysched_last_key_i;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 69,
+        "op": "OP-HOLD",
+        "before": "data_var = addroundkey_data_i;",
+        "after": "data_var = data_var;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 70,
+        "op": "OP-HOLD",
+        "before": "round_key_var = keysched_new_key_o;",
+        "after": "round_key_var = round_key_var;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 72,
+        "op": "OP-HOLD",
+        "before": "next_addroundkey_data_reg = round_data_var;",
+        "after": "next_addroundkey_data_reg = next_addroundkey_data_reg;",
+        "killScenes": [
+          "SCENE1 rand",
+          "SCENE2 small"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [
+        {
+          "signal": "data_var",
+          "class": "U5",
+          "policy": false,
+          "line": 28,
+          "snippet": "reg [3:0] data_var;"
+        },
+        {
+          "signal": "keysched_last_key_i",
+          "class": "U5",
+          "policy": false,
+          "line": 0,
+          "snippet": ""
+        },
+        {
+          "signal": "next_addroundkey_data_reg",
+          "class": "U5",
+          "policy": false,
+          "line": 0,
+          "snippet": ""
+        },
+        {
+          "signal": "round_key_var",
+          "class": "U5",
+          "policy": false,
+          "line": 29,
+          "snippet": "reg [3:0] round_key_var;"
+        }
+      ],
+      "summary": {
+        "uncovered": 4,
+        "byClass": {
+          "U5": 4
+        },
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 13,
+      "hit": 3,
+      "rate": "3/13"
+    }
+  }
+}

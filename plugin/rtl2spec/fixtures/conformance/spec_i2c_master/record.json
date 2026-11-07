@@ -1,0 +1,7959 @@
+{
+  "design": "spec_i2c_master",
+  "src": "crates/spec-i2c/rtl/i2c_master.v",
+  "top": "i2c_master",
+  "specPath": "plugin/rtl2spec/golden/crates/spec-i2c/rtl/i2c_master.rules.json",
+  "rules": 152,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "113fec7c29a40a5403a12340c4db8c31f3571eec237909116725a44a0ccc1a1b",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 6
+  },
+  "expected": {
+    "sha256": "f4035d05dbea1801ce1cdf432509c462b2db66e807fe8d35f4875d28ce0ef466",
+    "lines": 932
+  },
+  "numbers": {
+    "generated": 272,
+    "stillborn": 0,
+    "equivalent": 17,
+    "eligible": 255,
+    "killed": 77,
+    "survived": 178,
+    "timeout": 0,
+    "rate": "77/255",
+    "ruleVerified": {
+      "exclusive": "56/152",
+      "shared": "10/152"
+    },
+    "catalogCoverage": "152/152",
+    "unruled": {
+      "generated": 3,
+      "killed": 2
+    },
+    "controlsSurvived": "20/20",
+    "ambiguous": 2,
+    "na": 244
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 49,
+      "out": 16
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 195,
+      "equivalent": 17,
+      "unproven": 178,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 77,
+      "mainKilled": 77,
+      "unproven": 76,
+      "adjudicationFailed": 1,
+      "equivalent": 0,
+      "failed": [
+        "m0011 OP-POL@69 yosys-error: Async reset \\rst_n yields non-constant value 1'm for signal \\ack_rx."
+      ]
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "guard": {
+      "total": 20,
+      "unique": 20
+    },
+    "transition": {
+      "total": 9,
+      "unique": 7
+    },
+    "sequence": {
+      "total": 123,
+      "unique": 123
+    }
+  },
+  "stateTables": {
+    "state": [
+      "ST_START",
+      "ST_SHIFT",
+      "ST_ACK",
+      "ST_HOLD",
+      "ST_STOP",
+      "ST_IDLE"
+    ]
+  },
+  "attempts": [
+    {
+      "ruleId": "i2c_master.R001",
+      "op": "OP-RVAL",
+      "status": "n/a",
+      "reason": "源碼 RHS 非單一字面量",
+      "line": 70
+    },
+    {
+      "ruleId": "i2c_master.R021",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 122
+    },
+    {
+      "ruleId": "i2c_master.R022",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 156
+    },
+    {
+      "ruleId": "i2c_master.R023",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 191
+    },
+    {
+      "ruleId": "i2c_master.R024",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 232
+    },
+    {
+      "ruleId": "i2c_master.R025",
+      "op": "OP-CONST",
+      "status": "ambiguous",
+      "reason": "區間內 2 行左值==state",
+      "line": null
+    },
+    {
+      "ruleId": "i2c_master.R026",
+      "op": "OP-CONST",
+      "status": "ambiguous",
+      "reason": "區間內 2 行左值==state",
+      "line": null
+    },
+    {
+      "ruleId": "i2c_master.R027",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 265
+    },
+    {
+      "ruleId": "i2c_master.R028",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 272
+    },
+    {
+      "ruleId": "i2c_master.R029",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 306
+    },
+    {
+      "ruleId": "i2c_master.R030",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 91
+    },
+    {
+      "ruleId": "i2c_master.R030",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 91
+    },
+    {
+      "ruleId": "i2c_master.R031",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 96
+    },
+    {
+      "ruleId": "i2c_master.R031",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 96
+    },
+    {
+      "ruleId": "i2c_master.R032",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 97
+    },
+    {
+      "ruleId": "i2c_master.R032",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 97
+    },
+    {
+      "ruleId": "i2c_master.R032",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 97
+    },
+    {
+      "ruleId": "i2c_master.R032",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 97
+    },
+    {
+      "ruleId": "i2c_master.R032",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 97
+    },
+    {
+      "ruleId": "i2c_master.R033",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 99
+    },
+    {
+      "ruleId": "i2c_master.R033",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 99
+    },
+    {
+      "ruleId": "i2c_master.R034",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 100
+    },
+    {
+      "ruleId": "i2c_master.R034",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 100
+    },
+    {
+      "ruleId": "i2c_master.R035",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 101
+    },
+    {
+      "ruleId": "i2c_master.R035",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 101
+    },
+    {
+      "ruleId": "i2c_master.R036",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 106
+    },
+    {
+      "ruleId": "i2c_master.R036",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 106
+    },
+    {
+      "ruleId": "i2c_master.R037",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 107
+    },
+    {
+      "ruleId": "i2c_master.R037",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 107
+    },
+    {
+      "ruleId": "i2c_master.R038",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 108
+    },
+    {
+      "ruleId": "i2c_master.R038",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 108
+    },
+    {
+      "ruleId": "i2c_master.R039",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 109
+    },
+    {
+      "ruleId": "i2c_master.R039",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 109
+    },
+    {
+      "ruleId": "i2c_master.R040",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 110
+    },
+    {
+      "ruleId": "i2c_master.R040",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 110
+    },
+    {
+      "ruleId": "i2c_master.R041",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 111
+    },
+    {
+      "ruleId": "i2c_master.R041",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 111
+    },
+    {
+      "ruleId": "i2c_master.R042",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 112
+    },
+    {
+      "ruleId": "i2c_master.R042",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 112
+    },
+    {
+      "ruleId": "i2c_master.R043",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 113
+    },
+    {
+      "ruleId": "i2c_master.R043",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 113
+    },
+    {
+      "ruleId": "i2c_master.R044",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 114
+    },
+    {
+      "ruleId": "i2c_master.R044",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 114
+    },
+    {
+      "ruleId": "i2c_master.R045",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 115
+    },
+    {
+      "ruleId": "i2c_master.R045",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 115
+    },
+    {
+      "ruleId": "i2c_master.R046",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 117
+    },
+    {
+      "ruleId": "i2c_master.R046",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 117
+    },
+    {
+      "ruleId": "i2c_master.R047",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 118
+    },
+    {
+      "ruleId": "i2c_master.R047",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 118
+    },
+    {
+      "ruleId": "i2c_master.R048",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 119
+    },
+    {
+      "ruleId": "i2c_master.R048",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 119
+    },
+    {
+      "ruleId": "i2c_master.R049",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 120
+    },
+    {
+      "ruleId": "i2c_master.R049",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 120
+    },
+    {
+      "ruleId": "i2c_master.R050",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 121
+    },
+    {
+      "ruleId": "i2c_master.R050",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 121
+    },
+    {
+      "ruleId": "i2c_master.R051",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 131
+    },
+    {
+      "ruleId": "i2c_master.R051",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 131
+    },
+    {
+      "ruleId": "i2c_master.R052",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 132
+    },
+    {
+      "ruleId": "i2c_master.R052",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 132
+    },
+    {
+      "ruleId": "i2c_master.R053",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 133
+    },
+    {
+      "ruleId": "i2c_master.R053",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 133
+    },
+    {
+      "ruleId": "i2c_master.R054",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 135
+    },
+    {
+      "ruleId": "i2c_master.R054",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 135
+    },
+    {
+      "ruleId": "i2c_master.R055",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 136
+    },
+    {
+      "ruleId": "i2c_master.R055",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 136
+    },
+    {
+      "ruleId": "i2c_master.R057",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 139
+    },
+    {
+      "ruleId": "i2c_master.R057",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 139
+    },
+    {
+      "ruleId": "i2c_master.R058",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 140
+    },
+    {
+      "ruleId": "i2c_master.R058",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 140
+    },
+    {
+      "ruleId": "i2c_master.R059",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 142
+    },
+    {
+      "ruleId": "i2c_master.R059",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 142
+    },
+    {
+      "ruleId": "i2c_master.R060",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 143
+    },
+    {
+      "ruleId": "i2c_master.R060",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 143
+    },
+    {
+      "ruleId": "i2c_master.R062",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 146
+    },
+    {
+      "ruleId": "i2c_master.R062",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 146
+    },
+    {
+      "ruleId": "i2c_master.R063",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 147
+    },
+    {
+      "ruleId": "i2c_master.R063",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 147
+    },
+    {
+      "ruleId": "i2c_master.R064",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 148
+    },
+    {
+      "ruleId": "i2c_master.R064",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 148
+    },
+    {
+      "ruleId": "i2c_master.R065",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 149
+    },
+    {
+      "ruleId": "i2c_master.R065",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 149
+    },
+    {
+      "ruleId": "i2c_master.R066",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 151
+    },
+    {
+      "ruleId": "i2c_master.R066",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 151
+    },
+    {
+      "ruleId": "i2c_master.R067",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 152
+    },
+    {
+      "ruleId": "i2c_master.R067",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 152
+    },
+    {
+      "ruleId": "i2c_master.R068",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 153
+    },
+    {
+      "ruleId": "i2c_master.R068",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 153
+    },
+    {
+      "ruleId": "i2c_master.R069",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 154
+    },
+    {
+      "ruleId": "i2c_master.R069",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 154
+    },
+    {
+      "ruleId": "i2c_master.R070",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 155
+    },
+    {
+      "ruleId": "i2c_master.R070",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 155
+    },
+    {
+      "ruleId": "i2c_master.R072",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 164
+    },
+    {
+      "ruleId": "i2c_master.R072",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 164
+    },
+    {
+      "ruleId": "i2c_master.R073",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 165
+    },
+    {
+      "ruleId": "i2c_master.R073",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 165
+    },
+    {
+      "ruleId": "i2c_master.R074",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 167
+    },
+    {
+      "ruleId": "i2c_master.R074",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 167
+    },
+    {
+      "ruleId": "i2c_master.R075",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 168
+    },
+    {
+      "ruleId": "i2c_master.R075",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 168
+    },
+    {
+      "ruleId": "i2c_master.R077",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 171
+    },
+    {
+      "ruleId": "i2c_master.R077",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 171
+    },
+    {
+      "ruleId": "i2c_master.R078",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 174
+    },
+    {
+      "ruleId": "i2c_master.R078",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 174
+    },
+    {
+      "ruleId": "i2c_master.R079",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 175
+    },
+    {
+      "ruleId": "i2c_master.R079",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 175
+    },
+    {
+      "ruleId": "i2c_master.R080",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 176
+    },
+    {
+      "ruleId": "i2c_master.R080",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 176
+    },
+    {
+      "ruleId": "i2c_master.R082",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 182
+    },
+    {
+      "ruleId": "i2c_master.R082",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 182
+    },
+    {
+      "ruleId": "i2c_master.R083",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 183
+    },
+    {
+      "ruleId": "i2c_master.R083",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 183
+    },
+    {
+      "ruleId": "i2c_master.R084",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 184
+    },
+    {
+      "ruleId": "i2c_master.R084",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 184
+    },
+    {
+      "ruleId": "i2c_master.R085",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 185
+    },
+    {
+      "ruleId": "i2c_master.R085",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 185
+    },
+    {
+      "ruleId": "i2c_master.R086",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 187
+    },
+    {
+      "ruleId": "i2c_master.R086",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 187
+    },
+    {
+      "ruleId": "i2c_master.R086",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 187
+    },
+    {
+      "ruleId": "i2c_master.R086",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 187
+    },
+    {
+      "ruleId": "i2c_master.R087",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 190
+    },
+    {
+      "ruleId": "i2c_master.R087",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 190
+    },
+    {
+      "ruleId": "i2c_master.R090",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 203
+    },
+    {
+      "ruleId": "i2c_master.R090",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 203
+    },
+    {
+      "ruleId": "i2c_master.R091",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 204
+    },
+    {
+      "ruleId": "i2c_master.R091",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 204
+    },
+    {
+      "ruleId": "i2c_master.R092",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 206
+    },
+    {
+      "ruleId": "i2c_master.R092",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 206
+    },
+    {
+      "ruleId": "i2c_master.R093",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 207
+    },
+    {
+      "ruleId": "i2c_master.R093",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 207
+    },
+    {
+      "ruleId": "i2c_master.R094",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 209
+    },
+    {
+      "ruleId": "i2c_master.R094",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 209
+    },
+    {
+      "ruleId": "i2c_master.R095",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 210
+    },
+    {
+      "ruleId": "i2c_master.R095",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 210
+    },
+    {
+      "ruleId": "i2c_master.R096",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 213
+    },
+    {
+      "ruleId": "i2c_master.R096",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 213
+    },
+    {
+      "ruleId": "i2c_master.R097",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 214
+    },
+    {
+      "ruleId": "i2c_master.R097",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 214
+    },
+    {
+      "ruleId": "i2c_master.R098",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 215
+    },
+    {
+      "ruleId": "i2c_master.R098",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 215
+    },
+    {
+      "ruleId": "i2c_master.R100",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 220
+    },
+    {
+      "ruleId": "i2c_master.R100",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 220
+    },
+    {
+      "ruleId": "i2c_master.R101",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 221
+    },
+    {
+      "ruleId": "i2c_master.R101",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 221
+    },
+    {
+      "ruleId": "i2c_master.R102",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 222
+    },
+    {
+      "ruleId": "i2c_master.R102",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 222
+    },
+    {
+      "ruleId": "i2c_master.R103",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 223
+    },
+    {
+      "ruleId": "i2c_master.R103",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 223
+    },
+    {
+      "ruleId": "i2c_master.R104",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 225
+    },
+    {
+      "ruleId": "i2c_master.R104",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 225
+    },
+    {
+      "ruleId": "i2c_master.R104",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 225
+    },
+    {
+      "ruleId": "i2c_master.R104",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 225
+    },
+    {
+      "ruleId": "i2c_master.R104",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 225
+    },
+    {
+      "ruleId": "i2c_master.R105",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 226
+    },
+    {
+      "ruleId": "i2c_master.R105",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 226
+    },
+    {
+      "ruleId": "i2c_master.R105",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 226
+    },
+    {
+      "ruleId": "i2c_master.R105",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 226
+    },
+    {
+      "ruleId": "i2c_master.R105",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 226
+    },
+    {
+      "ruleId": "i2c_master.R106",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 228
+    },
+    {
+      "ruleId": "i2c_master.R106",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 228
+    },
+    {
+      "ruleId": "i2c_master.R106",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 228
+    },
+    {
+      "ruleId": "i2c_master.R106",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 228
+    },
+    {
+      "ruleId": "i2c_master.R106",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 228
+    },
+    {
+      "ruleId": "i2c_master.R107",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 230
+    },
+    {
+      "ruleId": "i2c_master.R107",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 230
+    },
+    {
+      "ruleId": "i2c_master.R108",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 231
+    },
+    {
+      "ruleId": "i2c_master.R108",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 231
+    },
+    {
+      "ruleId": "i2c_master.R110",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 240
+    },
+    {
+      "ruleId": "i2c_master.R110",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 240
+    },
+    {
+      "ruleId": "i2c_master.R111",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 241
+    },
+    {
+      "ruleId": "i2c_master.R111",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 241
+    },
+    {
+      "ruleId": "i2c_master.R112",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 242
+    },
+    {
+      "ruleId": "i2c_master.R112",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 242
+    },
+    {
+      "ruleId": "i2c_master.R113",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 243
+    },
+    {
+      "ruleId": "i2c_master.R113",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 243
+    },
+    {
+      "ruleId": "i2c_master.R114",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 245
+    },
+    {
+      "ruleId": "i2c_master.R114",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 245
+    },
+    {
+      "ruleId": "i2c_master.R115",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 246
+    },
+    {
+      "ruleId": "i2c_master.R115",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 246
+    },
+    {
+      "ruleId": "i2c_master.R116",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 247
+    },
+    {
+      "ruleId": "i2c_master.R116",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 247
+    },
+    {
+      "ruleId": "i2c_master.R117",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 248
+    },
+    {
+      "ruleId": "i2c_master.R117",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 248
+    },
+    {
+      "ruleId": "i2c_master.R118",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 249
+    },
+    {
+      "ruleId": "i2c_master.R118",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 249
+    },
+    {
+      "ruleId": "i2c_master.R119",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 250
+    },
+    {
+      "ruleId": "i2c_master.R119",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 250
+    },
+    {
+      "ruleId": "i2c_master.R120",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 253
+    },
+    {
+      "ruleId": "i2c_master.R120",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 253
+    },
+    {
+      "ruleId": "i2c_master.R121",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 254
+    },
+    {
+      "ruleId": "i2c_master.R121",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 254
+    },
+    {
+      "ruleId": "i2c_master.R122",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 255
+    },
+    {
+      "ruleId": "i2c_master.R122",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 255
+    },
+    {
+      "ruleId": "i2c_master.R123",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 256
+    },
+    {
+      "ruleId": "i2c_master.R123",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 256
+    },
+    {
+      "ruleId": "i2c_master.R124",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 257
+    },
+    {
+      "ruleId": "i2c_master.R124",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 257
+    },
+    {
+      "ruleId": "i2c_master.R125",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 258
+    },
+    {
+      "ruleId": "i2c_master.R125",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 258
+    },
+    {
+      "ruleId": "i2c_master.R126",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 259
+    },
+    {
+      "ruleId": "i2c_master.R126",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 259
+    },
+    {
+      "ruleId": "i2c_master.R127",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 262
+    },
+    {
+      "ruleId": "i2c_master.R127",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 262
+    },
+    {
+      "ruleId": "i2c_master.R128",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 263
+    },
+    {
+      "ruleId": "i2c_master.R128",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 263
+    },
+    {
+      "ruleId": "i2c_master.R129",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 264
+    },
+    {
+      "ruleId": "i2c_master.R129",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 264
+    },
+    {
+      "ruleId": "i2c_master.R130",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 267
+    },
+    {
+      "ruleId": "i2c_master.R130",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 267
+    },
+    {
+      "ruleId": "i2c_master.R131",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 268
+    },
+    {
+      "ruleId": "i2c_master.R131",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 268
+    },
+    {
+      "ruleId": "i2c_master.R132",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 269
+    },
+    {
+      "ruleId": "i2c_master.R132",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 269
+    },
+    {
+      "ruleId": "i2c_master.R133",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 270
+    },
+    {
+      "ruleId": "i2c_master.R133",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 270
+    },
+    {
+      "ruleId": "i2c_master.R134",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 271
+    },
+    {
+      "ruleId": "i2c_master.R134",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 271
+    },
+    {
+      "ruleId": "i2c_master.R135",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 282
+    },
+    {
+      "ruleId": "i2c_master.R135",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 282
+    },
+    {
+      "ruleId": "i2c_master.R136",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 283
+    },
+    {
+      "ruleId": "i2c_master.R136",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 283
+    },
+    {
+      "ruleId": "i2c_master.R137",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 284
+    },
+    {
+      "ruleId": "i2c_master.R137",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 284
+    },
+    {
+      "ruleId": "i2c_master.R138",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 285
+    },
+    {
+      "ruleId": "i2c_master.R138",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 285
+    },
+    {
+      "ruleId": "i2c_master.R139",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 287
+    },
+    {
+      "ruleId": "i2c_master.R139",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 287
+    },
+    {
+      "ruleId": "i2c_master.R140",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 288
+    },
+    {
+      "ruleId": "i2c_master.R140",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 288
+    },
+    {
+      "ruleId": "i2c_master.R142",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 291
+    },
+    {
+      "ruleId": "i2c_master.R142",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 291
+    },
+    {
+      "ruleId": "i2c_master.R143",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 293
+    },
+    {
+      "ruleId": "i2c_master.R143",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 293
+    },
+    {
+      "ruleId": "i2c_master.R144",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 294
+    },
+    {
+      "ruleId": "i2c_master.R144",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 294
+    },
+    {
+      "ruleId": "i2c_master.R146",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 297
+    },
+    {
+      "ruleId": "i2c_master.R146",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 297
+    },
+    {
+      "ruleId": "i2c_master.R147",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 298
+    },
+    {
+      "ruleId": "i2c_master.R147",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 298
+    },
+    {
+      "ruleId": "i2c_master.R148",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 300
+    },
+    {
+      "ruleId": "i2c_master.R148",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 300
+    },
+    {
+      "ruleId": "i2c_master.R149",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 301
+    },
+    {
+      "ruleId": "i2c_master.R149",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 301
+    },
+    {
+      "ruleId": "i2c_master.R151",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 304
+    },
+    {
+      "ruleId": "i2c_master.R151",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 304
+    },
+    {
+      "ruleId": "i2c_master.R152",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 305
+    },
+    {
+      "ruleId": "i2c_master.R152",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 305
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "122|            state <= ST_SHIFT;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 122,
+      "before": "            state <= ST_START;",
+      "after": "            state <= ST_SHIFT;",
+      "detail": "ST_START→ST_SHIFT",
+      "ruleIds": [
+        "i2c_master.R021"
+      ],
+      "attribution": "span",
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "156|              state <= ST_ACK;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 156,
+      "before": "              state <= ST_SHIFT;",
+      "after": "              state <= ST_ACK;",
+      "detail": "ST_SHIFT→ST_ACK",
+      "ruleIds": [
+        "i2c_master.R022"
+      ],
+      "attribution": "span",
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "191|                state <= ST_HOLD;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 191,
+      "before": "                state <= ST_ACK;",
+      "after": "                state <= ST_HOLD;",
+      "detail": "ST_ACK→ST_HOLD",
+      "ruleIds": [
+        "i2c_master.R023"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 3,
+      "unprovenCells": [
+        "state[0]",
+        "state[1]",
+        "state[2]"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "232|              state <= ST_STOP;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 232,
+      "before": "              state <= ST_HOLD;",
+      "after": "              state <= ST_STOP;",
+      "detail": "ST_HOLD→ST_STOP",
+      "ruleIds": [
+        "i2c_master.R024"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "state[0]"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "251|            state <= ST_ACK;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 251,
+      "before": "            state <= ST_SHIFT;",
+      "after": "            state <= ST_ACK;",
+      "detail": "ST_SHIFT→ST_ACK",
+      "ruleIds": [
+        "i2c_master.R025",
+        "i2c_master.R026",
+        "i2c_master.R027",
+        "i2c_master.R028"
+      ],
+      "attribution": "span",
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "state[0]"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "260|            state <= ST_ACK;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 260,
+      "before": "            state <= ST_SHIFT;",
+      "after": "            state <= ST_ACK;",
+      "detail": "ST_SHIFT→ST_ACK",
+      "ruleIds": [
+        "i2c_master.R025",
+        "i2c_master.R026",
+        "i2c_master.R027",
+        "i2c_master.R028"
+      ],
+      "attribution": "span",
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "state[0]"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "265|            state <= ST_IDLE;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 265,
+      "before": "            state <= ST_STOP;",
+      "after": "            state <= ST_IDLE;",
+      "detail": "ST_STOP→ST_IDLE",
+      "ruleIds": [
+        "i2c_master.R027"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "state[0]",
+        "state[2]"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "272|            state <= ST_SHIFT;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 272,
+      "before": "            state <= ST_START;",
+      "after": "            state <= ST_SHIFT;",
+      "detail": "ST_START→ST_SHIFT",
+      "ruleIds": [
+        "i2c_master.R025",
+        "i2c_master.R026",
+        "i2c_master.R027",
+        "i2c_master.R028"
+      ],
+      "attribution": "span",
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "state[0]",
+        "state[1]"
+      ]
+    },
+    {
+      "id": "m0009",
+      "key": "306|            state <= ST_START;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 306,
+      "before": "            state <= ST_IDLE;",
+      "after": "            state <= ST_START;",
+      "detail": "ST_IDLE→ST_START",
+      "ruleIds": [
+        "i2c_master.R029"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "state[0]"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "68|  always @(posedge clk) begin",
+      "pool": "rule",
+      "op": "OP-ASYNC",
+      "line": 68,
+      "before": "  always @(posedge clk or negedge rst_n) begin",
+      "after": "  always @(posedge clk) begin",
+      "detail": "刪 or negedge rst_n",
+      "ruleIds": [
+        "i2c_master.R001",
+        "i2c_master.R002",
+        "i2c_master.R003",
+        "i2c_master.R004",
+        "i2c_master.R005",
+        "i2c_master.R006",
+        "i2c_master.R007",
+        "i2c_master.R008",
+        "i2c_master.R009",
+        "i2c_master.R010",
+        "i2c_master.R011",
+        "i2c_master.R012",
+        "i2c_master.R013",
+        "i2c_master.R014",
+        "i2c_master.R015",
+        "i2c_master.R016",
+        "i2c_master.R017",
+        "i2c_master.R018",
+        "i2c_master.R019",
+        "i2c_master.R020"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n"
+      ]
+    },
+    {
+      "id": "m0011",
+      "key": "69|    if (rst_n) begin",
+      "pool": "rule",
+      "op": "OP-POL",
+      "line": 69,
+      "before": "    if (!rst_n) begin",
+      "after": "    if (rst_n) begin",
+      "detail": "if (!rst_n)→if (rst_n)",
+      "ruleIds": [
+        "i2c_master.R001",
+        "i2c_master.R002",
+        "i2c_master.R003",
+        "i2c_master.R004",
+        "i2c_master.R005",
+        "i2c_master.R006",
+        "i2c_master.R007",
+        "i2c_master.R008",
+        "i2c_master.R009",
+        "i2c_master.R010",
+        "i2c_master.R011",
+        "i2c_master.R012",
+        "i2c_master.R013",
+        "i2c_master.R014",
+        "i2c_master.R015",
+        "i2c_master.R016",
+        "i2c_master.R017",
+        "i2c_master.R018",
+        "i2c_master.R019",
+        "i2c_master.R020"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "71|      cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 71,
+      "before": "      cnt <= 16'd0;",
+      "after": "      cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R002"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0013",
+      "key": "72|      half <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 72,
+      "before": "      half <= 1'b0;",
+      "after": "      half <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R003"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0014",
+      "key": "73|      bitcnt <= 4'd1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 73,
+      "before": "      bitcnt <= 4'd0;",
+      "after": "      bitcnt <= 4'd1;",
+      "detail": "4'd0→4'd1",
+      "ruleIds": [
+        "i2c_master.R004"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "bitcnt[0]"
+      ]
+    },
+    {
+      "id": "m0015",
+      "key": "74|      step <= 2'd1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 74,
+      "before": "      step <= 2'd0;",
+      "after": "      step <= 2'd1;",
+      "detail": "2'd0→2'd1",
+      "ruleIds": [
+        "i2c_master.R005"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "step[0]"
+      ]
+    },
+    {
+      "id": "m0016",
+      "key": "75|      tx <= 8'd1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 75,
+      "before": "      tx <= 8'd0;",
+      "after": "      tx <= 8'd1;",
+      "detail": "8'd0→8'd1",
+      "ruleIds": [
+        "i2c_master.R006"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tx[0]"
+      ]
+    },
+    {
+      "id": "m0017",
+      "key": "76|      rd_mode <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 76,
+      "before": "      rd_mode <= 1'b0;",
+      "after": "      rd_mode <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R007"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "rd_mode"
+      ]
+    },
+    {
+      "id": "m0018",
+      "key": "77|      pend_start <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 77,
+      "before": "      pend_start <= 1'b0;",
+      "after": "      pend_start <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R008"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full"
+      ]
+    },
+    {
+      "id": "m0019",
+      "key": "78|      pend_stop <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 78,
+      "before": "      pend_stop <= 1'b0;",
+      "after": "      pend_stop <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R009"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_stop"
+      ]
+    },
+    {
+      "id": "m0020",
+      "key": "79|      pend_wr <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 79,
+      "before": "      pend_wr <= 1'b0;",
+      "after": "      pend_wr <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R010"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_wr"
+      ]
+    },
+    {
+      "id": "m0021",
+      "key": "80|      pend_rd <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 80,
+      "before": "      pend_rd <= 1'b0;",
+      "after": "      pend_rd <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R011"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_rd"
+      ]
+    },
+    {
+      "id": "m0022",
+      "key": "81|      scl_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 81,
+      "before": "      scl_o <= 1'b1;",
+      "after": "      scl_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R012"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n"
+      ]
+    },
+    {
+      "id": "m0023",
+      "key": "82|      sda_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 82,
+      "before": "      sda_o <= 1'b1;",
+      "after": "      sda_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R013"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n"
+      ]
+    },
+    {
+      "id": "m0024",
+      "key": "83|      scl_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 83,
+      "before": "      scl_oe <= 1'b0;",
+      "after": "      scl_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R014"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n"
+      ]
+    },
+    {
+      "id": "m0025",
+      "key": "84|      sda_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 84,
+      "before": "      sda_oe <= 1'b0;",
+      "after": "      sda_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R015"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n"
+      ]
+    },
+    {
+      "id": "m0026",
+      "key": "85|      busy <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 85,
+      "before": "      busy <= 1'b0;",
+      "after": "      busy <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R016"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n"
+      ]
+    },
+    {
+      "id": "m0027",
+      "key": "86|      tip <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 86,
+      "before": "      tip <= 1'b0;",
+      "after": "      tip <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R017"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n"
+      ]
+    },
+    {
+      "id": "m0028",
+      "key": "87|      done <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 87,
+      "before": "      done <= 1'b0;",
+      "after": "      done <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R018"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n"
+      ]
+    },
+    {
+      "id": "m0029",
+      "key": "88|      ack_rx <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 88,
+      "before": "      ack_rx <= 1'b1;",
+      "after": "      ack_rx <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R019"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0030",
+      "key": "89|      dout <= 8'd1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 89,
+      "before": "      dout <= 8'd0;",
+      "after": "      dout <= 8'd1;",
+      "detail": "8'd0→8'd1",
+      "ruleIds": [
+        "i2c_master.R020"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0031",
+      "key": "91|      done <= done;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 91,
+      "before": "      done <= 1'b0;",
+      "after": "      done <= done;",
+      "detail": "rhs→done",
+      "ruleIds": [
+        "i2c_master.R030"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "done"
+      ]
+    },
+    {
+      "id": "m0032",
+      "key": "91|      done <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 91,
+      "before": "      done <= 1'b0;",
+      "after": "      done <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R030"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0033",
+      "key": "96|          pend_wr <= pend_wr;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 96,
+      "before": "          pend_wr <= 1'b1;",
+      "after": "          pend_wr <= pend_wr;",
+      "detail": "rhs→pend_wr",
+      "ruleIds": [
+        "i2c_master.R031"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_wr"
+      ]
+    },
+    {
+      "id": "m0034",
+      "key": "96|          pend_wr <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 96,
+      "before": "          pend_wr <= 1'b1;",
+      "after": "          pend_wr <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R031"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_wr"
+      ]
+    },
+    {
+      "id": "m0035",
+      "key": "97|          tx <= tx;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 97,
+      "before": "          tx <= din;",
+      "after": "          tx <= tx;",
+      "detail": "rhs→tx",
+      "ruleIds": [
+        "i2c_master.R032"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0036",
+      "key": "99|        if (cmd == CMD_RD) pend_rd <= pend_rd;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 99,
+      "before": "        if (cmd == CMD_RD) pend_rd <= 1'b1;",
+      "after": "        if (cmd == CMD_RD) pend_rd <= pend_rd;",
+      "detail": "rhs→pend_rd",
+      "ruleIds": [
+        "i2c_master.R033"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_rd"
+      ]
+    },
+    {
+      "id": "m0037",
+      "key": "99|        if (cmd == CMD_RD) pend_rd <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 99,
+      "before": "        if (cmd == CMD_RD) pend_rd <= 1'b1;",
+      "after": "        if (cmd == CMD_RD) pend_rd <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R033"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_rd"
+      ]
+    },
+    {
+      "id": "m0038",
+      "key": "100|        if (cmd == CMD_START) pend_start <= pend_start;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 100,
+      "before": "        if (cmd == CMD_START) pend_start <= 1'b1;",
+      "after": "        if (cmd == CMD_START) pend_start <= pend_start;",
+      "detail": "rhs→pend_start",
+      "ruleIds": [
+        "i2c_master.R034"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0039",
+      "key": "100|        if (cmd == CMD_START) pend_start <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 100,
+      "before": "        if (cmd == CMD_START) pend_start <= 1'b1;",
+      "after": "        if (cmd == CMD_START) pend_start <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R034"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0040",
+      "key": "101|        if (cmd == CMD_STOP) pend_stop <= pend_stop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 101,
+      "before": "        if (cmd == CMD_STOP) pend_stop <= 1'b1;",
+      "after": "        if (cmd == CMD_STOP) pend_stop <= pend_stop;",
+      "detail": "rhs→pend_stop",
+      "ruleIds": [
+        "i2c_master.R035"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_stop"
+      ]
+    },
+    {
+      "id": "m0041",
+      "key": "101|        if (cmd == CMD_STOP) pend_stop <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 101,
+      "before": "        if (cmd == CMD_STOP) pend_stop <= 1'b1;",
+      "after": "        if (cmd == CMD_STOP) pend_stop <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R035"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_stop"
+      ]
+    },
+    {
+      "id": "m0042",
+      "key": "106|          scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 106,
+      "before": "          scl_oe <= 1'b0;",
+      "after": "          scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R036"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0043",
+      "key": "106|          scl_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 106,
+      "before": "          scl_oe <= 1'b0;",
+      "after": "          scl_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R036"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full"
+      ]
+    },
+    {
+      "id": "m0044",
+      "key": "107|          sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 107,
+      "before": "          sda_oe <= 1'b0;",
+      "after": "          sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R037"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0045",
+      "key": "107|          sda_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 107,
+      "before": "          sda_oe <= 1'b0;",
+      "after": "          sda_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R037"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full"
+      ]
+    },
+    {
+      "id": "m0046",
+      "key": "108|          scl_o <= scl_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 108,
+      "before": "          scl_o <= 1'b1;",
+      "after": "          scl_o <= scl_o;",
+      "detail": "rhs→scl_o",
+      "ruleIds": [
+        "i2c_master.R038"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_o"
+      ]
+    },
+    {
+      "id": "m0047",
+      "key": "108|          scl_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 108,
+      "before": "          scl_o <= 1'b1;",
+      "after": "          scl_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R038"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0048",
+      "key": "109|          sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 109,
+      "before": "          sda_o <= 1'b1;",
+      "after": "          sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R039"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0049",
+      "key": "109|          sda_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 109,
+      "before": "          sda_o <= 1'b1;",
+      "after": "          sda_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R039"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full"
+      ]
+    },
+    {
+      "id": "m0050",
+      "key": "110|          busy <= busy;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 110,
+      "before": "          busy <= 1'b0;",
+      "after": "          busy <= busy;",
+      "detail": "rhs→busy",
+      "ruleIds": [
+        "i2c_master.R040"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0051",
+      "key": "110|          busy <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 110,
+      "before": "          busy <= 1'b0;",
+      "after": "          busy <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R040"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full"
+      ]
+    },
+    {
+      "id": "m0052",
+      "key": "111|          tip <= tip;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 111,
+      "before": "          tip <= 1'b0;",
+      "after": "          tip <= tip;",
+      "detail": "rhs→tip",
+      "ruleIds": [
+        "i2c_master.R041"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0053",
+      "key": "111|          tip <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 111,
+      "before": "          tip <= 1'b0;",
+      "after": "          tip <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R041"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_rst_n",
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0054",
+      "key": "112|          cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 112,
+      "before": "          cnt <= 16'd0;",
+      "after": "          cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R042"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0055",
+      "key": "112|          cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 112,
+      "before": "          cnt <= 16'd0;",
+      "after": "          cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R042"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0056",
+      "key": "113|          half <= half;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 113,
+      "before": "          half <= 1'b0;",
+      "after": "          half <= half;",
+      "detail": "rhs→half",
+      "ruleIds": [
+        "i2c_master.R043"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0057",
+      "key": "113|          half <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 113,
+      "before": "          half <= 1'b0;",
+      "after": "          half <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R043"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0058",
+      "key": "114|          bitcnt <= bitcnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 114,
+      "before": "          bitcnt <= 4'd0;",
+      "after": "          bitcnt <= bitcnt;",
+      "detail": "rhs→bitcnt",
+      "ruleIds": [
+        "i2c_master.R044"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 4,
+      "unprovenCells": [
+        "bitcnt[0]",
+        "bitcnt[1]",
+        "bitcnt[2]",
+        "bitcnt[3]"
+      ]
+    },
+    {
+      "id": "m0059",
+      "key": "114|          bitcnt <= 4'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 114,
+      "before": "          bitcnt <= 4'd0;",
+      "after": "          bitcnt <= 4'd1;",
+      "detail": "4'd0→4'd1",
+      "ruleIds": [
+        "i2c_master.R044"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "bitcnt[0]"
+      ]
+    },
+    {
+      "id": "m0060",
+      "key": "115|          step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 115,
+      "before": "          step <= 2'd0;",
+      "after": "          step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R045"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "step[0]",
+        "step[1]"
+      ]
+    },
+    {
+      "id": "m0061",
+      "key": "115|          step <= 2'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 115,
+      "before": "          step <= 2'd0;",
+      "after": "          step <= 2'd1;",
+      "detail": "2'd0→2'd1",
+      "ruleIds": [
+        "i2c_master.R045"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "step[0]"
+      ]
+    },
+    {
+      "id": "m0062",
+      "key": "117|            pend_start <= pend_start;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 117,
+      "before": "            pend_start <= 1'b0;",
+      "after": "            pend_start <= pend_start;",
+      "detail": "rhs→pend_start",
+      "ruleIds": [
+        "i2c_master.R046"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_start"
+      ]
+    },
+    {
+      "id": "m0063",
+      "key": "117|            pend_start <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 117,
+      "before": "            pend_start <= 1'b0;",
+      "after": "            pend_start <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R046"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_start"
+      ]
+    },
+    {
+      "id": "m0064",
+      "key": "118|            busy <= busy;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 118,
+      "before": "            busy <= 1'b1;",
+      "after": "            busy <= busy;",
+      "detail": "rhs→busy",
+      "ruleIds": [
+        "i2c_master.R047"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0065",
+      "key": "118|            busy <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 118,
+      "before": "            busy <= 1'b1;",
+      "after": "            busy <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R047"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0066",
+      "key": "119|            rd_mode <= rd_mode;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 119,
+      "before": "            rd_mode <= 1'b0;",
+      "after": "            rd_mode <= rd_mode;",
+      "detail": "rhs→rd_mode",
+      "ruleIds": [
+        "i2c_master.R048"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "rd_mode"
+      ]
+    },
+    {
+      "id": "m0067",
+      "key": "119|            rd_mode <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 119,
+      "before": "            rd_mode <= 1'b0;",
+      "after": "            rd_mode <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R048"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0068",
+      "key": "120|            step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 120,
+      "before": "            step <= 2'd0;",
+      "after": "            step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R049"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "step[0]",
+        "step[1]"
+      ]
+    },
+    {
+      "id": "m0069",
+      "key": "120|            step <= 2'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 120,
+      "before": "            step <= 2'd0;",
+      "after": "            step <= 2'd1;",
+      "detail": "2'd0→2'd1",
+      "ruleIds": [
+        "i2c_master.R049"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0070",
+      "key": "121|            cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 121,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R050"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0071",
+      "key": "121|            cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 121,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R050"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0072",
+      "key": "131|            scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 131,
+      "before": "            scl_oe <= 1'b0;",
+      "after": "            scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R051"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0073",
+      "key": "131|            scl_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 131,
+      "before": "            scl_oe <= 1'b0;",
+      "after": "            scl_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R051"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0074",
+      "key": "132|            sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 132,
+      "before": "            sda_oe <= 1'b0;",
+      "after": "            sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R052"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0075",
+      "key": "132|            sda_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 132,
+      "before": "            sda_oe <= 1'b0;",
+      "after": "            sda_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R052"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0076",
+      "key": "133|            sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 133,
+      "before": "            sda_o <= 1'b1;",
+      "after": "            sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R053"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0077",
+      "key": "133|            sda_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 133,
+      "before": "            sda_o <= 1'b1;",
+      "after": "            sda_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R053"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0078",
+      "key": "135|              step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 135,
+      "before": "              step <= 2'd1;",
+      "after": "              step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R054"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0079",
+      "key": "135|              step <= 2'd2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 135,
+      "before": "              step <= 2'd1;",
+      "after": "              step <= 2'd2;",
+      "detail": "2'd1→2'd2",
+      "ruleIds": [
+        "i2c_master.R054"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0080",
+      "key": "136|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 136,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R055"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0081",
+      "key": "136|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 136,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R055"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0082",
+      "key": "137|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 137,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R056"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0083",
+      "key": "137|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 137,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R056"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0084",
+      "key": "139|            sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 139,
+      "before": "            sda_o <= 1'b0;",
+      "after": "            sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R057"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0085",
+      "key": "139|            sda_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 139,
+      "before": "            sda_o <= 1'b0;",
+      "after": "            sda_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R057"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0086",
+      "key": "140|            sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 140,
+      "before": "            sda_oe <= 1'b1;",
+      "after": "            sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R058"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0087",
+      "key": "140|            sda_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 140,
+      "before": "            sda_oe <= 1'b1;",
+      "after": "            sda_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R058"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0088",
+      "key": "142|              step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 142,
+      "before": "              step <= 2'd2;",
+      "after": "              step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R059"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0089",
+      "key": "142|              step <= 2'd3;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 142,
+      "before": "              step <= 2'd2;",
+      "after": "              step <= 2'd3;",
+      "detail": "2'd2→2'd3",
+      "ruleIds": [
+        "i2c_master.R059"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "step[0]"
+      ]
+    },
+    {
+      "id": "m0090",
+      "key": "143|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 143,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R060"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0091",
+      "key": "143|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 143,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R060"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0092",
+      "key": "144|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 144,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R061"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0093",
+      "key": "144|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 144,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R061"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0094",
+      "key": "146|            scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 146,
+      "before": "            scl_oe <= 1'b1;",
+      "after": "            scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R062"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0095",
+      "key": "146|            scl_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 146,
+      "before": "            scl_oe <= 1'b1;",
+      "after": "            scl_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R062"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0096",
+      "key": "147|            scl_o <= scl_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 147,
+      "before": "            scl_o <= 1'b0;",
+      "after": "            scl_o <= scl_o;",
+      "detail": "rhs→scl_o",
+      "ruleIds": [
+        "i2c_master.R063"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0097",
+      "key": "147|            scl_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 147,
+      "before": "            scl_o <= 1'b0;",
+      "after": "            scl_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R063"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0098",
+      "key": "148|            sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 148,
+      "before": "            sda_oe <= 1'b1;",
+      "after": "            sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R064"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0099",
+      "key": "148|            sda_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 148,
+      "before": "            sda_oe <= 1'b1;",
+      "after": "            sda_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R064"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0100",
+      "key": "149|            sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 149,
+      "before": "            sda_o <= 1'b0;",
+      "after": "            sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R065"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0101",
+      "key": "149|            sda_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 149,
+      "before": "            sda_o <= 1'b0;",
+      "after": "            sda_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R065"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0102",
+      "key": "151|              step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 151,
+      "before": "              step <= 2'd0;",
+      "after": "              step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R066"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "step[0]",
+        "step[1]"
+      ]
+    },
+    {
+      "id": "m0103",
+      "key": "151|              step <= 2'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 151,
+      "before": "              step <= 2'd0;",
+      "after": "              step <= 2'd1;",
+      "detail": "2'd0→2'd1",
+      "ruleIds": [
+        "i2c_master.R066"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "step[0]"
+      ]
+    },
+    {
+      "id": "m0104",
+      "key": "152|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 152,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R067"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0105",
+      "key": "152|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 152,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R067"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0106",
+      "key": "153|              half <= half;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 153,
+      "before": "              half <= 1'b0;",
+      "after": "              half <= half;",
+      "detail": "rhs→half",
+      "ruleIds": [
+        "i2c_master.R068"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0107",
+      "key": "153|              half <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 153,
+      "before": "              half <= 1'b0;",
+      "after": "              half <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R068"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0108",
+      "key": "154|              bitcnt <= bitcnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 154,
+      "before": "              bitcnt <= 4'd0;",
+      "after": "              bitcnt <= bitcnt;",
+      "detail": "rhs→bitcnt",
+      "ruleIds": [
+        "i2c_master.R069"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 4,
+      "unprovenCells": [
+        "bitcnt[0]",
+        "bitcnt[1]",
+        "bitcnt[2]",
+        "bitcnt[3]"
+      ]
+    },
+    {
+      "id": "m0109",
+      "key": "154|              bitcnt <= 4'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 154,
+      "before": "              bitcnt <= 4'd0;",
+      "after": "              bitcnt <= 4'd1;",
+      "detail": "4'd0→4'd1",
+      "ruleIds": [
+        "i2c_master.R069"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0110",
+      "key": "155|              tip <= tip;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 155,
+      "before": "              tip <= 1'b1;",
+      "after": "              tip <= tip;",
+      "detail": "rhs→tip",
+      "ruleIds": [
+        "i2c_master.R070"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0111",
+      "key": "155|              tip <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 155,
+      "before": "              tip <= 1'b1;",
+      "after": "              tip <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R070"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0112",
+      "key": "157|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 157,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R071"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0113",
+      "key": "157|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 157,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R071"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 15,
+      "unprovenCells": [
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0114",
+      "key": "164|            scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 164,
+      "before": "            scl_oe <= 1'b1;",
+      "after": "            scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R072"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0115",
+      "key": "164|            scl_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 164,
+      "before": "            scl_oe <= 1'b1;",
+      "after": "            scl_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R072"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0116",
+      "key": "165|            scl_o <= scl_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 165,
+      "before": "            scl_o <= 1'b0;",
+      "after": "            scl_o <= scl_o;",
+      "detail": "rhs→scl_o",
+      "ruleIds": [
+        "i2c_master.R073"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0117",
+      "key": "165|            scl_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 165,
+      "before": "            scl_o <= 1'b0;",
+      "after": "            scl_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R073"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0118",
+      "key": "167|              sda_oe <= sda_oe;  // release for the slave to drive",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 167,
+      "before": "              sda_oe <= 1'b0;  // release for the slave to drive",
+      "after": "              sda_oe <= sda_oe;  // release for the slave to drive",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R074"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0119",
+      "key": "167|              sda_oe <= 1'b1;  // release for the slave to drive",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 167,
+      "before": "              sda_oe <= 1'b0;  // release for the slave to drive",
+      "after": "              sda_oe <= 1'b1;  // release for the slave to drive",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R074"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0120",
+      "key": "168|              sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 168,
+      "before": "              sda_o <= 1'b1;",
+      "after": "              sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R075"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0121",
+      "key": "168|              sda_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 168,
+      "before": "              sda_o <= 1'b1;",
+      "after": "              sda_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R075"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0122",
+      "key": "170|              sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 170,
+      "before": "              sda_oe <= ~tx[7 - bitcnt[2:0]];",
+      "after": "              sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R076"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0123",
+      "key": "170|              sda_oe <= ~tx[7 + bitcnt[2:0]];",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 170,
+      "before": "              sda_oe <= ~tx[7 - bitcnt[2:0]];",
+      "after": "              sda_oe <= ~tx[7 + bitcnt[2:0]];",
+      "detail": "-→+",
+      "ruleIds": [
+        "i2c_master.R076"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0124",
+      "key": "171|              sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 171,
+      "before": "              sda_o <= 1'b0;",
+      "after": "              sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R077"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0125",
+      "key": "171|              sda_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 171,
+      "before": "              sda_o <= 1'b0;",
+      "after": "              sda_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R077"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0126",
+      "key": "174|              half <= half;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 174,
+      "before": "              half <= 1'b1;",
+      "after": "              half <= half;",
+      "detail": "rhs→half",
+      "ruleIds": [
+        "i2c_master.R078"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0127",
+      "key": "174|              half <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 174,
+      "before": "              half <= 1'b1;",
+      "after": "              half <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R078"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0128",
+      "key": "175|              scl_oe <= scl_oe;  // release: SCL rises",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 175,
+      "before": "              scl_oe <= 1'b0;  // release: SCL rises",
+      "after": "              scl_oe <= scl_oe;  // release: SCL rises",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R079"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0129",
+      "key": "175|              scl_oe <= 1'b1;  // release: SCL rises",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 175,
+      "before": "              scl_oe <= 1'b0;  // release: SCL rises",
+      "after": "              scl_oe <= 1'b1;  // release: SCL rises",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R079"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0130",
+      "key": "176|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 176,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R080"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0131",
+      "key": "176|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 176,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R080"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0132",
+      "key": "177|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 177,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R081"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0133",
+      "key": "177|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 177,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R081"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0134",
+      "key": "182|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 182,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R082"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0135",
+      "key": "182|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 182,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R082"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0136",
+      "key": "183|              half <= half;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 183,
+      "before": "              half <= 1'b0;",
+      "after": "              half <= half;",
+      "detail": "rhs→half",
+      "ruleIds": [
+        "i2c_master.R083"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0137",
+      "key": "183|              half <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 183,
+      "before": "              half <= 1'b0;",
+      "after": "              half <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R083"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0138",
+      "key": "184|              scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 184,
+      "before": "              scl_oe <= 1'b1;",
+      "after": "              scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R084"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0139",
+      "key": "184|              scl_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 184,
+      "before": "              scl_oe <= 1'b1;",
+      "after": "              scl_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R084"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0140",
+      "key": "185|              scl_o <= scl_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 185,
+      "before": "              scl_o <= 1'b0;",
+      "after": "              scl_o <= scl_o;",
+      "detail": "rhs→scl_o",
+      "ruleIds": [
+        "i2c_master.R085"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_o"
+      ]
+    },
+    {
+      "id": "m0141",
+      "key": "185|              scl_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 185,
+      "before": "              scl_o <= 1'b0;",
+      "after": "              scl_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R085"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0142",
+      "key": "187|                tx <= tx;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 187,
+      "before": "                tx <= {tx[6:0], sda_i};",
+      "after": "                tx <= tx;",
+      "detail": "rhs→tx",
+      "ruleIds": [
+        "i2c_master.R086"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 8,
+      "unprovenCells": [
+        "tx[0]",
+        "tx[1]",
+        "tx[2]",
+        "tx[3]",
+        "tx[4]",
+        "tx[5]",
+        "tx[6]",
+        "tx[7]"
+      ]
+    },
+    {
+      "id": "m0143",
+      "key": "187|                tx <= {tx[7:1], sda_i};",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 187,
+      "before": "                tx <= {tx[6:0], sda_i};",
+      "after": "                tx <= {tx[7:1], sda_i};",
+      "detail": "[6:0]→[7:1]",
+      "ruleIds": [
+        "i2c_master.R086"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 7,
+      "unprovenCells": [
+        "tx[1]",
+        "tx[2]",
+        "tx[3]",
+        "tx[4]",
+        "tx[5]",
+        "tx[6]",
+        "tx[7]"
+      ]
+    },
+    {
+      "id": "m0144",
+      "key": "190|                bitcnt <= bitcnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 190,
+      "before": "                bitcnt <= 4'd0;",
+      "after": "                bitcnt <= bitcnt;",
+      "detail": "rhs→bitcnt",
+      "ruleIds": [
+        "i2c_master.R087"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 3,
+      "unprovenCells": [
+        "bitcnt[0]",
+        "bitcnt[1]",
+        "bitcnt[2]"
+      ]
+    },
+    {
+      "id": "m0145",
+      "key": "190|                bitcnt <= 4'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 190,
+      "before": "                bitcnt <= 4'd0;",
+      "after": "                bitcnt <= 4'd1;",
+      "detail": "4'd0→4'd1",
+      "ruleIds": [
+        "i2c_master.R087"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "bitcnt[0]"
+      ]
+    },
+    {
+      "id": "m0146",
+      "key": "193|                bitcnt <= bitcnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 193,
+      "before": "                bitcnt <= bitcnt + 4'd1;",
+      "after": "                bitcnt <= bitcnt;",
+      "detail": "rhs→bitcnt",
+      "ruleIds": [
+        "i2c_master.R088"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0147",
+      "key": "193|                bitcnt <= bitcnt - 4'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 193,
+      "before": "                bitcnt <= bitcnt + 4'd1;",
+      "after": "                bitcnt <= bitcnt - 4'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R088"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0148",
+      "key": "195|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 195,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R089"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0149",
+      "key": "195|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 195,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R089"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0150",
+      "key": "203|            scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 203,
+      "before": "            scl_oe <= 1'b1;",
+      "after": "            scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R090"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0151",
+      "key": "203|            scl_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 203,
+      "before": "            scl_oe <= 1'b1;",
+      "after": "            scl_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R090"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0152",
+      "key": "204|            scl_o <= scl_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 204,
+      "before": "            scl_o <= 1'b0;",
+      "after": "            scl_o <= scl_o;",
+      "detail": "rhs→scl_o",
+      "ruleIds": [
+        "i2c_master.R091"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0153",
+      "key": "204|            scl_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 204,
+      "before": "            scl_o <= 1'b0;",
+      "after": "            scl_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R091"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_o"
+      ]
+    },
+    {
+      "id": "m0154",
+      "key": "206|              sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 206,
+      "before": "              sda_oe <= 1'b1;",
+      "after": "              sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R092"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0155",
+      "key": "206|              sda_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 206,
+      "before": "              sda_oe <= 1'b1;",
+      "after": "              sda_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R092"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0156",
+      "key": "207|              sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 207,
+      "before": "              sda_o <= 1'b0;",
+      "after": "              sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R093"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0157",
+      "key": "207|              sda_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 207,
+      "before": "              sda_o <= 1'b0;",
+      "after": "              sda_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R093"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0158",
+      "key": "209|              sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 209,
+      "before": "              sda_oe <= 1'b0;",
+      "after": "              sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R094"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0159",
+      "key": "209|              sda_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 209,
+      "before": "              sda_oe <= 1'b0;",
+      "after": "              sda_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R094"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0160",
+      "key": "210|              sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 210,
+      "before": "              sda_o <= 1'b1;",
+      "after": "              sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R095"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0161",
+      "key": "210|              sda_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 210,
+      "before": "              sda_o <= 1'b1;",
+      "after": "              sda_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R095"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0162",
+      "key": "213|              half <= half;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 213,
+      "before": "              half <= 1'b1;",
+      "after": "              half <= half;",
+      "detail": "rhs→half",
+      "ruleIds": [
+        "i2c_master.R096"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0163",
+      "key": "213|              half <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 213,
+      "before": "              half <= 1'b1;",
+      "after": "              half <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R096"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0164",
+      "key": "214|              scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 214,
+      "before": "              scl_oe <= 1'b0;",
+      "after": "              scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R097"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0165",
+      "key": "214|              scl_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 214,
+      "before": "              scl_oe <= 1'b0;",
+      "after": "              scl_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R097"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0166",
+      "key": "215|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 215,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R098"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0167",
+      "key": "215|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 215,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R098"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0168",
+      "key": "216|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 216,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R099"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0169",
+      "key": "216|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 216,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R099"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 15,
+      "unprovenCells": [
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0170",
+      "key": "220|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 220,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R100"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0171",
+      "key": "220|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 220,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R100"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0172",
+      "key": "221|              half <= half;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 221,
+      "before": "              half <= 1'b0;",
+      "after": "              half <= half;",
+      "detail": "rhs→half",
+      "ruleIds": [
+        "i2c_master.R101"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0173",
+      "key": "221|              half <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 221,
+      "before": "              half <= 1'b0;",
+      "after": "              half <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R101"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0174",
+      "key": "222|              scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 222,
+      "before": "              scl_oe <= 1'b1;",
+      "after": "              scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R102"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0175",
+      "key": "222|              scl_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 222,
+      "before": "              scl_oe <= 1'b1;",
+      "after": "              scl_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R102"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0176",
+      "key": "223|              scl_o <= scl_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 223,
+      "before": "              scl_o <= 1'b0;",
+      "after": "              scl_o <= scl_o;",
+      "detail": "rhs→scl_o",
+      "ruleIds": [
+        "i2c_master.R103"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_o"
+      ]
+    },
+    {
+      "id": "m0177",
+      "key": "223|              scl_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 223,
+      "before": "              scl_o <= 1'b0;",
+      "after": "              scl_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R103"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_o"
+      ]
+    },
+    {
+      "id": "m0178",
+      "key": "225|                ack_rx <= ack_rx;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 225,
+      "before": "                ack_rx <= sda_i;",
+      "after": "                ack_rx <= ack_rx;",
+      "detail": "rhs→ack_rx",
+      "ruleIds": [
+        "i2c_master.R104"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "ack_rx"
+      ]
+    },
+    {
+      "id": "m0179",
+      "key": "226|                dout <= dout;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 226,
+      "before": "                dout <= tx;",
+      "after": "                dout <= dout;",
+      "detail": "rhs→dout",
+      "ruleIds": [
+        "i2c_master.R105"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 8,
+      "unprovenCells": [
+        "dout[0]",
+        "dout[1]",
+        "dout[2]",
+        "dout[3]",
+        "dout[4]",
+        "dout[5]",
+        "dout[6]",
+        "dout[7]"
+      ]
+    },
+    {
+      "id": "m0180",
+      "key": "228|                dout <= dout;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 228,
+      "before": "                dout <= tx;",
+      "after": "                dout <= dout;",
+      "detail": "rhs→dout",
+      "ruleIds": [
+        "i2c_master.R106"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 8,
+      "unprovenCells": [
+        "dout[0]",
+        "dout[1]",
+        "dout[2]",
+        "dout[3]",
+        "dout[4]",
+        "dout[5]",
+        "dout[6]",
+        "dout[7]"
+      ]
+    },
+    {
+      "id": "m0181",
+      "key": "230|              done <= done;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 230,
+      "before": "              done <= 1'b1;",
+      "after": "              done <= done;",
+      "detail": "rhs→done",
+      "ruleIds": [
+        "i2c_master.R107"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "done"
+      ]
+    },
+    {
+      "id": "m0182",
+      "key": "230|              done <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 230,
+      "before": "              done <= 1'b1;",
+      "after": "              done <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R107"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "done"
+      ]
+    },
+    {
+      "id": "m0183",
+      "key": "231|              tip <= tip;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 231,
+      "before": "              tip <= 1'b0;",
+      "after": "              tip <= tip;",
+      "detail": "rhs→tip",
+      "ruleIds": [
+        "i2c_master.R108"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tip"
+      ]
+    },
+    {
+      "id": "m0184",
+      "key": "231|              tip <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 231,
+      "before": "              tip <= 1'b0;",
+      "after": "              tip <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R108"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tip"
+      ]
+    },
+    {
+      "id": "m0185",
+      "key": "233|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 233,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R109"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0186",
+      "key": "233|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 233,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R109"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 15,
+      "unprovenCells": [
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0187",
+      "key": "240|          scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 240,
+      "before": "          scl_oe <= 1'b1;",
+      "after": "          scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R110"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0188",
+      "key": "240|          scl_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 240,
+      "before": "          scl_oe <= 1'b1;",
+      "after": "          scl_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R110"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0189",
+      "key": "241|          scl_o <= scl_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 241,
+      "before": "          scl_o <= 1'b0;",
+      "after": "          scl_o <= scl_o;",
+      "detail": "rhs→scl_o",
+      "ruleIds": [
+        "i2c_master.R111"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0190",
+      "key": "241|          scl_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 241,
+      "before": "          scl_o <= 1'b0;",
+      "after": "          scl_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R111"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_o"
+      ]
+    },
+    {
+      "id": "m0191",
+      "key": "242|          sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 242,
+      "before": "          sda_oe <= 1'b0;",
+      "after": "          sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R112"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0192",
+      "key": "242|          sda_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 242,
+      "before": "          sda_oe <= 1'b0;",
+      "after": "          sda_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R112"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0193",
+      "key": "243|          sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 243,
+      "before": "          sda_o <= 1'b1;",
+      "after": "          sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R113"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0194",
+      "key": "243|          sda_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 243,
+      "before": "          sda_o <= 1'b1;",
+      "after": "          sda_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R113"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0195",
+      "key": "245|            pend_wr <= pend_wr;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 245,
+      "before": "            pend_wr <= 1'b0;",
+      "after": "            pend_wr <= pend_wr;",
+      "detail": "rhs→pend_wr",
+      "ruleIds": [
+        "i2c_master.R114"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_wr"
+      ]
+    },
+    {
+      "id": "m0196",
+      "key": "245|            pend_wr <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 245,
+      "before": "            pend_wr <= 1'b0;",
+      "after": "            pend_wr <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R114"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_wr"
+      ]
+    },
+    {
+      "id": "m0197",
+      "key": "246|            rd_mode <= rd_mode;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 246,
+      "before": "            rd_mode <= 1'b0;",
+      "after": "            rd_mode <= rd_mode;",
+      "detail": "rhs→rd_mode",
+      "ruleIds": [
+        "i2c_master.R115"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "rd_mode"
+      ]
+    },
+    {
+      "id": "m0198",
+      "key": "246|            rd_mode <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 246,
+      "before": "            rd_mode <= 1'b0;",
+      "after": "            rd_mode <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R115"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "rd_mode"
+      ]
+    },
+    {
+      "id": "m0199",
+      "key": "247|            bitcnt <= bitcnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 247,
+      "before": "            bitcnt <= 4'd0;",
+      "after": "            bitcnt <= bitcnt;",
+      "detail": "rhs→bitcnt",
+      "ruleIds": [
+        "i2c_master.R116"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 4,
+      "unprovenCells": [
+        "bitcnt[0]",
+        "bitcnt[1]",
+        "bitcnt[2]",
+        "bitcnt[3]"
+      ]
+    },
+    {
+      "id": "m0200",
+      "key": "247|            bitcnt <= 4'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 247,
+      "before": "            bitcnt <= 4'd0;",
+      "after": "            bitcnt <= 4'd1;",
+      "detail": "4'd0→4'd1",
+      "ruleIds": [
+        "i2c_master.R116"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "bitcnt[0]"
+      ]
+    },
+    {
+      "id": "m0201",
+      "key": "248|            half <= half;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 248,
+      "before": "            half <= 1'b0;",
+      "after": "            half <= half;",
+      "detail": "rhs→half",
+      "ruleIds": [
+        "i2c_master.R117"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0202",
+      "key": "248|            half <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 248,
+      "before": "            half <= 1'b0;",
+      "after": "            half <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R117"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0203",
+      "key": "249|            cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 249,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R118"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0204",
+      "key": "249|            cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 249,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R118"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0205",
+      "key": "250|            tip <= tip;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 250,
+      "before": "            tip <= 1'b1;",
+      "after": "            tip <= tip;",
+      "detail": "rhs→tip",
+      "ruleIds": [
+        "i2c_master.R119"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tip"
+      ]
+    },
+    {
+      "id": "m0206",
+      "key": "250|            tip <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 250,
+      "before": "            tip <= 1'b1;",
+      "after": "            tip <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R119"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tip"
+      ]
+    },
+    {
+      "id": "m0207",
+      "key": "253|            pend_rd <= pend_rd;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 253,
+      "before": "            pend_rd <= 1'b0;",
+      "after": "            pend_rd <= pend_rd;",
+      "detail": "rhs→pend_rd",
+      "ruleIds": [
+        "i2c_master.R120"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_rd"
+      ]
+    },
+    {
+      "id": "m0208",
+      "key": "253|            pend_rd <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 253,
+      "before": "            pend_rd <= 1'b0;",
+      "after": "            pend_rd <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R120"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_rd"
+      ]
+    },
+    {
+      "id": "m0209",
+      "key": "254|            rd_mode <= rd_mode;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 254,
+      "before": "            rd_mode <= 1'b1;",
+      "after": "            rd_mode <= rd_mode;",
+      "detail": "rhs→rd_mode",
+      "ruleIds": [
+        "i2c_master.R121"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "rd_mode"
+      ]
+    },
+    {
+      "id": "m0210",
+      "key": "254|            rd_mode <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 254,
+      "before": "            rd_mode <= 1'b1;",
+      "after": "            rd_mode <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R121"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "rd_mode"
+      ]
+    },
+    {
+      "id": "m0211",
+      "key": "255|            tx <= tx;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 255,
+      "before": "            tx <= 8'd0;",
+      "after": "            tx <= tx;",
+      "detail": "rhs→tx",
+      "ruleIds": [
+        "i2c_master.R122"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 8,
+      "unprovenCells": [
+        "tx[0]",
+        "tx[1]",
+        "tx[2]",
+        "tx[3]",
+        "tx[4]",
+        "tx[5]",
+        "tx[6]",
+        "tx[7]"
+      ]
+    },
+    {
+      "id": "m0212",
+      "key": "255|            tx <= 8'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 255,
+      "before": "            tx <= 8'd0;",
+      "after": "            tx <= 8'd1;",
+      "detail": "8'd0→8'd1",
+      "ruleIds": [
+        "i2c_master.R122"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tx[0]"
+      ]
+    },
+    {
+      "id": "m0213",
+      "key": "256|            bitcnt <= bitcnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 256,
+      "before": "            bitcnt <= 4'd0;",
+      "after": "            bitcnt <= bitcnt;",
+      "detail": "rhs→bitcnt",
+      "ruleIds": [
+        "i2c_master.R123"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 4,
+      "unprovenCells": [
+        "bitcnt[0]",
+        "bitcnt[1]",
+        "bitcnt[2]",
+        "bitcnt[3]"
+      ]
+    },
+    {
+      "id": "m0214",
+      "key": "256|            bitcnt <= 4'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 256,
+      "before": "            bitcnt <= 4'd0;",
+      "after": "            bitcnt <= 4'd1;",
+      "detail": "4'd0→4'd1",
+      "ruleIds": [
+        "i2c_master.R123"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "bitcnt[0]"
+      ]
+    },
+    {
+      "id": "m0215",
+      "key": "257|            half <= half;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 257,
+      "before": "            half <= 1'b0;",
+      "after": "            half <= half;",
+      "detail": "rhs→half",
+      "ruleIds": [
+        "i2c_master.R124"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0216",
+      "key": "257|            half <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 257,
+      "before": "            half <= 1'b0;",
+      "after": "            half <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R124"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "half"
+      ]
+    },
+    {
+      "id": "m0217",
+      "key": "258|            cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 258,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R125"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0218",
+      "key": "258|            cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 258,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R125"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0219",
+      "key": "259|            tip <= tip;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 259,
+      "before": "            tip <= 1'b1;",
+      "after": "            tip <= tip;",
+      "detail": "rhs→tip",
+      "ruleIds": [
+        "i2c_master.R126"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tip"
+      ]
+    },
+    {
+      "id": "m0220",
+      "key": "259|            tip <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 259,
+      "before": "            tip <= 1'b1;",
+      "after": "            tip <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R126"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tip"
+      ]
+    },
+    {
+      "id": "m0221",
+      "key": "262|            pend_stop <= pend_stop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 262,
+      "before": "            pend_stop <= 1'b0;",
+      "after": "            pend_stop <= pend_stop;",
+      "detail": "rhs→pend_stop",
+      "ruleIds": [
+        "i2c_master.R127"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_stop"
+      ]
+    },
+    {
+      "id": "m0222",
+      "key": "262|            pend_stop <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 262,
+      "before": "            pend_stop <= 1'b0;",
+      "after": "            pend_stop <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R127"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_stop"
+      ]
+    },
+    {
+      "id": "m0223",
+      "key": "263|            step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 263,
+      "before": "            step <= 2'd0;",
+      "after": "            step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R128"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "step[0]",
+        "step[1]"
+      ]
+    },
+    {
+      "id": "m0224",
+      "key": "263|            step <= 2'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 263,
+      "before": "            step <= 2'd0;",
+      "after": "            step <= 2'd1;",
+      "detail": "2'd0→2'd1",
+      "ruleIds": [
+        "i2c_master.R128"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "step[0]"
+      ]
+    },
+    {
+      "id": "m0225",
+      "key": "264|            cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 264,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R129"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0226",
+      "key": "264|            cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 264,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R129"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0227",
+      "key": "267|            pend_start <= pend_start;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 267,
+      "before": "            pend_start <= 1'b0;",
+      "after": "            pend_start <= pend_start;",
+      "detail": "rhs→pend_start",
+      "ruleIds": [
+        "i2c_master.R130"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_start"
+      ]
+    },
+    {
+      "id": "m0228",
+      "key": "267|            pend_start <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 267,
+      "before": "            pend_start <= 1'b0;",
+      "after": "            pend_start <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R130"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "pend_start"
+      ]
+    },
+    {
+      "id": "m0229",
+      "key": "268|            step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 268,
+      "before": "            step <= 2'd0;",
+      "after": "            step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R131"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "step[0]",
+        "step[1]"
+      ]
+    },
+    {
+      "id": "m0230",
+      "key": "268|            step <= 2'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 268,
+      "before": "            step <= 2'd0;",
+      "after": "            step <= 2'd1;",
+      "detail": "2'd0→2'd1",
+      "ruleIds": [
+        "i2c_master.R131"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "step[0]"
+      ]
+    },
+    {
+      "id": "m0231",
+      "key": "269|            cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 269,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R132"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0232",
+      "key": "269|            cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 269,
+      "before": "            cnt <= 16'd0;",
+      "after": "            cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R132"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0233",
+      "key": "270|            sda_oe <= sda_oe;  // SDA back high for the restart sequence",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 270,
+      "before": "            sda_oe <= 1'b1;  // SDA back high for the restart sequence",
+      "after": "            sda_oe <= sda_oe;  // SDA back high for the restart sequence",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R133"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0234",
+      "key": "270|            sda_oe <= 1'b0;  // SDA back high for the restart sequence",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 270,
+      "before": "            sda_oe <= 1'b1;  // SDA back high for the restart sequence",
+      "after": "            sda_oe <= 1'b0;  // SDA back high for the restart sequence",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R133"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0235",
+      "key": "271|            sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 271,
+      "before": "            sda_o <= 1'b1;",
+      "after": "            sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R134"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0236",
+      "key": "271|            sda_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 271,
+      "before": "            sda_o <= 1'b1;",
+      "after": "            sda_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R134"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0237",
+      "key": "282|            sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 282,
+      "before": "            sda_oe <= 1'b1;",
+      "after": "            sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R135"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0238",
+      "key": "282|            sda_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 282,
+      "before": "            sda_oe <= 1'b1;",
+      "after": "            sda_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R135"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0239",
+      "key": "283|            sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 283,
+      "before": "            sda_o <= 1'b0;",
+      "after": "            sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R136"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0240",
+      "key": "283|            sda_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 283,
+      "before": "            sda_o <= 1'b0;",
+      "after": "            sda_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R136"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0241",
+      "key": "284|            scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 284,
+      "before": "            scl_oe <= 1'b1;",
+      "after": "            scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R137"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0242",
+      "key": "284|            scl_oe <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 284,
+      "before": "            scl_oe <= 1'b1;",
+      "after": "            scl_oe <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R137"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0243",
+      "key": "285|            scl_o <= scl_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 285,
+      "before": "            scl_o <= 1'b0;",
+      "after": "            scl_o <= scl_o;",
+      "detail": "rhs→scl_o",
+      "ruleIds": [
+        "i2c_master.R138"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 57
+    },
+    {
+      "id": "m0244",
+      "key": "285|            scl_o <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 285,
+      "before": "            scl_o <= 1'b0;",
+      "after": "            scl_o <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R138"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_o"
+      ]
+    },
+    {
+      "id": "m0245",
+      "key": "287|              step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 287,
+      "before": "              step <= 2'd1;",
+      "after": "              step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R139"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "step[0]"
+      ]
+    },
+    {
+      "id": "m0246",
+      "key": "287|              step <= 2'd2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 287,
+      "before": "              step <= 2'd1;",
+      "after": "              step <= 2'd2;",
+      "detail": "2'd1→2'd2",
+      "ruleIds": [
+        "i2c_master.R139"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "step[0]",
+        "step[1]"
+      ]
+    },
+    {
+      "id": "m0247",
+      "key": "288|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 288,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R140"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0248",
+      "key": "288|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 288,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R140"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0249",
+      "key": "289|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 289,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R141"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0250",
+      "key": "289|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 289,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R141"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 15,
+      "unprovenCells": [
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0251",
+      "key": "291|            scl_oe <= scl_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 291,
+      "before": "            scl_oe <= 1'b0;",
+      "after": "            scl_oe <= scl_oe;",
+      "detail": "rhs→scl_oe",
+      "ruleIds": [
+        "i2c_master.R142"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0252",
+      "key": "291|            scl_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 291,
+      "before": "            scl_oe <= 1'b0;",
+      "after": "            scl_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R142"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "scl_oe"
+      ]
+    },
+    {
+      "id": "m0253",
+      "key": "293|              step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 293,
+      "before": "              step <= 2'd2;",
+      "after": "              step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R143"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "step[0]",
+        "step[1]"
+      ]
+    },
+    {
+      "id": "m0254",
+      "key": "293|              step <= 2'd3;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 293,
+      "before": "              step <= 2'd2;",
+      "after": "              step <= 2'd3;",
+      "detail": "2'd2→2'd3",
+      "ruleIds": [
+        "i2c_master.R143"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "step[0]"
+      ]
+    },
+    {
+      "id": "m0255",
+      "key": "294|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 294,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R144"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0256",
+      "key": "294|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 294,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R144"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0257",
+      "key": "295|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 295,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R145"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0258",
+      "key": "295|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 295,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R145"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 15,
+      "unprovenCells": [
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0259",
+      "key": "297|            sda_oe <= sda_oe;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 297,
+      "before": "            sda_oe <= 1'b0;",
+      "after": "            sda_oe <= sda_oe;",
+      "detail": "rhs→sda_oe",
+      "ruleIds": [
+        "i2c_master.R146"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0260",
+      "key": "297|            sda_oe <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 297,
+      "before": "            sda_oe <= 1'b0;",
+      "after": "            sda_oe <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R146"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_oe"
+      ]
+    },
+    {
+      "id": "m0261",
+      "key": "298|            sda_o <= sda_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 298,
+      "before": "            sda_o <= 1'b1;",
+      "after": "            sda_o <= sda_o;",
+      "detail": "rhs→sda_o",
+      "ruleIds": [
+        "i2c_master.R147"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0262",
+      "key": "298|            sda_o <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 298,
+      "before": "            sda_o <= 1'b1;",
+      "after": "            sda_o <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "i2c_master.R147"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "sda_o"
+      ]
+    },
+    {
+      "id": "m0263",
+      "key": "300|              step <= step;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 300,
+      "before": "              step <= 2'd3;",
+      "after": "              step <= step;",
+      "detail": "rhs→step",
+      "ruleIds": [
+        "i2c_master.R148"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "step[0]"
+      ]
+    },
+    {
+      "id": "m0264",
+      "key": "300|              step <= 2'd0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 300,
+      "before": "              step <= 2'd3;",
+      "after": "              step <= 2'd0;",
+      "detail": "2'd3→2'd0",
+      "ruleIds": [
+        "i2c_master.R148"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "step[0]",
+        "step[1]"
+      ]
+    },
+    {
+      "id": "m0265",
+      "key": "301|              cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 301,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R149"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "cnt[0]",
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0266",
+      "key": "301|              cnt <= 16'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 301,
+      "before": "              cnt <= 16'd0;",
+      "after": "              cnt <= 16'd1;",
+      "detail": "16'd0→16'd1",
+      "ruleIds": [
+        "i2c_master.R149"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0267",
+      "key": "302|            end else cnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 302,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "i2c_master.R150"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cnt[0]"
+      ]
+    },
+    {
+      "id": "m0268",
+      "key": "302|            end else cnt <= cnt - 16'd1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 302,
+      "before": "            end else cnt <= cnt + 16'd1;",
+      "after": "            end else cnt <= cnt - 16'd1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "i2c_master.R150"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 15,
+      "unprovenCells": [
+        "cnt[10]",
+        "cnt[11]",
+        "cnt[12]",
+        "cnt[13]",
+        "cnt[14]",
+        "cnt[15]",
+        "cnt[1]",
+        "cnt[2]",
+        "cnt[3]",
+        "cnt[4]",
+        "cnt[5]",
+        "cnt[6]",
+        "cnt[7]",
+        "cnt[8]",
+        "cnt[9]"
+      ]
+    },
+    {
+      "id": "m0269",
+      "key": "304|            busy <= busy;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 304,
+      "before": "            busy <= 1'b0;",
+      "after": "            busy <= busy;",
+      "detail": "rhs→busy",
+      "ruleIds": [
+        "i2c_master.R151"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "busy"
+      ]
+    },
+    {
+      "id": "m0270",
+      "key": "304|            busy <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 304,
+      "before": "            busy <= 1'b0;",
+      "after": "            busy <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R151"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "busy"
+      ]
+    },
+    {
+      "id": "m0271",
+      "key": "305|            tip <= tip;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 305,
+      "before": "            tip <= 1'b0;",
+      "after": "            tip <= tip;",
+      "detail": "rhs→tip",
+      "ruleIds": [
+        "i2c_master.R152"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tip"
+      ]
+    },
+    {
+      "id": "m0272",
+      "key": "305|            tip <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 305,
+      "before": "            tip <= 1'b0;",
+      "after": "            tip <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "i2c_master.R152"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 57,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "tip"
+      ]
+    },
+    {
+      "id": "m0273",
+      "key": "69|    if (!rst_n) begin // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 69,
+      "before": "    if (!rst_n) begin",
+      "after": "    if (!rst_n) begin // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "i2c_master.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0274",
+      "key": "105|        ST_IDLE: begin // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 105,
+      "before": "        ST_IDLE: begin",
+      "after": "        ST_IDLE: begin // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "i2c_master.R021"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0275",
+      "key": "91|      done <= 1'b0; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 91,
+      "before": "      done <= 1'b0;",
+      "after": "      done <= 1'b0; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "i2c_master.R030"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0276",
+      "key": "66|  wire cnt_end = cnt_end;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 66,
+      "before": "  wire cnt_end = (cnt >= prescale - 1);",
+      "after": "  wire cnt_end = cnt_end;",
+      "detail": "rhs→cnt_end",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0277",
+      "key": "66|  wire cnt_end = (cnt >= prescale + 1);",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 66,
+      "before": "  wire cnt_end = (cnt >= prescale - 1);",
+      "after": "  wire cnt_end = (cnt >= prescale + 1);",
+      "detail": "-→+",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0278",
+      "key": "310|        default: state <= state;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 310,
+      "before": "        default: state <= ST_IDLE;",
+      "after": "        default: state <= state;",
+      "detail": "rhs→state",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 66,
+        "op": "OP-HOLD",
+        "before": "wire cnt_end = (cnt >= prescale - 1);",
+        "after": "wire cnt_end = cnt_end;",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 66,
+        "op": "OP-ARITH",
+        "before": "wire cnt_end = (cnt >= prescale - 1);",
+        "after": "wire cnt_end = (cnt >= prescale + 1);",
+        "killScenes": [
+          "SCENE3 small"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [
+        {
+          "signal": "cnt_end",
+          "class": "U1",
+          "policy": false,
+          "line": 66,
+          "snippet": "wire cnt_end = (cnt >= prescale - 1);"
+        }
+      ],
+      "summary": {
+        "uncovered": 1,
+        "byClass": {
+          "U1": 1
+        },
+        "policyExcluded": 0,
+        "defects": 1
+      }
+    },
+    "leaveOneOut": {
+      "total": 77,
+      "hit": 18,
+      "rate": "18/77"
+    }
+  }
+}

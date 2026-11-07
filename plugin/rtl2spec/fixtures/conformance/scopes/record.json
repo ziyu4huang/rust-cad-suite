@@ -1,0 +1,975 @@
+{
+  "design": "scopes",
+  "src": "corpus-external/yosys-simple/scopes.v",
+  "top": "scopes_test_01",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/scopes.rules.json",
+  "rules": 1,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "d75812c49fc922c1df4aff9df8abde7b01242e2ca40c3647ff0254321c876212",
+    "scenes": 2,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 2
+    },
+    "simMs": 7
+  },
+  "expected": {
+    "sha256": "4d5a2e5404c2ec1c85dade2b26901a4c0b89f2b500565fad8eb4d9ee999a505d",
+    "lines": 547
+  },
+  "numbers": {
+    "generated": 1,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 1,
+    "killed": 1,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "1/1",
+    "ruleVerified": {
+      "exclusive": "1/1",
+      "shared": "0/1"
+    },
+    "catalogCoverage": "1/1",
+    "unruled": {
+      "generated": 30,
+      "killed": 28
+    },
+    "controlsSurvived": "1/1",
+    "ambiguous": 0,
+    "na": 4
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 36,
+      "out": 32
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 48
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 0,
+      "equivalent": 0,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 1,
+      "mainKilled": 1,
+      "unproven": 1,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "relation": {
+      "total": 1,
+      "unique": 1
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "scopes_test_01.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 57
+    },
+    {
+      "ruleId": "scopes_test_01.R001",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 57
+    },
+    {
+      "ruleId": "scopes_test_01.R001",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 57
+    },
+    {
+      "ruleId": "scopes_test_01.R001",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 57
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "57|\t\t\ty = y - k;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 57,
+      "before": "\t\t\ty = y + k;",
+      "after": "\t\t\ty = y - k;",
+      "detail": "+→-",
+      "ruleIds": [
+        "scopes_test_01.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "57|\t\t\ty = y + k; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 57,
+      "before": "\t\t\ty = y + k;",
+      "after": "\t\t\ty = y + k; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "scopes_test_01.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0003",
+      "key": "5|\t\t\tfunc_01 = func_01;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 5,
+      "before": "\t\t\tfunc_01 = x + y;",
+      "after": "\t\t\tfunc_01 = func_01;",
+      "detail": "rhs→func_01",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "5|\t\t\tfunc_01 = x - y;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 5,
+      "before": "\t\t\tfunc_01 = x + y;",
+      "after": "\t\t\tfunc_01 = x - y;",
+      "detail": "+→-",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "8|\t\t\t\tx = x;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 8,
+      "before": "\t\t\t\tx = y;",
+      "after": "\t\t\t\tx = x;",
+      "detail": "rhs→x",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "9|\t\t\t\tfunc_01 = func_01;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 9,
+      "before": "\t\t\t\tfunc_01 = func_01 ^ x;",
+      "after": "\t\t\t\tfunc_01 = func_01;",
+      "detail": "rhs→func_01",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "9|\t\t\t\tfunc_01 = func_01 | x;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 9,
+      "before": "\t\t\t\tfunc_01 = func_01 ^ x;",
+      "after": "\t\t\t\tfunc_01 = func_01 | x;",
+      "detail": "^→|",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "11|\t\t\tfunc_01 = func_01;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 11,
+      "before": "\t\t\tfunc_01 = func_01 ^ x;",
+      "after": "\t\t\tfunc_01 = func_01;",
+      "detail": "rhs→func_01",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0009",
+      "key": "11|\t\t\tfunc_01 = func_01 | x;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 11,
+      "before": "\t\t\tfunc_01 = func_01 ^ x;",
+      "after": "\t\t\tfunc_01 = func_01 | x;",
+      "detail": "^→|",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "18|\t\t\tfunc_02 = func_02;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 18,
+      "before": "\t\t\tfunc_02 = x - y;",
+      "after": "\t\t\tfunc_02 = func_02;",
+      "detail": "rhs→func_02",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0011",
+      "key": "18|\t\t\tfunc_02 = x + y;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 18,
+      "before": "\t\t\tfunc_02 = x - y;",
+      "after": "\t\t\tfunc_02 = x + y;",
+      "detail": "-→+",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "21|\t\t\t\tfunc_02 = func_02;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 21,
+      "before": "\t\t\t\tfunc_02 = 0;",
+      "after": "\t\t\t\tfunc_02 = func_02;",
+      "detail": "rhs→func_02",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0013",
+      "key": "21|\t\t\t\tfunc_02 = 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 21,
+      "before": "\t\t\t\tfunc_02 = 0;",
+      "after": "\t\t\t\tfunc_02 = 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0014",
+      "key": "30|\t\t\ty = y;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 30,
+      "before": "\t\t\ty = a * 23;",
+      "after": "\t\t\ty = y;",
+      "detail": "rhs→y",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0015",
+      "key": "30|\t\t\ty = a * 24;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 30,
+      "before": "\t\t\ty = a * 23;",
+      "after": "\t\t\ty = a * 24;",
+      "detail": "23→24",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0016",
+      "key": "31|\t\t\tx = x;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 31,
+      "before": "\t\t\tx = x + y;",
+      "after": "\t\t\tx = x;",
+      "detail": "rhs→x",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0017",
+      "key": "31|\t\t\tx = x - y;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 31,
+      "before": "\t\t\tx = x + y;",
+      "after": "\t\t\tx = x - y;",
+      "detail": "+→-",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0018",
+      "key": "39|\t\t\tx = x;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 39,
+      "before": "\t\t\tx = y;",
+      "after": "\t\t\tx = x;",
+      "detail": "rhs→x",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0019",
+      "key": "42|\t\t\t\tx = x;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 42,
+      "before": "\t\t\t\tx = 77 + a;",
+      "after": "\t\t\t\tx = x;",
+      "detail": "rhs→x",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0020",
+      "key": "42|\t\t\t\tx = 77 - a;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 42,
+      "before": "\t\t\t\tx = 77 + a;",
+      "after": "\t\t\t\tx = 77 - a;",
+      "detail": "+→-",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0021",
+      "key": "43|\t\t\t\tz = z;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 43,
+      "before": "\t\t\t\tz = -x;",
+      "after": "\t\t\t\tz = z;",
+      "detail": "rhs→z",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0022",
+      "key": "43|\t\t\t\tz = +x;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 43,
+      "before": "\t\t\t\tz = -x;",
+      "after": "\t\t\t\tz = +x;",
+      "detail": "-→+",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0023",
+      "key": "45|\t\t\ty = y;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 45,
+      "before": "\t\t\ty = x ^ z;",
+      "after": "\t\t\ty = y;",
+      "detail": "rhs→y",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0024",
+      "key": "45|\t\t\ty = x | z;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 45,
+      "before": "\t\t\ty = x ^ z;",
+      "after": "\t\t\ty = x | z;",
+      "detail": "^→|",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0025",
+      "key": "50|\t\tx = x;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 50,
+      "before": "\t\tx = func_01(11, 22);",
+      "after": "\t\tx = x;",
+      "detail": "rhs→x",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0026",
+      "key": "50|\t\tx = func_01(12, 22);",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 50,
+      "before": "\t\tx = func_01(11, 22);",
+      "after": "\t\tx = func_01(12, 22);",
+      "detail": "11→12",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0027",
+      "key": "51|\t\ty = y;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 51,
+      "before": "\t\ty = func_02(33, 44);",
+      "after": "\t\ty = y;",
+      "detail": "rhs→y",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0028",
+      "key": "51|\t\ty = func_02(34, 44);",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 51,
+      "before": "\t\ty = func_02(33, 44);",
+      "after": "\t\ty = func_02(34, 44);",
+      "detail": "33→34",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0029",
+      "key": "56|\t\t\ty = y;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 56,
+      "before": "\t\t\ty = x;",
+      "after": "\t\t\ty = y;",
+      "detail": "rhs→y",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0030",
+      "key": "58|\t\t\tx = x;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 58,
+      "before": "\t\t\tx = y;",
+      "after": "\t\t\tx = x;",
+      "detail": "rhs→x",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0031",
+      "key": "60|\t\tx = x;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 60,
+      "before": "\t\tx = func_01(y, x);",
+      "after": "\t\tx = x;",
+      "detail": "rhs→x",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0032",
+      "key": "61|\t\ty = y;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 61,
+      "before": "\t\ty = func_02(y, x);",
+      "after": "\t\ty = y;",
+      "detail": "rhs→y",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 5,
+        "op": "OP-HOLD",
+        "before": "func_01 = x + y;",
+        "after": "func_01 = func_01;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 5,
+        "op": "OP-ARITH",
+        "before": "func_01 = x + y;",
+        "after": "func_01 = x - y;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 8,
+        "op": "OP-HOLD",
+        "before": "x = y;",
+        "after": "x = x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 9,
+        "op": "OP-HOLD",
+        "before": "func_01 = func_01 ^ x;",
+        "after": "func_01 = func_01;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 9,
+        "op": "OP-ARITH",
+        "before": "func_01 = func_01 ^ x;",
+        "after": "func_01 = func_01 | x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 11,
+        "op": "OP-HOLD",
+        "before": "func_01 = func_01 ^ x;",
+        "after": "func_01 = func_01;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 11,
+        "op": "OP-ARITH",
+        "before": "func_01 = func_01 ^ x;",
+        "after": "func_01 = func_01 | x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 18,
+        "op": "OP-HOLD",
+        "before": "func_02 = x - y;",
+        "after": "func_02 = func_02;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 18,
+        "op": "OP-ARITH",
+        "before": "func_02 = x - y;",
+        "after": "func_02 = x + y;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 30,
+        "op": "OP-HOLD",
+        "before": "y = a * 23;",
+        "after": "y = y;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 30,
+        "op": "OP-CONST",
+        "before": "y = a * 23;",
+        "after": "y = a * 24;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 31,
+        "op": "OP-HOLD",
+        "before": "x = x + y;",
+        "after": "x = x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 31,
+        "op": "OP-ARITH",
+        "before": "x = x + y;",
+        "after": "x = x - y;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 39,
+        "op": "OP-HOLD",
+        "before": "x = y;",
+        "after": "x = x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 42,
+        "op": "OP-HOLD",
+        "before": "x = 77 + a;",
+        "after": "x = x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 42,
+        "op": "OP-ARITH",
+        "before": "x = 77 + a;",
+        "after": "x = 77 - a;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 43,
+        "op": "OP-HOLD",
+        "before": "z = -x;",
+        "after": "z = z;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 43,
+        "op": "OP-ARITH",
+        "before": "z = -x;",
+        "after": "z = +x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 45,
+        "op": "OP-HOLD",
+        "before": "y = x ^ z;",
+        "after": "y = y;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 45,
+        "op": "OP-ARITH",
+        "before": "y = x ^ z;",
+        "after": "y = x | z;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 50,
+        "op": "OP-HOLD",
+        "before": "x = func_01(11, 22);",
+        "after": "x = x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 50,
+        "op": "OP-CONST",
+        "before": "x = func_01(11, 22);",
+        "after": "x = func_01(12, 22);",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 51,
+        "op": "OP-HOLD",
+        "before": "y = func_02(33, 44);",
+        "after": "y = y;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 51,
+        "op": "OP-CONST",
+        "before": "y = func_02(33, 44);",
+        "after": "y = func_02(34, 44);",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 56,
+        "op": "OP-HOLD",
+        "before": "y = x;",
+        "after": "y = y;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 58,
+        "op": "OP-HOLD",
+        "before": "x = y;",
+        "after": "x = x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 60,
+        "op": "OP-HOLD",
+        "before": "x = func_01(y, x);",
+        "after": "x = x;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 61,
+        "op": "OP-HOLD",
+        "before": "y = func_02(y, x);",
+        "after": "y = y;",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [
+        {
+          "signal": "x",
+          "class": "U5",
+          "policy": false,
+          "line": 7,
+          "snippet": "reg [15:0] x;"
+        }
+      ],
+      "summary": {
+        "uncovered": 1,
+        "byClass": {
+          "U5": 1
+        },
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 1,
+      "hit": 1,
+      "rate": "1/1"
+    }
+  }
+}

@@ -1,6 +1,7 @@
 // probe-determinism.mjs — 提取器確定性探針(§16.0 F1 驗收/§16.1.5 契約面)。
 //
-// S8 自驗①②:全釘選檔單 bun 進程內重複調用(wasm 腿=dist 同一產物),
+// S8 自驗①②:全釘選檔單 bun 進程內重複調用(wasm 腿=dist 同一產物;C-S2 起
+//   含 rtl_tb_plan_sv 逐模組幀=規則書+計劃+模板三面同守 §16.1.5 契約),
 //   ①同進程 N 跑 byte-identical(16.1.5 契約①;F1a/F1b 修後 flapper 清零);
 //   ②調用序擾動(R17-8 復審修訂,頭注對齊實現)——全檔正序跑完後本檔
 //     再跑一輪,擾動輪 hash 必∈N 輪 hash 集(契約②輸出禁依賴調用流
@@ -74,22 +75,30 @@ for (const rel of files) {
     bad++;
     continue;
   }
-  // ① 同進程 N 跑(rules+gaps 兩模式)
+  // tbplan 面(C-S2):逐模組取幀(含 TB1 錯誤幀,其同樣須確定),多模組檔也覆蓋。
+  const moduleNames = JSON.parse(glue.rtl_extract_rules_sv(rel, source, 256)).modules.map((m) => m.module);
+  const tbFrames = () =>
+    moduleNames.map((m) => glue.rtl_tb_plan_sv(rel, source, m, 0, 0, 0)).join('\n');
+  // ① 同進程 N 跑(rules/gaps/tbplan 三模式)
   const ruleHashes = new Set();
   const gapHashes = new Set();
+  const tbHashes = new Set();
   for (let k = 0; k < runs; k++) {
     ruleHashes.add(sha(glue.rtl_extract_rules_sv(rel, source, 256)));
     gapHashes.add(sha(glue.rtl_scan_gaps_sv(rel, source)));
+    tbHashes.add(sha(tbFrames()));
   }
   // ② 調用序擾動:全檔正序跑完後本檔再跑一輪(此時調用流位置已不同)
   const rulePert = sha(glue.rtl_extract_rules_sv(rel, source, 256));
   const gapPert = sha(glue.rtl_scan_gaps_sv(rel, source));
+  const tbPert = sha(tbFrames());
   const okRules = ruleHashes.size === 1;
   const okGaps = gapHashes.size === 1 && gapHashes.has(gapPert);
-  if (okRules && okGaps) {
-    console.log(`PASS ${rel} (runs=${runs} rules=${[...ruleHashes][0].slice(0, 8)} gaps=${[...gapHashes][0].slice(0, 8)})`);
+  const okTb = tbHashes.size === 1 && tbHashes.has(tbPert);
+  if (okRules && okGaps && okTb) {
+    console.log(`PASS ${rel} (runs=${runs} rules=${[...ruleHashes][0].slice(0, 8)} gaps=${[...gapHashes][0].slice(0, 8)} tb=${[...tbHashes][0].slice(0, 8)} modules=${moduleNames.length})`);
   } else {
-    console.log(`FAIL ${rel} rules_kinds=${ruleHashes.size} gaps_kinds=${gapHashes.size} gaps_perturb_match=${gapHashes.has(gapPert)} rules_perturb_match=${ruleHashes.has(rulePert)}`);
+    console.log(`FAIL ${rel} rules_kinds=${ruleHashes.size} gaps_kinds=${gapHashes.size} gaps_perturb_match=${gapHashes.has(gapPert)} rules_perturb_match=${ruleHashes.has(rulePert)} tb_kinds=${tbHashes.size} tb_perturb_match=${tbHashes.has(tbPert)}`);
     bad++;
   }
 }

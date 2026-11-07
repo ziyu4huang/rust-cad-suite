@@ -1,0 +1,981 @@
+{
+  "design": "acc_pipe",
+  "src": "corpus/e2e/58_xls_acc_pipe/acc_pipe.v",
+  "top": "__acc_pipe__acc_pipe",
+  "specPath": "plugin/rtl2spec/golden/corpus/e2e/58_xls_acc_pipe/acc_pipe.rules.json",
+  "rules": 9,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "directed",
+    "protocolLeg": "acc-r0-k1",
+    "sha256": "e972677c3368f578b2e18fa8444c74cc3486064824edecb6c5c0fea96c14d6aa",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 6
+  },
+  "expected": {
+    "sha256": "b9e9c701814a06474505718b707414fc23ef1dd591a5928f7dad01603e6626ab",
+    "lines": 66
+  },
+  "numbers": {
+    "generated": 11,
+    "stillborn": 0,
+    "equivalent": 1,
+    "eligible": 10,
+    "killed": 10,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "10/10",
+    "ruleVerified": {
+      "exclusive": "9/9",
+      "shared": "0/9"
+    },
+    "catalogCoverage": "9/9",
+    "unruled": {
+      "generated": 1,
+      "killed": 1
+    },
+    "controlsSurvived": "3/3",
+    "ambiguous": 2,
+    "na": 34
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 33,
+      "out": 16
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 108
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 1,
+      "equivalent": 1,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 10,
+      "mainKilled": 10,
+      "unproven": 10,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "sequence": {
+      "total": 5,
+      "unique": 5
+    },
+    "relation": {
+      "total": 4,
+      "unique": 4
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R001",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 14
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 14
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R001",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 14
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R001",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 14
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R001",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 14
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R002",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 15
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 15
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R002",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 15
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R002",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 15
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R002",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 15
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 21
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R003",
+      "op": "OP-CONST",
+      "status": "ambiguous",
+      "reason": "字面量 1'h0 行內計數≠1",
+      "line": 21
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R003",
+      "op": "OP-SIGN",
+      "status": "ambiguous",
+      "reason": "字面量 1'h0 行內計數≠1",
+      "line": 21
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R003",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 21
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R004",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R004",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 22
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R004",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 22
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R005",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 28
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R005",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 28
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R005",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 28
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R005",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 28
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R005",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 28
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R006",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 29
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R006",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 29
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R006",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 29
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R006",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 29
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R006",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 29
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R007",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 35
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R008",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 36
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R008",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 36
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R009",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 41
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R009",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 41
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R009",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 41
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R009",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 41
+    },
+    {
+      "ruleId": "__acc_pipe__acc_pipe.R009",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 41
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "14|    x__input_flop <= x__input_flop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 14,
+      "before": "    x__input_flop <= x;",
+      "after": "    x__input_flop <= x__input_flop;",
+      "detail": "rhs→x__input_flop",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "15|    y__input_flop <= y__input_flop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 15,
+      "before": "    y__input_flop <= y;",
+      "after": "    y__input_flop <= y__input_flop;",
+      "detail": "rhs→y__input_flop",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "21|  assign p1_add_96_comb = {1'h0, x__input_flop} - {1'h0, y__input_flop};",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 21,
+      "before": "  assign p1_add_96_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop};",
+      "after": "  assign p1_add_96_comb = {1'h0, x__input_flop} - {1'h0, y__input_flop};",
+      "detail": "+→-",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "22|  assign p1_bit_slice_103_comb = p1_add_96_comb[7:0];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 22,
+      "before": "  assign p1_bit_slice_103_comb = p1_add_96_comb[8:1];",
+      "after": "  assign p1_bit_slice_103_comb = p1_add_96_comb[7:0];",
+      "detail": "[8:1]→[7:0]",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "28|    p0_add_20 <= p0_add_20;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 28,
+      "before": "    p0_add_20 <= p1_add_96_comb;",
+      "after": "    p0_add_20 <= p0_add_20;",
+      "detail": "rhs→p0_add_20",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "29|    p0_bit_slice_48 <= p0_bit_slice_48;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 29,
+      "before": "    p0_bit_slice_48 <= p1_bit_slice_103_comb;",
+      "after": "    p0_bit_slice_48 <= p0_bit_slice_48;",
+      "detail": "rhs→p0_bit_slice_48",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R006"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "35|  assign p2_add_98_comb = {2'h0, p0_bit_slice_48} - {1'h0, p0_add_20};",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 35,
+      "before": "  assign p2_add_98_comb = {2'h0, p0_bit_slice_48} + {1'h0, p0_add_20};",
+      "after": "  assign p2_add_98_comb = {2'h0, p0_bit_slice_48} - {1'h0, p0_add_20};",
+      "detail": "+→-",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R007"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "35|  assign p2_add_98_comb = {2'h1, p0_bit_slice_48} + {1'h0, p0_add_20};",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 35,
+      "before": "  assign p2_add_98_comb = {2'h0, p0_bit_slice_48} + {1'h0, p0_add_20};",
+      "after": "  assign p2_add_98_comb = {2'h1, p0_bit_slice_48} + {1'h0, p0_add_20};",
+      "detail": "2'h0→2'h1",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R007"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0009",
+      "key": "36|  assign p2_scaled_comb = {5'h01, p2_add_98_comb, p0_add_20[0]};",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 36,
+      "before": "  assign p2_scaled_comb = {5'h00, p2_add_98_comb, p0_add_20[0]};",
+      "after": "  assign p2_scaled_comb = {5'h01, p2_add_98_comb, p0_add_20[0]};",
+      "detail": "5'h00→5'h01",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R008"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "36|  assign p2_scaled_comb = {5'sh00, p2_add_98_comb, p0_add_20[0]};",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 36,
+      "before": "  assign p2_scaled_comb = {5'h00, p2_add_98_comb, p0_add_20[0]};",
+      "after": "  assign p2_scaled_comb = {5'sh00, p2_add_98_comb, p0_add_20[0]};",
+      "detail": "5'h00→5'sh00",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R008"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 108
+    },
+    {
+      "id": "m0011",
+      "key": "41|    out__output_flop <= out__output_flop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 41,
+      "before": "    out__output_flop <= p2_scaled_comb;",
+      "after": "    out__output_flop <= out__output_flop;",
+      "detail": "rhs→out__output_flop",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R009"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "14|    x__input_flop <= x; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 14,
+      "before": "    x__input_flop <= x;",
+      "after": "    x__input_flop <= x; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0013",
+      "key": "21|  assign p1_add_96_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop}; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 21,
+      "before": "  assign p1_add_96_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop};",
+      "after": "  assign p1_add_96_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop}; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "__acc_pipe__acc_pipe.R003"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0014",
+      "key": "43|  assign out = out;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 43,
+      "before": "  assign out = out__output_flop;",
+      "after": "  assign out = out;",
+      "detail": "rhs→out",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 pipe_stages_sync_ramp",
+        "SCENE2 only_x_changes",
+        "SCENE3 only_y_changes",
+        "SCENE4 boundary_walk"
+      ]
+    }
+  ],
+  "baselineTemplate": {
+    "leg": "template",
+    "sha256": "1220205fd40665d4469d82dbf97b831a7cf2c71ee197e8e6dea68d80ab93f45e",
+    "expectedSha256": "c44728eab499704d1d3599f2a478449d366e0477e2d4f2cab857c1b2ef6b961e",
+    "numbers": {
+      "generated": 11,
+      "stillborn": 0,
+      "equivalent": 1,
+      "eligible": 10,
+      "killed": 10,
+      "survived": 0,
+      "timeout": 0,
+      "rate": "10/10",
+      "ruleVerified": {
+        "exclusive": "9/9",
+        "shared": "0/9"
+      },
+      "catalogCoverage": "9/9",
+      "unruled": {
+        "generated": 1,
+        "killed": 1
+      },
+      "controlsSurvived": "3/3",
+      "ambiguous": 2,
+      "na": 34
+    },
+    "gainKilled": 0,
+    "formFloor": {
+      "sequence": "5/5",
+      "relation": "5/5"
+    },
+    "notWorse": true,
+    "mutants": [
+      {
+        "id": "m0001",
+        "key": "14|    x__input_flop <= x__input_flop;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 14,
+        "before": "    x__input_flop <= x;",
+        "after": "    x__input_flop <= x__input_flop;",
+        "detail": "rhs→x__input_flop",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R001"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0002",
+        "key": "15|    y__input_flop <= y__input_flop;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 15,
+        "before": "    y__input_flop <= y;",
+        "after": "    y__input_flop <= y__input_flop;",
+        "detail": "rhs→y__input_flop",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R002"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0003",
+        "key": "21|  assign p1_add_96_comb = {1'h0, x__input_flop} - {1'h0, y__input_flop};",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 21,
+        "before": "  assign p1_add_96_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop};",
+        "after": "  assign p1_add_96_comb = {1'h0, x__input_flop} - {1'h0, y__input_flop};",
+        "detail": "+→-",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R003"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0004",
+        "key": "22|  assign p1_bit_slice_103_comb = p1_add_96_comb[7:0];",
+        "pool": "rule",
+        "op": "OP-SLICE",
+        "line": 22,
+        "before": "  assign p1_bit_slice_103_comb = p1_add_96_comb[8:1];",
+        "after": "  assign p1_bit_slice_103_comb = p1_add_96_comb[7:0];",
+        "detail": "[8:1]→[7:0]",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R004"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0005",
+        "key": "28|    p0_add_20 <= p0_add_20;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 28,
+        "before": "    p0_add_20 <= p1_add_96_comb;",
+        "after": "    p0_add_20 <= p0_add_20;",
+        "detail": "rhs→p0_add_20",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R005"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0006",
+        "key": "29|    p0_bit_slice_48 <= p0_bit_slice_48;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 29,
+        "before": "    p0_bit_slice_48 <= p1_bit_slice_103_comb;",
+        "after": "    p0_bit_slice_48 <= p0_bit_slice_48;",
+        "detail": "rhs→p0_bit_slice_48",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R006"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0007",
+        "key": "35|  assign p2_add_98_comb = {2'h0, p0_bit_slice_48} - {1'h0, p0_add_20};",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 35,
+        "before": "  assign p2_add_98_comb = {2'h0, p0_bit_slice_48} + {1'h0, p0_add_20};",
+        "after": "  assign p2_add_98_comb = {2'h0, p0_bit_slice_48} - {1'h0, p0_add_20};",
+        "detail": "+→-",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R007"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0008",
+        "key": "35|  assign p2_add_98_comb = {2'h1, p0_bit_slice_48} + {1'h0, p0_add_20};",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 35,
+        "before": "  assign p2_add_98_comb = {2'h0, p0_bit_slice_48} + {1'h0, p0_add_20};",
+        "after": "  assign p2_add_98_comb = {2'h1, p0_bit_slice_48} + {1'h0, p0_add_20};",
+        "detail": "2'h0→2'h1",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R007"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0009",
+        "key": "36|  assign p2_scaled_comb = {5'h01, p2_add_98_comb, p0_add_20[0]};",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 36,
+        "before": "  assign p2_scaled_comb = {5'h00, p2_add_98_comb, p0_add_20[0]};",
+        "after": "  assign p2_scaled_comb = {5'h01, p2_add_98_comb, p0_add_20[0]};",
+        "detail": "5'h00→5'h01",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R008"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0010",
+        "key": "36|  assign p2_scaled_comb = {5'sh00, p2_add_98_comb, p0_add_20[0]};",
+        "pool": "rule",
+        "op": "OP-SIGN",
+        "line": 36,
+        "before": "  assign p2_scaled_comb = {5'h00, p2_add_98_comb, p0_add_20[0]};",
+        "after": "  assign p2_scaled_comb = {5'sh00, p2_add_98_comb, p0_add_20[0]};",
+        "detail": "5'h00→5'sh00",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R008"
+        ],
+        "result": "survived",
+        "killScenes": [],
+        "adjudication": "equivalent"
+      },
+      {
+        "id": "m0011",
+        "key": "41|    out__output_flop <= out__output_flop;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 41,
+        "before": "    out__output_flop <= p2_scaled_comb;",
+        "after": "    out__output_flop <= out__output_flop;",
+        "detail": "rhs→out__output_flop",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R009"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0012",
+        "key": "14|    x__input_flop <= x; // conformance-nop",
+        "pool": "control",
+        "op": "OP-NOP",
+        "line": 14,
+        "before": "    x__input_flop <= x;",
+        "after": "    x__input_flop <= x; // conformance-nop",
+        "detail": "append nop",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R001"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0013",
+        "key": "21|  assign p1_add_96_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop}; // conformance-nop",
+        "pool": "control",
+        "op": "OP-NOP",
+        "line": 21,
+        "before": "  assign p1_add_96_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop};",
+        "after": "  assign p1_add_96_comb = {1'h0, x__input_flop} + {1'h0, y__input_flop}; // conformance-nop",
+        "detail": "append nop",
+        "ruleIds": [
+          "__acc_pipe__acc_pipe.R003"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0014",
+        "key": "43|  assign out = out;",
+        "pool": "unruled",
+        "op": "OP-HOLD",
+        "line": 43,
+        "before": "  assign out = out__output_flop;",
+        "after": "  assign out = out;",
+        "detail": "rhs→out",
+        "ruleIds": [],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      }
+    ]
+  },
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 43,
+        "op": "OP-HOLD",
+        "before": "assign out = out__output_flop;",
+        "after": "assign out = out;",
+        "killScenes": [
+          "SCENE1 pipe_stages_sync_ramp",
+          "SCENE2 only_x_changes",
+          "SCENE3 only_y_changes",
+          "SCENE4 boundary_walk"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [
+        {
+          "signal": "out",
+          "class": "U2",
+          "policy": true,
+          "line": 43,
+          "snippet": "assign out = out__output_flop;"
+        }
+      ],
+      "summary": {
+        "uncovered": 1,
+        "byClass": {
+          "U2": 1
+        },
+        "policyExcluded": 1,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 10,
+      "hit": 3,
+      "rate": "3/10"
+    }
+  }
+}

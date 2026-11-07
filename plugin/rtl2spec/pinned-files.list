@@ -1,4 +1,5 @@
-# pinned-files.list — golden 釘選語料集 37 檔(§16.1.1;SSOT=方案文檔表)
+# pinned-files.list — golden 釘選語料集 49 檔(SSOT=RTL2SPEC-PLUGIN §20.5 釘選全表,run-plugin-check ⑤e 逐檔名對拍;
+#   37 檔=§16.1.1 原表,+12=收尾弧 S3 擴檔;條目數=golden-check.mjs EXPECTED_PINNED 精確數斷言)
 # 註釋行跳過;路徑=repo 相對。釘選集增刪=語義事件:同輪更新 §16.1.1 表。
 # license:corpus-external/yosys-simple=ISC(COPYING 隨附);corpus/=repo MIT;
 # crates/spec-i2c=乾淨室 MIT(OpenCores 唯讀啟發零拷貝)。
@@ -44,3 +45,18 @@ crates/spec-i2c/rtl/i2c_master.v
 corpus/e2e/58_xls_acc_pipe/acc_pipe.v
 corpus/e2e/57_xls_add3/add3.v
 corpus/fulladd/fulladd.v
+
+# --- 收尾弧 S3 擴檔 12(conformance T 腿 staging ADMITTED 且原未釘;入選依據=TB 實殺變異的直接證據,
+#     取代 §16.1.1「<3 條規則無斷言價值」代理判據;裁定與名單=RTL2SPEC-FINISH-PLAN §11、CONFORMANCE-PROTOCOL §9) ---
+corpus-external/yosys-simple/always01.v
+corpus-external/yosys-simple/always02.v
+corpus-external/yosys-simple/attrib01_module.v
+corpus-external/yosys-simple/attrib02_port_decl.v
+corpus-external/yosys-simple/attrib06_operator_suffix.v
+corpus-external/yosys-simple/attrib08_mod_inst.v
+corpus-external/yosys-simple/attrib09_case.v
+corpus-external/yosys-simple/graphtest.v
+corpus-external/yosys-simple/loop_prefix_case.v
+corpus-external/yosys-simple/retime.v
+corpus-external/yosys-simple/scopes.v
+corpus-external/yosys-simple/usb_phy_tests.v

@@ -114,6 +114,38 @@ const TABLE = [
     desc: 'G2 覆蓋守衛(M6:case_covered 不報+case_sparse 仍報)',
     expected: [['case_sparse', 'incomplete_case', 'heuristic']],
   },
+  // ---- §19.2 C-S1 D-r1c 破口面五行(期望=rtl_scan_gaps_sv 實探定案;修前實探在檔
+  // build/c-s1/probe-pre.txt):select_trigger=規則面與破口面單一語義源。
+  {
+    // 正樣:復位前置敏感列表——修前 G4 certain(假陽性現形)→修後零 G4。
+    file: 'plugin/rtl2spec/fixtures/rst_first_async.v',
+    desc: 'D-r1c 復位前置 async 正樣(修後零 G4;修前假陽性 G4 certain)',
+    expected: [],
+  },
+  {
+    // 孿生:時鐘前置序(修前修後皆零)。
+    file: 'plugin/rtl2spec/fixtures/rst_first_twin.v',
+    desc: 'D-r1c 時鐘前置孿生(零 findings,修前修後同)',
+    expected: [],
+  },
+  {
+    // 負樣:頂層條件非單訊號(load && en)→無單訊號復位臂=結構可證 G4 certain(修前修後同)。
+    file: 'plugin/rtl2spec/fixtures/rst_first_compound.v',
+    desc: 'D-r1c 複合條件負樣(G4 certain,修前修後同)',
+    expected: [['rst_first_compound', 'missing_reset', 'certain']],
+  },
+  {
+    // 零漂移釘:單訊號 load 不在敏感列表→照取復位臂→零 findings(修前修後同)。
+    file: 'plugin/rtl2spec/fixtures/rst_first_loadsig.v',
+    desc: 'D-r1c 非列表單訊號零漂移釘(零 findings,修前修後同)',
+    expected: [],
+  },
+  {
+    // 負樣:單沿純復位行程→回退首沿→G4 certain(修前修後同;零漂移釘≠正確性背書,§19.13-7)。
+    file: 'plugin/rtl2spec/fixtures/rst_only_edge.v',
+    desc: 'D-r1c 單沿純復位負樣(G4 certain,修前修後同)',
+    expected: [['rst_only_edge', 'missing_reset', 'certain']],
+  },
 ];
 
 const fail = (msg) => {
@@ -206,13 +238,27 @@ for (const row of TABLE) {
   }
 }
 
+// D-r1c 破口面 selfcheck(§19.2 C-S1):正樣期望(rst_only_edge 的 G4 certain,模組名
+// 無關的 class|confidence 形)誤配修後零 G4 的 rst_first_async 必紅——若成立=D-r1c 迴歸
+// 或斷言表恆真(修前 rst_first_async 恰報此形)。
+{
+  const cc = (rep) => rep.items.map((i) => `${i.class}|${i.confidence}`).sort();
+  const wouldPass = JSON.stringify(cc(scan('plugin/rtl2spec/fixtures/rst_first_async.v'))) ===
+    JSON.stringify(['missing_reset|certain']);
+  if (!wouldPass) {
+    console.log('PASS D-r1c 破口面 selfcheck 正樣期望誤配 rst_first_async 必紅');
+  } else {
+    fail('D-r1c 破口面 selfcheck:rst_first_async 竟呈 G4 certain(修前假陽性形)=迴歸或斷言表恆真');
+  }
+}
+
 // ---- S2 規則面矩陣(N3;§5.2 S2)——extract_rules 腿(與 gap 檔級矩陣同形:
 // 正樣條級 multiset 相等+負樣零規則+selfcheck 判別力;fixture=自著 MIT)。
 {
   const extract = (f) => {
     try {
       return JSON.parse(
-        glue.rtl_extract_rules_sv(f, readFileSync(join(repoRoot, f), 'utf8'), 128),
+        glue.rtl_extract_rules_sv(f, readFileSync(join(repoRoot, f), 'utf8'), 256),
       );
     } catch (e) {
       fail(`${f} wasm trap/解析敗: ${String(e).slice(0, 120)}`);
@@ -317,6 +363,66 @@ for (const row of TABLE) {
       console.log('PASS S4/M1+M2 負樣 單標簽不增殖+無 default 零規則 (m12_negative.v)');
     } else {
       fail(`S4/M1+M2 負樣形不符: m1neg=${m1neg.length} m2neg=${m2neg.length} ${JSON.stringify(rules.map((r) => [r.module, r.check.when]))}`);
+    }
+  }
+  // ---- §19.2 C-S1 D-r1c 規則面五行(guard 條級 multiset;期望=dist wasm 實探定案,
+  // 修前實探在檔 build/c-s1/probe-pre.txt)。guard 簽名=module|when|async|edge signal|lhs<=value。
+  {
+    const F = 'plugin/rtl2spec/fixtures/';
+    const gsig = (r) =>
+      `${r.module}|${r.check.when}|${r.check.async}|${r.check.trigger?.edge} ${r.check.trigger?.signal}|` +
+      (r.check.effects ?? []).map((e) => `${e.lhs}<=${e.value}`).join(',');
+    const guardsOf = (rb) => (rb.modules ?? []).flatMap((m) => m.rules ?? []).filter((r) => r.check?.form === 'guard');
+    const ROWS = [
+      // 正樣:修前零 guard(sequence×2,bug 現形)→修後 guard×1 async=true trigger=clk posedge。
+      ['rst_first_async.v', 'D-r1c 復位前置 async 正樣', ["rst_first|!rst_n|true|posedge clk|q<=1'b0"]],
+      // 孿生:修前修後皆 guard×1(順序不變性的比較基準)。
+      ['rst_first_twin.v', 'D-r1c 時鐘前置孿生', ["rst_first|!rst_n|true|posedge clk|q<=1'b0"]],
+      // 負樣:複合條件無復位候選→零 guard。
+      ['rst_first_compound.v', 'D-r1c 複合條件負樣', []],
+      // 零漂移釘:單訊號 load 不在敏感列表→guard×1 when=load async=false trigger=首沿 rst_n negedge。
+      ['rst_first_loadsig.v', 'D-r1c 非列表單訊號零漂移釘', ["rst_first_loadsig|load|false|negedge rst_n|q<=1'b0"]],
+      // 負樣:單沿純復位→回退首沿→is_trigger→零 guard。
+      ['rst_only_edge.v', 'D-r1c 單沿純復位負樣', []],
+    ];
+    const books = {};
+    for (const [file, desc, want] of ROWS) {
+      const rb = extract(F + file);
+      books[file] = rb;
+      const actual = guardsOf(rb).map(gsig).sort();
+      const w = [...want].sort();
+      if (JSON.stringify(actual) === JSON.stringify(w)) {
+        console.log(`PASS ${desc} 規則面 guard 條級 multiset (${file} guards=${actual.length})`);
+      } else {
+        fail(`${desc} 規則面 guard 集合不等:\n  want=${JSON.stringify(w)}\n  actual=${JSON.stringify(actual)}`);
+      }
+    }
+    // 順序不變性:正樣與孿生 check 載荷逐條相等;evidence[1](敏感列表原文)必然不同(§19 RV1-10)。
+    {
+      const checks = (rb) => JSON.stringify((rb.modules ?? []).flatMap((m) => m.rules ?? []).map((r) => r.check));
+      const ev1 = (rb) => guardsOf(rb)[0]?.evidence?.[1]?.snippet;
+      const a = books['rst_first_async.v'];
+      const t = books['rst_first_twin.v'];
+      const ok =
+        checks(a) === checks(t) &&
+        ev1(a) === '  always @(negedge rst_n or posedge clk)' &&
+        ev1(t) === '  always @(posedge clk or negedge rst_n)';
+      if (ok) {
+        console.log('PASS D-r1c 順序不變性(async↔twin check 載荷相等+evidence[1] 敏感列表原文各自如實)');
+      } else {
+        fail(`D-r1c 順序不變性不成立: ev1(async)=${JSON.stringify(ev1(a))} ev1(twin)=${JSON.stringify(ev1(t))}`);
+      }
+    }
+    // selfcheck:正樣 guard 期望(模組名無關形)誤配零 guard 負樣必紅(斷言表判別力自證)。
+    {
+      const anon = (rb) => guardsOf(rb).map((r) => gsig(r).split('|').slice(1).join('|')).sort();
+      const wouldPass = JSON.stringify(anon(books['rst_first_compound.v'])) ===
+        JSON.stringify(["!rst_n|true|posedge clk|q<=1'b0"]);
+      if (!wouldPass) {
+        console.log('PASS D-r1c 規則面 selfcheck 正樣期望誤配負樣必紅');
+      } else {
+        fail('D-r1c 規則面 selfcheck:負樣竟通過正樣 guard 期望=斷言表恆真,紅路失效');
+      }
     }
   }
 }

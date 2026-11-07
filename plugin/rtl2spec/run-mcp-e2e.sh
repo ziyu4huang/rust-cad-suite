@@ -4,7 +4,7 @@
 # ②pkg 陳舊檢查(find 全傳遞依賴目錄 -newer pkg/...bg.wasm → wasm-pack
 #   rebuild --target web;漏列傳遞依賴=雙閘驗陳舊 wasm,「閘驗出貨物」
 #   (D8)即謊言)→ 同步 pkg→plugin/rtl2spec/dist/wasm
-# ③bun scripts/mcp-client.mjs 七斷言回環
+# ③bun scripts/mcp-client.mjs 回環斷言(19 條=實跑 PASS 行數,iverilog 在場時;§19 C-S2 起含 ⑧ max_rules 四調用+⑨⑩⑪ rtl_tb_plan)
 # ④斷言失敗→exit 1;構建失敗→exit 3;成功→exit 0
 set -u
 PLUGIN_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -54,7 +54,7 @@ cp "$REPO_ROOT/crates/rtl-spec-wasm/pkg/rtl_spec_wasm.d.ts" "$PLUGIN_ROOT/dist/w
   || echo "INFO glue .d.ts not present (optional)"
 echo "PASS sync dist/wasm"
 
-# ③ 七斷言回環
+# ③ 回環斷言(19 條,iverilog 在場時)
 echo "== MCP stdio loopback =="
 bun "$PLUGIN_ROOT/scripts/mcp-client.mjs"
 CLIENT_EXIT=$?

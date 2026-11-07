@@ -1,0 +1,3928 @@
+{
+  "design": "sincos",
+  "src": "corpus-external/yosys-simple/sincos.v",
+  "top": "d",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/sincos.rules.json",
+  "rules": 46,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "directed",
+    "protocolLeg": "sincos-r2-k1",
+    "sha256": "e1342900930ef165e82b9365cd1d57bb0b75712779dc49b569e1885fc2882674",
+    "scenes": 6,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 7
+  },
+  "expected": {
+    "sha256": "97f8fdaa9034d17a12c26e518bd66ba7809467c13b58bea597b26c91b573e1f1",
+    "lines": 345
+  },
+  "numbers": {
+    "generated": 82,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 82,
+    "killed": 76,
+    "survived": 6,
+    "timeout": 0,
+    "rate": "76/82",
+    "ruleVerified": {
+      "exclusive": "41/46",
+      "shared": "4/46"
+    },
+    "catalogCoverage": "46/46",
+    "unruled": {
+      "generated": 0,
+      "killed": 0
+    },
+    "controlsSurvived": "2/2",
+    "ambiguous": 0,
+    "na": 67
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 64,
+      "out": 41
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 107
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 6,
+      "equivalent": 0,
+      "unproven": 6,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 76,
+      "mainKilled": 76,
+      "unproven": 76,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [
+    {
+      "ruleId": "d.R035",
+      "tag": "unadjudicated",
+      "mutants": 2,
+      "killed": 0,
+      "dist": {
+        "equivalent": 0,
+        "unproven": 2,
+        "adjudication-failed": 0,
+        "unjudged": 0
+      },
+      "dataTag": "unadjudicated"
+    }
+  ],
+  "anchors": {
+    "guard": {
+      "total": 8,
+      "unique": 8
+    },
+    "sequence": {
+      "total": 38,
+      "unique": 38
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "d.R009",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 68
+    },
+    {
+      "ruleId": "d.R009",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 68
+    },
+    {
+      "ruleId": "d.R010",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 69
+    },
+    {
+      "ruleId": "d.R010",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 69
+    },
+    {
+      "ruleId": "d.R011",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 70
+    },
+    {
+      "ruleId": "d.R011",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 70
+    },
+    {
+      "ruleId": "d.R011",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 70
+    },
+    {
+      "ruleId": "d.R011",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 70
+    },
+    {
+      "ruleId": "d.R011",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 70
+    },
+    {
+      "ruleId": "d.R012",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 71
+    },
+    {
+      "ruleId": "d.R012",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 71
+    },
+    {
+      "ruleId": "d.R013",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 72
+    },
+    {
+      "ruleId": "d.R013",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 72
+    },
+    {
+      "ruleId": "d.R014",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 73
+    },
+    {
+      "ruleId": "d.R014",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 73
+    },
+    {
+      "ruleId": "d.R017",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 80
+    },
+    {
+      "ruleId": "d.R017",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 80
+    },
+    {
+      "ruleId": "d.R018",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 81
+    },
+    {
+      "ruleId": "d.R018",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 81
+    },
+    {
+      "ruleId": "d.R019",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 82
+    },
+    {
+      "ruleId": "d.R019",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 82
+    },
+    {
+      "ruleId": "d.R020",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 83
+    },
+    {
+      "ruleId": "d.R020",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 83
+    },
+    {
+      "ruleId": "d.R021",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 84
+    },
+    {
+      "ruleId": "d.R021",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 84
+    },
+    {
+      "ruleId": "d.R022",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 85
+    },
+    {
+      "ruleId": "d.R022",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 85
+    },
+    {
+      "ruleId": "d.R023",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 86
+    },
+    {
+      "ruleId": "d.R023",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 86
+    },
+    {
+      "ruleId": "d.R024",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 87
+    },
+    {
+      "ruleId": "d.R024",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 87
+    },
+    {
+      "ruleId": "d.R025",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 88
+    },
+    {
+      "ruleId": "d.R025",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 88
+    },
+    {
+      "ruleId": "d.R026",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 89
+    },
+    {
+      "ruleId": "d.R026",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 89
+    },
+    {
+      "ruleId": "d.R027",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 90
+    },
+    {
+      "ruleId": "d.R027",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 90
+    },
+    {
+      "ruleId": "d.R028",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 91
+    },
+    {
+      "ruleId": "d.R028",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 91
+    },
+    {
+      "ruleId": "d.R029",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 92
+    },
+    {
+      "ruleId": "d.R029",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 92
+    },
+    {
+      "ruleId": "d.R030",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 93
+    },
+    {
+      "ruleId": "d.R030",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 93
+    },
+    {
+      "ruleId": "d.R031",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 94
+    },
+    {
+      "ruleId": "d.R031",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 94
+    },
+    {
+      "ruleId": "d.R032",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 95
+    },
+    {
+      "ruleId": "d.R032",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 95
+    },
+    {
+      "ruleId": "d.R033",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 96
+    },
+    {
+      "ruleId": "d.R033",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 96
+    },
+    {
+      "ruleId": "d.R034",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 97
+    },
+    {
+      "ruleId": "d.R034",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 97
+    },
+    {
+      "ruleId": "d.R035",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 98
+    },
+    {
+      "ruleId": "d.R035",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 98
+    },
+    {
+      "ruleId": "d.R042",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 111
+    },
+    {
+      "ruleId": "d.R042",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 111
+    },
+    {
+      "ruleId": "d.R042",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 111
+    },
+    {
+      "ruleId": "d.R042",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 111
+    },
+    {
+      "ruleId": "d.R042",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 111
+    },
+    {
+      "ruleId": "d.R043",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 112
+    },
+    {
+      "ruleId": "d.R043",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 112
+    },
+    {
+      "ruleId": "d.R043",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 112
+    },
+    {
+      "ruleId": "d.R043",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 112
+    },
+    {
+      "ruleId": "d.R043",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 112
+    },
+    {
+      "ruleId": "d.R044",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 113
+    },
+    {
+      "ruleId": "d.R044",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 113
+    },
+    {
+      "ruleId": "d.R045",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 114
+    },
+    {
+      "ruleId": "d.R045",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 114
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "55|        state = 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 55,
+      "before": "        state = 1'b0;",
+      "after": "        state = 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "d.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "45|always @(posedge clock) begin: DESIGN_PROCESSOR",
+      "pool": "rule",
+      "op": "OP-ASYNC",
+      "line": 45,
+      "before": "always @(posedge clock, posedge reset) begin: DESIGN_PROCESSOR",
+      "after": "always @(posedge clock) begin: DESIGN_PROCESSOR",
+      "detail": "刪 , posedge reset",
+      "ruleIds": [
+        "d.R001",
+        "d.R002",
+        "d.R003",
+        "d.R004",
+        "d.R005",
+        "d.R006",
+        "d.R007",
+        "d.R008"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "56|        cos_z0 <= 2;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 56,
+      "before": "        cos_z0 <= 1;",
+      "after": "        cos_z0 <= 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "d.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE2 quadrant_scan",
+        "SCENE5 mid_compute_reset",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "57|        sin_z0 <= 1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 57,
+      "before": "        sin_z0 <= 0;",
+      "after": "        sin_z0 <= 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "d.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE2 quadrant_scan",
+        "SCENE5 mid_compute_reset",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "58|        done <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 58,
+      "before": "        done <= 1'b0;",
+      "after": "        done <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "d.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE5 mid_compute_reset",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "59|        x = 1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 59,
+      "before": "        x = 0;",
+      "after": "        x = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "d.R005"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 107,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "DESIGN_PROCESSOR.x[0]"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "60|        y = 1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 60,
+      "before": "        y = 0;",
+      "after": "        y = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "d.R006"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 107,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "DESIGN_PROCESSOR.y[0]"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "61|        z = 1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 61,
+      "before": "        z = 0;",
+      "after": "        z = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "d.R007"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 107,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "DESIGN_PROCESSOR.z[0]"
+      ]
+    },
+    {
+      "id": "m0009",
+      "key": "62|        i = 1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 62,
+      "before": "        i = 0;",
+      "after": "        i = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "d.R008"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 107,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "DESIGN_PROCESSOR.i[0]"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "68|                    x = x;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 68,
+      "before": "                    x = 159188;",
+      "after": "                    x = x;",
+      "detail": "rhs→x",
+      "ruleIds": [
+        "d.R009"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0011",
+      "key": "68|                    x = 159189;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 68,
+      "before": "                    x = 159188;",
+      "after": "                    x = 159189;",
+      "detail": "159188→159189",
+      "ruleIds": [
+        "d.R009"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "69|                    y = y;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 69,
+      "before": "                    y = 0;",
+      "after": "                    y = y;",
+      "detail": "rhs→y",
+      "ruleIds": [
+        "d.R010"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0013",
+      "key": "69|                    y = 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 69,
+      "before": "                    y = 0;",
+      "after": "                    y = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "d.R010"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0014",
+      "key": "70|                    z = z;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 70,
+      "before": "                    z = z0;",
+      "after": "                    z = z;",
+      "detail": "rhs→z",
+      "ruleIds": [
+        "d.R011"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0015",
+      "key": "71|                    i = i;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 71,
+      "before": "                    i = 0;",
+      "after": "                    i = i;",
+      "detail": "rhs→i",
+      "ruleIds": [
+        "d.R012"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0016",
+      "key": "71|                    i = 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 71,
+      "before": "                    i = 0;",
+      "after": "                    i = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "d.R012"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0017",
+      "key": "72|                    done <= done;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 72,
+      "before": "                    done <= 1'b0;",
+      "after": "                    done <= done;",
+      "detail": "rhs→done",
+      "ruleIds": [
+        "d.R013"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0018",
+      "key": "72|                    done <= 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 72,
+      "before": "                    done <= 1'b0;",
+      "after": "                    done <= 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "d.R013"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0019",
+      "key": "73|                    state = state;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 73,
+      "before": "                    state = 1'b1;",
+      "after": "                    state = state;",
+      "detail": "rhs→state",
+      "ruleIds": [
+        "d.R014"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE5 mid_compute_reset",
+        "SCENE6 async_reset_observe",
+        "<tail>"
+      ]
+    },
+    {
+      "id": "m0020",
+      "key": "73|                    state = 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 73,
+      "before": "                    state = 1'b1;",
+      "after": "                    state = 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "d.R014"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE5 mid_compute_reset",
+        "SCENE6 async_reset_observe",
+        "<tail>"
+      ]
+    },
+    {
+      "id": "m0021",
+      "key": "77|                dx = dx;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 77,
+      "before": "                dx = $signed(y >>> $signed({1'b0, i}));",
+      "after": "                dx = dx;",
+      "detail": "rhs→dx",
+      "ruleIds": [
+        "d.R015"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0022",
+      "key": "77|                dx = $signed(y >> $signed({1'b0, i}));",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 77,
+      "before": "                dx = $signed(y >>> $signed({1'b0, i}));",
+      "after": "                dx = $signed(y >> $signed({1'b0, i}));",
+      "detail": ">>>→>>",
+      "ruleIds": [
+        "d.R015"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0023",
+      "key": "78|                dy = dy;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 78,
+      "before": "                dy = $signed(x >>> $signed({1'b0, i}));",
+      "after": "                dy = dy;",
+      "detail": "rhs→dy",
+      "ruleIds": [
+        "d.R016"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0024",
+      "key": "78|                dy = $signed(x >> $signed({1'b0, i}));",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 78,
+      "before": "                dy = $signed(x >>> $signed({1'b0, i}));",
+      "after": "                dy = $signed(x >> $signed({1'b0, i}));",
+      "detail": ">>>→>>",
+      "ruleIds": [
+        "d.R016"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0025",
+      "key": "80|                    0: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 80,
+      "before": "                    0: dz = 205887;",
+      "after": "                    0: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R017"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0026",
+      "key": "80|                    0: dz = 205888;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 80,
+      "before": "                    0: dz = 205887;",
+      "after": "                    0: dz = 205888;",
+      "detail": "205887→205888",
+      "ruleIds": [
+        "d.R017"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0027",
+      "key": "81|                    1: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 81,
+      "before": "                    1: dz = 121542;",
+      "after": "                    1: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R018"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0028",
+      "key": "81|                    1: dz = 121543;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 81,
+      "before": "                    1: dz = 121542;",
+      "after": "                    1: dz = 121543;",
+      "detail": "121542→121543",
+      "ruleIds": [
+        "d.R018"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0029",
+      "key": "82|                    2: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 82,
+      "before": "                    2: dz = 64220;",
+      "after": "                    2: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R019"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0030",
+      "key": "82|                    2: dz = 64221;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 82,
+      "before": "                    2: dz = 64220;",
+      "after": "                    2: dz = 64221;",
+      "detail": "64220→64221",
+      "ruleIds": [
+        "d.R019"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0031",
+      "key": "83|                    3: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 83,
+      "before": "                    3: dz = 32599;",
+      "after": "                    3: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R020"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0032",
+      "key": "83|                    3: dz = 32600;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 83,
+      "before": "                    3: dz = 32599;",
+      "after": "                    3: dz = 32600;",
+      "detail": "32599→32600",
+      "ruleIds": [
+        "d.R020"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0033",
+      "key": "84|                    4: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 84,
+      "before": "                    4: dz = 16363;",
+      "after": "                    4: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R021"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0034",
+      "key": "84|                    4: dz = 16364;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 84,
+      "before": "                    4: dz = 16363;",
+      "after": "                    4: dz = 16364;",
+      "detail": "16363→16364",
+      "ruleIds": [
+        "d.R021"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0035",
+      "key": "85|                    5: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 85,
+      "before": "                    5: dz = 8189;",
+      "after": "                    5: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R022"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0036",
+      "key": "85|                    5: dz = 8190;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 85,
+      "before": "                    5: dz = 8189;",
+      "after": "                    5: dz = 8190;",
+      "detail": "8189→8190",
+      "ruleIds": [
+        "d.R022"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0037",
+      "key": "86|                    6: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 86,
+      "before": "                    6: dz = 4096;",
+      "after": "                    6: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R023"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0038",
+      "key": "86|                    6: dz = 4097;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 86,
+      "before": "                    6: dz = 4096;",
+      "after": "                    6: dz = 4097;",
+      "detail": "4096→4097",
+      "ruleIds": [
+        "d.R023"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0039",
+      "key": "87|                    7: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 87,
+      "before": "                    7: dz = 2048;",
+      "after": "                    7: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R024"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0040",
+      "key": "87|                    7: dz = 2049;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 87,
+      "before": "                    7: dz = 2048;",
+      "after": "                    7: dz = 2049;",
+      "detail": "2048→2049",
+      "ruleIds": [
+        "d.R024"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0041",
+      "key": "88|                    8: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 88,
+      "before": "                    8: dz = 1024;",
+      "after": "                    8: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R025"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0042",
+      "key": "88|                    8: dz = 1025;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 88,
+      "before": "                    8: dz = 1024;",
+      "after": "                    8: dz = 1025;",
+      "detail": "1024→1025",
+      "ruleIds": [
+        "d.R025"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0043",
+      "key": "89|                    9: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 89,
+      "before": "                    9: dz = 512;",
+      "after": "                    9: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R026"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0044",
+      "key": "89|                    9: dz = 513;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 89,
+      "before": "                    9: dz = 512;",
+      "after": "                    9: dz = 513;",
+      "detail": "512→513",
+      "ruleIds": [
+        "d.R026"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0045",
+      "key": "90|                    10: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 90,
+      "before": "                    10: dz = 256;",
+      "after": "                    10: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R027"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0046",
+      "key": "90|                    10: dz = 257;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 90,
+      "before": "                    10: dz = 256;",
+      "after": "                    10: dz = 257;",
+      "detail": "256→257",
+      "ruleIds": [
+        "d.R027"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0047",
+      "key": "91|                    11: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 91,
+      "before": "                    11: dz = 128;",
+      "after": "                    11: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R028"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0048",
+      "key": "91|                    11: dz = 129;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 91,
+      "before": "                    11: dz = 128;",
+      "after": "                    11: dz = 129;",
+      "detail": "128→129",
+      "ruleIds": [
+        "d.R028"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0049",
+      "key": "92|                    12: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 92,
+      "before": "                    12: dz = 64;",
+      "after": "                    12: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R029"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0050",
+      "key": "92|                    12: dz = 65;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 92,
+      "before": "                    12: dz = 64;",
+      "after": "                    12: dz = 65;",
+      "detail": "64→65",
+      "ruleIds": [
+        "d.R029"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0051",
+      "key": "93|                    13: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 93,
+      "before": "                    13: dz = 32;",
+      "after": "                    13: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R030"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0052",
+      "key": "93|                    13: dz = 33;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 93,
+      "before": "                    13: dz = 32;",
+      "after": "                    13: dz = 33;",
+      "detail": "32→33",
+      "ruleIds": [
+        "d.R030"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0053",
+      "key": "94|                    14: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 94,
+      "before": "                    14: dz = 16;",
+      "after": "                    14: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R031"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0054",
+      "key": "94|                    14: dz = 17;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 94,
+      "before": "                    14: dz = 16;",
+      "after": "                    14: dz = 17;",
+      "detail": "16→17",
+      "ruleIds": [
+        "d.R031"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0055",
+      "key": "95|                    15: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 95,
+      "before": "                    15: dz = 8;",
+      "after": "                    15: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R032"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0056",
+      "key": "95|                    15: dz = 9;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 95,
+      "before": "                    15: dz = 8;",
+      "after": "                    15: dz = 9;",
+      "detail": "8→9",
+      "ruleIds": [
+        "d.R032"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0057",
+      "key": "96|                    16: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 96,
+      "before": "                    16: dz = 4;",
+      "after": "                    16: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R033"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0058",
+      "key": "96|                    16: dz = 5;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 96,
+      "before": "                    16: dz = 4;",
+      "after": "                    16: dz = 5;",
+      "detail": "4→5",
+      "ruleIds": [
+        "d.R033"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0059",
+      "key": "97|                    17: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 97,
+      "before": "                    17: dz = 2;",
+      "after": "                    17: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R034"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0060",
+      "key": "97|                    17: dz = 3;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 97,
+      "before": "                    17: dz = 2;",
+      "after": "                    17: dz = 3;",
+      "detail": "2→3",
+      "ruleIds": [
+        "d.R034"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0061",
+      "key": "98|                    default: dz = dz;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 98,
+      "before": "                    default: dz = 1;",
+      "after": "                    default: dz = dz;",
+      "detail": "rhs→dz",
+      "ruleIds": [
+        "d.R035"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 107,
+      "eqUnproven": 20,
+      "unprovenCells": [
+        "DESIGN_PROCESSOR.z[0]",
+        "DESIGN_PROCESSOR.z[10]",
+        "DESIGN_PROCESSOR.z[11]",
+        "DESIGN_PROCESSOR.z[12]",
+        "DESIGN_PROCESSOR.z[13]",
+        "DESIGN_PROCESSOR.z[14]",
+        "DESIGN_PROCESSOR.z[15]",
+        "DESIGN_PROCESSOR.z[16]",
+        "DESIGN_PROCESSOR.z[17]",
+        "DESIGN_PROCESSOR.z[18]",
+        "DESIGN_PROCESSOR.z[19]",
+        "DESIGN_PROCESSOR.z[1]",
+        "DESIGN_PROCESSOR.z[2]",
+        "DESIGN_PROCESSOR.z[3]",
+        "DESIGN_PROCESSOR.z[4]",
+        "DESIGN_PROCESSOR.z[5]",
+        "DESIGN_PROCESSOR.z[6]",
+        "DESIGN_PROCESSOR.z[7]",
+        "DESIGN_PROCESSOR.z[8]",
+        "DESIGN_PROCESSOR.z[9]"
+      ]
+    },
+    {
+      "id": "m0062",
+      "key": "98|                    default: dz = 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 98,
+      "before": "                    default: dz = 1;",
+      "after": "                    default: dz = 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "d.R035"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 107,
+      "eqUnproven": 20,
+      "unprovenCells": [
+        "DESIGN_PROCESSOR.z[0]",
+        "DESIGN_PROCESSOR.z[10]",
+        "DESIGN_PROCESSOR.z[11]",
+        "DESIGN_PROCESSOR.z[12]",
+        "DESIGN_PROCESSOR.z[13]",
+        "DESIGN_PROCESSOR.z[14]",
+        "DESIGN_PROCESSOR.z[15]",
+        "DESIGN_PROCESSOR.z[16]",
+        "DESIGN_PROCESSOR.z[17]",
+        "DESIGN_PROCESSOR.z[18]",
+        "DESIGN_PROCESSOR.z[19]",
+        "DESIGN_PROCESSOR.z[1]",
+        "DESIGN_PROCESSOR.z[2]",
+        "DESIGN_PROCESSOR.z[3]",
+        "DESIGN_PROCESSOR.z[4]",
+        "DESIGN_PROCESSOR.z[5]",
+        "DESIGN_PROCESSOR.z[6]",
+        "DESIGN_PROCESSOR.z[7]",
+        "DESIGN_PROCESSOR.z[8]",
+        "DESIGN_PROCESSOR.z[9]"
+      ]
+    },
+    {
+      "id": "m0063",
+      "key": "101|                    x = x;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 101,
+      "before": "                    x = x - dx;",
+      "after": "                    x = x;",
+      "detail": "rhs→x",
+      "ruleIds": [
+        "d.R036"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0064",
+      "key": "101|                    x = x + dx;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 101,
+      "before": "                    x = x - dx;",
+      "after": "                    x = x + dx;",
+      "detail": "-→+",
+      "ruleIds": [
+        "d.R036"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0065",
+      "key": "102|                    y = y;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 102,
+      "before": "                    y = y + dy;",
+      "after": "                    y = y;",
+      "detail": "rhs→y",
+      "ruleIds": [
+        "d.R037"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0066",
+      "key": "102|                    y = y - dy;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 102,
+      "before": "                    y = y + dy;",
+      "after": "                    y = y - dy;",
+      "detail": "+→-",
+      "ruleIds": [
+        "d.R037"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0067",
+      "key": "103|                    z = z;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 103,
+      "before": "                    z = z - dz;",
+      "after": "                    z = z;",
+      "detail": "rhs→z",
+      "ruleIds": [
+        "d.R038"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0068",
+      "key": "103|                    z = z + dz;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 103,
+      "before": "                    z = z - dz;",
+      "after": "                    z = z + dz;",
+      "detail": "-→+",
+      "ruleIds": [
+        "d.R038"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0069",
+      "key": "106|                    x = x;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 106,
+      "before": "                    x = x + dx;",
+      "after": "                    x = x;",
+      "detail": "rhs→x",
+      "ruleIds": [
+        "d.R039"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0070",
+      "key": "106|                    x = x - dx;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 106,
+      "before": "                    x = x + dx;",
+      "after": "                    x = x - dx;",
+      "detail": "+→-",
+      "ruleIds": [
+        "d.R039"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0071",
+      "key": "107|                    y = y;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 107,
+      "before": "                    y = y - dy;",
+      "after": "                    y = y;",
+      "detail": "rhs→y",
+      "ruleIds": [
+        "d.R040"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0072",
+      "key": "107|                    y = y + dy;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 107,
+      "before": "                    y = y - dy;",
+      "after": "                    y = y + dy;",
+      "detail": "-→+",
+      "ruleIds": [
+        "d.R040"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0073",
+      "key": "108|                    z = z;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 108,
+      "before": "                    z = z + dz;",
+      "after": "                    z = z;",
+      "detail": "rhs→z",
+      "ruleIds": [
+        "d.R041"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0074",
+      "key": "108|                    z = z - dz;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 108,
+      "before": "                    z = z + dz;",
+      "after": "                    z = z - dz;",
+      "detail": "+→-",
+      "ruleIds": [
+        "d.R041"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0075",
+      "key": "111|                    cos_z0 <= cos_z0;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 111,
+      "before": "                    cos_z0 <= x;",
+      "after": "                    cos_z0 <= cos_z0;",
+      "detail": "rhs→cos_z0",
+      "ruleIds": [
+        "d.R042"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0076",
+      "key": "112|                    sin_z0 <= sin_z0;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 112,
+      "before": "                    sin_z0 <= y;",
+      "after": "                    sin_z0 <= sin_z0;",
+      "detail": "rhs→sin_z0",
+      "ruleIds": [
+        "d.R043"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0077",
+      "key": "113|                    state = state;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 113,
+      "before": "                    state = 1'b0;",
+      "after": "                    state = state;",
+      "detail": "rhs→state",
+      "ruleIds": [
+        "d.R044"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0078",
+      "key": "113|                    state = 1'b1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 113,
+      "before": "                    state = 1'b0;",
+      "after": "                    state = 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "d.R044"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream"
+      ]
+    },
+    {
+      "id": "m0079",
+      "key": "114|                    done <= done;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 114,
+      "before": "                    done <= 1'b1;",
+      "after": "                    done <= done;",
+      "detail": "rhs→done",
+      "ruleIds": [
+        "d.R045"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE5 mid_compute_reset",
+        "SCENE6 async_reset_observe",
+        "<tail>"
+      ]
+    },
+    {
+      "id": "m0080",
+      "key": "114|                    done <= 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 114,
+      "before": "                    done <= 1'b1;",
+      "after": "                    done <= 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "d.R045"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE5 mid_compute_reset",
+        "SCENE6 async_reset_observe",
+        "<tail>"
+      ]
+    },
+    {
+      "id": "m0081",
+      "key": "117|                    i = i;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 117,
+      "before": "                    i = i + 1;",
+      "after": "                    i = i;",
+      "detail": "rhs→i",
+      "ruleIds": [
+        "d.R046"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE5 mid_compute_reset",
+        "SCENE6 async_reset_observe",
+        "<tail>"
+      ]
+    },
+    {
+      "id": "m0082",
+      "key": "117|                    i = i - 1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 117,
+      "before": "                    i = i + 1;",
+      "after": "                    i = i - 1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "d.R046"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 quadrant_scan",
+        "SCENE3 back_to_back",
+        "SCENE4 random_stream",
+        "SCENE6 async_reset_observe"
+      ]
+    },
+    {
+      "id": "m0083",
+      "key": "54|    if (reset) begin // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 54,
+      "before": "    if (reset) begin",
+      "after": "    if (reset) begin // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "d.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0084",
+      "key": "68|                    x = 159188; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 68,
+      "before": "                    x = 159188;",
+      "after": "                    x = 159188; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "d.R009"
+      ],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": {
+    "leg": "template",
+    "sha256": "46552e62cde19e1ccd988eb7391f741537cb9d9101b38104dba17b1b98ae3a06",
+    "expectedSha256": "2230efe71c0fda3c04cb69b1d4d5705fbf7f1dee76a87712808a6b44b4b984c2",
+    "numbers": {
+      "generated": 82,
+      "stillborn": 0,
+      "equivalent": 0,
+      "eligible": 82,
+      "killed": 74,
+      "survived": 8,
+      "timeout": 0,
+      "rate": "74/82",
+      "ruleVerified": {
+        "exclusive": "41/46",
+        "shared": "4/46"
+      },
+      "catalogCoverage": "46/46",
+      "unruled": {
+        "generated": 0,
+        "killed": 0
+      },
+      "controlsSurvived": "2/2",
+      "ambiguous": 0,
+      "na": 67
+    },
+    "gainKilled": 2,
+    "formFloor": {
+      "guard": "5/9",
+      "sequence": "71/73"
+    },
+    "notWorse": true,
+    "mutants": [
+      {
+        "id": "m0001",
+        "key": "55|        state = 1'b1;",
+        "pool": "rule",
+        "op": "OP-RVAL",
+        "line": 55,
+        "before": "        state = 1'b0;",
+        "after": "        state = 1'b1;",
+        "detail": "1'b0→1'b1",
+        "ruleIds": [
+          "d.R001"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0002",
+        "key": "45|always @(posedge clock) begin: DESIGN_PROCESSOR",
+        "pool": "rule",
+        "op": "OP-ASYNC",
+        "line": 45,
+        "before": "always @(posedge clock, posedge reset) begin: DESIGN_PROCESSOR",
+        "after": "always @(posedge clock) begin: DESIGN_PROCESSOR",
+        "detail": "刪 , posedge reset",
+        "ruleIds": [
+          "d.R001",
+          "d.R002",
+          "d.R003",
+          "d.R004",
+          "d.R005",
+          "d.R006",
+          "d.R007",
+          "d.R008"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE1 arst_reset"
+        ]
+      },
+      {
+        "id": "m0003",
+        "key": "56|        cos_z0 <= 2;",
+        "pool": "rule",
+        "op": "OP-RVAL",
+        "line": 56,
+        "before": "        cos_z0 <= 1;",
+        "after": "        cos_z0 <= 2;",
+        "detail": "1→2",
+        "ruleIds": [
+          "d.R002"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full"
+        ]
+      },
+      {
+        "id": "m0004",
+        "key": "57|        sin_z0 <= 1;",
+        "pool": "rule",
+        "op": "OP-RVAL",
+        "line": 57,
+        "before": "        sin_z0 <= 0;",
+        "after": "        sin_z0 <= 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "d.R003"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full"
+        ]
+      },
+      {
+        "id": "m0005",
+        "key": "58|        done <= 1'b1;",
+        "pool": "rule",
+        "op": "OP-RVAL",
+        "line": 58,
+        "before": "        done <= 1'b0;",
+        "after": "        done <= 1'b1;",
+        "detail": "1'b0→1'b1",
+        "ruleIds": [
+          "d.R004"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE1 arst_reset"
+        ]
+      },
+      {
+        "id": "m0006",
+        "key": "59|        x = 1;",
+        "pool": "rule",
+        "op": "OP-RVAL",
+        "line": 59,
+        "before": "        x = 0;",
+        "after": "        x = 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "d.R005"
+        ],
+        "result": "survived",
+        "killScenes": [],
+        "adjudication": "unadjudicated"
+      },
+      {
+        "id": "m0007",
+        "key": "60|        y = 1;",
+        "pool": "rule",
+        "op": "OP-RVAL",
+        "line": 60,
+        "before": "        y = 0;",
+        "after": "        y = 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "d.R006"
+        ],
+        "result": "survived",
+        "killScenes": [],
+        "adjudication": "unadjudicated"
+      },
+      {
+        "id": "m0008",
+        "key": "61|        z = 1;",
+        "pool": "rule",
+        "op": "OP-RVAL",
+        "line": 61,
+        "before": "        z = 0;",
+        "after": "        z = 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "d.R007"
+        ],
+        "result": "survived",
+        "killScenes": [],
+        "adjudication": "unadjudicated"
+      },
+      {
+        "id": "m0009",
+        "key": "62|        i = 1;",
+        "pool": "rule",
+        "op": "OP-RVAL",
+        "line": 62,
+        "before": "        i = 0;",
+        "after": "        i = 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "d.R008"
+        ],
+        "result": "survived",
+        "killScenes": [],
+        "adjudication": "unadjudicated"
+      },
+      {
+        "id": "m0010",
+        "key": "68|                    x = x;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 68,
+        "before": "                    x = 159188;",
+        "after": "                    x = x;",
+        "detail": "rhs→x",
+        "ruleIds": [
+          "d.R009"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0011",
+        "key": "68|                    x = 159189;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 68,
+        "before": "                    x = 159188;",
+        "after": "                    x = 159189;",
+        "detail": "159188→159189",
+        "ruleIds": [
+          "d.R009"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0012",
+        "key": "69|                    y = y;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 69,
+        "before": "                    y = 0;",
+        "after": "                    y = y;",
+        "detail": "rhs→y",
+        "ruleIds": [
+          "d.R010"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0013",
+        "key": "69|                    y = 1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 69,
+        "before": "                    y = 0;",
+        "after": "                    y = 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "d.R010"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0014",
+        "key": "70|                    z = z;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 70,
+        "before": "                    z = z0;",
+        "after": "                    z = z;",
+        "detail": "rhs→z",
+        "ruleIds": [
+          "d.R011"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0015",
+        "key": "71|                    i = i;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 71,
+        "before": "                    i = 0;",
+        "after": "                    i = i;",
+        "detail": "rhs→i",
+        "ruleIds": [
+          "d.R012"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0016",
+        "key": "71|                    i = 1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 71,
+        "before": "                    i = 0;",
+        "after": "                    i = 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "d.R012"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0017",
+        "key": "72|                    done <= done;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 72,
+        "before": "                    done <= 1'b0;",
+        "after": "                    done <= done;",
+        "detail": "rhs→done",
+        "ruleIds": [
+          "d.R013"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0018",
+        "key": "72|                    done <= 1'b1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 72,
+        "before": "                    done <= 1'b0;",
+        "after": "                    done <= 1'b1;",
+        "detail": "1'b0→1'b1",
+        "ruleIds": [
+          "d.R013"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0019",
+        "key": "73|                    state = state;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 73,
+        "before": "                    state = 1'b1;",
+        "after": "                    state = state;",
+        "detail": "rhs→state",
+        "ruleIds": [
+          "d.R014"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0020",
+        "key": "73|                    state = 1'b0;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 73,
+        "before": "                    state = 1'b1;",
+        "after": "                    state = 1'b0;",
+        "detail": "1'b1→1'b0",
+        "ruleIds": [
+          "d.R014"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0021",
+        "key": "77|                dx = dx;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 77,
+        "before": "                dx = $signed(y >>> $signed({1'b0, i}));",
+        "after": "                dx = dx;",
+        "detail": "rhs→dx",
+        "ruleIds": [
+          "d.R015"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0022",
+        "key": "77|                dx = $signed(y >> $signed({1'b0, i}));",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 77,
+        "before": "                dx = $signed(y >>> $signed({1'b0, i}));",
+        "after": "                dx = $signed(y >> $signed({1'b0, i}));",
+        "detail": ">>>→>>",
+        "ruleIds": [
+          "d.R015"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0023",
+        "key": "78|                dy = dy;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 78,
+        "before": "                dy = $signed(x >>> $signed({1'b0, i}));",
+        "after": "                dy = dy;",
+        "detail": "rhs→dy",
+        "ruleIds": [
+          "d.R016"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0024",
+        "key": "78|                dy = $signed(x >> $signed({1'b0, i}));",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 78,
+        "before": "                dy = $signed(x >>> $signed({1'b0, i}));",
+        "after": "                dy = $signed(x >> $signed({1'b0, i}));",
+        "detail": ">>>→>>",
+        "ruleIds": [
+          "d.R016"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0025",
+        "key": "80|                    0: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 80,
+        "before": "                    0: dz = 205887;",
+        "after": "                    0: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R017"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0026",
+        "key": "80|                    0: dz = 205888;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 80,
+        "before": "                    0: dz = 205887;",
+        "after": "                    0: dz = 205888;",
+        "detail": "205887→205888",
+        "ruleIds": [
+          "d.R017"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0027",
+        "key": "81|                    1: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 81,
+        "before": "                    1: dz = 121542;",
+        "after": "                    1: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R018"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0028",
+        "key": "81|                    1: dz = 121543;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 81,
+        "before": "                    1: dz = 121542;",
+        "after": "                    1: dz = 121543;",
+        "detail": "121542→121543",
+        "ruleIds": [
+          "d.R018"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0029",
+        "key": "82|                    2: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 82,
+        "before": "                    2: dz = 64220;",
+        "after": "                    2: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R019"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0030",
+        "key": "82|                    2: dz = 64221;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 82,
+        "before": "                    2: dz = 64220;",
+        "after": "                    2: dz = 64221;",
+        "detail": "64220→64221",
+        "ruleIds": [
+          "d.R019"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0031",
+        "key": "83|                    3: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 83,
+        "before": "                    3: dz = 32599;",
+        "after": "                    3: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R020"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0032",
+        "key": "83|                    3: dz = 32600;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 83,
+        "before": "                    3: dz = 32599;",
+        "after": "                    3: dz = 32600;",
+        "detail": "32599→32600",
+        "ruleIds": [
+          "d.R020"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0033",
+        "key": "84|                    4: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 84,
+        "before": "                    4: dz = 16363;",
+        "after": "                    4: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R021"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0034",
+        "key": "84|                    4: dz = 16364;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 84,
+        "before": "                    4: dz = 16363;",
+        "after": "                    4: dz = 16364;",
+        "detail": "16363→16364",
+        "ruleIds": [
+          "d.R021"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0035",
+        "key": "85|                    5: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 85,
+        "before": "                    5: dz = 8189;",
+        "after": "                    5: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R022"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0036",
+        "key": "85|                    5: dz = 8190;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 85,
+        "before": "                    5: dz = 8189;",
+        "after": "                    5: dz = 8190;",
+        "detail": "8189→8190",
+        "ruleIds": [
+          "d.R022"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0037",
+        "key": "86|                    6: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 86,
+        "before": "                    6: dz = 4096;",
+        "after": "                    6: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R023"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0038",
+        "key": "86|                    6: dz = 4097;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 86,
+        "before": "                    6: dz = 4096;",
+        "after": "                    6: dz = 4097;",
+        "detail": "4096→4097",
+        "ruleIds": [
+          "d.R023"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0039",
+        "key": "87|                    7: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 87,
+        "before": "                    7: dz = 2048;",
+        "after": "                    7: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R024"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0040",
+        "key": "87|                    7: dz = 2049;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 87,
+        "before": "                    7: dz = 2048;",
+        "after": "                    7: dz = 2049;",
+        "detail": "2048→2049",
+        "ruleIds": [
+          "d.R024"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0041",
+        "key": "88|                    8: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 88,
+        "before": "                    8: dz = 1024;",
+        "after": "                    8: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R025"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0042",
+        "key": "88|                    8: dz = 1025;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 88,
+        "before": "                    8: dz = 1024;",
+        "after": "                    8: dz = 1025;",
+        "detail": "1024→1025",
+        "ruleIds": [
+          "d.R025"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0043",
+        "key": "89|                    9: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 89,
+        "before": "                    9: dz = 512;",
+        "after": "                    9: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R026"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0044",
+        "key": "89|                    9: dz = 513;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 89,
+        "before": "                    9: dz = 512;",
+        "after": "                    9: dz = 513;",
+        "detail": "512→513",
+        "ruleIds": [
+          "d.R026"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0045",
+        "key": "90|                    10: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 90,
+        "before": "                    10: dz = 256;",
+        "after": "                    10: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R027"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0046",
+        "key": "90|                    10: dz = 257;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 90,
+        "before": "                    10: dz = 256;",
+        "after": "                    10: dz = 257;",
+        "detail": "256→257",
+        "ruleIds": [
+          "d.R027"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0047",
+        "key": "91|                    11: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 91,
+        "before": "                    11: dz = 128;",
+        "after": "                    11: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R028"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0048",
+        "key": "91|                    11: dz = 129;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 91,
+        "before": "                    11: dz = 128;",
+        "after": "                    11: dz = 129;",
+        "detail": "128→129",
+        "ruleIds": [
+          "d.R028"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0049",
+        "key": "92|                    12: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 92,
+        "before": "                    12: dz = 64;",
+        "after": "                    12: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R029"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0050",
+        "key": "92|                    12: dz = 65;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 92,
+        "before": "                    12: dz = 64;",
+        "after": "                    12: dz = 65;",
+        "detail": "64→65",
+        "ruleIds": [
+          "d.R029"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0051",
+        "key": "93|                    13: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 93,
+        "before": "                    13: dz = 32;",
+        "after": "                    13: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R030"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0052",
+        "key": "93|                    13: dz = 33;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 93,
+        "before": "                    13: dz = 32;",
+        "after": "                    13: dz = 33;",
+        "detail": "32→33",
+        "ruleIds": [
+          "d.R030"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0053",
+        "key": "94|                    14: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 94,
+        "before": "                    14: dz = 16;",
+        "after": "                    14: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R031"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0054",
+        "key": "94|                    14: dz = 17;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 94,
+        "before": "                    14: dz = 16;",
+        "after": "                    14: dz = 17;",
+        "detail": "16→17",
+        "ruleIds": [
+          "d.R031"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0055",
+        "key": "95|                    15: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 95,
+        "before": "                    15: dz = 8;",
+        "after": "                    15: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R032"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0056",
+        "key": "95|                    15: dz = 9;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 95,
+        "before": "                    15: dz = 8;",
+        "after": "                    15: dz = 9;",
+        "detail": "8→9",
+        "ruleIds": [
+          "d.R032"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0057",
+        "key": "96|                    16: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 96,
+        "before": "                    16: dz = 4;",
+        "after": "                    16: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R033"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0058",
+        "key": "96|                    16: dz = 5;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 96,
+        "before": "                    16: dz = 4;",
+        "after": "                    16: dz = 5;",
+        "detail": "4→5",
+        "ruleIds": [
+          "d.R033"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0059",
+        "key": "97|                    17: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 97,
+        "before": "                    17: dz = 2;",
+        "after": "                    17: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R034"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small"
+        ]
+      },
+      {
+        "id": "m0060",
+        "key": "97|                    17: dz = 3;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 97,
+        "before": "                    17: dz = 2;",
+        "after": "                    17: dz = 3;",
+        "detail": "2→3",
+        "ruleIds": [
+          "d.R034"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0061",
+        "key": "98|                    default: dz = dz;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 98,
+        "before": "                    default: dz = 1;",
+        "after": "                    default: dz = dz;",
+        "detail": "rhs→dz",
+        "ruleIds": [
+          "d.R035"
+        ],
+        "result": "survived",
+        "killScenes": [],
+        "adjudication": "unadjudicated"
+      },
+      {
+        "id": "m0062",
+        "key": "98|                    default: dz = 2;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 98,
+        "before": "                    default: dz = 1;",
+        "after": "                    default: dz = 2;",
+        "detail": "1→2",
+        "ruleIds": [
+          "d.R035"
+        ],
+        "result": "survived",
+        "killScenes": [],
+        "adjudication": "unadjudicated"
+      },
+      {
+        "id": "m0063",
+        "key": "101|                    x = x;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 101,
+        "before": "                    x = x - dx;",
+        "after": "                    x = x;",
+        "detail": "rhs→x",
+        "ruleIds": [
+          "d.R036"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0064",
+        "key": "101|                    x = x + dx;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 101,
+        "before": "                    x = x - dx;",
+        "after": "                    x = x + dx;",
+        "detail": "-→+",
+        "ruleIds": [
+          "d.R036"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0065",
+        "key": "102|                    y = y;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 102,
+        "before": "                    y = y + dy;",
+        "after": "                    y = y;",
+        "detail": "rhs→y",
+        "ruleIds": [
+          "d.R037"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0066",
+        "key": "102|                    y = y - dy;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 102,
+        "before": "                    y = y + dy;",
+        "after": "                    y = y - dy;",
+        "detail": "+→-",
+        "ruleIds": [
+          "d.R037"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0067",
+        "key": "103|                    z = z;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 103,
+        "before": "                    z = z - dz;",
+        "after": "                    z = z;",
+        "detail": "rhs→z",
+        "ruleIds": [
+          "d.R038"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0068",
+        "key": "103|                    z = z + dz;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 103,
+        "before": "                    z = z - dz;",
+        "after": "                    z = z + dz;",
+        "detail": "-→+",
+        "ruleIds": [
+          "d.R038"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0069",
+        "key": "106|                    x = x;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 106,
+        "before": "                    x = x + dx;",
+        "after": "                    x = x;",
+        "detail": "rhs→x",
+        "ruleIds": [
+          "d.R039"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0070",
+        "key": "106|                    x = x - dx;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 106,
+        "before": "                    x = x + dx;",
+        "after": "                    x = x - dx;",
+        "detail": "+→-",
+        "ruleIds": [
+          "d.R039"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0071",
+        "key": "107|                    y = y;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 107,
+        "before": "                    y = y - dy;",
+        "after": "                    y = y;",
+        "detail": "rhs→y",
+        "ruleIds": [
+          "d.R040"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0072",
+        "key": "107|                    y = y + dy;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 107,
+        "before": "                    y = y - dy;",
+        "after": "                    y = y + dy;",
+        "detail": "-→+",
+        "ruleIds": [
+          "d.R040"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0073",
+        "key": "108|                    z = z;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 108,
+        "before": "                    z = z + dz;",
+        "after": "                    z = z;",
+        "detail": "rhs→z",
+        "ruleIds": [
+          "d.R041"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0074",
+        "key": "108|                    z = z - dz;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 108,
+        "before": "                    z = z + dz;",
+        "after": "                    z = z - dz;",
+        "detail": "+→-",
+        "ruleIds": [
+          "d.R041"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0075",
+        "key": "111|                    cos_z0 <= cos_z0;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 111,
+        "before": "                    cos_z0 <= x;",
+        "after": "                    cos_z0 <= cos_z0;",
+        "detail": "rhs→cos_z0",
+        "ruleIds": [
+          "d.R042"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0076",
+        "key": "112|                    sin_z0 <= sin_z0;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 112,
+        "before": "                    sin_z0 <= y;",
+        "after": "                    sin_z0 <= sin_z0;",
+        "detail": "rhs→sin_z0",
+        "ruleIds": [
+          "d.R043"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0077",
+        "key": "113|                    state = state;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 113,
+        "before": "                    state = 1'b0;",
+        "after": "                    state = state;",
+        "detail": "rhs→state",
+        "ruleIds": [
+          "d.R044"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0078",
+        "key": "113|                    state = 1'b1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 113,
+        "before": "                    state = 1'b0;",
+        "after": "                    state = 1'b1;",
+        "detail": "1'b0→1'b1",
+        "ruleIds": [
+          "d.R044"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0079",
+        "key": "114|                    done <= done;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 114,
+        "before": "                    done <= 1'b1;",
+        "after": "                    done <= done;",
+        "detail": "rhs→done",
+        "ruleIds": [
+          "d.R045"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0080",
+        "key": "114|                    done <= 1'b0;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 114,
+        "before": "                    done <= 1'b1;",
+        "after": "                    done <= 1'b0;",
+        "detail": "1'b1→1'b0",
+        "ruleIds": [
+          "d.R045"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0081",
+        "key": "117|                    i = i;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 117,
+        "before": "                    i = i + 1;",
+        "after": "                    i = i;",
+        "detail": "rhs→i",
+        "ruleIds": [
+          "d.R046"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0082",
+        "key": "117|                    i = i - 1;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 117,
+        "before": "                    i = i + 1;",
+        "after": "                    i = i - 1;",
+        "detail": "+→-",
+        "ruleIds": [
+          "d.R046"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0083",
+        "key": "54|    if (reset) begin // conformance-nop",
+        "pool": "control",
+        "op": "OP-NOP",
+        "line": 54,
+        "before": "    if (reset) begin",
+        "after": "    if (reset) begin // conformance-nop",
+        "detail": "append nop",
+        "ruleIds": [
+          "d.R001"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0084",
+        "key": "68|                    x = 159188; // conformance-nop",
+        "pool": "control",
+        "op": "OP-NOP",
+        "line": 68,
+        "before": "                    x = 159188;",
+        "after": "                    x = 159188; // conformance-nop",
+        "detail": "append nop",
+        "ruleIds": [
+          "d.R009"
+        ],
+        "result": "survived",
+        "killScenes": []
+      }
+    ]
+  },
+  "rulebookDefects": {
+    "unruledKilled": [],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 76,
+      "hit": 9,
+      "rate": "9/76"
+    }
+  }
+}

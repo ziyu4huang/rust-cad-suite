@@ -39,6 +39,20 @@ export interface GapItemJson {
   suggested_test: string;
 }
 
+export interface TbPlanJson {
+  module: string;
+  params: { name: string; value: string; local: boolean }[];
+  ports: { name: string; dir: 'input' | 'output'; width: number; signed: boolean }[];
+  clocks: { edge: string; signal: string }[];
+  resets: { signal: string; active_low: boolean; async: boolean; rule_ids: string[] }[];
+  sens_edges: [string, string][];
+  data_inputs: string[];
+  outputs: string[];
+  obligations: { rule_id: string; form: string; category: string; observe: 'port' | 'indirect' }[];
+  waivers: { rule_id: string; reason: 'x-valued' }[];
+  scenes: { name: string; kind: string; covers: (string | '*')[] }[];
+}
+
 export interface GapReportJson {
   source: string;
   parse_errors: string[];
@@ -73,4 +87,6 @@ export interface InitOutput {
   rtl_analyze_rtlil(name: string, source: string): string;
   rtl_extract_rules_rtlil(name: string, source: string): string;
   rtl_scan_gaps_rtlil(name: string, source: string): string;
+  rtl_tb_plan_sv(name: string, source: string, module: string, seed: number, cycles: number, flush: number): string;
+  rtl_tb_plan_rtlil(name: string, source: string, module: string, seed: number, cycles: number, flush: number): string;
 }

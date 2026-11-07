@@ -1,0 +1,492 @@
+{
+  "design": "realexpr",
+  "src": "corpus-external/yosys-simple/realexpr.v",
+  "top": "demo_001",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/realexpr.rules.json",
+  "rules": 4,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "3a9fa6eb7bb024ed9e01dc12eb46b75e5be09537e6a5cd6e4ddaa3c778337f1b",
+    "scenes": 2,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 5
+    },
+    "simMs": 7
+  },
+  "expected": {
+    "sha256": "d1d0d77a3922817d5eff186f3d4297947078bf44308a0ba6f1e85385389718ac",
+    "lines": 2051
+  },
+  "numbers": {
+    "generated": 8,
+    "stillborn": 0,
+    "equivalent": 2,
+    "eligible": 6,
+    "killed": 6,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "6/6",
+    "ruleVerified": {
+      "exclusive": "4/4",
+      "shared": "0/4"
+    },
+    "catalogCoverage": "4/4",
+    "unruled": {
+      "generated": 12,
+      "killed": 0
+    },
+    "controlsSurvived": "3/3",
+    "ambiguous": 0,
+    "na": 4
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 32,
+      "out": 32
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 32
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 2,
+      "equivalent": 2,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 6,
+      "mainKilled": 6,
+      "unproven": 6,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "relation": {
+      "total": 4,
+      "unique": 4
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "demo_001.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 9
+    },
+    {
+      "ruleId": "demo_001.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 10
+    },
+    {
+      "ruleId": "demo_001.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 11
+    },
+    {
+      "ruleId": "demo_001.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 12
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "9|\tassign y1 = p1 - 0.2;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 9,
+      "before": "\tassign y1 = p1 + 0.2;",
+      "after": "\tassign y1 = p1 - 0.2;",
+      "detail": "+→-",
+      "ruleIds": [
+        "demo_001.R001"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 32
+    },
+    {
+      "id": "m0002",
+      "key": "9|\tassign y1 = p1 + 1.2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 9,
+      "before": "\tassign y1 = p1 + 0.2;",
+      "after": "\tassign y1 = p1 + 1.2;",
+      "detail": "0→1",
+      "ruleIds": [
+        "demo_001.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "10|\tassign y2 = p2 - 0.2;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 10,
+      "before": "\tassign y2 = p2 + 0.2;",
+      "after": "\tassign y2 = p2 - 0.2;",
+      "detail": "+→-",
+      "ruleIds": [
+        "demo_001.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "10|\tassign y2 = p2 + 1.2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 10,
+      "before": "\tassign y2 = p2 + 0.2;",
+      "after": "\tassign y2 = p2 + 1.2;",
+      "detail": "0→1",
+      "ruleIds": [
+        "demo_001.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "11|\tassign y3 = p3 - 0.2;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 11,
+      "before": "\tassign y3 = p3 + 0.2;",
+      "after": "\tassign y3 = p3 - 0.2;",
+      "detail": "+→-",
+      "ruleIds": [
+        "demo_001.R003"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 32
+    },
+    {
+      "id": "m0006",
+      "key": "11|\tassign y3 = p3 + 1.2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 11,
+      "before": "\tassign y3 = p3 + 0.2;",
+      "after": "\tassign y3 = p3 + 1.2;",
+      "detail": "0→1",
+      "ruleIds": [
+        "demo_001.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "12|\tassign y4 = p4 - 0.2;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 12,
+      "before": "\tassign y4 = p4 + 0.2;",
+      "after": "\tassign y4 = p4 - 0.2;",
+      "detail": "+→-",
+      "ruleIds": [
+        "demo_001.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "12|\tassign y4 = p4 + 1.2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 12,
+      "before": "\tassign y4 = p4 + 0.2;",
+      "after": "\tassign y4 = p4 + 1.2;",
+      "detail": "0→1",
+      "ruleIds": [
+        "demo_001.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 rand",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0009",
+      "key": "9|\tassign y1 = p1 + 0.2; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 9,
+      "before": "\tassign y1 = p1 + 0.2;",
+      "after": "\tassign y1 = p1 + 0.2; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "demo_001.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0010",
+      "key": "18|\tassign y0 = y0;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 18,
+      "before": "\tassign y0 = 1'bx >= (-1 * -1.17);",
+      "after": "\tassign y0 = y0;",
+      "detail": "rhs→y0",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0011",
+      "key": "18|\tassign y0 = 1'bx > (-1 * -1.17);",
+      "pool": "unruled",
+      "op": "OP-CMP",
+      "line": 18,
+      "before": "\tassign y0 = 1'bx >= (-1 * -1.17);",
+      "after": "\tassign y0 = 1'bx > (-1 * -1.17);",
+      "detail": ">=→>",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0012",
+      "key": "19|\tassign y1 = y1;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 19,
+      "before": "\tassign y1 = 1 ?  1 ?  -1 : 'd0 : 0.0;",
+      "after": "\tassign y1 = y1;",
+      "detail": "rhs→y1",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0013",
+      "key": "19|\tassign y1 = 1 ?  1 ?  +1 : 'd0 : 0.0;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 19,
+      "before": "\tassign y1 = 1 ?  1 ?  -1 : 'd0 : 0.0;",
+      "after": "\tassign y1 = 1 ?  1 ?  +1 : 'd0 : 0.0;",
+      "detail": "-→+",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0014",
+      "key": "20|\tassign y2 = y2;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 20,
+      "before": "\tassign y2 = 1 ? -1 :   1 ? 'd0 : 0.0;",
+      "after": "\tassign y2 = y2;",
+      "detail": "rhs→y2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0015",
+      "key": "20|\tassign y2 = 1 ? +1 :   1 ? 'd0 : 0.0;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 20,
+      "before": "\tassign y2 = 1 ? -1 :   1 ? 'd0 : 0.0;",
+      "after": "\tassign y2 = 1 ? +1 :   1 ? 'd0 : 0.0;",
+      "detail": "-→+",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0016",
+      "key": "21|\tassign y3 = y3;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 21,
+      "before": "\tassign y3 = 1 ? -1 : 'd0;",
+      "after": "\tassign y3 = y3;",
+      "detail": "rhs→y3",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0017",
+      "key": "21|\tassign y3 = 1 ? +1 : 'd0;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 21,
+      "before": "\tassign y3 = 1 ? -1 : 'd0;",
+      "after": "\tassign y3 = 1 ? +1 : 'd0;",
+      "detail": "-→+",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0018",
+      "key": "26|\tassign A = A;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 26,
+      "before": "\tassign A = (p==1.0);",
+      "after": "\tassign A = A;",
+      "detail": "rhs→A",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0019",
+      "key": "26|\tassign A = (p!=1.0);",
+      "pool": "unruled",
+      "op": "OP-CMP",
+      "line": 26,
+      "before": "\tassign A = (p==1.0);",
+      "after": "\tassign A = (p!=1.0);",
+      "detail": "==→!=",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0020",
+      "key": "27|\tassign B = B;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 27,
+      "before": "\tassign B = (p!=\"1.000000\");",
+      "after": "\tassign B = B;",
+      "detail": "rhs→B",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0021",
+      "key": "27|\tassign B = (p!=\"2.000000\");",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 27,
+      "before": "\tassign B = (p!=\"1.000000\");",
+      "after": "\tassign B = (p!=\"2.000000\");",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 6,
+      "hit": 6,
+      "rate": "6/6"
+    }
+  }
+}

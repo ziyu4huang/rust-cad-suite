@@ -1,7 +1,7 @@
 // golden-check.mjs — golden 錄製/比對執行器(§16.1.3 段 3+4+5;§16.1.4 re-record 機制)。
 //
 // 兩模式:
-//   默認(比對): 37 檔釘選集跑提取(dist 同一 wasm,D8 閘驗出貨物)→寫
+//   默認(比對): 釘選集(檔數=EXPECTED_PINNED 精確數斷言)跑提取(dist 同一 wasm,D8 閘驗出貨物)→寫
 //     build/golden-current/<鏡像>.(rules|gaps).json→與 golden/<鏡像>…
 //     逐一 byte-diff(任何 diff→列檔名+首個差異鍵路徑→exit 1);全等後
 //     對 golden/ 每份正式樹檔算 sha256 與 PROVENANCE.md 表核對(快照被
@@ -9,7 +9,7 @@
 //   --record(錄製): 前置自檢(§16.1.4 實現形=進程內重複調用:每檔每模式
 //     3 跑 hash 必全等;任何檔不過→**全輪拒錄** exit 3,不寫任何盤——
 //     兩階段防部分錄製)→全過後統一寫 golden/<鏡像>…+重寫
-//     golden/PROVENANCE.md 元資料區(命令/日期/bun/wasm sha256/74 份 sha256 表);
+//     golden/PROVENANCE.md 元資料區(命令/日期/bun/wasm sha256/檔數×2 份 sha256 表);
 //     歷史區(## re-record 歷史 行→檔尾)解析-保留-追加(§5.2 S0;審讀 #7 M7):
 //     既有手記行原樣保留,新增錄製行 append 進歷史區(錄製行=機械時間戳+sha
 //     前 8 位;語義輪對帳手記由輪內補寫於其後,下次錄製保留)。
@@ -62,6 +62,12 @@ const files = readFileSync(listPath, 'utf8')
   .split('\n')
   .map((l) => l.trim())
   .filter((l) => l && !l.startsWith('#'));
+// 精確數基線(AGENTS 10.8 同輪上調;收尾弧 S3 擴檔 37→49=golden 98/98):只對正式清單斷言,--list 自訂清單不斷言。
+const EXPECTED_PINNED = 49;
+if (listRel === 'plugin/rtl2spec/pinned-files.list' && files.length !== EXPECTED_PINNED) {
+  console.error(`FAIL: 釘選清單 ${files.length} 檔≠EXPECTED_PINNED ${EXPECTED_PINNED}(釘選集變更=語義事件,同輪上調本常數+§16.1.1/§20 表)`);
+  process.exit(2);
+}
 const missing = files.filter((f) => !existsSync(join(repoRoot, f)));
 if (missing.length > 0) {
   console.error(`FAIL: 釘選集缺 ${missing.length} 檔:\n  ${missing.join('\n  ')}`);
@@ -199,7 +205,7 @@ if (record) {
   const prov = [
     '# golden PROVENANCE(機械生成禁手改;--record 機械重寫元資料區+歷史區保留追加錄製行;語義輪手記入歷史區)',
     '',
-    '## 正式釘選集 37 檔×2 模式(§16.1.2)',
+    `## 正式釘選集 ${files.length} 檔×2 模式(§16.1.2;37 檔=§16.1.1 表,其餘=收尾弧 S3 擴檔,見 RTL2SPEC-FINISH-PLAN §11)`,
     '',
     `- 錄製命令: bash plugin/rtl2spec/run-golden-regression.sh --record`,
     `- 錄製時間: ${nowIso}`,

@@ -1,0 +1,457 @@
+{
+  "design": "forloops",
+  "src": "corpus-external/yosys-simple/forloops.v",
+  "top": "forloops01",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/forloops.rules.json",
+  "rules": 4,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "a39366130f5536a980685089c884a457fe7b771370612fc2c4765be60812c2a6",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 7
+    },
+    "simMs": 6
+  },
+  "expected": {
+    "sha256": "e461ea0396b9d57570636e7898670ea67eb6a66de3a6c26e94539d1ef5702194",
+    "lines": 397
+  },
+  "numbers": {
+    "generated": 5,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 5,
+    "killed": 5,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "5/5",
+    "ruleVerified": {
+      "exclusive": "3/3",
+      "shared": "0/3"
+    },
+    "catalogCoverage": "3/4",
+    "unruled": {
+      "generated": 6,
+      "killed": 0
+    },
+    "controlsSurvived": "2/2",
+    "ambiguous": 6,
+    "na": 7
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 19,
+      "out": 16
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 48
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 0,
+      "equivalent": 0,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 5,
+      "mainKilled": 5,
+      "unproven": 5,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "sequence": {
+      "total": 2,
+      "unique": 1
+    },
+    "relation": {
+      "total": 2,
+      "unique": 2
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "forloops01.R001",
+      "op": "OP-HOLD",
+      "status": "ambiguous",
+      "reason": "區間 5-5 無左值==p['sd2 * k +:: 'sd2]",
+      "line": null
+    },
+    {
+      "ruleId": "forloops01.R001",
+      "op": "OP-ARITH",
+      "status": "ambiguous",
+      "reason": "區間 5-5 無左值==p['sd2 * k +:: 'sd2]",
+      "line": null
+    },
+    {
+      "ruleId": "forloops01.R001",
+      "op": "OP-CMP",
+      "status": "ambiguous",
+      "reason": "區間 5-5 無左值==p['sd2 * k +:: 'sd2]",
+      "line": null
+    },
+    {
+      "ruleId": "forloops01.R001",
+      "op": "OP-CONST",
+      "status": "ambiguous",
+      "reason": "區間 5-5 無左值==p['sd2 * k +:: 'sd2]",
+      "line": null
+    },
+    {
+      "ruleId": "forloops01.R001",
+      "op": "OP-SIGN",
+      "status": "ambiguous",
+      "reason": "區間 5-5 無左值==p['sd2 * k +:: 'sd2]",
+      "line": null
+    },
+    {
+      "ruleId": "forloops01.R001",
+      "op": "OP-SLICE",
+      "status": "ambiguous",
+      "reason": "區間 5-5 無左值==p['sd2 * k +:: 'sd2]",
+      "line": null
+    },
+    {
+      "ruleId": "forloops01.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 10
+    },
+    {
+      "ruleId": "forloops01.R003",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 10
+    },
+    {
+      "ruleId": "forloops01.R003",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 10
+    },
+    {
+      "ruleId": "forloops01.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 11
+    },
+    {
+      "ruleId": "forloops01.R004",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 11
+    },
+    {
+      "ruleId": "forloops01.R004",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 11
+    },
+    {
+      "ruleId": "forloops01.R004",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 11
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "6|\t\tx <= x;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 6,
+      "before": "\t\tx <= k + {a, b};",
+      "after": "\t\tx <= x;",
+      "detail": "rhs→x",
+      "ruleIds": [
+        "forloops01.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "6|\t\tx <= k - {a, b};",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 6,
+      "before": "\t\tx <= k + {a, b};",
+      "after": "\t\tx <= k - {a, b};",
+      "detail": "+→-",
+      "ruleIds": [
+        "forloops01.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "10|\t\t\tq[k] = {~a, ~b, a, b} << k[1:0];",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 10,
+      "before": "\t\t\tq[k] = {~a, ~b, a, b} >> k[1:0];",
+      "after": "\t\t\tq[k] = {~a, ~b, a, b} << k[1:0];",
+      "detail": ">>→<<",
+      "ruleIds": [
+        "forloops01.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "10|\t\t\tq[k] = {~a, ~b, a, b} >> k[2:1];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 10,
+      "before": "\t\t\tq[k] = {~a, ~b, a, b} >> k[1:0];",
+      "after": "\t\t\tq[k] = {~a, ~b, a, b} >> k[2:1];",
+      "detail": "[1:0]→[2:1]",
+      "ruleIds": [
+        "forloops01.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "11|\t\ty = k + {a, b};",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 11,
+      "before": "\t\ty = k - {a, b};",
+      "after": "\t\ty = k + {a, b};",
+      "detail": "-→+",
+      "ruleIds": [
+        "forloops01.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "5|\t\t\tp[2*k +: 2] = {a, b} ^ {2{k}}; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 5,
+      "before": "\t\t\tp[2*k +: 2] = {a, b} ^ {2{k}};",
+      "after": "\t\t\tp[2*k +: 2] = {a, b} ^ {2{k}}; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "forloops01.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0007",
+      "key": "10|\t\t\tq[k] = {~a, ~b, a, b} >> k[1:0]; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 10,
+      "before": "\t\t\tq[k] = {~a, ~b, a, b} >> k[1:0];",
+      "after": "\t\t\tq[k] = {~a, ~b, a, b} >> k[1:0]; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "forloops01.R003"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0008",
+      "key": "19|\t\t\tq[k] = q[k];",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 19,
+      "before": "\t\t\tq[k] = {~a, ~b, a, b} >> k[1:0];",
+      "after": "\t\t\tq[k] = q[k];",
+      "detail": "rhs→q[k]",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0009",
+      "key": "19|\t\t\tq[k] = {~a, ~b, a, b} << k[1:0];",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 19,
+      "before": "\t\t\tq[k] = {~a, ~b, a, b} >> k[1:0];",
+      "after": "\t\t\tq[k] = {~a, ~b, a, b} << k[1:0];",
+      "detail": ">>→<<",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0010",
+      "key": "22|\t\tx = x;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 22,
+      "before": "\t\tx = k + {a, b};",
+      "after": "\t\tx = x;",
+      "detail": "rhs→x",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0011",
+      "key": "22|\t\tx = k - {a, b};",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 22,
+      "before": "\t\tx = k + {a, b};",
+      "after": "\t\tx = k - {a, b};",
+      "detail": "+→-",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0012",
+      "key": "24|\tassign y = y;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 24,
+      "before": "\tassign y = k - {a, b};",
+      "after": "\tassign y = y;",
+      "detail": "rhs→y",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0013",
+      "key": "24|\tassign y = k + {a, b};",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 24,
+      "before": "\tassign y = k - {a, b};",
+      "after": "\tassign y = k + {a, b};",
+      "detail": "-→+",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [],
+    "defLint": {
+      "items": [
+        {
+          "signal": "k",
+          "class": "U5",
+          "policy": false,
+          "line": 0,
+          "snippet": ""
+        }
+      ],
+      "summary": {
+        "uncovered": 1,
+        "byClass": {
+          "U5": 1
+        },
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 5,
+      "hit": 5,
+      "rate": "5/5"
+    }
+  }
+}

@@ -7,10 +7,13 @@
 //     (A/B 禁混報)+消融點按切片分段(S1/S2/S3+抄寫通道)。
 // 盲寫腿=輔助證據,永不進確定性閘;機械面=編譯成敗+TB 塊 diff(REIMPL-PROTOCOL.md §2)。
 // 用法: bun scripts/reimpl-eval.mjs [--trim <counter8|acc_pipe|i2c_master>]
+// C-S3(§19.5 D-C8):場景切塊與子進程執行遷用 lib/tbproto.mjs(帶看門狗,補 AGENTS §4 洞);
+// verdict.json 結構/matched 計算/exit 語義凍結不動,parity=遷用前後 legs/segments 深等+runs/out_* byte
+// 相等(§19.20 實錄);scenesParsed 只落 sidecar build/reimpl-eval/scene-protocol.json+console 一行(R1-7)。
 import { readFileSync, writeFileSync, mkdirSync, existsSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execFileSync } from 'node:child_process';
+import { run as runWatched, sceneBlocks, parseProtocol } from './lib/tbproto.mjs';
 
 const pluginRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const repoRoot = dirname(dirname(pluginRoot));
@@ -72,30 +75,25 @@ const clock = (label, fn) => {
   const r = fn();
   return { label, ms: Date.now() - t0, ...r };
 };
-const sh = (cmd, args, cwd) => execFileSync(cmd, args, { cwd, encoding: 'utf8' });
+// C-S3 遷用 tbproto(§19.5 D-C8):帶看門狗執行(AGENTS §4;原 execFileSync 無 timeout 洞)。
+// 回傳形與遷用前逐欄同義(成功時不帶 err=原 execFileSync 成功路徑不收 stderr——verdict.json
+// 的 warn 欄因而不變;parity 斷言見 RTL2SPEC-PLUGIN §19.20)。
+const SIM_TIMEOUT_MS = 30000;
 const trySh = (cmd, args, cwd) => {
-  try {
-    return { code: 0, out: sh(cmd, args, cwd) };
-  } catch (e) {
-    return { code: e.status ?? 1, out: e.stdout ?? '', err: e.stderr ?? String(e.message).slice(0, 200) };
-  }
+  const r = runWatched(cmd, args, { cwd, timeoutMs: SIM_TIMEOUT_MS });
+  if (r.code === 0 && !r.timedOut) return { code: 0, out: r.stdout };
+  return {
+    code: r.timedOut ? 124 : r.code,
+    out: r.stdout ?? '',
+    // 原 execFileSync 失敗路徑:err=子進程 stderr 全文(僅 spawn 失敗時才取 message 前 200 字)。
+    err: r.timedOut ? `TIMEOUT ${SIM_TIMEOUT_MS}ms` : r.spawnError ? String(r.spawnError).slice(0, 200) : r.stderr,
+  };
 };
 
 // 逐場景切塊:TB 輸出協議=`SCENE<n> <name>` 前缀行+塊內行;塊 diff=任一行差異即失配。
-const scenes = (txt) => {
-  const blocks = new Map();
-  let cur = null;
-  for (const l of txt.split('\n')) {
-    const m = l.match(/^SCENE(\d+)\b/);
-    if (m) {
-      cur = `SCENE${m[1]}`;
-      blocks.set(cur, []);
-    } else if (cur && l.trim() !== '') {
-      blocks.get(cur).push(l.trimEnd());
-    }
-  }
-  return blocks;
-};
+// C-S3 起=tbproto.sceneBlocks(語義逐字移植;matched 計算不變)。
+const scenes = sceneBlocks;
+const sceneProtocol = {}; // sidecar(不入 verdict.json,R1-7):逐腿 scenesParsed 資訊欄
 
 const LEGS = [
   { leg: 'counter8-A1', design: 'counter8', group: 'A', n: 1, tb: 'e1/tb_counter8.v', origDut: ['corpus/counter8/counter.v'], reimplDut: ['e1-reimpl/counter8-a1/top.v'], scenes: 6, point: 'control' },
@@ -131,6 +129,7 @@ for (const design of ['counter8', 'acc_pipe', 'i2c_master']) {
   if (c.code !== 0) { origFail.push(`${design}: iverilog ${c.code} ${c.err?.slice(0, 120)}`); continue; }
   const r = trySh(join(runDir, `sim_${design}_orig`), [], runDir);
   origOut[design] = r.out;
+  sceneProtocol[`${design}-orig`] = { scenesParsed: parseProtocol(r.out).scenes.length };
   writeFileSync(join(runDir, `out_${design}_orig.txt`), r.out);
 }
 if (origFail.length > 0) {
@@ -158,6 +157,7 @@ for (const leg of LEGS) {
   if (compiled) {
     const run = trySh(join(runDir, `sim_${leg.leg}`), [], runDir);
     writeFileSync(join(runDir, `out_${leg.leg}.txt`), run.out);
+    sceneProtocol[leg.leg] = { scenesParsed: parseProtocol(run.out).scenes.length, scenesTotal: leg.scenes, timedOut: run.code === 124 || undefined };
     const a = scenes(origOut[leg.design]);
     const b = scenes(run.out);
     const mismatched = [];
@@ -200,6 +200,9 @@ verdict.segments = segments;
 
 const vPath = join(outDir, 'verdict.json');
 writeFileSync(vPath, JSON.stringify(verdict, null, 2));
+// sidecar(R1-7:verdict.json 結構凍結,scenesParsed 只落此檔+console 一行;不改 exit、不改 matched)。
+writeFileSync(join(outDir, 'scene-protocol.json'), JSON.stringify(sceneProtocol, null, 2) + '\n');
+console.log(`INFO scene-protocol: ${Object.entries(sceneProtocol).map(([k, v]) => `${k}=${v.scenesParsed}`).join(' ')}`);
 console.log(`== verdict: ${vPath} ==`);
 console.log(JSON.stringify(segments, null, 2));
 const missingLegs = verdict.legs.filter((l) => !l.present).length;

@@ -58,8 +58,8 @@ check(
   '裝載根變數必用(server/wasm 以插件根定位)',
 );
 
-// skills 三目錄在場且 frontmatter 含 name+description。
-const skillDirs = ['rtl-analyze', 'rtl-rulebook', 'rtl-gap-hunt'];
+// skills 四目錄在場且 frontmatter 含 name+description(C-S2 新增 rtl-conformance)。
+const skillDirs = ['rtl-analyze', 'rtl-rulebook', 'rtl-gap-hunt', 'rtl-conformance'];
 for (const d of skillDirs) {
   const p = join(root, m.skills ?? 'skills', d, 'SKILL.md');
   const inPlace = existsSync(p) && statSync(p).isFile();

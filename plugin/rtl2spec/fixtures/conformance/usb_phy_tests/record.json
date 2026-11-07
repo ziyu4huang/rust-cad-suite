@@ -1,0 +1,748 @@
+{
+  "design": "usb_phy_tests",
+  "src": "corpus-external/yosys-simple/usb_phy_tests.v",
+  "top": "usb_phy_test01",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/usb_phy_tests.rules.json",
+  "rules": 10,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "a5ef0ff2fcc6db9c9178688eeedf23a4938aeffef52f5150952d3ab40c006a39",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 6
+  },
+  "expected": {
+    "sha256": "5b219124d67a0cbe79b68dfe5e05c2f509184a09e78a50129b0967b4e4a8817f",
+    "lines": 103
+  },
+  "numbers": {
+    "generated": 20,
+    "stillborn": 0,
+    "equivalent": 9,
+    "eligible": 11,
+    "killed": 10,
+    "survived": 1,
+    "timeout": 0,
+    "rate": "10/11",
+    "ruleVerified": {
+      "exclusive": "9/10",
+      "shared": "0/10"
+    },
+    "catalogCoverage": "10/10",
+    "unruled": {
+      "generated": 2,
+      "killed": 2
+    },
+    "controlsSurvived": "11/11",
+    "ambiguous": 0,
+    "na": 20
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 4,
+      "out": 1
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 10,
+      "equivalent": 9,
+      "unproven": 1,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 10,
+      "mainKilled": 10,
+      "unproven": 10,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "sequence": {
+      "total": 1,
+      "unique": 1
+    },
+    "relation": {
+      "total": 9,
+      "unique": 9
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "usb_phy_test01.R001",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 12
+    },
+    {
+      "ruleId": "usb_phy_test01.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 12
+    },
+    {
+      "ruleId": "usb_phy_test01.R002",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 19
+    },
+    {
+      "ruleId": "usb_phy_test01.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 19
+    },
+    {
+      "ruleId": "usb_phy_test01.R003",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 20
+    },
+    {
+      "ruleId": "usb_phy_test01.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 20
+    },
+    {
+      "ruleId": "usb_phy_test01.R004",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "usb_phy_test01.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "usb_phy_test01.R005",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 23
+    },
+    {
+      "ruleId": "usb_phy_test01.R005",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 23
+    },
+    {
+      "ruleId": "usb_phy_test01.R006",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 24
+    },
+    {
+      "ruleId": "usb_phy_test01.R006",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 24
+    },
+    {
+      "ruleId": "usb_phy_test01.R007",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 27
+    },
+    {
+      "ruleId": "usb_phy_test01.R007",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 27
+    },
+    {
+      "ruleId": "usb_phy_test01.R008",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 28
+    },
+    {
+      "ruleId": "usb_phy_test01.R008",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 28
+    },
+    {
+      "ruleId": "usb_phy_test01.R009",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 30
+    },
+    {
+      "ruleId": "usb_phy_test01.R009",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 30
+    },
+    {
+      "ruleId": "usb_phy_test01.R010",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 31
+    },
+    {
+      "ruleId": "usb_phy_test01.R010",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 31
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "12|\tdpll_state <= dpll_state;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 12,
+      "before": "\tdpll_state <= rst ? 0 : dpll_next_state;",
+      "after": "\tdpll_state <= dpll_state;",
+      "detail": "rhs→dpll_state",
+      "ruleIds": [
+        "usb_phy_test01.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "12|\tdpll_state <= rst ? 1 : dpll_next_state;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 12,
+      "before": "\tdpll_state <= rst ? 0 : dpll_next_state;",
+      "after": "\tdpll_state <= rst ? 1 : dpll_next_state;",
+      "detail": "0→1",
+      "ruleIds": [
+        "usb_phy_test01.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "19|\t\tif(rx_en)\tdpll_next_state = 2'h1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 19,
+      "before": "\t\tif(rx_en)\tdpll_next_state = 2'h0;",
+      "after": "\t\tif(rx_en)\tdpll_next_state = 2'h1;",
+      "detail": "2'h0→2'h1",
+      "ruleIds": [
+        "usb_phy_test01.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "19|\t\tif(rx_en)\tdpll_next_state = 2'sh0;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 19,
+      "before": "\t\tif(rx_en)\tdpll_next_state = 2'h0;",
+      "after": "\t\tif(rx_en)\tdpll_next_state = 2'sh0;",
+      "detail": "2'h0→2'sh0",
+      "ruleIds": [
+        "usb_phy_test01.R002"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    {
+      "id": "m0005",
+      "key": "20|\t\telse\t\tdpll_next_state = 2'h2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 20,
+      "before": "\t\telse\t\tdpll_next_state = 2'h1;",
+      "after": "\t\telse\t\tdpll_next_state = 2'h2;",
+      "detail": "2'h1→2'h2",
+      "ruleIds": [
+        "usb_phy_test01.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "20|\t\telse\t\tdpll_next_state = 2'sh1;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 20,
+      "before": "\t\telse\t\tdpll_next_state = 2'h1;",
+      "after": "\t\telse\t\tdpll_next_state = 2'sh1;",
+      "detail": "2'h1→2'sh1",
+      "ruleIds": [
+        "usb_phy_test01.R003"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    {
+      "id": "m0007",
+      "key": "22|\t\tfs_ce = 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 22,
+      "before": "\t\tfs_ce = 1'b1;",
+      "after": "\t\tfs_ce = 1'b0;",
+      "detail": "1'b1→1'b0",
+      "ruleIds": [
+        "usb_phy_test01.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "22|\t\tfs_ce = 1'sb1;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 22,
+      "before": "\t\tfs_ce = 1'b1;",
+      "after": "\t\tfs_ce = 1'sb1;",
+      "detail": "1'b1→1'sb1",
+      "ruleIds": [
+        "usb_phy_test01.R004"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    {
+      "id": "m0009",
+      "key": "23|\t\tif(rx_en)\tdpll_next_state = 2'h0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 23,
+      "before": "\t\tif(rx_en)\tdpll_next_state = 2'h3;",
+      "after": "\t\tif(rx_en)\tdpll_next_state = 2'h0;",
+      "detail": "2'h3→2'h0",
+      "ruleIds": [
+        "usb_phy_test01.R005"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 5,
+      "eqUnproven": 2,
+      "unprovenCells": [
+        "dpll_next_state[0]",
+        "dpll_next_state[1]"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "23|\t\tif(rx_en)\tdpll_next_state = 2'sh3;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 23,
+      "before": "\t\tif(rx_en)\tdpll_next_state = 2'h3;",
+      "after": "\t\tif(rx_en)\tdpll_next_state = 2'sh3;",
+      "detail": "2'h3→2'sh3",
+      "ruleIds": [
+        "usb_phy_test01.R005"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    {
+      "id": "m0011",
+      "key": "24|\t\telse\t\tdpll_next_state = 2'h3;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 24,
+      "before": "\t\telse\t\tdpll_next_state = 2'h2;",
+      "after": "\t\telse\t\tdpll_next_state = 2'h3;",
+      "detail": "2'h2→2'h3",
+      "ruleIds": [
+        "usb_phy_test01.R006"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "24|\t\telse\t\tdpll_next_state = 2'sh2;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 24,
+      "before": "\t\telse\t\tdpll_next_state = 2'h2;",
+      "after": "\t\telse\t\tdpll_next_state = 2'sh2;",
+      "detail": "2'h2→2'sh2",
+      "ruleIds": [
+        "usb_phy_test01.R006"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    {
+      "id": "m0013",
+      "key": "27|\t\tif(rx_en)\tdpll_next_state = 2'h1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 27,
+      "before": "\t\tif(rx_en)\tdpll_next_state = 2'h0;",
+      "after": "\t\tif(rx_en)\tdpll_next_state = 2'h1;",
+      "detail": "2'h0→2'h1",
+      "ruleIds": [
+        "usb_phy_test01.R007"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0014",
+      "key": "27|\t\tif(rx_en)\tdpll_next_state = 2'sh0;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 27,
+      "before": "\t\tif(rx_en)\tdpll_next_state = 2'h0;",
+      "after": "\t\tif(rx_en)\tdpll_next_state = 2'sh0;",
+      "detail": "2'h0→2'sh0",
+      "ruleIds": [
+        "usb_phy_test01.R007"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    {
+      "id": "m0015",
+      "key": "28|\t\telse\t\tdpll_next_state = 2'h0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 28,
+      "before": "\t\telse\t\tdpll_next_state = 2'h3;",
+      "after": "\t\telse\t\tdpll_next_state = 2'h0;",
+      "detail": "2'h3→2'h0",
+      "ruleIds": [
+        "usb_phy_test01.R008"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0016",
+      "key": "28|\t\telse\t\tdpll_next_state = 2'sh3;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 28,
+      "before": "\t\telse\t\tdpll_next_state = 2'h3;",
+      "after": "\t\telse\t\tdpll_next_state = 2'sh3;",
+      "detail": "2'h3→2'sh3",
+      "ruleIds": [
+        "usb_phy_test01.R008"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    {
+      "id": "m0017",
+      "key": "30|\t\tif(rx_en)\tdpll_next_state = 2'h1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 30,
+      "before": "\t\tif(rx_en)\tdpll_next_state = 2'h0;",
+      "after": "\t\tif(rx_en)\tdpll_next_state = 2'h1;",
+      "detail": "2'h0→2'h1",
+      "ruleIds": [
+        "usb_phy_test01.R009"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0018",
+      "key": "30|\t\tif(rx_en)\tdpll_next_state = 2'sh0;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 30,
+      "before": "\t\tif(rx_en)\tdpll_next_state = 2'h0;",
+      "after": "\t\tif(rx_en)\tdpll_next_state = 2'sh0;",
+      "detail": "2'h0→2'sh0",
+      "ruleIds": [
+        "usb_phy_test01.R009"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    {
+      "id": "m0019",
+      "key": "31|\t\telse\t\tdpll_next_state = 2'h1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 31,
+      "before": "\t\telse\t\tdpll_next_state = 2'h0;",
+      "after": "\t\telse\t\tdpll_next_state = 2'h1;",
+      "detail": "2'h0→2'h1",
+      "ruleIds": [
+        "usb_phy_test01.R010"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0020",
+      "key": "31|\t\telse\t\tdpll_next_state = 2'sh0;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 31,
+      "before": "\t\telse\t\tdpll_next_state = 2'h0;",
+      "after": "\t\telse\t\tdpll_next_state = 2'sh0;",
+      "detail": "2'h0→2'sh0",
+      "ruleIds": [
+        "usb_phy_test01.R010"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 5
+    },
+    {
+      "id": "m0021",
+      "key": "12|\tdpll_state <= rst ? 0 : dpll_next_state; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 12,
+      "before": "\tdpll_state <= rst ? 0 : dpll_next_state;",
+      "after": "\tdpll_state <= rst ? 0 : dpll_next_state; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "usb_phy_test01.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0022",
+      "key": "19|\t\tif(rx_en)\tdpll_next_state = 2'h0; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 19,
+      "before": "\t\tif(rx_en)\tdpll_next_state = 2'h0;",
+      "after": "\t\tif(rx_en)\tdpll_next_state = 2'h0; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "usb_phy_test01.R002"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0023",
+      "key": "16|\tfs_ce = fs_ce;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 16,
+      "before": "\tfs_ce = 1'b0;",
+      "after": "\tfs_ce = fs_ce;",
+      "detail": "rhs→fs_ce",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0024",
+      "key": "16|\tfs_ce = 1'b1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 16,
+      "before": "\tfs_ce = 1'b0;",
+      "after": "\tfs_ce = 1'b1;",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 16,
+        "op": "OP-HOLD",
+        "before": "fs_ce = 1'b0;",
+        "after": "fs_ce = fs_ce;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 16,
+        "op": "OP-CONST",
+        "before": "fs_ce = 1'b0;",
+        "after": "fs_ce = 1'b1;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 10,
+      "hit": 2,
+      "rate": "2/10"
+    }
+  }
+}

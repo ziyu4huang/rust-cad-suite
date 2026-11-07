@@ -149,6 +149,67 @@ export function rtl_spec_version() {
         wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
     }
 }
+
+/**
+ * tb_plan rtlil 面(RV2-8:恆 TB1 錯誤幀;硬錯文案由核心產生,本面零語義)。
+ * @param {string} name
+ * @param {string} source
+ * @param {string} module
+ * @param {number} seed
+ * @param {number} cycles
+ * @param {number} flush
+ * @returns {string}
+ */
+export function rtl_tb_plan_rtlil(name, source, module, seed, cycles, flush) {
+    let deferred4_0;
+    let deferred4_1;
+    try {
+        const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(source, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(module, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ret = wasm.rtl_tb_plan_rtlil(ptr0, len0, ptr1, len1, ptr2, len2, seed, cycles, flush);
+        deferred4_0 = ret[0];
+        deferred4_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+    }
+}
+
+/**
+ * tb_plan sv 面(RV1-11/RV2-8):`module==""`=未指定(單模組自動選取);
+ * seed/cycles/flush==0=核心默認(TbOpts::resolve,與 max_rules==0 同約定);
+ * 回傳幀=`{"ok":true,"plan":{…},"template_v":"…"}` 或
+ * `{"ok":false,"error":"…(milestone TB1)"}`(錯誤走資料,不 trap)。
+ * @param {string} name
+ * @param {string} source
+ * @param {string} module
+ * @param {number} seed
+ * @param {number} cycles
+ * @param {number} flush
+ * @returns {string}
+ */
+export function rtl_tb_plan_sv(name, source, module, seed, cycles, flush) {
+    let deferred4_0;
+    let deferred4_1;
+    try {
+        const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(source, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ptr2 = passStringToWasm0(module, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len2 = WASM_VECTOR_LEN;
+        const ret = wasm.rtl_tb_plan_sv(ptr0, len0, ptr1, len1, ptr2, len2, seed, cycles, flush);
+        deferred4_0 = ret[0];
+        deferred4_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred4_0, deferred4_1, 1);
+    }
+}
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,

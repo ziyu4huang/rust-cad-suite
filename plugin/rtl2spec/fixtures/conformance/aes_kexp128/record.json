@@ -1,0 +1,544 @@
+{
+  "design": "aes_kexp128",
+  "src": "corpus-external/yosys-simple/aes_kexp128.v",
+  "top": "aes_key_expand_128",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/aes_kexp128.rules.json",
+  "rules": 4,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "9c4723b76612d226f0bdeccac441fa3d6e2d17c79bdc78b137ea9bf93e165f16",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 5
+  },
+  "expected": {
+    "sha256": "0700c80352d77630ebcec1cbd6eca42f6b2ece06f9732df4d39eab7090413cef",
+    "lines": 397
+  },
+  "numbers": {
+    "generated": 8,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 8,
+    "killed": 8,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "8/8",
+    "ruleVerified": {
+      "exclusive": "4/4",
+      "shared": "0/4"
+    },
+    "catalogCoverage": "4/4",
+    "unruled": {
+      "generated": 4,
+      "killed": 4
+    },
+    "controlsSurvived": "1/1",
+    "ambiguous": 2,
+    "na": 10
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 34,
+      "out": 16
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 32
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 0,
+      "equivalent": 0,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 8,
+      "mainKilled": 8,
+      "unproven": 8,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "sequence": {
+      "total": 4,
+      "unique": 4
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "aes_key_expand_128.R001",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 17
+    },
+    {
+      "ruleId": "aes_key_expand_128.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 17
+    },
+    {
+      "ruleId": "aes_key_expand_128.R001",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 17
+    },
+    {
+      "ruleId": "aes_key_expand_128.R001",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 17
+    },
+    {
+      "ruleId": "aes_key_expand_128.R003",
+      "op": "OP-ARITH",
+      "status": "ambiguous",
+      "reason": "算子 ^ 行內計數≠1",
+      "line": 19
+    },
+    {
+      "ruleId": "aes_key_expand_128.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 19
+    },
+    {
+      "ruleId": "aes_key_expand_128.R003",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 19
+    },
+    {
+      "ruleId": "aes_key_expand_128.R003",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 19
+    },
+    {
+      "ruleId": "aes_key_expand_128.R004",
+      "op": "OP-ARITH",
+      "status": "ambiguous",
+      "reason": "算子 ^ 行內計數≠1",
+      "line": 20
+    },
+    {
+      "ruleId": "aes_key_expand_128.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 20
+    },
+    {
+      "ruleId": "aes_key_expand_128.R004",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 20
+    },
+    {
+      "ruleId": "aes_key_expand_128.R004",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 20
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "17|\tw[0] <= w[0];",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 17,
+      "before": "\tw[0] <= kld ? key[15:12] : w[0];",
+      "after": "\tw[0] <= w[0];",
+      "detail": "rhs→w[0]",
+      "ruleIds": [
+        "aes_key_expand_128.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "17|\tw[0] <= kld ? key[14:11] : w[0];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 17,
+      "before": "\tw[0] <= kld ? key[15:12] : w[0];",
+      "after": "\tw[0] <= kld ? key[14:11] : w[0];",
+      "detail": "[15:12]→[14:11]",
+      "ruleIds": [
+        "aes_key_expand_128.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "18|\tw[1] <= w[1];",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 18,
+      "before": "\tw[1] <= kld ? key[11: 8] : w[0]^w[1];",
+      "after": "\tw[1] <= w[1];",
+      "detail": "rhs→w[1]",
+      "ruleIds": [
+        "aes_key_expand_128.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "18|\tw[1] <= kld ? key[11: 8] : w[0]|w[1];",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 18,
+      "before": "\tw[1] <= kld ? key[11: 8] : w[0]^w[1];",
+      "after": "\tw[1] <= kld ? key[11: 8] : w[0]|w[1];",
+      "detail": "^→|",
+      "ruleIds": [
+        "aes_key_expand_128.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "19|\tw[2] <= w[2];",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 19,
+      "before": "\tw[2] <= kld ? key[ 7: 4] : w[0]^w[1]^w[2];",
+      "after": "\tw[2] <= w[2];",
+      "detail": "rhs→w[2]",
+      "ruleIds": [
+        "aes_key_expand_128.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "19|\tw[2] <= kld ? key[6:3] : w[0]^w[1]^w[2];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 19,
+      "before": "\tw[2] <= kld ? key[ 7: 4] : w[0]^w[1]^w[2];",
+      "after": "\tw[2] <= kld ? key[6:3] : w[0]^w[1]^w[2];",
+      "detail": "[ 7: 4]→[6:3]",
+      "ruleIds": [
+        "aes_key_expand_128.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "20|\tw[3] <= w[3];",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 20,
+      "before": "\tw[3] <= kld ? key[ 3: 0] : w[0]^w[1]^w[2]^w[3];",
+      "after": "\tw[3] <= w[3];",
+      "detail": "rhs→w[3]",
+      "ruleIds": [
+        "aes_key_expand_128.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "20|\tw[3] <= kld ? key[4:1] : w[0]^w[1]^w[2]^w[3];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 20,
+      "before": "\tw[3] <= kld ? key[ 3: 0] : w[0]^w[1]^w[2]^w[3];",
+      "after": "\tw[3] <= kld ? key[4:1] : w[0]^w[1]^w[2]^w[3];",
+      "detail": "[ 3: 0]→[4:1]",
+      "ruleIds": [
+        "aes_key_expand_128.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0009",
+      "key": "17|\tw[0] <= kld ? key[15:12] : w[0]; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 17,
+      "before": "\tw[0] <= kld ? key[15:12] : w[0];",
+      "after": "\tw[0] <= kld ? key[15:12] : w[0]; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "aes_key_expand_128.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0010",
+      "key": "11|assign wo_0 = wo_0;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 11,
+      "before": "assign wo_0 = w[0];",
+      "after": "assign wo_0 = wo_0;",
+      "detail": "rhs→wo_0",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0011",
+      "key": "12|assign wo_1 = wo_1;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 12,
+      "before": "assign wo_1 = w[1];",
+      "after": "assign wo_1 = wo_1;",
+      "detail": "rhs→wo_1",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "13|assign wo_2 = wo_2;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 13,
+      "before": "assign wo_2 = w[2];",
+      "after": "assign wo_2 = wo_2;",
+      "detail": "rhs→wo_2",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0013",
+      "key": "14|assign wo_3 = wo_3;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 14,
+      "before": "assign wo_3 = w[3];",
+      "after": "assign wo_3 = wo_3;",
+      "detail": "rhs→wo_3",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 11,
+        "op": "OP-HOLD",
+        "before": "assign wo_0 = w[0];",
+        "after": "assign wo_0 = wo_0;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 12,
+        "op": "OP-HOLD",
+        "before": "assign wo_1 = w[1];",
+        "after": "assign wo_1 = wo_1;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 13,
+        "op": "OP-HOLD",
+        "before": "assign wo_2 = w[2];",
+        "after": "assign wo_2 = wo_2;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 14,
+        "op": "OP-HOLD",
+        "before": "assign wo_3 = w[3];",
+        "after": "assign wo_3 = wo_3;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [
+        {
+          "signal": "wo_0",
+          "class": "U2",
+          "policy": true,
+          "line": 11,
+          "snippet": "assign wo_0 = w[0];"
+        },
+        {
+          "signal": "wo_1",
+          "class": "U2",
+          "policy": true,
+          "line": 12,
+          "snippet": "assign wo_1 = w[1];"
+        },
+        {
+          "signal": "wo_2",
+          "class": "U2",
+          "policy": true,
+          "line": 13,
+          "snippet": "assign wo_2 = w[2];"
+        },
+        {
+          "signal": "wo_3",
+          "class": "U2",
+          "policy": true,
+          "line": 14,
+          "snippet": "assign wo_3 = w[3];"
+        }
+      ],
+      "summary": {
+        "uncovered": 4,
+        "byClass": {
+          "U2": 4
+        },
+        "policyExcluded": 4,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 8,
+      "hit": 6,
+      "rate": "6/8"
+    }
+  }
+}

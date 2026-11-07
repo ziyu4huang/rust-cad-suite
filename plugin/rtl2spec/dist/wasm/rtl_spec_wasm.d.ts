@@ -18,6 +18,19 @@ export function rtl_scan_gaps_sv(name: string, source: string): string;
  */
 export function rtl_spec_version(): string;
 
+/**
+ * tb_plan rtlil 面(RV2-8:恆 TB1 錯誤幀;硬錯文案由核心產生,本面零語義)。
+ */
+export function rtl_tb_plan_rtlil(name: string, source: string, module: string, seed: number, cycles: number, flush: number): string;
+
+/**
+ * tb_plan sv 面(RV1-11/RV2-8):`module==""`=未指定(單模組自動選取);
+ * seed/cycles/flush==0=核心默認(TbOpts::resolve,與 max_rules==0 同約定);
+ * 回傳幀=`{"ok":true,"plan":{…},"template_v":"…"}` 或
+ * `{"ok":false,"error":"…(milestone TB1)"}`(錯誤走資料,不 trap)。
+ */
+export function rtl_tb_plan_sv(name: string, source: string, module: string, seed: number, cycles: number, flush: number): string;
+
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
@@ -29,6 +42,8 @@ export interface InitOutput {
     readonly rtl_scan_gaps_rtlil: (a: number, b: number, c: number, d: number) => [number, number];
     readonly rtl_scan_gaps_sv: (a: number, b: number, c: number, d: number) => [number, number];
     readonly rtl_spec_version: () => [number, number];
+    readonly rtl_tb_plan_rtlil: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => [number, number];
+    readonly rtl_tb_plan_sv: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => [number, number];
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

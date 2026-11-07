@@ -1,0 +1,2172 @@
+{
+  "design": "fsm",
+  "src": "corpus-external/yosys-simple/fsm.v",
+  "top": "fsm_test",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/fsm.rules.json",
+  "rules": 23,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "directed",
+    "protocolLeg": "fsm-r0-k1",
+    "sha256": "6792d5a97ee4d3860aa7fca36360953e8791dddff105f7d7bf3099fa9109b288",
+    "scenes": 6,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 5
+  },
+  "expected": {
+    "sha256": "25d7b4dd37d819c1aaa8f87f1792de3d26b422cc9f6cc6e7ad41345cf65c83d5",
+    "lines": 86
+  },
+  "numbers": {
+    "generated": 44,
+    "stillborn": 0,
+    "equivalent": 2,
+    "eligible": 42,
+    "killed": 42,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "42/42",
+    "ruleVerified": {
+      "exclusive": "23/23",
+      "shared": "0/23"
+    },
+    "catalogCoverage": "23/23",
+    "unruled": {
+      "generated": 2,
+      "killed": 2
+    },
+    "controlsSurvived": "4/4",
+    "ambiguous": 0,
+    "na": 34
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 8,
+      "out": 4
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 40
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "groundTruth": {
+      "positive": {
+        "id": "m0045",
+        "op": "OP-NOP",
+        "eqverdict": "equivalent",
+        "eqCells": 40
+      }
+    },
+    "counts": {
+      "adjudicated": 2,
+      "equivalent": 2,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 42,
+      "mainKilled": 42,
+      "unproven": 42,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "transition": {
+      "total": 5,
+      "unique": 5
+    },
+    "sequence": {
+      "total": 18,
+      "unique": 18
+    }
+  },
+  "stateTables": {
+    "state": [
+      "200",
+      "300",
+      "210",
+      "100",
+      "310"
+    ]
+  },
+  "attempts": [
+    {
+      "ruleId": "fsm_test.R006",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 21
+    },
+    {
+      "ruleId": "fsm_test.R006",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 21
+    },
+    {
+      "ruleId": "fsm_test.R007",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "fsm_test.R007",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "fsm_test.R008",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 23
+    },
+    {
+      "ruleId": "fsm_test.R008",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 23
+    },
+    {
+      "ruleId": "fsm_test.R009",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 24
+    },
+    {
+      "ruleId": "fsm_test.R009",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 24
+    },
+    {
+      "ruleId": "fsm_test.R010",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 25
+    },
+    {
+      "ruleId": "fsm_test.R010",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 25
+    },
+    {
+      "ruleId": "fsm_test.R011",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 28
+    },
+    {
+      "ruleId": "fsm_test.R011",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 28
+    },
+    {
+      "ruleId": "fsm_test.R012",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 38
+    },
+    {
+      "ruleId": "fsm_test.R012",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 38
+    },
+    {
+      "ruleId": "fsm_test.R013",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 39
+    },
+    {
+      "ruleId": "fsm_test.R013",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 39
+    },
+    {
+      "ruleId": "fsm_test.R015",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 45
+    },
+    {
+      "ruleId": "fsm_test.R015",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 45
+    },
+    {
+      "ruleId": "fsm_test.R016",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 46
+    },
+    {
+      "ruleId": "fsm_test.R016",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 46
+    },
+    {
+      "ruleId": "fsm_test.R016",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 46
+    },
+    {
+      "ruleId": "fsm_test.R016",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 46
+    },
+    {
+      "ruleId": "fsm_test.R016",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 46
+    },
+    {
+      "ruleId": "fsm_test.R018",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 52
+    },
+    {
+      "ruleId": "fsm_test.R018",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 52
+    },
+    {
+      "ruleId": "fsm_test.R019",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 53
+    },
+    {
+      "ruleId": "fsm_test.R019",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 53
+    },
+    {
+      "ruleId": "fsm_test.R021",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 59
+    },
+    {
+      "ruleId": "fsm_test.R021",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 59
+    },
+    {
+      "ruleId": "fsm_test.R022",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 60
+    },
+    {
+      "ruleId": "fsm_test.R022",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 60
+    },
+    {
+      "ruleId": "fsm_test.R022",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 60
+    },
+    {
+      "ruleId": "fsm_test.R022",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 60
+    },
+    {
+      "ruleId": "fsm_test.R022",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 60
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "33|\t\t\t\t\tstate <= 300;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 33,
+      "before": "\t\t\t\t\tstate <= 200;",
+      "after": "\t\t\t\t\tstate <= 300;",
+      "detail": "200→300",
+      "ruleIds": [
+        "fsm_test.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "35|\t\t\t\t\tstate <= 210;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 35,
+      "before": "\t\t\t\t\tstate <= 300;",
+      "after": "\t\t\t\t\tstate <= 210;",
+      "detail": "300→210",
+      "ruleIds": [
+        "fsm_test.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "42|\t\t\t\t\tstate <= 100;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 42,
+      "before": "\t\t\t\t\tstate <= 210;",
+      "after": "\t\t\t\t\tstate <= 100;",
+      "detail": "210→100",
+      "ruleIds": [
+        "fsm_test.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "49|\t\t\t\t\tstate <= 310;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 49,
+      "before": "\t\t\t\t\tstate <= 100;",
+      "after": "\t\t\t\t\tstate <= 310;",
+      "detail": "100→310",
+      "ruleIds": [
+        "fsm_test.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "56|\t\t\t\t\tstate <= 200;",
+      "pool": "rule",
+      "op": "OP-STATE",
+      "line": 56,
+      "before": "\t\t\t\t\tstate <= 310;",
+      "after": "\t\t\t\t\tstate <= 200;",
+      "detail": "310→200",
+      "ruleIds": [
+        "fsm_test.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "33|\t\t\t\t\tstate <= 201;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 33,
+      "before": "\t\t\t\t\tstate <= 200;",
+      "after": "\t\t\t\t\tstate <= 201;",
+      "detail": "200→201",
+      "ruleIds": [
+        "fsm_test.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "35|\t\t\t\t\tstate <= 301;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 35,
+      "before": "\t\t\t\t\tstate <= 300;",
+      "after": "\t\t\t\t\tstate <= 301;",
+      "detail": "300→301",
+      "ruleIds": [
+        "fsm_test.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "42|\t\t\t\t\tstate <= 211;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 42,
+      "before": "\t\t\t\t\tstate <= 210;",
+      "after": "\t\t\t\t\tstate <= 211;",
+      "detail": "210→211",
+      "ruleIds": [
+        "fsm_test.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset"
+      ]
+    },
+    {
+      "id": "m0009",
+      "key": "49|\t\t\t\t\tstate <= 101;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 49,
+      "before": "\t\t\t\t\tstate <= 100;",
+      "after": "\t\t\t\t\tstate <= 101;",
+      "detail": "100→101",
+      "ruleIds": [
+        "fsm_test.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "56|\t\t\t\t\tstate <= 311;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 56,
+      "before": "\t\t\t\t\tstate <= 310;",
+      "after": "\t\t\t\t\tstate <= 311;",
+      "detail": "310→311",
+      "ruleIds": [
+        "fsm_test.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0011",
+      "key": "21|\tcnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 21,
+      "before": "\tcnt <= 0;",
+      "after": "\tcnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "fsm_test.R006"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "21|\tcnt <= 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 21,
+      "before": "\tcnt <= 0;",
+      "after": "\tcnt <= 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "fsm_test.R006"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0013",
+      "key": "22|\tred_a <= red_a;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 22,
+      "before": "\tred_a <= 1;",
+      "after": "\tred_a <= red_a;",
+      "detail": "rhs→red_a",
+      "ruleIds": [
+        "fsm_test.R007"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0014",
+      "key": "22|\tred_a <= 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 22,
+      "before": "\tred_a <= 1;",
+      "after": "\tred_a <= 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "fsm_test.R007"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0015",
+      "key": "23|\tred_b <= red_b;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 23,
+      "before": "\tred_b <= 1;",
+      "after": "\tred_b <= red_b;",
+      "detail": "rhs→red_b",
+      "ruleIds": [
+        "fsm_test.R008"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0016",
+      "key": "23|\tred_b <= 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 23,
+      "before": "\tred_b <= 1;",
+      "after": "\tred_b <= 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "fsm_test.R008"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0017",
+      "key": "24|\tgreen_a <= green_a;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 24,
+      "before": "\tgreen_a <= 0;",
+      "after": "\tgreen_a <= green_a;",
+      "detail": "rhs→green_a",
+      "ruleIds": [
+        "fsm_test.R009"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle"
+      ]
+    },
+    {
+      "id": "m0018",
+      "key": "24|\tgreen_a <= 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 24,
+      "before": "\tgreen_a <= 0;",
+      "after": "\tgreen_a <= 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "fsm_test.R009"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0019",
+      "key": "25|\tgreen_b <= green_b;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 25,
+      "before": "\tgreen_b <= 0;",
+      "after": "\tgreen_b <= green_b;",
+      "detail": "rhs→green_b",
+      "ruleIds": [
+        "fsm_test.R010"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE2 a_arm_full",
+        "SCENE5 mid_arm_reset"
+      ]
+    },
+    {
+      "id": "m0020",
+      "key": "25|\tgreen_b <= 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 25,
+      "before": "\tgreen_b <= 0;",
+      "after": "\tgreen_b <= 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "fsm_test.R010"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 reset_and_idle",
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0021",
+      "key": "28|\t\tstate <= state;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 28,
+      "before": "\t\tstate <= 100;",
+      "after": "\t\tstate <= state;",
+      "detail": "rhs→state",
+      "ruleIds": [
+        "fsm_test.R011"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0022",
+      "key": "28|\t\tstate <= 101;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 28,
+      "before": "\t\tstate <= 100;",
+      "after": "\t\tstate <= 101;",
+      "detail": "100→101",
+      "ruleIds": [
+        "fsm_test.R011"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0023",
+      "key": "38|\t\t\t\tred_a <= red_a;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 38,
+      "before": "\t\t\t\tred_a <= 0;",
+      "after": "\t\t\t\tred_a <= red_a;",
+      "detail": "rhs→red_a",
+      "ruleIds": [
+        "fsm_test.R012"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0024",
+      "key": "38|\t\t\t\tred_a <= 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 38,
+      "before": "\t\t\t\tred_a <= 0;",
+      "after": "\t\t\t\tred_a <= 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "fsm_test.R012"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0025",
+      "key": "39|\t\t\t\tgreen_a <= green_a;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 39,
+      "before": "\t\t\t\tgreen_a <= 1;",
+      "after": "\t\t\t\tgreen_a <= green_a;",
+      "detail": "rhs→green_a",
+      "ruleIds": [
+        "fsm_test.R013"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0026",
+      "key": "39|\t\t\t\tgreen_a <= 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 39,
+      "before": "\t\t\t\tgreen_a <= 1;",
+      "after": "\t\t\t\tgreen_a <= 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "fsm_test.R013"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0027",
+      "key": "40|\t\t\t\tcnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 40,
+      "before": "\t\t\t\tcnt <= cnt + 1;",
+      "after": "\t\t\t\tcnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "fsm_test.R014"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset"
+      ]
+    },
+    {
+      "id": "m0028",
+      "key": "40|\t\t\t\tcnt <= cnt - 1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 40,
+      "before": "\t\t\t\tcnt <= cnt + 1;",
+      "after": "\t\t\t\tcnt <= cnt - 1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "fsm_test.R014"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0029",
+      "key": "45|\t\t\t\tred_a <= red_a;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 45,
+      "before": "\t\t\t\tred_a <= 0;",
+      "after": "\t\t\t\tred_a <= red_a;",
+      "detail": "rhs→red_a",
+      "ruleIds": [
+        "fsm_test.R015"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 40
+    },
+    {
+      "id": "m0030",
+      "key": "45|\t\t\t\tred_a <= 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 45,
+      "before": "\t\t\t\tred_a <= 0;",
+      "after": "\t\t\t\tred_a <= 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "fsm_test.R015"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0031",
+      "key": "46|\t\t\t\tgreen_a <= green_a;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 46,
+      "before": "\t\t\t\tgreen_a <= cnt[0];",
+      "after": "\t\t\t\tgreen_a <= green_a;",
+      "detail": "rhs→green_a",
+      "ruleIds": [
+        "fsm_test.R016"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0032",
+      "key": "47|\t\t\t\tcnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 47,
+      "before": "\t\t\t\tcnt <= cnt + 1;",
+      "after": "\t\t\t\tcnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "fsm_test.R017"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full",
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset"
+      ]
+    },
+    {
+      "id": "m0033",
+      "key": "47|\t\t\t\tcnt <= cnt - 1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 47,
+      "before": "\t\t\t\tcnt <= cnt + 1;",
+      "after": "\t\t\t\tcnt <= cnt - 1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "fsm_test.R017"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 a_arm_full"
+      ]
+    },
+    {
+      "id": "m0034",
+      "key": "52|\t\t\t\tred_b <= red_b;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 52,
+      "before": "\t\t\t\tred_b <= 0;",
+      "after": "\t\t\t\tred_b <= red_b;",
+      "detail": "rhs→red_b",
+      "ruleIds": [
+        "fsm_test.R018"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0035",
+      "key": "52|\t\t\t\tred_b <= 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 52,
+      "before": "\t\t\t\tred_b <= 0;",
+      "after": "\t\t\t\tred_b <= 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "fsm_test.R018"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0036",
+      "key": "53|\t\t\t\tgreen_b <= green_b;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 53,
+      "before": "\t\t\t\tgreen_b <= 1;",
+      "after": "\t\t\t\tgreen_b <= green_b;",
+      "detail": "rhs→green_b",
+      "ruleIds": [
+        "fsm_test.R019"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0037",
+      "key": "53|\t\t\t\tgreen_b <= 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 53,
+      "before": "\t\t\t\tgreen_b <= 1;",
+      "after": "\t\t\t\tgreen_b <= 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "fsm_test.R019"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0038",
+      "key": "54|\t\t\t\tcnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 54,
+      "before": "\t\t\t\tcnt <= cnt + 1;",
+      "after": "\t\t\t\tcnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "fsm_test.R020"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0039",
+      "key": "54|\t\t\t\tcnt <= cnt - 1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 54,
+      "before": "\t\t\t\tcnt <= cnt + 1;",
+      "after": "\t\t\t\tcnt <= cnt - 1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "fsm_test.R020"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0040",
+      "key": "59|\t\t\t\tred_b <= red_b;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 59,
+      "before": "\t\t\t\tred_b <= 0;",
+      "after": "\t\t\t\tred_b <= red_b;",
+      "detail": "rhs→red_b",
+      "ruleIds": [
+        "fsm_test.R021"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 40
+    },
+    {
+      "id": "m0041",
+      "key": "59|\t\t\t\tred_b <= 1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 59,
+      "before": "\t\t\t\tred_b <= 0;",
+      "after": "\t\t\t\tred_b <= 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "fsm_test.R021"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0042",
+      "key": "60|\t\t\t\tgreen_b <= green_b;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 60,
+      "before": "\t\t\t\tgreen_b <= cnt[0];",
+      "after": "\t\t\t\tgreen_b <= green_b;",
+      "detail": "rhs→green_b",
+      "ruleIds": [
+        "fsm_test.R022"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0043",
+      "key": "61|\t\t\t\tcnt <= cnt;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 61,
+      "before": "\t\t\t\tcnt <= cnt + 1;",
+      "after": "\t\t\t\tcnt <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [
+        "fsm_test.R023"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0044",
+      "key": "61|\t\t\t\tcnt <= cnt - 1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 61,
+      "before": "\t\t\t\tcnt <= cnt + 1;",
+      "after": "\t\t\t\tcnt <= cnt - 1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "fsm_test.R023"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0045",
+      "key": "31|\t\t\t100: begin // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 31,
+      "before": "\t\t\t100: begin",
+      "after": "\t\t\t100: begin // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "fsm_test.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0046",
+      "key": "21|\tcnt <= 0; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 21,
+      "before": "\tcnt <= 0;",
+      "after": "\tcnt <= 0; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "fsm_test.R006"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0047",
+      "key": "63|\t\t\t\t\tstate <= state;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 63,
+      "before": "\t\t\t\t\tstate <= 100;",
+      "after": "\t\t\t\t\tstate <= state;",
+      "detail": "rhs→state",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE3 b_arm_full",
+        "SCENE4 both_neither",
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    },
+    {
+      "id": "m0048",
+      "key": "63|\t\t\t\t\tstate <= 101;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 63,
+      "before": "\t\t\t\t\tstate <= 100;",
+      "after": "\t\t\t\t\tstate <= 101;",
+      "detail": "100→101",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE5 mid_arm_reset",
+        "SCENE6 random_buttons"
+      ]
+    }
+  ],
+  "baselineTemplate": {
+    "leg": "template",
+    "sha256": "82f49e24122b64e3b9e9aca258c096fe333f006d5b0e85e6fa314c017362447e",
+    "expectedSha256": "922e24b57bf8667eaaeae5e70abe4fdaf59cb864107af562fdb0c268573aedd4",
+    "numbers": {
+      "generated": 44,
+      "stillborn": 0,
+      "equivalent": 2,
+      "eligible": 42,
+      "killed": 31,
+      "survived": 11,
+      "timeout": 0,
+      "rate": "31/42",
+      "ruleVerified": {
+        "exclusive": "17/23",
+        "shared": "0/23"
+      },
+      "catalogCoverage": "23/23",
+      "unruled": {
+        "generated": 2,
+        "killed": 0
+      },
+      "controlsSurvived": "4/4",
+      "ambiguous": 0,
+      "na": 34
+    },
+    "gainKilled": 11,
+    "formFloor": {
+      "transition": "10/10",
+      "sequence": "32/32"
+    },
+    "notWorse": true,
+    "mutants": [
+      {
+        "id": "m0001",
+        "key": "33|\t\t\t\t\tstate <= 300;",
+        "pool": "rule",
+        "op": "OP-STATE",
+        "line": 33,
+        "before": "\t\t\t\t\tstate <= 200;",
+        "after": "\t\t\t\t\tstate <= 300;",
+        "detail": "200→300",
+        "ruleIds": [
+          "fsm_test.R001"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small"
+        ]
+      },
+      {
+        "id": "m0002",
+        "key": "35|\t\t\t\t\tstate <= 210;",
+        "pool": "rule",
+        "op": "OP-STATE",
+        "line": 35,
+        "before": "\t\t\t\t\tstate <= 300;",
+        "after": "\t\t\t\t\tstate <= 210;",
+        "detail": "300→210",
+        "ruleIds": [
+          "fsm_test.R002"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0003",
+        "key": "42|\t\t\t\t\tstate <= 100;",
+        "pool": "rule",
+        "op": "OP-STATE",
+        "line": 42,
+        "before": "\t\t\t\t\tstate <= 210;",
+        "after": "\t\t\t\t\tstate <= 100;",
+        "detail": "210→100",
+        "ruleIds": [
+          "fsm_test.R003"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0004",
+        "key": "49|\t\t\t\t\tstate <= 310;",
+        "pool": "rule",
+        "op": "OP-STATE",
+        "line": 49,
+        "before": "\t\t\t\t\tstate <= 100;",
+        "after": "\t\t\t\t\tstate <= 310;",
+        "detail": "100→310",
+        "ruleIds": [
+          "fsm_test.R004"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0005",
+        "key": "56|\t\t\t\t\tstate <= 200;",
+        "pool": "rule",
+        "op": "OP-STATE",
+        "line": 56,
+        "before": "\t\t\t\t\tstate <= 310;",
+        "after": "\t\t\t\t\tstate <= 200;",
+        "detail": "310→200",
+        "ruleIds": [
+          "fsm_test.R005"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0006",
+        "key": "33|\t\t\t\t\tstate <= 201;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 33,
+        "before": "\t\t\t\t\tstate <= 200;",
+        "after": "\t\t\t\t\tstate <= 201;",
+        "detail": "200→201",
+        "ruleIds": [
+          "fsm_test.R001"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small"
+        ]
+      },
+      {
+        "id": "m0007",
+        "key": "35|\t\t\t\t\tstate <= 301;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 35,
+        "before": "\t\t\t\t\tstate <= 300;",
+        "after": "\t\t\t\t\tstate <= 301;",
+        "detail": "300→301",
+        "ruleIds": [
+          "fsm_test.R002"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0008",
+        "key": "42|\t\t\t\t\tstate <= 211;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 42,
+        "before": "\t\t\t\t\tstate <= 210;",
+        "after": "\t\t\t\t\tstate <= 211;",
+        "detail": "210→211",
+        "ruleIds": [
+          "fsm_test.R003"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0009",
+        "key": "49|\t\t\t\t\tstate <= 101;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 49,
+        "before": "\t\t\t\t\tstate <= 100;",
+        "after": "\t\t\t\t\tstate <= 101;",
+        "detail": "100→101",
+        "ruleIds": [
+          "fsm_test.R004"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0010",
+        "key": "56|\t\t\t\t\tstate <= 311;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 56,
+        "before": "\t\t\t\t\tstate <= 310;",
+        "after": "\t\t\t\t\tstate <= 311;",
+        "detail": "310→311",
+        "ruleIds": [
+          "fsm_test.R005"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0011",
+        "key": "21|\tcnt <= cnt;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 21,
+        "before": "\tcnt <= 0;",
+        "after": "\tcnt <= cnt;",
+        "detail": "rhs→cnt",
+        "ruleIds": [
+          "fsm_test.R006"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0012",
+        "key": "21|\tcnt <= 1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 21,
+        "before": "\tcnt <= 0;",
+        "after": "\tcnt <= 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "fsm_test.R006"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0013",
+        "key": "22|\tred_a <= red_a;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 22,
+        "before": "\tred_a <= 1;",
+        "after": "\tred_a <= red_a;",
+        "detail": "rhs→red_a",
+        "ruleIds": [
+          "fsm_test.R007"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0014",
+        "key": "22|\tred_a <= 2;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 22,
+        "before": "\tred_a <= 1;",
+        "after": "\tred_a <= 2;",
+        "detail": "1→2",
+        "ruleIds": [
+          "fsm_test.R007"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0015",
+        "key": "23|\tred_b <= red_b;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 23,
+        "before": "\tred_b <= 1;",
+        "after": "\tred_b <= red_b;",
+        "detail": "rhs→red_b",
+        "ruleIds": [
+          "fsm_test.R008"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0016",
+        "key": "23|\tred_b <= 2;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 23,
+        "before": "\tred_b <= 1;",
+        "after": "\tred_b <= 2;",
+        "detail": "1→2",
+        "ruleIds": [
+          "fsm_test.R008"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0017",
+        "key": "24|\tgreen_a <= green_a;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 24,
+        "before": "\tgreen_a <= 0;",
+        "after": "\tgreen_a <= green_a;",
+        "detail": "rhs→green_a",
+        "ruleIds": [
+          "fsm_test.R009"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0018",
+        "key": "24|\tgreen_a <= 1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 24,
+        "before": "\tgreen_a <= 0;",
+        "after": "\tgreen_a <= 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "fsm_test.R009"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0019",
+        "key": "25|\tgreen_b <= green_b;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 25,
+        "before": "\tgreen_b <= 0;",
+        "after": "\tgreen_b <= green_b;",
+        "detail": "rhs→green_b",
+        "ruleIds": [
+          "fsm_test.R010"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0020",
+        "key": "25|\tgreen_b <= 1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 25,
+        "before": "\tgreen_b <= 0;",
+        "after": "\tgreen_b <= 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "fsm_test.R010"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0021",
+        "key": "28|\t\tstate <= state;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 28,
+        "before": "\t\tstate <= 100;",
+        "after": "\t\tstate <= state;",
+        "detail": "rhs→state",
+        "ruleIds": [
+          "fsm_test.R011"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0022",
+        "key": "28|\t\tstate <= 101;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 28,
+        "before": "\t\tstate <= 100;",
+        "after": "\t\tstate <= 101;",
+        "detail": "100→101",
+        "ruleIds": [
+          "fsm_test.R011"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0023",
+        "key": "38|\t\t\t\tred_a <= red_a;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 38,
+        "before": "\t\t\t\tred_a <= 0;",
+        "after": "\t\t\t\tred_a <= red_a;",
+        "detail": "rhs→red_a",
+        "ruleIds": [
+          "fsm_test.R012"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small"
+        ]
+      },
+      {
+        "id": "m0024",
+        "key": "38|\t\t\t\tred_a <= 1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 38,
+        "before": "\t\t\t\tred_a <= 0;",
+        "after": "\t\t\t\tred_a <= 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "fsm_test.R012"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small"
+        ]
+      },
+      {
+        "id": "m0025",
+        "key": "39|\t\t\t\tgreen_a <= green_a;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 39,
+        "before": "\t\t\t\tgreen_a <= 1;",
+        "after": "\t\t\t\tgreen_a <= green_a;",
+        "detail": "rhs→green_a",
+        "ruleIds": [
+          "fsm_test.R013"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small"
+        ]
+      },
+      {
+        "id": "m0026",
+        "key": "39|\t\t\t\tgreen_a <= 2;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 39,
+        "before": "\t\t\t\tgreen_a <= 1;",
+        "after": "\t\t\t\tgreen_a <= 2;",
+        "detail": "1→2",
+        "ruleIds": [
+          "fsm_test.R013"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE3 small"
+        ]
+      },
+      {
+        "id": "m0027",
+        "key": "40|\t\t\t\tcnt <= cnt;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 40,
+        "before": "\t\t\t\tcnt <= cnt + 1;",
+        "after": "\t\t\t\tcnt <= cnt;",
+        "detail": "rhs→cnt",
+        "ruleIds": [
+          "fsm_test.R014"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0028",
+        "key": "40|\t\t\t\tcnt <= cnt - 1;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 40,
+        "before": "\t\t\t\tcnt <= cnt + 1;",
+        "after": "\t\t\t\tcnt <= cnt - 1;",
+        "detail": "+→-",
+        "ruleIds": [
+          "fsm_test.R014"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0029",
+        "key": "45|\t\t\t\tred_a <= red_a;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 45,
+        "before": "\t\t\t\tred_a <= 0;",
+        "after": "\t\t\t\tred_a <= red_a;",
+        "detail": "rhs→red_a",
+        "ruleIds": [
+          "fsm_test.R015"
+        ],
+        "result": "survived",
+        "killScenes": [],
+        "adjudication": "equivalent"
+      },
+      {
+        "id": "m0030",
+        "key": "45|\t\t\t\tred_a <= 1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 45,
+        "before": "\t\t\t\tred_a <= 0;",
+        "after": "\t\t\t\tred_a <= 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "fsm_test.R015"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0031",
+        "key": "46|\t\t\t\tgreen_a <= green_a;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 46,
+        "before": "\t\t\t\tgreen_a <= cnt[0];",
+        "after": "\t\t\t\tgreen_a <= green_a;",
+        "detail": "rhs→green_a",
+        "ruleIds": [
+          "fsm_test.R016"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0032",
+        "key": "47|\t\t\t\tcnt <= cnt;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 47,
+        "before": "\t\t\t\tcnt <= cnt + 1;",
+        "after": "\t\t\t\tcnt <= cnt;",
+        "detail": "rhs→cnt",
+        "ruleIds": [
+          "fsm_test.R017"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0033",
+        "key": "47|\t\t\t\tcnt <= cnt - 1;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 47,
+        "before": "\t\t\t\tcnt <= cnt + 1;",
+        "after": "\t\t\t\tcnt <= cnt - 1;",
+        "detail": "+→-",
+        "ruleIds": [
+          "fsm_test.R017"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0034",
+        "key": "52|\t\t\t\tred_b <= red_b;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 52,
+        "before": "\t\t\t\tred_b <= 0;",
+        "after": "\t\t\t\tred_b <= red_b;",
+        "detail": "rhs→red_b",
+        "ruleIds": [
+          "fsm_test.R018"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0035",
+        "key": "52|\t\t\t\tred_b <= 1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 52,
+        "before": "\t\t\t\tred_b <= 0;",
+        "after": "\t\t\t\tred_b <= 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "fsm_test.R018"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0036",
+        "key": "53|\t\t\t\tgreen_b <= green_b;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 53,
+        "before": "\t\t\t\tgreen_b <= 1;",
+        "after": "\t\t\t\tgreen_b <= green_b;",
+        "detail": "rhs→green_b",
+        "ruleIds": [
+          "fsm_test.R019"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0037",
+        "key": "53|\t\t\t\tgreen_b <= 2;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 53,
+        "before": "\t\t\t\tgreen_b <= 1;",
+        "after": "\t\t\t\tgreen_b <= 2;",
+        "detail": "1→2",
+        "ruleIds": [
+          "fsm_test.R019"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0038",
+        "key": "54|\t\t\t\tcnt <= cnt;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 54,
+        "before": "\t\t\t\tcnt <= cnt + 1;",
+        "after": "\t\t\t\tcnt <= cnt;",
+        "detail": "rhs→cnt",
+        "ruleIds": [
+          "fsm_test.R020"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0039",
+        "key": "54|\t\t\t\tcnt <= cnt - 1;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 54,
+        "before": "\t\t\t\tcnt <= cnt + 1;",
+        "after": "\t\t\t\tcnt <= cnt - 1;",
+        "detail": "+→-",
+        "ruleIds": [
+          "fsm_test.R020"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0040",
+        "key": "59|\t\t\t\tred_b <= red_b;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 59,
+        "before": "\t\t\t\tred_b <= 0;",
+        "after": "\t\t\t\tred_b <= red_b;",
+        "detail": "rhs→red_b",
+        "ruleIds": [
+          "fsm_test.R021"
+        ],
+        "result": "survived",
+        "killScenes": [],
+        "adjudication": "equivalent"
+      },
+      {
+        "id": "m0041",
+        "key": "59|\t\t\t\tred_b <= 1;",
+        "pool": "rule",
+        "op": "OP-CONST",
+        "line": 59,
+        "before": "\t\t\t\tred_b <= 0;",
+        "after": "\t\t\t\tred_b <= 1;",
+        "detail": "0→1",
+        "ruleIds": [
+          "fsm_test.R021"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0042",
+        "key": "60|\t\t\t\tgreen_b <= green_b;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 60,
+        "before": "\t\t\t\tgreen_b <= cnt[0];",
+        "after": "\t\t\t\tgreen_b <= green_b;",
+        "detail": "rhs→green_b",
+        "ruleIds": [
+          "fsm_test.R022"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0043",
+        "key": "61|\t\t\t\tcnt <= cnt;",
+        "pool": "rule",
+        "op": "OP-HOLD",
+        "line": 61,
+        "before": "\t\t\t\tcnt <= cnt + 1;",
+        "after": "\t\t\t\tcnt <= cnt;",
+        "detail": "rhs→cnt",
+        "ruleIds": [
+          "fsm_test.R023"
+        ],
+        "result": "killed",
+        "killScenes": [
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "id": "m0044",
+        "key": "61|\t\t\t\tcnt <= cnt - 1;",
+        "pool": "rule",
+        "op": "OP-ARITH",
+        "line": 61,
+        "before": "\t\t\t\tcnt <= cnt + 1;",
+        "after": "\t\t\t\tcnt <= cnt - 1;",
+        "detail": "+→-",
+        "ruleIds": [
+          "fsm_test.R023"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0045",
+        "key": "31|\t\t\t100: begin // conformance-nop",
+        "pool": "control",
+        "op": "OP-NOP",
+        "line": 31,
+        "before": "\t\t\t100: begin",
+        "after": "\t\t\t100: begin // conformance-nop",
+        "detail": "append nop",
+        "ruleIds": [
+          "fsm_test.R001"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0046",
+        "key": "21|\tcnt <= 0; // conformance-nop",
+        "pool": "control",
+        "op": "OP-NOP",
+        "line": 21,
+        "before": "\tcnt <= 0;",
+        "after": "\tcnt <= 0; // conformance-nop",
+        "detail": "append nop",
+        "ruleIds": [
+          "fsm_test.R006"
+        ],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0047",
+        "key": "63|\t\t\t\t\tstate <= state;",
+        "pool": "unruled",
+        "op": "OP-HOLD",
+        "line": 63,
+        "before": "\t\t\t\t\tstate <= 100;",
+        "after": "\t\t\t\t\tstate <= state;",
+        "detail": "rhs→state",
+        "ruleIds": [],
+        "result": "survived",
+        "killScenes": []
+      },
+      {
+        "id": "m0048",
+        "key": "63|\t\t\t\t\tstate <= 101;",
+        "pool": "unruled",
+        "op": "OP-CONST",
+        "line": 63,
+        "before": "\t\t\t\t\tstate <= 100;",
+        "after": "\t\t\t\t\tstate <= 101;",
+        "detail": "100→101",
+        "ruleIds": [],
+        "result": "survived",
+        "killScenes": []
+      }
+    ]
+  },
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 63,
+        "op": "OP-HOLD",
+        "before": "state <= 100;",
+        "after": "state <= state;",
+        "killScenes": [
+          "SCENE3 b_arm_full",
+          "SCENE4 both_neither",
+          "SCENE5 mid_arm_reset",
+          "SCENE6 random_buttons"
+        ]
+      },
+      {
+        "line": 63,
+        "op": "OP-CONST",
+        "before": "state <= 100;",
+        "after": "state <= 101;",
+        "killScenes": [
+          "SCENE5 mid_arm_reset",
+          "SCENE6 random_buttons"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 42,
+      "hit": 7,
+      "rate": "7/42"
+    }
+  }
+}

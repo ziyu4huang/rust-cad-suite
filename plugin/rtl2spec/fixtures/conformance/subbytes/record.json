@@ -1,0 +1,1380 @@
+{
+  "design": "subbytes",
+  "src": "corpus-external/yosys-simple/subbytes.v",
+  "top": "subbytes_00",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/subbytes.rules.json",
+  "rules": 16,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "af3e4e2360e538b04c61ed07f2157434a7b37ce86866a2c23e42e06112f4a203",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 2
+    },
+    "simMs": 7
+  },
+  "expected": {
+    "sha256": "5d2795716da81f3631b0ef8aa3a019c03a37afbda4e24f464f17b43c49e04e4f",
+    "lines": 417
+  },
+  "numbers": {
+    "generated": 18,
+    "stillborn": 0,
+    "equivalent": 5,
+    "eligible": 13,
+    "killed": 8,
+    "survived": 5,
+    "timeout": 0,
+    "rate": "8/13",
+    "ruleVerified": {
+      "exclusive": "6/11",
+      "shared": "1/11"
+    },
+    "catalogCoverage": "16/16",
+    "unruled": {
+      "generated": 14,
+      "killed": 10
+    },
+    "controlsSurvived": "8/8",
+    "ambiguous": 0,
+    "na": 52
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 86,
+      "out": 42
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 175
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 10,
+      "equivalent": 5,
+      "unproven": 5,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 8,
+      "mainKilled": 8,
+      "unproven": 8,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "guard": {
+      "total": 3,
+      "unique": 3
+    },
+    "sequence": {
+      "total": 3,
+      "unique": 3
+    },
+    "relation": {
+      "total": 10,
+      "unique": 10
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "subbytes_00.R004",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 35
+    },
+    {
+      "ruleId": "subbytes_00.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 35
+    },
+    {
+      "ruleId": "subbytes_00.R004",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 35
+    },
+    {
+      "ruleId": "subbytes_00.R004",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 35
+    },
+    {
+      "ruleId": "subbytes_00.R004",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 35
+    },
+    {
+      "ruleId": "subbytes_00.R005",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 36
+    },
+    {
+      "ruleId": "subbytes_00.R005",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 36
+    },
+    {
+      "ruleId": "subbytes_00.R005",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 36
+    },
+    {
+      "ruleId": "subbytes_00.R005",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 36
+    },
+    {
+      "ruleId": "subbytes_00.R005",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 36
+    },
+    {
+      "ruleId": "subbytes_00.R006",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 37
+    },
+    {
+      "ruleId": "subbytes_00.R006",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 37
+    },
+    {
+      "ruleId": "subbytes_00.R006",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 37
+    },
+    {
+      "ruleId": "subbytes_00.R006",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 37
+    },
+    {
+      "ruleId": "subbytes_00.R006",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 37
+    },
+    {
+      "ruleId": "subbytes_00.R007",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 49
+    },
+    {
+      "ruleId": "subbytes_00.R007",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 49
+    },
+    {
+      "ruleId": "subbytes_00.R007",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 49
+    },
+    {
+      "ruleId": "subbytes_00.R007",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 49
+    },
+    {
+      "ruleId": "subbytes_00.R008",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 50
+    },
+    {
+      "ruleId": "subbytes_00.R008",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 50
+    },
+    {
+      "ruleId": "subbytes_00.R008",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 50
+    },
+    {
+      "ruleId": "subbytes_00.R008",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 50
+    },
+    {
+      "ruleId": "subbytes_00.R009",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 51
+    },
+    {
+      "ruleId": "subbytes_00.R009",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 51
+    },
+    {
+      "ruleId": "subbytes_00.R009",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 51
+    },
+    {
+      "ruleId": "subbytes_00.R009",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 51
+    },
+    {
+      "ruleId": "subbytes_00.R010",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 52
+    },
+    {
+      "ruleId": "subbytes_00.R010",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 52
+    },
+    {
+      "ruleId": "subbytes_00.R010",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 52
+    },
+    {
+      "ruleId": "subbytes_00.R010",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 52
+    },
+    {
+      "ruleId": "subbytes_00.R011",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 54
+    },
+    {
+      "ruleId": "subbytes_00.R011",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 54
+    },
+    {
+      "ruleId": "subbytes_00.R011",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 54
+    },
+    {
+      "ruleId": "subbytes_00.R011",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 54
+    },
+    {
+      "ruleId": "subbytes_00.R012",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 55
+    },
+    {
+      "ruleId": "subbytes_00.R012",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 55
+    },
+    {
+      "ruleId": "subbytes_00.R012",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 55
+    },
+    {
+      "ruleId": "subbytes_00.R012",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 55
+    },
+    {
+      "ruleId": "subbytes_00.R013",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 56
+    },
+    {
+      "ruleId": "subbytes_00.R013",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 56
+    },
+    {
+      "ruleId": "subbytes_00.R013",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 56
+    },
+    {
+      "ruleId": "subbytes_00.R013",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 56
+    },
+    {
+      "ruleId": "subbytes_00.R014",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 57
+    },
+    {
+      "ruleId": "subbytes_00.R014",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 57
+    },
+    {
+      "ruleId": "subbytes_00.R014",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 57
+    },
+    {
+      "ruleId": "subbytes_00.R014",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 57
+    },
+    {
+      "ruleId": "subbytes_00.R015",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 69
+    },
+    {
+      "ruleId": "subbytes_00.R015",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 69
+    },
+    {
+      "ruleId": "subbytes_00.R015",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 69
+    },
+    {
+      "ruleId": "subbytes_00.R015",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 69
+    },
+    {
+      "ruleId": "subbytes_00.R016",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 78
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "31|\t\tdata_reg = 1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 31,
+      "before": "\t\tdata_reg = 0;",
+      "after": "\t\tdata_reg = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "subbytes_00.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "28|always @(posedge clk)",
+      "pool": "rule",
+      "op": "OP-ASYNC",
+      "line": 28,
+      "before": "always @(posedge clk or negedge reset)",
+      "after": "always @(posedge clk)",
+      "detail": "刪 or negedge reset",
+      "ruleIds": [
+        "subbytes_00.R001",
+        "subbytes_00.R002",
+        "subbytes_00.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "32|\t\tstate = 1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 32,
+      "before": "\t\tstate = 0;",
+      "after": "\t\tstate = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "subbytes_00.R002"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 175,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "state[0]"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "33|\t\tready_o = 1;",
+      "pool": "rule",
+      "op": "OP-RVAL",
+      "line": 33,
+      "before": "\t\tready_o = 0;",
+      "after": "\t\tready_o = 1;",
+      "detail": "0→1",
+      "ruleIds": [
+        "subbytes_00.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "35|\t\tdata_reg = data_reg;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 35,
+      "before": "\t\tdata_reg = next_data_reg;",
+      "after": "\t\tdata_reg = data_reg;",
+      "detail": "rhs→data_reg",
+      "ruleIds": [
+        "subbytes_00.R004"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 143,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "data_o[24]",
+        "data_o[25]",
+        "data_o[26]",
+        "data_o[27]",
+        "data_o[28]",
+        "data_o[29]",
+        "data_o[30]",
+        "data_o[31]",
+        "data_reg[24]",
+        "data_reg[25]",
+        "data_reg[26]",
+        "data_reg[27]",
+        "data_reg[28]",
+        "data_reg[29]",
+        "data_reg[30]",
+        "data_reg[31]"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "36|\t\tstate = state;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 36,
+      "before": "\t\tstate = next_state;",
+      "after": "\t\tstate = state;",
+      "detail": "rhs→state",
+      "ruleIds": [
+        "subbytes_00.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "37|\t\tready_o = ready_o;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 37,
+      "before": "\t\tready_o = next_ready_o;",
+      "after": "\t\tready_o = ready_o;",
+      "detail": "rhs→ready_o",
+      "ruleIds": [
+        "subbytes_00.R006"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 175
+    },
+    {
+      "id": "m0008",
+      "key": "49|\tdata_array[0] = data_i_var[30:23];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 49,
+      "before": "\tdata_array[0] = data_i_var[ 31: 24];",
+      "after": "\tdata_array[0] = data_i_var[30:23];",
+      "detail": "[ 31: 24]→[30:23]",
+      "ruleIds": [
+        "subbytes_00.R007"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 175,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "data_array[0][0]",
+        "data_array[0][1]",
+        "data_array[0][2]",
+        "data_array[0][3]",
+        "data_array[0][4]",
+        "data_array[0][5]",
+        "data_array[0][6]",
+        "data_array[0][7]",
+        "sbox_data_o[0]",
+        "sbox_data_o[1]",
+        "sbox_data_o[2]",
+        "sbox_data_o[3]",
+        "sbox_data_o[4]",
+        "sbox_data_o[5]",
+        "sbox_data_o[6]",
+        "sbox_data_o[7]"
+      ]
+    },
+    {
+      "id": "m0009",
+      "key": "50|\tdata_array[1] = data_i_var[22:15];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 50,
+      "before": "\tdata_array[1] = data_i_var[ 23: 16];",
+      "after": "\tdata_array[1] = data_i_var[22:15];",
+      "detail": "[ 23: 16]→[22:15]",
+      "ruleIds": [
+        "subbytes_00.R008"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "51|\tdata_array[2] = data_i_var[14:7];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 51,
+      "before": "\tdata_array[2] = data_i_var[ 15:  8];",
+      "after": "\tdata_array[2] = data_i_var[14:7];",
+      "detail": "[ 15:  8]→[14:7]",
+      "ruleIds": [
+        "subbytes_00.R009"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 175,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "data_array[2][0]",
+        "data_array[2][1]",
+        "data_array[2][2]",
+        "data_array[2][3]",
+        "data_array[2][4]",
+        "data_array[2][5]",
+        "data_array[2][6]",
+        "data_array[2][7]",
+        "sbox_data_o[0]",
+        "sbox_data_o[1]",
+        "sbox_data_o[2]",
+        "sbox_data_o[3]",
+        "sbox_data_o[4]",
+        "sbox_data_o[5]",
+        "sbox_data_o[6]",
+        "sbox_data_o[7]"
+      ]
+    },
+    {
+      "id": "m0011",
+      "key": "52|\tdata_array[3] = data_i_var[8:1];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 52,
+      "before": "\tdata_array[3] = data_i_var[  7:  0];",
+      "after": "\tdata_array[3] = data_i_var[8:1];",
+      "detail": "[  7:  0]→[8:1]",
+      "ruleIds": [
+        "subbytes_00.R010"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 175,
+      "eqUnproven": 16,
+      "unprovenCells": [
+        "data_array[3][0]",
+        "data_array[3][1]",
+        "data_array[3][2]",
+        "data_array[3][3]",
+        "data_array[3][4]",
+        "data_array[3][5]",
+        "data_array[3][6]",
+        "data_array[3][7]",
+        "sbox_data_o[0]",
+        "sbox_data_o[1]",
+        "sbox_data_o[2]",
+        "sbox_data_o[3]",
+        "sbox_data_o[4]",
+        "sbox_data_o[5]",
+        "sbox_data_o[6]",
+        "sbox_data_o[7]"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "54|\tdata_reg_var[0] = data_reg[30:23];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 54,
+      "before": "\tdata_reg_var[0] = data_reg[ 31: 24];",
+      "after": "\tdata_reg_var[0] = data_reg[30:23];",
+      "detail": "[ 31: 24]→[30:23]",
+      "ruleIds": [
+        "subbytes_00.R011"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 175
+    },
+    {
+      "id": "m0013",
+      "key": "55|\tdata_reg_var[1] = data_reg[22:15];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 55,
+      "before": "\tdata_reg_var[1] = data_reg[ 23: 16];",
+      "after": "\tdata_reg_var[1] = data_reg[22:15];",
+      "detail": "[ 23: 16]→[22:15]",
+      "ruleIds": [
+        "subbytes_00.R012"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 175
+    },
+    {
+      "id": "m0014",
+      "key": "56|\tdata_reg_var[2] = data_reg[14:7];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 56,
+      "before": "\tdata_reg_var[2] = data_reg[ 15:  8];",
+      "after": "\tdata_reg_var[2] = data_reg[14:7];",
+      "detail": "[ 15:  8]→[14:7]",
+      "ruleIds": [
+        "subbytes_00.R013"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 175
+    },
+    {
+      "id": "m0015",
+      "key": "57|\tdata_reg_var[3] = data_reg[8:1];",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 57,
+      "before": "\tdata_reg_var[3] = data_reg[  7:  0];",
+      "after": "\tdata_reg_var[3] = data_reg[8:1];",
+      "detail": "[  7:  0]→[8:1]",
+      "ruleIds": [
+        "subbytes_00.R014"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 175
+    },
+    {
+      "id": "m0016",
+      "key": "69|\t\t\tnext_state = 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 69,
+      "before": "\t\t\tnext_state = 1;",
+      "after": "\t\t\tnext_state = 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "subbytes_00.R015"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0017",
+      "key": "78|\t\tnext_state = state - 1;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 78,
+      "before": "\t\tnext_state = state + 1;",
+      "after": "\t\tnext_state = state - 1;",
+      "detail": "+→-",
+      "ruleIds": [
+        "subbytes_00.R016"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset"
+      ]
+    },
+    {
+      "id": "m0018",
+      "key": "78|\t\tnext_state = state + 2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 78,
+      "before": "\t\tnext_state = state + 1;",
+      "after": "\t\tnext_state = state + 2;",
+      "detail": "1→2",
+      "ruleIds": [
+        "subbytes_00.R016"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset"
+      ]
+    },
+    {
+      "id": "m0019",
+      "key": "30|\tif (!reset) begin // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 30,
+      "before": "\tif (!reset) begin",
+      "after": "\tif (!reset) begin // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "subbytes_00.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0020",
+      "key": "35|\t\tdata_reg = next_data_reg; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 35,
+      "before": "\t\tdata_reg = next_data_reg;",
+      "after": "\t\tdata_reg = next_data_reg; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "subbytes_00.R004"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0021",
+      "key": "49|\tdata_array[0] = data_i_var[ 31: 24]; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 49,
+      "before": "\tdata_array[0] = data_i_var[ 31: 24];",
+      "after": "\tdata_array[0] = data_i_var[ 31: 24]; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "subbytes_00.R007"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0022",
+      "key": "47|\tdata_i_var = data_i_var;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 47,
+      "before": "\tdata_i_var = data_i;",
+      "after": "\tdata_i_var = data_i_var;",
+      "detail": "rhs→data_i_var",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0023",
+      "key": "59|\tsbox_decrypt_o = sbox_decrypt_o;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 59,
+      "before": "\tsbox_decrypt_o = decrypt_i;",
+      "after": "\tsbox_decrypt_o = sbox_decrypt_o;",
+      "detail": "rhs→sbox_decrypt_o",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0024",
+      "key": "60|\tsbox_data_o = sbox_data_o;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 60,
+      "before": "\tsbox_data_o = data_array[state];",
+      "after": "\tsbox_data_o = sbox_data_o;",
+      "detail": "rhs→sbox_data_o",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0025",
+      "key": "61|\tnext_state = next_state;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 61,
+      "before": "\tnext_state = state;",
+      "after": "\tnext_state = next_state;",
+      "detail": "rhs→next_state",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0026",
+      "key": "62|\tnext_data_reg = next_data_reg;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 62,
+      "before": "\tnext_data_reg = data_reg;",
+      "after": "\tnext_data_reg = next_data_reg;",
+      "detail": "rhs→next_data_reg",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0027",
+      "key": "64|\tnext_ready_o = next_ready_o;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 64,
+      "before": "\tnext_ready_o = 0;",
+      "after": "\tnext_ready_o = next_ready_o;",
+      "detail": "rhs→next_ready_o",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0028",
+      "key": "64|\tnext_ready_o = 1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 64,
+      "before": "\tnext_ready_o = 0;",
+      "after": "\tnext_ready_o = 1;",
+      "detail": "0→1",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0029",
+      "key": "65|\tdata_o = data_o;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 65,
+      "before": "\tdata_o = data_reg;",
+      "after": "\tdata_o = data_o;",
+      "detail": "rhs→data_o",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0030",
+      "key": "72|\t\tdata_reg_var[state] = data_reg_var[state];",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 72,
+      "before": "\t\tdata_reg_var[state] = sbox_data_i;",
+      "after": "\t\tdata_reg_var[state] = data_reg_var[state];",
+      "detail": "rhs→data_reg_var[state]",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0031",
+      "key": "73|\t\tdata_reg_128[ 31: 24] = data_reg_128[ 31: 24];",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 73,
+      "before": "\t\tdata_reg_128[ 31: 24] = data_reg_var[0];",
+      "after": "\t\tdata_reg_128[ 31: 24] = data_reg_128[ 31: 24];",
+      "detail": "rhs→data_reg_128[ 31: 24]",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0032",
+      "key": "74|\t\tdata_reg_128[ 23: 16] = data_reg_128[ 23: 16];",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 74,
+      "before": "\t\tdata_reg_128[ 23: 16] = data_reg_var[1];",
+      "after": "\t\tdata_reg_128[ 23: 16] = data_reg_128[ 23: 16];",
+      "detail": "rhs→data_reg_128[ 23: 16]",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0033",
+      "key": "75|\t\tdata_reg_128[ 15:  8] = data_reg_128[ 15:  8];",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 75,
+      "before": "\t\tdata_reg_128[ 15:  8] = data_reg_var[2];",
+      "after": "\t\tdata_reg_128[ 15:  8] = data_reg_128[ 15:  8];",
+      "detail": "rhs→data_reg_128[ 15:  8]",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0034",
+      "key": "76|\t\tdata_reg_128[  7:  0] = data_reg_128[  7:  0];",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 76,
+      "before": "\t\tdata_reg_128[  7:  0] = data_reg_var[3];",
+      "after": "\t\tdata_reg_128[  7:  0] = data_reg_128[  7:  0];",
+      "detail": "rhs→data_reg_128[  7:  0]",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_reset",
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0035",
+      "key": "77|\t\tnext_data_reg = next_data_reg;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 77,
+      "before": "\t\tnext_data_reg = data_reg_128;",
+      "after": "\t\tnext_data_reg = next_data_reg;",
+      "detail": "rhs→next_data_reg",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 47,
+        "op": "OP-HOLD",
+        "before": "data_i_var = data_i;",
+        "after": "data_i_var = data_i_var;",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 59,
+        "op": "OP-HOLD",
+        "before": "sbox_decrypt_o = decrypt_i;",
+        "after": "sbox_decrypt_o = sbox_decrypt_o;",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 60,
+        "op": "OP-HOLD",
+        "before": "sbox_data_o = data_array[state];",
+        "after": "sbox_data_o = sbox_data_o;",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 64,
+        "op": "OP-HOLD",
+        "before": "next_ready_o = 0;",
+        "after": "next_ready_o = next_ready_o;",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 64,
+        "op": "OP-CONST",
+        "before": "next_ready_o = 0;",
+        "after": "next_ready_o = 1;",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 65,
+        "op": "OP-HOLD",
+        "before": "data_o = data_reg;",
+        "after": "data_o = data_o;",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 73,
+        "op": "OP-HOLD",
+        "before": "data_reg_128[ 31: 24] = data_reg_var[0];",
+        "after": "data_reg_128[ 31: 24] = data_reg_128[ 31: 24];",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 74,
+        "op": "OP-HOLD",
+        "before": "data_reg_128[ 23: 16] = data_reg_var[1];",
+        "after": "data_reg_128[ 23: 16] = data_reg_128[ 23: 16];",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 75,
+        "op": "OP-HOLD",
+        "before": "data_reg_128[ 15:  8] = data_reg_var[2];",
+        "after": "data_reg_128[ 15:  8] = data_reg_128[ 15:  8];",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 76,
+        "op": "OP-HOLD",
+        "before": "data_reg_128[  7:  0] = data_reg_var[3];",
+        "after": "data_reg_128[  7:  0] = data_reg_128[  7:  0];",
+        "killScenes": [
+          "SCENE1 arst_reset",
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [
+        {
+          "signal": "data_i_var",
+          "class": "U5",
+          "policy": false,
+          "line": 0,
+          "snippet": ""
+        },
+        {
+          "signal": "data_o",
+          "class": "U5",
+          "policy": false,
+          "line": 18,
+          "snippet": "reg [31:0] data_o;"
+        },
+        {
+          "signal": "data_reg_128",
+          "class": "U5",
+          "policy": false,
+          "line": 0,
+          "snippet": ""
+        },
+        {
+          "signal": "next_data_reg",
+          "class": "U5",
+          "policy": false,
+          "line": 25,
+          "snippet": "reg [31:0] next_data_reg;"
+        },
+        {
+          "signal": "next_ready_o",
+          "class": "U5",
+          "policy": false,
+          "line": 26,
+          "snippet": "reg next_ready_o;"
+        },
+        {
+          "signal": "sbox_data_o",
+          "class": "U5",
+          "policy": false,
+          "line": 19,
+          "snippet": "reg [7:0] sbox_data_o;"
+        },
+        {
+          "signal": "sbox_decrypt_o",
+          "class": "U5",
+          "policy": false,
+          "line": 20,
+          "snippet": "reg sbox_decrypt_o;"
+        }
+      ],
+      "summary": {
+        "uncovered": 7,
+        "byClass": {
+          "U5": 7
+        },
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 8,
+      "hit": 3,
+      "rate": "3/8"
+    }
+  }
+}

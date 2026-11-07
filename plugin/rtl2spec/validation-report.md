@@ -1,8 +1,8 @@
 # rtl2spec 真實 RTL 驗證報告
 
-- 日期:2026-11-06
+- 日期:2026-11-07
 - 命令行:`bash plugin/rtl2spec/run-rtl-validation.sh`(機械生成禁手改)
-- 工具鏈:bun 1.4.2、wasm sha256 `23af31de63d6580c01d4df81d4c467297180b1f71e091f4d4ac0f06556b92c74`
+- 工具鏈:bun 1.4.2、wasm sha256 `66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d`
 - 本檔=閘契約 V1..V6 的證據頁;評審員區外全部機械生成。
 
 ## 閘契約表(V1..V6)

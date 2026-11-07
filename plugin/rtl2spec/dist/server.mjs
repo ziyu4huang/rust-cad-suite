@@ -18,7 +18,7 @@ import { sumRules, countGaps, renderRulebookMarkdown, renderGapsMarkdown } from 
 import { fileURLToPath } from 'node:url';
 
 const SERVER_NAME = 'rtl2spec';
-const SERVER_VERSION = '0.3.0';
+const SERVER_VERSION = '0.5.0';
 const PROTOCOL_LATEST = '2025-11-25';
 const PROTOCOL_SUPPORTED = [
   '2025-11-25',
@@ -96,7 +96,7 @@ function loadSource(args) {
   return { error: 'either `path` or `source` is required' };
 }
 
-// ---- 工具面(§6.1 四工具) ----
+// ---- 工具面(§6.1 五工具;C-S2 新增 rtl_tb_plan,ADR-0013 D-C11 修訂) ----
 
 const TOOLS = [
   {
@@ -136,7 +136,7 @@ const TOOLS = [
         name: { type: 'string', description: 'virtual file name for inline `source`' },
         lang: { type: 'string', enum: ['sv', 'rtlil'] },
         format: { type: 'string', enum: ['json', 'markdown', 'both'], description: 'default both' },
-        max_rules_per_module: { type: 'number', description: 'default 128; overflow marks truncated' },
+        max_rules_per_module: { type: 'number', description: '省略或 0=核心 DEFAULT_MAX_RULES(現值 256);overflow marks truncated' },
       },
       required: [],
     },
@@ -145,9 +145,11 @@ const TOOLS = [
       if (loaded.error) return toolError(loaded.error);
       const lang = langOf(args, loaded.name);
       const format = ['json', 'markdown', 'both'].includes(args.format) ? args.format : 'both';
+      // 省略/非正數→傳 0:wasm 面契約「max_rules==0 取核心 DEFAULT_MAX_RULES」
+      // (crates/rtl-spec-wasm/src/lib.rs),面委託核心 SSOT 不複製常量(D-r1a,§19.2)。
       const max = Number.isFinite(args.max_rules_per_module) && args.max_rules_per_module > 0
         ? Math.floor(args.max_rules_per_module)
-        : 128;
+        : 0;
       const json =
         lang === 'rtlil'
           ? api.rtl_extract_rules_rtlil(loaded.name, loaded.source)
@@ -186,6 +188,44 @@ const TOOLS = [
     },
   },
   {
+    name: 'rtl_tb_plan',
+    description:
+      'Deterministic testbench plan + template (tb_plan-v1) from RTL: clocks/resets/sens_edges/obligations/waivers/scenes derived from the behavioural rulebook. template_v is a runnable harness skeleton — record expected output from the original, never hand-write it. Errors carry milestone TB1.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: { type: 'string', description: 'RTL source file path (relative to cwd)' },
+        source: { type: 'string', description: 'RTL source text (used when path is absent)' },
+        name: { type: 'string', description: 'virtual file name for inline `source`' },
+        lang: { type: 'string', enum: ['sv', 'rtlil'], description: 'default: by extension (.il → rtlil, else sv); rtlil → milestone TB1' },
+        module: { type: 'string', description: 'top module (default: the single module; multi-module without it → TB1)' },
+        seed: { type: 'number', description: 'xorshift seed; 0=core default' },
+        cycles: { type: 'number', description: 'cycles per random scene; 0=core default' },
+        flush: { type: 'number', description: 'flush cycles for resetless sequential; 0=core default' },
+      },
+      required: [],
+    },
+    call(args) {
+      const loaded = loadSource(args);
+      if (loaded.error) return toolError(loaded.error);
+      const lang = langOf(args, loaded.name);
+      // 缺省一律傳 0/空串(面委託核心 TbOpts::resolve/None,零常量複製)。
+      const module = typeof args.module === 'string' && args.module !== '' ? args.module : '';
+      const seed = Number.isFinite(args.seed) && args.seed > 0 ? Math.floor(args.seed) : 0;
+      const cycles = Number.isFinite(args.cycles) && args.cycles > 0 ? Math.floor(args.cycles) : 0;
+      const flush = Number.isFinite(args.flush) && args.flush > 0 ? Math.floor(args.flush) : 0;
+      const frame =
+        lang === 'rtlil'
+          ? api.rtl_tb_plan_rtlil(loaded.name, loaded.source, module, seed, cycles, flush)
+          : api.rtl_tb_plan_sv(loaded.name, loaded.source, module, seed, cycles, flush);
+      const parsed = JSON.parse(frame);
+      if (parsed.ok !== true) {
+        return toolError(String(parsed.error ?? 'tb_plan failed'));
+      }
+      return ok(parsed, null); // {ok:true,plan,template_v}=核心幀原樣轉出(零語義)
+    },
+  },
+  {
     name: 'rtl_extract_batch',
     description:
       'Batch rulebook+gap extraction over up to 64 RTL files; returns per-file ok/rule_count/gap_count summary (validation harness)',
@@ -216,7 +256,7 @@ const TOOLS = [
           const rbJson =
             lang === 'rtlil'
               ? api.rtl_extract_rules_rtlil(loaded.name, loaded.source)
-              : api.rtl_extract_rules_sv(loaded.name, loaded.source, 128);
+              : api.rtl_extract_rules_sv(loaded.name, loaded.source, 0); // 0=核心默認(D-r1a)
           const gapJson =
             lang === 'rtlil'
               ? api.rtl_scan_gaps_rtlil(loaded.name, loaded.source)

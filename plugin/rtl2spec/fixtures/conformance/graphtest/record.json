@@ -1,0 +1,577 @@
+{
+  "design": "graphtest",
+  "src": "corpus-external/yosys-simple/graphtest.v",
+  "top": "graphtest",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/graphtest.rules.json",
+  "rules": 6,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "c086f5a0816db08a89639aa054d6e6ad05fc463bcb37261451634d1b45c43776",
+    "scenes": 2,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 6
+  },
+  "expected": {
+    "sha256": "81649db0026b9cbb59ee8a9b95eb9b54a7bf798cefdaee541fa63b734d6b72e4",
+    "lines": 1539
+  },
+  "numbers": {
+    "generated": 10,
+    "stillborn": 0,
+    "equivalent": 3,
+    "eligible": 7,
+    "killed": 7,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "7/7",
+    "ruleVerified": {
+      "exclusive": "6/6",
+      "shared": "0/6"
+    },
+    "catalogCoverage": "6/6",
+    "unruled": {
+      "generated": 6,
+      "killed": 4
+    },
+    "controlsSurvived": "4/4",
+    "ambiguous": 0,
+    "na": 15
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 30,
+      "out": 22
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 27
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 3,
+      "equivalent": 3,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 7,
+      "mainKilled": 7,
+      "unproven": 7,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "relation": {
+      "total": 6,
+      "unique": 6
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "graphtest.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 12
+    },
+    {
+      "ruleId": "graphtest.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 13
+    },
+    {
+      "ruleId": "graphtest.R002",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 13
+    },
+    {
+      "ruleId": "graphtest.R002",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 13
+    },
+    {
+      "ruleId": "graphtest.R002",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 13
+    },
+    {
+      "ruleId": "graphtest.R003",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 18
+    },
+    {
+      "ruleId": "graphtest.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 18
+    },
+    {
+      "ruleId": "graphtest.R004",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "graphtest.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "graphtest.R004",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 22
+    },
+    {
+      "ruleId": "graphtest.R004",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 22
+    },
+    {
+      "ruleId": "graphtest.R005",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 23
+    },
+    {
+      "ruleId": "graphtest.R005",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 23
+    },
+    {
+      "ruleId": "graphtest.R006",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 30
+    },
+    {
+      "ruleId": "graphtest.R006",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 30
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "12|assign t[2:0] = A[2:0] | { 2'b10, B[3]}; // Concatenation of intermediate wire",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 12,
+      "before": "assign t[2:0] = A[2:0] & { 2'b10, B[3]}; // Concatenation of intermediate wire",
+      "after": "assign t[2:0] = A[2:0] | { 2'b10, B[3]}; // Concatenation of intermediate wire",
+      "detail": "&→|",
+      "ruleIds": [
+        "graphtest.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "12|assign t[2:0] = A[2:0] & { 2'b11, B[3]}; // Concatenation of intermediate wire",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 12,
+      "before": "assign t[2:0] = A[2:0] & { 2'b10, B[3]}; // Concatenation of intermediate wire",
+      "after": "assign t[2:0] = A[2:0] & { 2'b11, B[3]}; // Concatenation of intermediate wire",
+      "detail": "2'b10→2'b11",
+      "ruleIds": [
+        "graphtest.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "13|assign t[3] = A[2] | B[3];               // Bitwise-XOR",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 13,
+      "before": "assign t[3] = A[2] ^ B[3];               // Bitwise-XOR",
+      "after": "assign t[3] = A[2] | B[3];               // Bitwise-XOR",
+      "detail": "^→|",
+      "ruleIds": [
+        "graphtest.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "18|assign Y = {3'b000, A, t[2:0]};          // Direct assignment of concatenation",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 18,
+      "before": "assign Y = {3'b111, A, t[2:0]};          // Direct assignment of concatenation",
+      "after": "assign Y = {3'b000, A, t[2:0]};          // Direct assignment of concatenation",
+      "detail": "3'b111→3'b000",
+      "ruleIds": [
+        "graphtest.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "18|assign Y = {3'sb111, A, t[2:0]};          // Direct assignment of concatenation",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 18,
+      "before": "assign Y = {3'b111, A, t[2:0]};          // Direct assignment of concatenation",
+      "after": "assign Y = {3'sb111, A, t[2:0]};          // Direct assignment of concatenation",
+      "detail": "3'b111→3'sb111",
+      "ruleIds": [
+        "graphtest.R003"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 27
+    },
+    {
+      "id": "m0006",
+      "key": "22|assign Z[3:2] = A[1:0];                  // PI connects to PO",
+      "pool": "rule",
+      "op": "OP-SLICE",
+      "line": 22,
+      "before": "assign Z[3:2] = A[2:1];                  // PI connects to PO",
+      "after": "assign Z[3:2] = A[1:0];                  // PI connects to PO",
+      "detail": "[2:1]→[1:0]",
+      "ruleIds": [
+        "graphtest.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0007",
+      "key": "23|assign Z[7:4] = {1'b1, B[2:0]};          // Concat of CV and PI connect to PO",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 23,
+      "before": "assign Z[7:4] = {1'b0, B[2:0]};          // Concat of CV and PI connect to PO",
+      "after": "assign Z[7:4] = {1'b1, B[2:0]};          // Concat of CV and PI connect to PO",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [
+        "graphtest.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "23|assign Z[7:4] = {1'sb0, B[2:0]};          // Concat of CV and PI connect to PO",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 23,
+      "before": "assign Z[7:4] = {1'b0, B[2:0]};          // Concat of CV and PI connect to PO",
+      "after": "assign Z[7:4] = {1'sb0, B[2:0]};          // Concat of CV and PI connect to PO",
+      "detail": "1'b0→1'sb0",
+      "ruleIds": [
+        "graphtest.R005"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 27
+    },
+    {
+      "id": "m0009",
+      "key": "30|    X = 4'b0001;                         // All-Const at port (mux)",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 30,
+      "before": "    X = 4'b0000;                         // All-Const at port (mux)",
+      "after": "    X = 4'b0001;                         // All-Const at port (mux)",
+      "detail": "4'b0000→4'b0001",
+      "ruleIds": [
+        "graphtest.R006"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "30|    X = 4'sb0000;                         // All-Const at port (mux)",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 30,
+      "before": "    X = 4'b0000;                         // All-Const at port (mux)",
+      "after": "    X = 4'sb0000;                         // All-Const at port (mux)",
+      "detail": "4'b0000→4'sb0000",
+      "ruleIds": [
+        "graphtest.R006"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 27
+    },
+    {
+      "id": "m0011",
+      "key": "12|assign t[2:0] = A[2:0] & { 2'b10, B[3]}; // Concatenation of intermediate wire // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 12,
+      "before": "assign t[2:0] = A[2:0] & { 2'b10, B[3]}; // Concatenation of intermediate wire",
+      "after": "assign t[2:0] = A[2:0] & { 2'b10, B[3]}; // Concatenation of intermediate wire // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "graphtest.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0012",
+      "key": "11|assign t[4] = t[4];                      // Constant connects to wire",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 11,
+      "before": "assign t[4] = 1'b0;                      // Constant connects to wire",
+      "after": "assign t[4] = t[4];                      // Constant connects to wire",
+      "detail": "rhs→t[4]",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0013",
+      "key": "11|assign t[4] = 1'b1;                      // Constant connects to wire",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 11,
+      "before": "assign t[4] = 1'b0;                      // Constant connects to wire",
+      "after": "assign t[4] = 1'b1;                      // Constant connects to wire",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0014",
+      "key": "20|assign Z[0] = Z[0];                      // Constant connects to PO",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 20,
+      "before": "assign Z[0] = 1'b0;                      // Constant connects to PO",
+      "after": "assign Z[0] = Z[0];                      // Constant connects to PO",
+      "detail": "rhs→Z[0]",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0015",
+      "key": "20|assign Z[0] = 1'b1;                      // Constant connects to PO",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 20,
+      "before": "assign Z[0] = 1'b0;                      // Constant connects to PO",
+      "after": "assign Z[0] = 1'b1;                      // Constant connects to PO",
+      "detail": "1'b0→1'b1",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0016",
+      "key": "21|assign Z[1] = Z[1];                      // Intermediate sig connects to PO",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 21,
+      "before": "assign Z[1] = t[3];                      // Intermediate sig connects to PO",
+      "after": "assign Z[1] = Z[1];                      // Intermediate sig connects to PO",
+      "detail": "rhs→Z[1]",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0017",
+      "key": "27|    X = X;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 27,
+      "before": "    X = B;",
+      "after": "    X = X;",
+      "detail": "rhs→X",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh"
+      ]
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 20,
+        "op": "OP-HOLD",
+        "before": "assign Z[0] = 1'b0;                      // Constant connects to PO",
+        "after": "assign Z[0] = Z[0];                      // Constant connects to PO",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 20,
+        "op": "OP-CONST",
+        "before": "assign Z[0] = 1'b0;                      // Constant connects to PO",
+        "after": "assign Z[0] = 1'b1;                      // Constant connects to PO",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 21,
+        "op": "OP-HOLD",
+        "before": "assign Z[1] = t[3];                      // Intermediate sig connects to PO",
+        "after": "assign Z[1] = Z[1];                      // Intermediate sig connects to PO",
+        "killScenes": [
+          "SCENE1 exh",
+          "SCENE2 small"
+        ]
+      },
+      {
+        "line": 27,
+        "op": "OP-HOLD",
+        "before": "X = B;",
+        "after": "X = X;",
+        "killScenes": [
+          "SCENE1 exh"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 7,
+      "hit": 6,
+      "rate": "6/7"
+    }
+  }
+}

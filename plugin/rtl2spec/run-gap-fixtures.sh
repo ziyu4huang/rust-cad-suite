@@ -25,6 +25,12 @@ FIXTURES=(
   "crates/rtl-spec/tests/fixtures/gaps_negative.v"
   "plugin/rtl2spec/fixtures/gap_missing_reset_no_arm.v"
   "plugin/rtl2spec/fixtures/gap_hang_repro.v"
+  # §19.2 C-S1 D-r1c 五檔(破口面+規則面兩矩陣各一行)
+  "plugin/rtl2spec/fixtures/rst_first_async.v"
+  "plugin/rtl2spec/fixtures/rst_first_twin.v"
+  "plugin/rtl2spec/fixtures/rst_first_compound.v"
+  "plugin/rtl2spec/fixtures/rst_first_loadsig.v"
+  "plugin/rtl2spec/fixtures/rst_only_edge.v"
 )
 MISSING=()
 for f in "${FIXTURES[@]}"; do

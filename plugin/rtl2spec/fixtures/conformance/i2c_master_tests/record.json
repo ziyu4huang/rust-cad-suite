@@ -1,0 +1,605 @@
+{
+  "design": "i2c_master_tests",
+  "src": "corpus-external/yosys-simple/i2c_master_tests.v",
+  "top": "i2c_test01",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/i2c_master_tests.rules.json",
+  "rules": 5,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "6b5acea7fc249aa6614269d8a9a5cecf6f1b58967954ca44770e5374b9b565f0",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 7
+  },
+  "expected": {
+    "sha256": "47061d7933dff07633055cb855fe20dc737d02691c1cec64101172fee64717e1",
+    "lines": 103
+  },
+  "numbers": {
+    "generated": 10,
+    "stillborn": 0,
+    "equivalent": 5,
+    "eligible": 5,
+    "killed": 3,
+    "survived": 2,
+    "timeout": 0,
+    "rate": "3/5",
+    "ruleVerified": {
+      "exclusive": "3/5",
+      "shared": "0/5"
+    },
+    "catalogCoverage": "5/5",
+    "unruled": {
+      "generated": 14,
+      "killed": 0
+    },
+    "controlsSurvived": "6/6",
+    "ambiguous": 0,
+    "na": 10
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 4,
+      "out": 1
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 7,
+      "equivalent": 5,
+      "unproven": 2,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 3,
+      "mainKilled": 3,
+      "unproven": 3,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "sequence": {
+      "total": 5,
+      "unique": 5
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "i2c_test01.R001",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 14
+    },
+    {
+      "ruleId": "i2c_test01.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 14
+    },
+    {
+      "ruleId": "i2c_test01.R002",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 16
+    },
+    {
+      "ruleId": "i2c_test01.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 16
+    },
+    {
+      "ruleId": "i2c_test01.R003",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 20
+    },
+    {
+      "ruleId": "i2c_test01.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 20
+    },
+    {
+      "ruleId": "i2c_test01.R004",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "i2c_test01.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 22
+    },
+    {
+      "ruleId": "i2c_test01.R005",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 24
+    },
+    {
+      "ruleId": "i2c_test01.R005",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 24
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "14|\t    cmd_stop <= cmd_stop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 14,
+      "before": "\t    cmd_stop <= #1 1'b0;",
+      "after": "\t    cmd_stop <= cmd_stop;",
+      "detail": "rhs→cmd_stop",
+      "ruleIds": [
+        "i2c_test01.R001"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 2,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cmd_stop"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "14|\t    cmd_stop <= #2 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 14,
+      "before": "\t    cmd_stop <= #1 1'b0;",
+      "after": "\t    cmd_stop <= #2 1'b0;",
+      "detail": "1→2",
+      "ruleIds": [
+        "i2c_test01.R001"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    {
+      "id": "m0003",
+      "key": "16|\t    cmd_stop <= cmd_stop;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 16,
+      "before": "\t    cmd_stop <= #1 1'b0;",
+      "after": "\t    cmd_stop <= cmd_stop;",
+      "detail": "rhs→cmd_stop",
+      "ruleIds": [
+        "i2c_test01.R002"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "unadjudicated",
+      "eqverdict": "unproven",
+      "eqCells": 2,
+      "eqUnproven": 1,
+      "unprovenCells": [
+        "cmd_stop"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "16|\t    cmd_stop <= #2 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 16,
+      "before": "\t    cmd_stop <= #1 1'b0;",
+      "after": "\t    cmd_stop <= #2 1'b0;",
+      "detail": "1→2",
+      "ruleIds": [
+        "i2c_test01.R002"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    {
+      "id": "m0005",
+      "key": "20|\t    al <= al;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 20,
+      "before": "\t    al <= #1 1'b0;",
+      "after": "\t    al <= al;",
+      "detail": "rhs→al",
+      "ruleIds": [
+        "i2c_test01.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "20|\t    al <= #2 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 20,
+      "before": "\t    al <= #1 1'b0;",
+      "after": "\t    al <= #2 1'b0;",
+      "detail": "1→2",
+      "ruleIds": [
+        "i2c_test01.R003"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    {
+      "id": "m0007",
+      "key": "22|\t    al <= al;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 22,
+      "before": "\t    al <= #1 1'b0;",
+      "after": "\t    al <= al;",
+      "detail": "rhs→al",
+      "ruleIds": [
+        "i2c_test01.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "22|\t    al <= #2 1'b0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 22,
+      "before": "\t    al <= #1 1'b0;",
+      "after": "\t    al <= #2 1'b0;",
+      "detail": "1→2",
+      "ruleIds": [
+        "i2c_test01.R004"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    {
+      "id": "m0009",
+      "key": "24|\t    al <= al;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 24,
+      "before": "\t    al <= #1 ~cmd_stop;",
+      "after": "\t    al <= al;",
+      "detail": "rhs→al",
+      "ruleIds": [
+        "i2c_test01.R005"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "24|\t    al <= #2 ~cmd_stop;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 24,
+      "before": "\t    al <= #1 ~cmd_stop;",
+      "after": "\t    al <= #2 ~cmd_stop;",
+      "detail": "1→2",
+      "ruleIds": [
+        "i2c_test01.R005"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    {
+      "id": "m0011",
+      "key": "14|\t    cmd_stop <= #1 1'b0; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 14,
+      "before": "\t    cmd_stop <= #1 1'b0;",
+      "after": "\t    cmd_stop <= #1 1'b0; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "i2c_test01.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0012",
+      "key": "43|\t          cnt    <= cnt;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 43,
+      "before": "\t          cnt    <= #1 clk_cnt;",
+      "after": "\t          cnt    <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0013",
+      "key": "43|\t          cnt    <= #2 clk_cnt;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 43,
+      "before": "\t          cnt    <= #1 clk_cnt;",
+      "after": "\t          cnt    <= #2 clk_cnt;",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0014",
+      "key": "44|\t          clk_en <= clk_en;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 44,
+      "before": "\t          clk_en <= #1 1'b1;",
+      "after": "\t          clk_en <= clk_en;",
+      "detail": "rhs→clk_en",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0015",
+      "key": "44|\t          clk_en <= #2 1'b1;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 44,
+      "before": "\t          clk_en <= #1 1'b1;",
+      "after": "\t          clk_en <= #2 1'b1;",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0016",
+      "key": "48|\t          cnt    <= cnt;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 48,
+      "before": "\t          cnt    <= #1 cnt;",
+      "after": "\t          cnt    <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0017",
+      "key": "48|\t          cnt    <= #2 cnt;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 48,
+      "before": "\t          cnt    <= #1 cnt;",
+      "after": "\t          cnt    <= #2 cnt;",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0018",
+      "key": "49|\t          clk_en <= clk_en;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 49,
+      "before": "\t          clk_en <= #1 1'b0;",
+      "after": "\t          clk_en <= clk_en;",
+      "detail": "rhs→clk_en",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0019",
+      "key": "49|\t          clk_en <= #2 1'b0;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 49,
+      "before": "\t          clk_en <= #1 1'b0;",
+      "after": "\t          clk_en <= #2 1'b0;",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0020",
+      "key": "53|                cnt    <= cnt;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 53,
+      "before": "                cnt    <= #1 cnt - 16'h1;",
+      "after": "                cnt    <= cnt;",
+      "detail": "rhs→cnt",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0021",
+      "key": "53|                cnt    <= #1 cnt + 16'h1;",
+      "pool": "unruled",
+      "op": "OP-ARITH",
+      "line": 53,
+      "before": "                cnt    <= #1 cnt - 16'h1;",
+      "after": "                cnt    <= #1 cnt + 16'h1;",
+      "detail": "-→+",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0022",
+      "key": "54|\t        clk_en <= clk_en;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 54,
+      "before": "\t        clk_en <= #1 1'b0;",
+      "after": "\t        clk_en <= clk_en;",
+      "detail": "rhs→clk_en",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0023",
+      "key": "54|\t        clk_en <= #2 1'b0;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 54,
+      "before": "\t        clk_en <= #1 1'b0;",
+      "after": "\t        clk_en <= #2 1'b0;",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0024",
+      "key": "59|\t    cmd_stop <= cmd_stop;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 59,
+      "before": "\t    cmd_stop <= #1 cmd;",
+      "after": "\t    cmd_stop <= cmd_stop;",
+      "detail": "rhs→cmd_stop",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0025",
+      "key": "59|\t    cmd_stop <= #2 cmd;",
+      "pool": "unruled",
+      "op": "OP-CONST",
+      "line": 59,
+      "before": "\t    cmd_stop <= #1 cmd;",
+      "after": "\t    cmd_stop <= #2 cmd;",
+      "detail": "1→2",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 3,
+      "hit": 2,
+      "rate": "2/3"
+    }
+  }
+}

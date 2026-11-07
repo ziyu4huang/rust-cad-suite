@@ -1,0 +1,17 @@
+{
+  "_note": "斷言規格(手寫合法,§19.4.4);tb.v/expected.txt/record.json 只由 --record 寫,禁手改",
+  "design": "signedexpr",
+  "src": "corpus-external/yosys-simple/signedexpr.v",
+  "top": "signed_test01",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/signedexpr.rules.json",
+  "iverilog": [
+    "-g2005"
+  ],
+  "tb_leg": "template",
+  "protocolLeg": "-",
+  "seed": 0,
+  "cycles": 0,
+  "flush": 0,
+  "waivers": [],
+  "aux": []
+}

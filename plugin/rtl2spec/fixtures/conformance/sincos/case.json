@@ -1,0 +1,25 @@
+{
+  "_note": "斷言規格(手寫合法,§19.4.4);tb.v/expected.txt/record.json 只由 --record 寫,禁手改",
+  "design": "sincos",
+  "src": "corpus-external/yosys-simple/sincos.v",
+  "top": "d",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/sincos.rules.json",
+  "iverilog": [
+    "-g2005"
+  ],
+  "tb_leg": "directed",
+  "protocolLeg": "sincos-r2-k1",
+  "seed": 0,
+  "cycles": 0,
+  "flush": 0,
+  "waivers": [],
+  "aux": [
+    {
+      "leg": "sincos-rew-r1",
+      "kind": "rewrite",
+      "files": [
+        "build/conformance/dleg/sincos/rewrite_r1_k1.v"
+      ]
+    }
+  ]
+}

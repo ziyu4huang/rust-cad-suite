@@ -1,0 +1,474 @@
+{
+  "design": "omsp_dbg_uart",
+  "src": "corpus-external/yosys-simple/omsp_dbg_uart.v",
+  "top": "omsp_dbg_uart",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/omsp_dbg_uart.rules.json",
+  "rules": 4,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "ad55d31edd4412339b1c0ba8d46990f6ad6eeb26344a21ca12b252c3c35ea290",
+    "scenes": 4,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 5
+  },
+  "expected": {
+    "sha256": "6c9ef60efbd17f1c44e0846bb2b626c63efc6614ae9b3931d8040c2f690ee16d",
+    "lines": 108
+  },
+  "numbers": {
+    "generated": 5,
+    "stillborn": 0,
+    "equivalent": 0,
+    "eligible": 5,
+    "killed": 5,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "5/5",
+    "ruleVerified": {
+      "exclusive": "3/3",
+      "shared": "0/3"
+    },
+    "catalogCoverage": "3/4",
+    "unruled": {
+      "generated": 4,
+      "killed": 3
+    },
+    "controlsSurvived": "3/3",
+    "ambiguous": 0,
+    "na": 11
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 4,
+      "out": 1
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 8
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 0,
+      "equivalent": 0,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 5,
+      "mainKilled": 5,
+      "unproven": 4,
+      "adjudicationFailed": 1,
+      "equivalent": 0,
+      "failed": [
+        "m0002 OP-POL@27 yosys-error: Async reset \\dbg_rst yields non-constant value 3'mmm for signal \\uart_state."
+      ]
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "guard": {
+      "total": 1,
+      "unique": 1
+    },
+    "sequence": {
+      "total": 1,
+      "unique": 1
+    },
+    "relation": {
+      "total": 2,
+      "unique": 2
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "omsp_dbg_uart.R001",
+      "op": "OP-RVAL",
+      "status": "n/a",
+      "reason": "源碼 RHS 非單一字面量",
+      "line": 27
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R002",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 28
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 28
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R002",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 28
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R002",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 28
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R002",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 28
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R004",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 31
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 31
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R004",
+      "op": "OP-CONST",
+      "status": "n/a",
+      "reason": "RHS 無可加一字面量",
+      "line": 31
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R004",
+      "op": "OP-SIGN",
+      "status": "n/a",
+      "reason": "RHS 無有位寬字面量",
+      "line": 31
+    },
+    {
+      "ruleId": "omsp_dbg_uart.R004",
+      "op": "OP-SLICE",
+      "status": "n/a",
+      "reason": "RHS 無數值部分選擇",
+      "line": 31
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "26|always @(posedge dbg_clk)",
+      "pool": "rule",
+      "op": "OP-ASYNC",
+      "line": 26,
+      "before": "always @(posedge dbg_clk or posedge dbg_rst)",
+      "after": "always @(posedge dbg_clk)",
+      "detail": "刪 or posedge dbg_rst",
+      "ruleIds": [
+        "omsp_dbg_uart.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 arst_dbg_rst"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "27|  if (!dbg_rst) uart_state <= RX_SYNC;",
+      "pool": "rule",
+      "op": "OP-POL",
+      "line": 27,
+      "before": "  if (dbg_rst) uart_state <= RX_SYNC;",
+      "after": "  if (!dbg_rst) uart_state <= RX_SYNC;",
+      "detail": "if (dbg_rst)→if (!dbg_rst)",
+      "ruleIds": [
+        "omsp_dbg_uart.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0003",
+      "key": "28|  else if (xfer_done | mem_burst) uart_state <= uart_state;",
+      "pool": "rule",
+      "op": "OP-HOLD",
+      "line": 28,
+      "before": "  else if (xfer_done | mem_burst) uart_state <= uart_state_nxt;",
+      "after": "  else if (xfer_done | mem_burst) uart_state <= uart_state;",
+      "detail": "rhs→uart_state",
+      "ruleIds": [
+        "omsp_dbg_uart.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "30|assign cmd_valid = (uart_state==RX_CMD) | xfer_done;",
+      "pool": "rule",
+      "op": "OP-ARITH",
+      "line": 30,
+      "before": "assign cmd_valid = (uart_state==RX_CMD) & xfer_done;",
+      "after": "assign cmd_valid = (uart_state==RX_CMD) | xfer_done;",
+      "detail": "&→|",
+      "ruleIds": [
+        "omsp_dbg_uart.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0005",
+      "key": "30|assign cmd_valid = (uart_state!=RX_CMD) & xfer_done;",
+      "pool": "rule",
+      "op": "OP-CMP",
+      "line": 30,
+      "before": "assign cmd_valid = (uart_state==RX_CMD) & xfer_done;",
+      "after": "assign cmd_valid = (uart_state!=RX_CMD) & xfer_done;",
+      "detail": "==→!=",
+      "ruleIds": [
+        "omsp_dbg_uart.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "27|  if (dbg_rst) uart_state <= RX_SYNC; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 27,
+      "before": "  if (dbg_rst) uart_state <= RX_SYNC;",
+      "after": "  if (dbg_rst) uart_state <= RX_SYNC; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "omsp_dbg_uart.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0007",
+      "key": "28|  else if (xfer_done | mem_burst) uart_state <= uart_state_nxt; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 28,
+      "before": "  else if (xfer_done | mem_burst) uart_state <= uart_state_nxt;",
+      "after": "  else if (xfer_done | mem_burst) uart_state <= uart_state_nxt; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "omsp_dbg_uart.R002"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0008",
+      "key": "30|assign cmd_valid = (uart_state==RX_CMD) & xfer_done; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 30,
+      "before": "assign cmd_valid = (uart_state==RX_CMD) & xfer_done;",
+      "after": "assign cmd_valid = (uart_state==RX_CMD) & xfer_done; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "omsp_dbg_uart.R003"
+      ],
+      "result": "survived",
+      "killScenes": []
+    },
+    {
+      "id": "m0009",
+      "key": "20|    RX_SYNC  : uart_state_nxt =  uart_state_nxt;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 20,
+      "before": "    RX_SYNC  : uart_state_nxt =  RX_CMD;",
+      "after": "    RX_SYNC  : uart_state_nxt =  uart_state_nxt;",
+      "detail": "rhs→uart_state_nxt",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0010",
+      "key": "21|    RX_CMD   : uart_state_nxt =  uart_state_nxt;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 21,
+      "before": "    RX_CMD   : uart_state_nxt =  mem_burst ? RX_DATA : RX_SYNC;",
+      "after": "    RX_CMD   : uart_state_nxt =  uart_state_nxt;",
+      "detail": "rhs→uart_state_nxt",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small",
+        "SCENE4 hold"
+      ]
+    },
+    {
+      "id": "m0011",
+      "key": "22|    RX_DATA : uart_state_nxt =  uart_state_nxt;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 22,
+      "before": "    RX_DATA : uart_state_nxt =  RX_SYNC;",
+      "after": "    RX_DATA : uart_state_nxt =  uart_state_nxt;",
+      "detail": "rhs→uart_state_nxt",
+      "ruleIds": [],
+      "result": "killed",
+      "killScenes": [
+        "SCENE2 full",
+        "SCENE3 small"
+      ]
+    },
+    {
+      "id": "m0012",
+      "key": "23|    default  : uart_state_nxt =  uart_state_nxt;",
+      "pool": "unruled",
+      "op": "OP-HOLD",
+      "line": 23,
+      "before": "    default  : uart_state_nxt =  RX_CMD;",
+      "after": "    default  : uart_state_nxt =  uart_state_nxt;",
+      "detail": "rhs→uart_state_nxt",
+      "ruleIds": [],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [
+      {
+        "line": 20,
+        "op": "OP-HOLD",
+        "before": "RX_SYNC  : uart_state_nxt =  RX_CMD;",
+        "after": "RX_SYNC  : uart_state_nxt =  uart_state_nxt;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small"
+        ]
+      },
+      {
+        "line": 21,
+        "op": "OP-HOLD",
+        "before": "RX_CMD   : uart_state_nxt =  mem_burst ? RX_DATA : RX_SYNC;",
+        "after": "RX_CMD   : uart_state_nxt =  uart_state_nxt;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small",
+          "SCENE4 hold"
+        ]
+      },
+      {
+        "line": 22,
+        "op": "OP-HOLD",
+        "before": "RX_DATA : uart_state_nxt =  RX_SYNC;",
+        "after": "RX_DATA : uart_state_nxt =  uart_state_nxt;",
+        "killScenes": [
+          "SCENE2 full",
+          "SCENE3 small"
+        ]
+      }
+    ],
+    "defLint": {
+      "items": [
+        {
+          "signal": "uart_state_nxt",
+          "class": "U5",
+          "policy": false,
+          "line": 10,
+          "snippet": "reg [2:0] uart_state_nxt;"
+        }
+      ],
+      "summary": {
+        "uncovered": 1,
+        "byClass": {
+          "U5": 1
+        },
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 5,
+      "hit": 3,
+      "rate": "3/5"
+    }
+  }
+}

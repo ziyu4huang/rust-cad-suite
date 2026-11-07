@@ -1,0 +1,53 @@
+{
+  "_note": "斷言規格(手寫合法,§19.4.4);tb.v/expected.txt/record.json 只由 --record 寫,禁手改",
+  "design": "acc_pipe",
+  "src": "corpus/e2e/58_xls_acc_pipe/acc_pipe.v",
+  "top": "__acc_pipe__acc_pipe",
+  "specPath": "plugin/rtl2spec/golden/corpus/e2e/58_xls_acc_pipe/acc_pipe.rules.json",
+  "iverilog": [
+    "-g2005"
+  ],
+  "tb_leg": "directed",
+  "protocolLeg": "acc-r0-k1",
+  "seed": 0,
+  "cycles": 0,
+  "flush": 0,
+  "waivers": [],
+  "aux": [
+    {
+      "leg": "acc-A0",
+      "kind": "rewrite",
+      "files": [
+        "fixtures/e1-reimpl/acc-a0/top.v"
+      ]
+    },
+    {
+      "leg": "acc-A1",
+      "kind": "rewrite",
+      "files": [
+        "build/reimpl-eval/reimpl/acc-A1/top.v"
+      ]
+    },
+    {
+      "leg": "acc-A2",
+      "kind": "rewrite",
+      "files": [
+        "build/reimpl-eval/reimpl/acc-A2/top.v"
+      ]
+    },
+    {
+      "leg": "acc-A3",
+      "kind": "rewrite",
+      "files": [
+        "build/reimpl-eval/reimpl/acc-A3/top.v"
+      ]
+    },
+    {
+      "leg": "acc-B1",
+      "kind": "rewrite",
+      "files": [
+        "build/reimpl-eval/reimpl/acc-B1/top.v"
+      ]
+    }
+  ]
+}

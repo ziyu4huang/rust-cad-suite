@@ -1,0 +1,364 @@
+{
+  "design": "attrib09_case",
+  "src": "corpus-external/yosys-simple/attrib09_case.v",
+  "top": "attrib09_bar",
+  "specPath": "plugin/rtl2spec/golden/yosys-simple/attrib09_case.rules.json",
+  "rules": 4,
+  "catalog": {
+    "version": "opcat-v1",
+    "priority": {
+      "guard": [
+        "OP-RVAL",
+        "OP-ASYNC",
+        "OP-POL"
+      ],
+      "transition": [
+        "OP-STATE",
+        "OP-CONST"
+      ],
+      "sequence": [
+        "OP-HOLD",
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "relation": [
+        "OP-ARITH",
+        "OP-CMP",
+        "OP-CONST",
+        "OP-SIGN",
+        "OP-SLICE"
+      ],
+      "invariant": []
+    },
+    "perRuleBudget": 2,
+    "nopControls": "first rule of each form"
+  },
+  "provenance": {
+    "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
+    "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
+    "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "opcat": "opcat-v1",
+    "date": "2026-11-07"
+  },
+  "tb": {
+    "leg": "template",
+    "protocolLeg": "-",
+    "sha256": "b07bd9e8388ba9315a66dffbd119ef33f9318b051ef0eae09f08ad1f73dd3d6e",
+    "scenes": 2,
+    "crossSim": "agree",
+    "verilatorDiag": {
+      "tb": 0,
+      "dut": 0
+    },
+    "simMs": 6
+  },
+  "expected": {
+    "sha256": "0afcb955805c1c37ddb035793ae06d78b84ea132c02d361282ddbde5ccb26fdc",
+    "lines": 275
+  },
+  "numbers": {
+    "generated": 8,
+    "stillborn": 0,
+    "equivalent": 4,
+    "eligible": 4,
+    "killed": 4,
+    "survived": 0,
+    "timeout": 0,
+    "rate": "4/4",
+    "ruleVerified": {
+      "exclusive": "4/4",
+      "shared": "0/4"
+    },
+    "catalogCoverage": "4/4",
+    "unruled": {
+      "generated": 0,
+      "killed": 0
+    },
+    "controlsSurvived": "5/5",
+    "ambiguous": 0,
+    "na": 8
+  },
+  "eqMeta": {
+    "yosysVersion": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
+    "commandTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "portsTemplate": "read_verilog <src>; hierarchy -top <top>; proc; write_json <ports.json>",
+    "emptyProbeTemplate": "read_verilog <src>; rename <top> gold; read_verilog <mut-top-only>; rename <top> gate; proc; flatten; memory; async2sync; opt_clean; equiv_make -blacklist <all-names.txt> gold gate equiv; hierarchy -top equiv; select -count t:$equiv; equiv_simple -seq 5; equiv_induct -seq 5; equiv_status",
+    "provenance": "弱等價(-seq 5)+flatten/async2sync/memory_map 抽象",
+    "ports": {
+      "all": 6,
+      "out": 2
+    },
+    "goldVsGold": {
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    "emptyProbe": {
+      "eqverdict": "adjudication-failed",
+      "eqCells": 0,
+      "eqReason": "empty"
+    },
+    "counts": {
+      "adjudicated": 4,
+      "equivalent": 4,
+      "unproven": 0,
+      "adjudicationFailed": 0
+    },
+    "killedSelfcheck": {
+      "total": 4,
+      "mainKilled": 4,
+      "unproven": 4,
+      "adjudicationFailed": 0,
+      "equivalent": 0,
+      "failed": []
+    }
+  },
+  "waiveTable": [],
+  "anchors": {
+    "relation": {
+      "total": 4,
+      "unique": 4
+    }
+  },
+  "stateTables": {},
+  "attempts": [
+    {
+      "ruleId": "attrib09_bar.R001",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 10
+    },
+    {
+      "ruleId": "attrib09_bar.R001",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 10
+    },
+    {
+      "ruleId": "attrib09_bar.R002",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 11
+    },
+    {
+      "ruleId": "attrib09_bar.R002",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 11
+    },
+    {
+      "ruleId": "attrib09_bar.R003",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 12
+    },
+    {
+      "ruleId": "attrib09_bar.R003",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 12
+    },
+    {
+      "ruleId": "attrib09_bar.R004",
+      "op": "OP-ARITH",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 13
+    },
+    {
+      "ruleId": "attrib09_bar.R004",
+      "op": "OP-CMP",
+      "status": "n/a",
+      "reason": "RHS 無目標算子",
+      "line": 13
+    }
+  ],
+  "mutants": [
+    {
+      "id": "m0001",
+      "key": "10|      2'd0: out <= 2'd0;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 10,
+      "before": "      2'd0: out <= 2'd3;",
+      "after": "      2'd0: out <= 2'd0;",
+      "detail": "2'd3→2'd0",
+      "ruleIds": [
+        "attrib09_bar.R001"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0002",
+      "key": "10|      2'd0: out <= 2'sd3;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 10,
+      "before": "      2'd0: out <= 2'd3;",
+      "after": "      2'd0: out <= 2'sd3;",
+      "detail": "2'd3→2'sd3",
+      "ruleIds": [
+        "attrib09_bar.R001"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    {
+      "id": "m0003",
+      "key": "11|      2'd1: out <= 2'd3;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 11,
+      "before": "      2'd1: out <= 2'd2;",
+      "after": "      2'd1: out <= 2'd3;",
+      "detail": "2'd2→2'd3",
+      "ruleIds": [
+        "attrib09_bar.R002"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0004",
+      "key": "11|      2'd1: out <= 2'sd2;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 11,
+      "before": "      2'd1: out <= 2'd2;",
+      "after": "      2'd1: out <= 2'sd2;",
+      "detail": "2'd2→2'sd2",
+      "ruleIds": [
+        "attrib09_bar.R002"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    {
+      "id": "m0005",
+      "key": "12|      2'd2: out <= 2'd2;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 12,
+      "before": "      2'd2: out <= 2'd1;",
+      "after": "      2'd2: out <= 2'd2;",
+      "detail": "2'd1→2'd2",
+      "ruleIds": [
+        "attrib09_bar.R003"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0006",
+      "key": "12|      2'd2: out <= 2'sd1;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 12,
+      "before": "      2'd2: out <= 2'd1;",
+      "after": "      2'd2: out <= 2'sd1;",
+      "detail": "2'd1→2'sd1",
+      "ruleIds": [
+        "attrib09_bar.R003"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    {
+      "id": "m0007",
+      "key": "13|      2'd3: out <= 2'd1;",
+      "pool": "rule",
+      "op": "OP-CONST",
+      "line": 13,
+      "before": "      2'd3: out <= 2'd0;",
+      "after": "      2'd3: out <= 2'd1;",
+      "detail": "2'd0→2'd1",
+      "ruleIds": [
+        "attrib09_bar.R004"
+      ],
+      "result": "killed",
+      "killScenes": [
+        "SCENE1 exh",
+        "SCENE2 small"
+      ]
+    },
+    {
+      "id": "m0008",
+      "key": "13|      2'd3: out <= 2'sd0;",
+      "pool": "rule",
+      "op": "OP-SIGN",
+      "line": 13,
+      "before": "      2'd3: out <= 2'd0;",
+      "after": "      2'd3: out <= 2'sd0;",
+      "detail": "2'd0→2'sd0",
+      "ruleIds": [
+        "attrib09_bar.R004"
+      ],
+      "result": "survived",
+      "killScenes": [],
+      "adjudication": "equivalent",
+      "eqverdict": "equivalent",
+      "eqCells": 2
+    },
+    {
+      "id": "m0009",
+      "key": "10|      2'd0: out <= 2'd3; // conformance-nop",
+      "pool": "control",
+      "op": "OP-NOP",
+      "line": 10,
+      "before": "      2'd0: out <= 2'd3;",
+      "after": "      2'd0: out <= 2'd3; // conformance-nop",
+      "detail": "append nop",
+      "ruleIds": [
+        "attrib09_bar.R001"
+      ],
+      "result": "survived",
+      "killScenes": []
+    }
+  ],
+  "baselineTemplate": null,
+  "rulebookDefects": {
+    "unruledKilled": [],
+    "defLint": {
+      "items": [],
+      "summary": {
+        "uncovered": 0,
+        "byClass": {},
+        "policyExcluded": 0,
+        "defects": 0
+      }
+    },
+    "leaveOneOut": {
+      "total": 4,
+      "hit": 0,
+      "rate": "0/4"
+    }
+  }
+}
