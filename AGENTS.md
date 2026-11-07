@@ -249,7 +249,8 @@
   比較器時跟 oracle——D-ys8b lt_by_name[compare_signals 尾分支]+
   opt_balance_tree TopoSort[compare_ptr_by_name,2026-11-01 M3 續弧
   批量收編第二例]+torder TopoSort[sort_by_id_str=lt_by_name,2026-11-02 批量收編第二批第三例];入場先分類「自指定比較器 vs 默認序」再選律)。機檢=ys-e2e 406/406 byte-exact(M2 續弧收平
-  時點,現行閘=450/460、subbytes/loops/constmuldivmod 的 intern 面在
+  時點,現行閘=469/479[2026-11-02 批量收編第二批後;2026-11-08 終審 R5-2
+  勘誤:原記 450/460 係 M3 時點數,未隨批次同步]、subbytes/loops/constmuldivmod 的 intern 面在
   -pb/-pbo 分層各自對帳);正典=SKILL
   ryosys 節 intern 法條;實錄=RYOSYS-MVP §8.8-4。
 - **opt 编排契约与 M3 裁定(2026-10-30,M3 实作轮)**:`opt` 编排器=
@@ -260,8 +261,9 @@
   (PROVENANCE P8)。**多删幸存序=D-ys8**(集合同、序不同,四单序假设
   模拟不达,禁硬磕);opt_clean 阶段序=remove_temporary_cells→cells→
   signals 迴圈→init;`selected_modules()` 盒模组(blackbox/whitebox)跳过;
-  SigMap::add(bit)=promote 代表元重选。**闸=ys-e2e 450/460+10 例
-  known-gap 逐字名单(regress S4;2026-10-31 續弧第 7 輪 31→10)
+  SigMap::add(bit)=promote 代表元重选。**闸=ys-e2e 469/479+10 例
+  known-gap 逐字名单(regress S4;2026-10-31 續弧第 7 輪 31→10;2026-11-08 終審 R5-2 勘誤:
+  原記 450/460 係 M3 時點數,现行以 REGISTRY.md:37 為準)+LIVE 456/456**
   +LIVE 456/456**;stub 面触新语料触发即
   同轮扩(铁则 3),正典=SKILL ryosys 节。
 - **序差类收平流程(2026-10-29,M2 续弧)**:golden byte-diff 的深树形/
@@ -302,7 +304,7 @@
   =certain(結構可證)|heuristic(受限場景),按 confidence 差異化採信;
   誤報形進單測釘死(拼接 LHS 驅動圖誤報 G3 實錄)。
 - **插件閘雙腳本=總閘成員**:`bash plugin/rtl2spec/run-mcp-e2e.sh`(stdio
-  JSON-RPC 回環七斷言)+`bash plugin/rtl2spec/run-rtl-validation.sh`(13 檔
+  JSON-RPC 回環 19 斷言=實跑 PASS 行數,§19 C-S2 起)+`bash plugin/rtl2spec/run-rtl-validation.sh`(13 檔
   in-git 語料 V1..V6 機械判據);S7 起以**雙守衛降級形**收編 regress.sh
   (守衛=crates/rtl-spec-wasm/pkg 在場+bun 在場;在場時 exit≠0 即整閘紅;
   D9,R2-4;基線 SUMMARY 斷言逐字不動);**閘驗出貨物**(D8:checker 裝載
@@ -311,8 +313,8 @@
 - **語料唯讀+dist 重建律**:閘腳本只讀 corpus/ 與 corpus-external/,寫只落
   plugin/rtl2spec/(build/=gitignored 產物);dist/wasm=構建產物(同步步
   刷新,禁手改),dist/server.mjs+md.mjs=手寫源入庫;fixtures/ 只放本弧
-  自著 Verilog(repo MIT);外部語料唯讀引用原檔不入 plugin/;zipcpu=GPL
-  永不入驗證集不入 plugin/。
+  自著 Verilog(repo MIT)(conformance 子樹例外見 10.12);外部語料唯讀
+  引用原檔不入 plugin/;zipcpu=GPL 永不入驗證集不入 plugin/。
 - **spec 提取無 oracle 契約**:質量閘=機械判據 V1..V6(降閾唯一路徑=
   ADR-0012 修訂+閘重跑,禁靜默)+獨立評審員定性評審(validation-report.md
   評審員區),**禁虛構 golden**;V4 逐位元組溯源=SV 側全量機械,RTLIL 側
@@ -320,7 +322,9 @@
 - **回歸與真實評測執法面(2026-11-04 S9..S12;ADR-0012 D14..D16)**:
   ①golden 回歸閘=`bash plugin/rtl2spec/run-golden-regression.sh`——
   golden=提取器自身輸出快照(非 oracle 期望,錄製產生禁手寫);釘選
-  37 檔×2 模式 byte-exact;**錄製順序鐵則=非確定源(HashSet/HashMap
+  49 檔×2 模式 byte-exact(37=§16.1.1 原表+12=收尾弧 S3 擴檔;釘選集 SSOT=RTL2SPEC-PLUGIN §20.5 全表,run-plugin-check ⑤e
+  逐檔名對拍;條目數=golden-check EXPECTED_PINNED
+  精確數斷言);**錄製順序鐵則=非確定源(HashSet/HashMap
   迭代面/調用流位置耦合)修復且 flapper 清零前禁錄任何 golden**
   (F1a/F1b 實錄:wasm 跨進程測試無判別力,自檢必須進程內跑);
   --record 顯式重錄+錄後 `git diff golden/` 逐案對帳=re-record 語義
@@ -357,3 +361,48 @@
   比較層自身配正負 fixture 自證。
 - **預算常數隨能力同輪上調**:能力變更使提取量觸頂預算常數(DEFAULT_MAX_RULES
   形)=V1 截斷紅燈,同輪上調(SSOT+全部調用點普查 rg),截斷語義不動。
+
+## 10.12 C 閉環紀律(2026-11-07;C-S1..C-S6 一弧;ADR-0013;正典=SKILL「C 閉環增補」節)
+
+- **寫面聲明**:本閘(run-conformance-eval)全部寫面在 plugin/rtl2spec/ 內(build/=gitignored 對賬工件;
+  --record 寫 fixtures/conformance/<design>/{tb.v,expected.txt,record.json}+conformance-report.md 證據頁),
+  無新增出 plugin 寫面(10.10 唯一出 plugin 寫面先例的同款約束)。
+- **fixtures 內容類型放寬(10.10 對應句的顯式例外,不得默認)**:fixtures/conformance/ 允許自著
+  tb.v+case.json(斷言規格,手寫合法)+expected.txt/record.json(錄製快照,禁手改);fixtures/conformance-lint/
+  只放自著 Verilog 片段;外部語料與 GPL 仍禁入。**TB 判別力自證鐵律**:每個入庫 TB 必配「正樣(原版 RTL 過)
+  +變異樣(≥1 個語義變異必紅)」雙 fixture,判別力數字實測入庫——無判別力的 TB=無效測試(§2)。
+- **LLM 腿永不進確定性閘(10.11 同款擴)**:D 腿(定向 TB)/重寫腿產物=凍結後才被閘消費;閘判據(Q1..Q9+
+  形族底線+不劣於基線)判的是「凍結 tb.v 這個工件」的機械可測屬性(R1-3 劃界),不是 LLM 的採樣過程或能力;
+  留一法自驗被測物=機械變異,不違 10.11。
+- **oracle 紀律**:conformance 度量「行為復原力」(oracle=原版 RTL 在 iverilog 下的可觀測行為,期望只由
+  --record 錄製禁手寫),不是意圖正確性;「TB 全過=設計正確」禁宣稱;D/T 兩腿殺傷數字分列禁合併。
+- **golden/gap-fixtures/評測基線隨語義面同輪上調禁靜默;禁攢批重錄**(10.5/10.8 同律);重錄片標準程序
+  G0..G5(19.4.4)=本弧通用,--record --slice <C-Sn> 錄前快照+record-diff 對賬。
+- **入庫 tb.v 禁手改(2026-11-07 收尾弧 S0;實錄:修前手改 fsm/tb.v 追加註釋默認模式 exit 0,變異矩陣對註釋
+  無感)**:換檔唯一路徑=`--record --slice <C-Sn> --promote <design>=<候選>`;機械閘=conformance-eval
+  TB-SHA-ALARM(record.tb.sha256/磁碟 tb.v/本輪主腿 TB 三方矛盾=REJECTED 或拒錄,exit 1;--promote 不洗白,
+  先還原再換檔)。**WAIVE 標籤不得宣稱無證據的方向**:集合=x-valued|unobservable|unadjudicated|tb-internal
+  (tblint WAIVE_LABELS,集外 Q9 硬紅);語義=`unobservable` 須無 killed 且存活變異全 equivalent,未全證用中性
+  `unadjudicated`,由 WAIVE↔record 交叉驗證併入 Q9 機械執法(靜態標籤只可見化)。協議
+  模板改動=協議事件(版本化圍欄+內容錨,dleg-prompt 取最高版本,任一錨不符 exit 2;枚舉與 tblint 逐集合核對在
+  selfcheck)。正典=SKILL「C 閉環增補」節;條文=CONFORMANCE-PROTOCOL §5/§6。
+- **等價裁決腿(2026-11-07 收尾弧 S1;條文=CONFORMANCE-PROTOCOL §7)**:測試側 harness,yosys 只在 --record 跑、默認模式零
+  依賴(`RTL2SPEC_YOSYS=none` 可驗);強形命令無 blacklist、含 flatten。`equivalent` 必須 proven 且 `select -count` cells≥
+  **輸出**端口位數(Q8 把 equivalent 併入控制組恒真,接不住空真,此守衛是唯一防線;全端口口徑會誤判組合設計)。gold-vs-gold/
+  正樣/反樣/空真探針/killed 全母體/存量重驗任一不過=拒錄;默認模式 eq-verify=schema+counts+waiveTable。**proven≠無條件行為等價、
+  unproven≠不等價,禁單向宣稱**。ryosys equiv_*=註冊里程碑(PLAN.md),本弧禁實現、禁空實現或 stub 過閘。
+- **波形幀診斷腿(2026-11-07 收尾弧 S2;條文=CONFORMANCE-PROTOCOL §8)**:`bash plugin/rtl2spec/run-frame-diag.sh` 直調,**不進任何閘**;幀診斷=
+  輔助證據,輸出必標 modality/confidence。vision 前置=統一窗(`--from 0 --to max(t_max)`)下剝 title 畫布 byte 比較+PNG sha 雙檢皆異,否則強制
+  text-fallback;剝 title 走程序化非貪婪跨行正則,禁逐行 sed(跨行 title 會偽放行 vision)。VCD 由 wavecap 第二 top 取得,tb.v 零改,帶探針輸出==
+  expected.txt 是硬斷言;t_max 取自 vl-vcd 渲染的軸標籤,禁手搓 VCD parser;腿內不構建(vcd2svg 缺或陳舊=exit 2)。驗證器只驗工件機械屬性,不驗 LLM
+  內容。**歸因不靠幀**(實錄:讀幀把 sincos 的 done 偏移誤判為累積,title 層才定準)。
+- **T 腿擴面(2026-11-07 收尾弧 S3;條文=CONFORMANCE-PROTOCOL §9)**:候選先進 staging(`--fixtures-root` 只收 build/ 內目錄,主
+  fixtures 與主證據頁零觸碰),ADMITTED 只看 staging verdict.json,不看 exit;收編走主根全集重錄 `--slice C-Sn-批次`,每批同輪上調
+  EXPECTED_DESIGNS(現 34)並逐案對賬(既有設計剝 tb.simMs 後須逐位元組一致)。主根設計的規則書必須是 golden 釘選快照(主根斷言);
+  釘選集增刪同輪上調 EXPECTED_PINNED。**判定旗標必須進 admitted**:只 push reason 不入判定=空操作(實錄:初版釘選斷言即此,負向探針
+  P1/P2 抓出)。新斷言一律配負向探針實跑必紅。
+- **收尾(2026-11-07 收尾弧 S4;記錄=RTL2SPEC-PLUGIN §20)**:wasm sha 保持=閘斷言——conformance 默認模式要求入庫 record 的
+  provenance.wasmSha256==dist wasm,dist wasm 一變未重錄即 DRIFT 紅;收尾弧欠條由 run-plugin-check ⑤e/⑤f 執法(§20.5 全表==
+  pinned-files.list、FINISH-PLAN 無「[欠]」)。跨切片欠條一律寫成可機檢標記並配清償閘,禁口頭欠帳。
+- **閘落點**:run-conformance-eval=總閘直調不進 regress(評測層分鐘級;收編重議條件=提供 ≤30s --quick
+  子集後經 ADR-0013 修訂);C 弧已知未決(D-c1..D-c4)與本案張力=REGISTRY「C 弧已知未決」小節,禁靜默。

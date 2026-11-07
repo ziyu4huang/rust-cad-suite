@@ -234,7 +234,8 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
   四判據 100%;V6 13/13);降閾唯一路徑=ADR-0012 修訂+閘重跑,禁靜默。
 - **fixtures 自著授權律**:plugin/rtl2spec/fixtures/ 只放本弧自著小型
   Verilog(repo MIT);外部語料(yosys-simple=ISC/xls=Apache-2.0)唯讀引用
-  原檔不入 plugin/;zipcpu=GPL 永不入驗證集不入 plugin/。
+  原檔不入 plugin/;zipcpu=GPL 永不入驗證集不入 plugin/(conformance 子樹
+  例外見「C 閉環增補」節)。
 - **零 serde 手寫 JSON 鍵序契約**:rtl-spec JSON writer 只寫不讀(D12 opts
   標量化,庫內零 parser);鍵序=寫出序 byte-exact 契約(單測釘死,沿
   analyzer-core report.rs 形);敵意轉義 fixture(引號/控制字元/非 ASCII)
@@ -269,7 +270,7 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
   git tag 慣例=rtl2spec-vX.Y.Z(真打由 user 定)。
 - **golden 回歸與評測增補(2026-11-04,S9..S12;ADR-0012 D14..D16;§16)**:
   ①golden=提取器**自身輸出快照**(self-recorded snapshot,非 oracle 期望;
-  「禁虛構 golden」讀法=錄製產生禁手寫);釘選 37 檔×rules+gaps=74 份
+  「禁虛構 golden」讀法=錄製產生禁手寫);釘選 49 檔×rules+gaps=98 份(37=§16.1.1+12=收尾弧 S3 擴檔;EXPECTED_PINNED 精確數;SSOT=RTL2SPEC-PLUGIN §20.5 全表,run-plugin-check ⑤e 對拍)
   JSON byte-exact(golden/ 鏡像源路徑:corpus-external/<X> 剥根,corpus/
   crates/ 全路徑),閘=`bash plugin/rtl2spec/run-golden-regression.sh`
   (wasm 腿=dist 同一產物,D8;--record 顯式重錄,錄前進程內每檔每模式
@@ -314,3 +315,53 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
 - 復原對拍(S5):機械面=iverilog+TB 逐場景 diff;盲寫腿=輔助證據永不進閘;
   A/B 按組分列;消融點按切片分段;預測與實測分歧記實測+偏差歸因;
   metamorphic 探針邊界(AGENTS 10.11)=比較層歸一化摘要集+無 oracle 聲明。
+
+## C 閉環增補(2026-11-07,C-S1..C-S6;ADR-0013;正典=docs/RTL2SPEC-PLUGIN.md §19)
+
+- **核心-first 三面一路(10.7 同款)**:tb_plan 語義全落 rtl-spec 核心(crates/rtl-spec/src/tbplan.rs;
+  clocks 復用 C-S1 select_trigger=單一語義源;resets 只由 guard 導出禁啟發式;TbError 十一條硬錯
+  `error: … (milestone TB1)`);wasm 9 導出(0=核心默認標量契約);MCP `rtl_tb_plan` 零語義(lang 沿
+  langOf,缺省傳 0/空串);skill rtl-conformance 只編排調用與解讀欄位(⑥判據:skills 內 rtl_ 標識符⊆工具名)。
+- **判別力雙 fixture 鐵則**:每個入庫 TB 配「正樣+變異樣」;閘=run-conformance-eval(Q1..Q9+形族底線+
+  不劣於基線+留一法自驗;selfcheck 每次必跑=分腿正規化敵意向量/TB-R1x 跨檔五向量/手術 count==1);
+  算子目錄 opcat-v1(規則錨定按主體定行+count==1 手術+P-unruled 池不入分母+OP-NOP 控制組)。
+- **D 腿(LLM 定向 TB)紀律**:產物凍結後才被閘消費;閘判「凍結工件」的機械屬性,不判採樣過程(10.11);
+  協議釘檔=CONFORMANCE-PROTOCOL.md(模型身份/採樣參數/污染聲明/模板逐字/腿表 append-only;內容錨
+  sha256 cc28f0c7… 34 行,改動=協議事件);prompt 實例化=dleg-prompt.mjs(確定性);候選 --try 寫只落
+  build/,入庫 --record --promote;D/T 兩腿數字分列禁合併。
+- **oracle 紀律**:期望只由 --record 從原版錄製禁手寫;「TB 全過=設計正確」禁宣稱——度量行為復原力。
+- **fixtures 自著授權律放寬(顯式,不得默認)**:fixtures/conformance/ 允許自著 tb.v+case.json(斷言規格
+  手寫合法)+expected.txt/record.json(錄製快照禁手改);fixtures/conformance-lint/ 只放自著 Verilog 片段
+  (TB-R1x 五向量等);外部語料與 GPL 仍禁入。
+- **def_lint 定位**:閘側工具(scripts/conformance/def_lint.mjs)不露面——不進 wasm 導出/MCP/規則書 JSON;
+  晉升為核心能力=後續立項走「新能力先落核心再露面」(10.7)。
+- **入庫 tb.v 禁手改+WAIVE 標籤紀律(2026-11-07 收尾弧 S0;CONFORMANCE-PROTOCOL §5/§6)**:換檔唯一路徑=
+  `--record --slice <C-Sn> --promote <design>=<候選>`;TB-SHA-ALARM=record.tb.sha256/磁碟 tb.v/本輪主腿 TB 三方核對
+  (默認模式磁碟≠record=REJECTED;錄製模式磁碟≠錄前 record=拒錄[--promote 不洗白]、directed 無 --promote 且無錄前
+  record=拒錄、寫後磁碟≠新 record=紅;exit 1;--try 不觸 fixtures 不適用)。標籤集=tblint `WAIVE_LABELS`
+  (x-valued|unobservable|unadjudicated|tb-internal),文法外/集外 Q9 硬紅;`unobservable`=無 killed 且存活變異全
+  equivalent,未全證=`unadjudicated`(中性,不帶方向),WAIVE↔record 交叉驗證併入 Q9,靜態標籤只可見化(record-diff 打印
+  每設計每標籤使用數變化量)。協議模板 v1→v2=協議事件(圍欄 `template-block vN`+錨行
+  `template-sha vN <sha>`,v2 104d13f1…、v1 cc28f0c7… 不變);dleg-prompt 取最高版本,proto-template.mjs 硬同步
+  (圍欄完整+版本連續+每版錨重算相等,任一不符 exit 2,禁回退舊版),selfcheck 每次核對枚舉==WAIVE_LABELS 與三條
+  篡改負向量。**探針寫法教訓**:驗收 grep 須用原因形 `TB-SHA-ALARM: `(selfcheck 行也含裸字串,裸 grep 無判別力)。
+- **等價裁決腿(2026-11-07 收尾弧 S1;CONFORMANCE-PROTOCOL §7;scripts/conformance/equiv.mjs)**:--record 專屬,默認模式零 yosys
+  依賴。流程=端口表→gold-vs-gold 帶守衛→空真探針(獨立模板全名單 blacklist,不屬生產管線)→地面真值(fsm m0045 OP-NOP→
+  equivalent;i2c m0001→非 equivalent)→全腿存活給 eqverdict→任一腿殺入 killed 全母體自檢(斷言 equivalent==0)→存量 equivalent
+  重驗(翻變列名)。三值 equivalent|unproven|adjudication-failed(reason 枚舉見協議);adjudication 兩值欄位保留。record 頂層 eqMeta+
+  waiveTable、變異級 eqverdict/eqCells/eqReason/eqUnproven/unprovenCells;SUMMARY 行形不動,另出 SUMMARY-EQ 行。**解析一律錨定行形
+  正則+selfcheck 真實輸出向量**(敵意面=`Found N unproven $equiv cells (K groups)` 與 `No selected unproven $equiv cells`);守衛
+  口徑=輸出端口位數;命令模板與協議 §7 逐字硬同步。**判別力**:假 oracle 三形(proven+0 cells/無條件 yes-man/恒 unproven)經
+  RTL2SPEC_YOSYS 注入必拒錄——yes-man 被空真探針與 killed 全母體雙抓。
+- **波形幀診斷腿(2026-11-07 收尾弧 S2;CONFORMANCE-PROTOCOL §8;scripts/frame-diag.mjs+conformance/frames.mjs+run-frame-diag.sh)**:非閘,直調;
+  selfcheck 只測純函數(跨行 title 敵意向量、軸 t_max、title 層分歧表、modality 四向量、驗證器 14 向量)。工件=frames/<design>/{counterexample.json,
+  gold.png,mutant.png,*_zoom.png,svg/,work/}+diag-vision/<design>.{prompt.md,json};幀重產=舊診斷作廢。雙檢不過時機械寫 text-fallback 診斷
+  (producedBy 註明未經 LLM)。值只在 title:只改數值不改沿的差異畫布看不到(subbytes/signedexpr m0001 實測),不是渲染缺陷。視覺 prompt 圍欄
+  `vision-prompt v1` 與 TB 模板版本鏈分開。讀幀是輔助:目讀 tick 與偏移規律會錯,用 title 層核對再寫進診斷(crossCheck 欄)。
+- **T 腿擴面(2026-11-07 收尾弧 S3;CONFORMANCE-PROTOCOL §9)**:候選池口徑=文件級單 top 取 rulebook.modules[0](勘察同口徑,57 TB 化;
+  核心默認 top 只得 30,禁混用)。流程=預篩(iverilog -g2005→-g2012)→staging `--record --slice C-S8-pre`→讀 staging verdict.json 判
+  ADMITTED→未釘者 golden 擴檔(`run-golden-regression.sh --record`,錄後既有 sha 須逐值不變)→主根分批全集重錄+reconcile。現狀 34 設計:
+  mutants 863/eligible 794/killed 544/equivalent 69;默認模式 3:08,record 6:39。拒收 23 個(Q8 鐵則 15/Q7 13/Q4 8/Q1 5/EQ 4)只登記不入庫。
+- **收尾(2026-11-07 收尾弧 S4;RTL2SPEC-PLUGIN §20)**:插件 0.5.0(四點一致);conformance 默認模式加 wasm sha 保持斷言(record 的
+  provenance.wasmSha256 必==dist wasm);run-plugin-check ⑤e/⑤f=欠條清償閘(§20.5 釘選全表==pinned-files.list,解析器 1 正 4 負自證;
+  FINISH-PLAN 無「[欠]」)。弧末遺留:D-c5/D-c6、operators 政策待裁、i2c D 腿丟殺 8(§20.8)。
