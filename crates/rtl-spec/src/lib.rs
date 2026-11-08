@@ -9,12 +9,15 @@
 //! 質量契約=反 doc-dump 三鎖(RTL2SPEC-PLUGIN §2.3)+V1..V6 機械判據
 //! (§8.3),無 oracle,禁虛構 golden。
 
+#[cfg(not(target_arch = "wasm32"))]
+pub mod cli;
 pub mod expr;
 pub mod json;
 mod lint;
 pub mod md;
 pub mod rtlil;
 pub mod schema;
+pub mod spec;
 pub mod sv;
 pub mod summary;
 pub mod tbplan;

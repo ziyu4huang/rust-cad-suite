@@ -7,10 +7,10 @@
 //! --out-dir pkg`; loaded from JS/Bun with explicit bytes:
 //! `init({ module_or_path: new Uint8Array(readFileSync(...)) })`.
 //!
-//! Export face (9 fns = §6.1 five MCP tools closed on both langs; C-S2
-//! adds tb_plan): analyze/extract/scan × {sv, rtlil} + tb_plan × {sv, rtlil}
-//! + version. Errors are embedded as `{"error"/"ok":false, ...}` JSON,
-//! never thrown across the boundary.
+//! Export face (11 fns; D-S3 adds spec parse/lint on top of §6.1 five MCP
+//! tools closed on both langs + tb_plan): analyze/extract/scan × {sv, rtlil} +
+//! tb_plan × {sv, rtlil} + spec parse/lint + version. Errors are embedded as
+//! `{"error"/"ok":false, ...}` JSON, never thrown across the boundary.
 
 use wasm_bindgen::prelude::*;
 
@@ -96,11 +96,33 @@ pub fn rtl_tb_plan_rtlil(name: &str, source: &str, module: &str, seed: u32, cycl
     rtl_spec::tb_plan_frame(&rtlil_input(name, source), m, seed, cycles, flush)
 }
 
+/// spec 檔解析面(D-S3):name 沿導出形(解析零名消費;SpecDoc.name 自檔
+/// 頭 `# spec:`);回傳=spec_json;Err(現無產出點)→ `{"error":…}` 幀。
+#[wasm_bindgen]
+pub fn rtl_spec_spec_parse(name: &str, source: &str) -> String {
+    let _ = name;
+    match rtl_spec::spec::parse_spec_md(source) {
+        Ok(doc) => rtl_spec::spec::spec_json(&doc),
+        Err(e) => rtl_spec::json::error_json(e.to_string()),
+    }
+}
+
+/// spec 七查 lint 面(D-S3):findings 緊湊字串陣列(與 CLI `spec lint`
+/// stdout byte-equal——run-spec-cli-parity spec 腿判據)。
+#[wasm_bindgen]
+pub fn rtl_spec_spec_lint(name: &str, source: &str) -> String {
+    let _ = name;
+    match rtl_spec::spec::parse_spec_md(source) {
+        Ok(doc) => rtl_spec::spec::spec_lint_json(&doc),
+        Err(e) => rtl_spec::json::error_json(e.to_string()),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     // host 面:導出函數在非 wasm 目標直呼(wasm-bindgen 宏對宿主編譯為
-    // 普通函數);9 導出回合法 JSON(sv 面 7 導出無 {"error"};tb_plan 恆
-    // {"ok":…} 幀)。
+    // 普通函數);11 導出回合法 JSON(sv 面 7 導出無 {"error"};tb_plan 恒
+    // {"ok":…} 幀;spec 面見 spec_exports 測)。
     const SV: &str = "module m(input wire clk, input wire d, output reg q);\n  always @(posedge clk) q <= d;\nendmodule\n";
     const IL: &str = "module \\m\n  wire width 1 input 0 \\clk\n  wire width 1 output 1 \\q\n  wire width 1 \\n0\n  process $p\n    assign \\n0 \\q\n    sync posedge \\clk\n      update \\q \\n0\n  end\nend\n";
 
@@ -128,6 +150,19 @@ mod tests {
         assert!(tb_ok.contains("\"template_v\":"), "{tb_ok}");
         let tb_il = super::rtl_tb_plan_rtlil("m.il", IL, "", 0, 0, 0);
         assert!(tb_il.starts_with("{\"ok\":false,") && tb_il.contains("milestone TB1"), "{tb_il}");
+    }
+
+    #[test]
+    fn spec_exports_parse_and_lint() {
+        const GOOD: &str = "# spec: t\n- spec-format: 1\n- module: m\n- port: a input wire scalar\n\n## behavior\n\n- B001 [c] 一\n  check(relation): a ≡ a when -\n\n## scenarios\n\n- SCENE1 s: c\n";
+        let parsed = super::rtl_spec_spec_parse("t.spec.md", GOOD);
+        assert!(parsed.contains("\"module\":\"m\"") && parsed.contains("\"behavior\""), "{parsed}");
+        assert_eq!(super::rtl_spec_spec_lint("t.spec.md", GOOD), "[]");
+        const BAD: &str = "- module: m\n"; // 缺 spec-format ①
+        let findings = super::rtl_spec_spec_lint("b.spec.md", BAD);
+        assert!(findings.starts_with("[\"") && findings.contains("①"), "{findings}");
+        // parse 面對劣化輸入仍出 JSON(全容錯;Err 幀現無產出點)。
+        assert!(super::rtl_spec_spec_parse("b.spec.md", BAD).starts_with('{'));
     }
 
     #[test]

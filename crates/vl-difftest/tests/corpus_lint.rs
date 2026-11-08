@@ -64,9 +64,13 @@ fn race_findings(src: &str) -> Vec<String> {
             continue;
         }
         // Statements after the event control on this line, then following
-        // lines until a delay (`#`) or another event control.
+        // lines until a delay (`#`) or another event control. A `#` on the
+        // SAME line closes the window entirely: `@(posedge clk); #1; x = …;`
+        // is the canonical fix (the delay advances time past this edge, so
+        // this and following lines do not race with it).
         let mut window = String::new();
         let rest = &line[at..];
+        let mut window_open = true;
         if let Some(close) = rest.find(')') {
             let tail = &rest[close + 1..];
             // Same-line remainder stops at the first delay/event control.
@@ -77,33 +81,21 @@ fn race_findings(src: &str) -> Vec<String> {
                 .min()
                 .unwrap_or(tail.len());
             window.push_str(&tail[..cut]);
-            if cut < tail.len() {
-                window.push('\n');
-                // A delay on this line ends the window entirely.
-                for stmt in window.split(';') {
-                    let _ = stmt;
-                }
-                let _ = &lines;
-                // fallthrough with closed window
-                let w = window.clone();
-                window = w;
-                // mark closed
-                let closed = true;
-                if closed {
-                    // evaluate immediately below without extending lines
-                }
-            }
+            // Same-line `#`/`@(` closes the window: no cross-line extension.
+            window_open = cut == tail.len();
         }
         window.push('\n');
-        let mut j = i + 1;
-        while j < lines.len() {
-            let lj = lines[j].trim();
-            if lj.contains('#') || lj.contains("@(") || lj.starts_with("end") {
-                break;
+        if window_open {
+            let mut j = i + 1;
+            while j < lines.len() {
+                let lj = lines[j].trim();
+                if lj.contains('#') || lj.contains("@(") || lj.starts_with("end") {
+                    break;
+                }
+                window.push_str(lj);
+                window.push('\n');
+                j += 1;
             }
-            window.push_str(lj);
-            window.push('\n');
-            j += 1;
         }
         for stmt in window.split(';') {
             let s = stmt.trim();
@@ -179,6 +171,27 @@ fn race_lint_catches_the_documented_pattern() {
     assert!(race_findings(good).is_empty(), "{:?}", race_findings(good));
     let nba = "module tb;\nreg clk=0, ld=0;\nalways @(posedge clk) if (ld) $display(1);\ninitial begin\n  @(posedge clk); ld <= 1;\nend\nendmodule\n";
     assert!(race_findings(nba).is_empty(), "NBA writes are region-safe");
+}
+
+#[test]
+fn race_lint_same_line_delay_closes_window_for_following_lines() {
+    // D-c3 positive fixture: the canonical fix form `@(posedge clk); #1; ld = 1;`
+    // on one line, THEN a following statement line (`q = 3;`) before the next
+    // edge wait. The same-line `#` closes the race window — no cross-line
+    // extension, zero findings. (Pre-fix this shape produced 1 false positive.)
+    let good = "module tb;\nreg clk=0, ld=0; reg [7:0] q;\nalways @(posedge clk) if (ld) q <= 1;\ninitial begin\n  @(posedge clk); #1; ld = 1;\n  q = 3;\n  @(posedge clk);\nend\nendmodule\n";
+    assert!(race_findings(good).is_empty(), "{:?}", race_findings(good));
+}
+
+#[test]
+fn race_lint_in_window_race_still_red() {
+    // D-c3 negative fixture: writes inside the race window must stay red.
+    // (a) blocking write directly after `@(posedge clk)` on the same line;
+    // (b) blocking write on a following line while the window is still open.
+    let same_line = "module tb;\nreg clk=0, ld=0; reg [7:0] q;\nalways @(posedge clk) if (ld) q <= 1;\ninitial begin\n  @(posedge clk); ld = 1;\nend\nendmodule\n";
+    assert_eq!(race_findings(same_line).len(), 1, "{:?}", race_findings(same_line));
+    let cross_line = "module tb;\nreg clk=0, ld=0; reg [7:0] q;\nalways @(posedge clk) if (ld) q <= 1;\ninitial begin\n  @(posedge clk);\n  q = 3;\nend\nendmodule\n";
+    assert_eq!(race_findings(cross_line).len(), 1, "{:?}", race_findings(cross_line));
 }
 
 #[test]

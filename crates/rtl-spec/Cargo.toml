@@ -17,3 +17,9 @@ analyzer-core = { workspace = true }
 vl-syntax = { workspace = true }
 ry-ir = { workspace = true }
 rcs-diag = { workspace = true }
+
+# rtl-spec bin:agent 唯一接口(D-S2;CLI-AGENT 憲法,ADR-0014 草案)。
+# cli 模組 host-only(wasm 構建只建 lib,bin 不入 wasm 面);JSON-first+exit code 四值。
+[[bin]]
+name = "rtl-spec"
+path = "src/bin/rtl-spec.rs"
