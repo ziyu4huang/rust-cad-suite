@@ -1,8 +1,10 @@
 // MCP stdio 端到端回環驅動(run-mcp-e2e.sh 的斷言腿;§8.1 ③)。
-// spawn server → newline 幀回環 → 19 斷言(實跑 PASS 行數,iverilog 在場時;§19 C-S2 起)→ kill 子進程。
+// spawn server → newline 幀回環 → 21 斷言(實跑 PASS 行數,iverilog 在場時;D-S3 起=§19 C-S2 形+rtl_spec_lint ⑫⑬)→ kill 子進程。
 // exit 0=PASS / 1=斷言失敗。
 //
-// 斷言(PASS 行 19:①②③③b④④b⑤⑥⑦⑧a⑧b⑧c⑧d⑨a⑨b⑨c⑩⑪+ping;iverilog 不在場時 ⑨c=SKIP 行,PASS 18):
+// 斷言(PASS 行 21:①②③③b④④b⑤⑥⑦⑧a⑧b⑧c⑧d⑨a⑨b⑨c⑩⑪⑫⑬+ping;iverilog 不在場時 ⑨c=SKIP 行,PASS 20):
+// ⑫rtl_spec_lint 正樣(D-S3):fixtures/d-spec/counter8.spec.md→findings 空陣列+count=0+isError=false
+// ⑬rtl_spec_lint 負樣:inline source 缺 spec-format/module/port/behavior/scenarios→count≥1(①..⑦ 起首)
 // ①initialize(serverInfo.name=="rtl2spec" 且 protocolVersion 回顧)
 // ②tools/list 恰 5 工具且 inputSchema.type=="object"
 // ③rtl_extract_rules@fixtures/fsm_counter.v:modules>=1 且 rules>=3
@@ -101,10 +103,10 @@ async function main() {
   const tools = listResp.result?.tools ?? [];
   const names = tools.map((t) => t.name).sort();
   check(
-    '② tools/list exactly 5 with object schemas',
-    names.length === 5 &&
+    '② tools/list exactly 6 with object schemas',
+    names.length === 6 &&
       JSON.stringify(names) ===
-        JSON.stringify(['rtl_analyze', 'rtl_extract_batch', 'rtl_extract_rules', 'rtl_scan_gaps', 'rtl_tb_plan']) &&
+        JSON.stringify(['rtl_analyze', 'rtl_extract_batch', 'rtl_extract_rules', 'rtl_scan_gaps', 'rtl_spec_lint', 'rtl_tb_plan']) &&
       tools.every((t) => t.inputSchema?.type === 'object'),
     JSON.stringify(names),
   );
@@ -268,7 +270,38 @@ async function main() {
     JSON.stringify(tbIl.result ?? tbIl).slice(0, 160),
   );
 
-  // 額外:ping。
+  // ⑫ rtl_spec_lint 正樣(D-S3):正樣語料零 findings。
+  const specLintResp = await send('tools/call', {
+    name: 'rtl_spec_lint',
+    arguments: { path: 'fixtures/d-spec/counter8.spec.md' },
+  });
+  const slSc = specLintResp.result?.structuredContent;
+  check(
+    '⑫ spec_lint counter8 → findings empty count=0',
+    specLintResp.result?.isError === false &&
+      Array.isArray(slSc?.findings) &&
+      slSc.findings.length === 0 &&
+      slSc.count === 0,
+    JSON.stringify(specLintResp.result ?? specLintResp).slice(0, 160),
+  );
+
+  // ⑬ rtl_spec_lint 負樣:inline 劣化 spec(缺 spec-format/module/port/behavior/scenarios)→count≥1。
+  const specBadResp = await send('tools/call', {
+    name: 'rtl_spec_lint',
+    arguments: { name: 'broken.spec.md', source: '- module: m\n' },
+  });
+  const badSc = specBadResp.result?.structuredContent;
+  const badFindings = badSc?.findings ?? [];
+  check(
+    '⑬ spec_lint broken spec → count>=1 ①-prefixed',
+    specBadResp.result?.isError === false &&
+      badSc?.count >= 1 &&
+      badFindings.length === badSc.count &&
+      badFindings.every((f) => /^[①-⑦]/.test(f)),
+    JSON.stringify(badFindings).slice(0, 160),
+  );
+
+  // 額外:ping。  // 額外:ping。
   const pingResp = await send('ping', {});
   check('ping → {}', JSON.stringify(pingResp.result) === '{}');
 }

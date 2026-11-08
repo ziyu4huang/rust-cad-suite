@@ -40,9 +40,9 @@
     "iverilog": "Icarus Verilog version 13.0 (stable) (v13_0)",
     "verilator": "Verilator 5.052 2026-09-05 rev vUNKNOWN-built20260905",
     "yosys": "Yosys 0.70+179 (git sha1 9534a7f4d, Release, Clang /usr/local/osxcross/target/bin/aarch64-apple-darwin25.5-clang++ 21.1.8)",
-    "wasmSha256": "66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d",
+    "wasmSha256": "fe64d518cbcde3d1f0f53b38a160e0926d078ee507840c94c4fb4e1d119b600f",
     "opcat": "opcat-v1",
-    "date": "2026-11-07"
+    "date": "2026-11-08"
   },
   "tb": {
     "leg": "template",
@@ -54,7 +54,7 @@
       "tb": 0,
       "dut": 0
     },
-    "simMs": 6
+    "simMs": 7
   },
   "expected": {
     "sha256": "81649db0026b9cbb59ee8a9b95eb9b54a7bf798cefdaee541fa63b734d6b72e4",

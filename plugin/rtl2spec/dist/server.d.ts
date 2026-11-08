@@ -89,4 +89,6 @@ export interface InitOutput {
   rtl_scan_gaps_rtlil(name: string, source: string): string;
   rtl_tb_plan_sv(name: string, source: string, module: string, seed: number, cycles: number, flush: number): string;
   rtl_tb_plan_rtlil(name: string, source: string, module: string, seed: number, cycles: number, flush: number): string;
+  rtl_spec_spec_parse(name: string, source: string): string;
+  rtl_spec_spec_lint(name: string, source: string): string;
 }

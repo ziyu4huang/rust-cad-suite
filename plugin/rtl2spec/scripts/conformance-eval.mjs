@@ -124,8 +124,8 @@ for (let k = 0; k < argv.length; k++) {
   }
   designArgs.push(argv[k]);
 }
-if (recordMode && !/^C-S[0-9]+(-[a-z0-9]+)?$/.test(slice ?? '')) {
-  console.log('FAIL usage: --record 必帶 --slice <C-Sn>[-<批次>](錄前快照與 record-diff 的切片標籤;§19.4.4)');
+if (recordMode && !/^(C|D)-S[0-9]+(-[a-z0-9]+)?$/.test(slice ?? '')) {
+  console.log('FAIL usage: --record 必帶 --slice <C-Sn|D-Sn>[-<批次>](錄前快照與 record-diff 的切片標籤;§19.4.4)');
   process.exit(2);
 }
 if (promote.size && !recordMode) {

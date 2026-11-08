@@ -134,6 +134,54 @@ export function rtl_scan_gaps_sv(name, source) {
 }
 
 /**
+ * spec 七查 lint 面(D-S3):findings 緊湊字串陣列(與 CLI `spec lint`
+ * stdout byte-equal——run-spec-cli-parity spec 腿判據)。
+ * @param {string} name
+ * @param {string} source
+ * @returns {string}
+ */
+export function rtl_spec_spec_lint(name, source) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(source, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.rtl_spec_spec_lint(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
+ * spec 檔解析面(D-S3):name 沿導出形(解析零名消費;SpecDoc.name 自檔
+ * 頭 `# spec:`);回傳=spec_json;Err(現無產出點)→ `{"error":…}` 幀。
+ * @param {string} name
+ * @param {string} source
+ * @returns {string}
+ */
+export function rtl_spec_spec_parse(name, source) {
+    let deferred3_0;
+    let deferred3_1;
+    try {
+        const ptr0 = passStringToWasm0(name, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ptr1 = passStringToWasm0(source, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        const ret = wasm.rtl_spec_spec_parse(ptr0, len0, ptr1, len1);
+        deferred3_0 = ret[0];
+        deferred3_1 = ret[1];
+        return getStringFromWasm0(ret[0], ret[1]);
+    } finally {
+        wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
+    }
+}
+
+/**
  * Package identity (matches plugin manifest `version`).
  * @returns {string}
  */

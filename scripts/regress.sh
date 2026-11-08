@@ -366,9 +366,13 @@ else
 fi
 
 # S7 rtl2spec 插件閘(RTL2SPEC-PLUGIN §8.5;ADR-0012 D9):雙守衛降級形
-# (守衛=crates/rtl-spec-wasm/pkg 在場 + bun 在場;在場時兩插件閘 exit≠0
+# (守衛=crates/rtl-spec-wasm/pkg 在場 + bun 在場;在場時插件閘 exit≠0
 # 即整閘紅)。既有基線斷言(469/479+456/456)逐字不動;總閘四件套保持
 # 直調雙保險。pkg 缺=SKIP(wasm-pack 腿由 run-* 自建)。
+# D-S6 收編兩新閘(ADR-0014/D-PLAN §5):spec-cli-parity 守衛=bin+pkg+bun;
+# spec-eval 守衛=iverilog(缺場 exit 2 SKIP;評測層分鐘級,直調不進 regress
+# 的例外=本收編形,D-PLAN §5.2 收編條款)。證據頁保鮮(spec-eval-report.md
+# byte 比對)隨 spec-eval 閘執法,已提交頁陳舊/手改=整閘紅。
 if [ -f crates/rtl-spec-wasm/pkg/rtl_spec_wasm_bg.wasm ] && command -v bun >/dev/null 2>&1; then
     if bash plugin/rtl2spec/run-mcp-e2e.sh; then
         echo "rtl2spec mcp-e2e: PASS"
@@ -389,6 +393,24 @@ if [ -f crates/rtl-spec-wasm/pkg/rtl_spec_wasm_bg.wasm ] && command -v bun >/dev
         echo "rtl2spec gap-fixtures: PASS"
     else
         echo "GATE FAIL: rtl2spec gap-fixtures"; fail=1
+    fi
+    if [ -x target/debug/rtl-spec ]; then
+        if bash plugin/rtl2spec/run-spec-cli-parity.sh; then
+            echo "rtl2spec spec-cli-parity: PASS"
+        else
+            echo "GATE FAIL: rtl2spec spec-cli-parity"; fail=1
+        fi
+    else
+        echo "rtl2spec spec-cli-parity: SKIP (bin absent; cargo build first)"
+    fi
+    if command -v iverilog >/dev/null 2>&1; then
+        if bash plugin/rtl2spec/run-spec-eval.sh; then
+            echo "rtl2spec spec-eval: PASS"
+        else
+            echo "GATE FAIL: rtl2spec spec-eval"; fail=1
+        fi
+    else
+        echo "rtl2spec spec-eval: SKIP (iverilog absent)"
     fi
 else
     echo "rtl2spec gates: SKIP (pkg/bun absent)"

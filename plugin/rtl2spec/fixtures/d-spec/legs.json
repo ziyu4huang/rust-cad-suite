@@ -1,0 +1,148 @@
+{
+  "comment": "D-S4 腿表(斷言規格,手寫合法;RTL2SPEC-D-PLAN §4 D-S4/R1-2)。全部路徑=repo 根相對。接線契約:編譯單元=tb+wrapperO(若有)+DUT 檔;DUT 檔含 `module <spec.module>`=runner 啟動斷言(spec.module 由 wasm rtl_spec_spec_parse 從 spec 檔取,SSOT=spec 檔本身)。首批腿=自對拍腿(reimplDut==origDut,orig vs orig,證 runner 判別力+TB 場景解析正確);盲寫腿(reimplDut=d-spec/reimpl/<design>/top.v)由 D-S5 凍結後增補。mutprobe=每設計一條內聯最小確定性變異(anchor 在 DUT 原文 count==1,運行期斷言);measured=首次實測數字(D-S4 落地輪錄入),閘每輪重測必復現=drift 即紅。",
+  "legs": [
+    {
+      "leg": "counter8-self",
+      "design": "counter8",
+      "spec": "plugin/rtl2spec/fixtures/d-spec/counter8.spec.md",
+      "tb": "plugin/rtl2spec/fixtures/e1/tb_counter8.v",
+      "origDut": [
+        "corpus/counter8/counter.v"
+      ],
+      "reimplDut": [
+        "corpus/counter8/counter.v"
+      ],
+      "wrapperO": null,
+      "scenes": 6,
+      "expected": {
+        "compiled": true,
+        "matched": 6
+      }
+    },
+    {
+      "leg": "acc_pipe-self",
+      "design": "acc_pipe",
+      "spec": "plugin/rtl2spec/fixtures/d-spec/acc_pipe.spec.md",
+      "tb": "plugin/rtl2spec/fixtures/e1/tb_acc_pipe.v",
+      "origDut": [
+        "corpus/e2e/58_xls_acc_pipe/acc_pipe.v"
+      ],
+      "reimplDut": [
+        "corpus/e2e/58_xls_acc_pipe/acc_pipe.v"
+      ],
+      "wrapperO": "plugin/rtl2spec/fixtures/e1/dut_orig_accpipe.v",
+      "scenes": 6,
+      "expected": {
+        "compiled": true,
+        "matched": 6
+      }
+    },
+    {
+      "leg": "i2c_master-self",
+      "design": "i2c_master",
+      "spec": "plugin/rtl2spec/fixtures/d-spec/i2c_master.spec.md",
+      "tb": "plugin/rtl2spec/fixtures/e1/tb_i2c.v",
+      "origDut": [
+        "corpus/e2e/59_i2c_master/i2c_master.v"
+      ],
+      "reimplDut": [
+        "corpus/e2e/59_i2c_master/i2c_master.v"
+      ],
+      "wrapperO": "plugin/rtl2spec/fixtures/e1/dut_orig_i2c.v",
+      "scenes": 11,
+      "expected": {
+        "compiled": true,
+        "matched": 11
+      }
+    },
+    {
+      "leg": "counter8-blind",
+      "design": "counter8",
+      "spec": "plugin/rtl2spec/fixtures/d-spec/counter8.spec.md",
+      "tb": "plugin/rtl2spec/fixtures/e1/tb_counter8.v",
+      "origDut": [
+        "corpus/counter8/counter.v"
+      ],
+      "reimplDut": [
+        "plugin/rtl2spec/fixtures/d-spec/reimpl/counter8/top.v"
+      ],
+      "wrapperO": null,
+      "scenes": 6,
+      "expected": {
+        "compiled": true,
+        "matched": 6,
+        "recorded": "D-S5 首跑錄製(build/spec-eval/blind-first-run/first-run.json;禁手寫)"
+      }
+    },
+    {
+      "leg": "acc_pipe-blind",
+      "design": "acc_pipe",
+      "spec": "plugin/rtl2spec/fixtures/d-spec/acc_pipe.spec.md",
+      "tb": "plugin/rtl2spec/fixtures/e1/tb_acc_pipe.v",
+      "origDut": [
+        "corpus/e2e/58_xls_acc_pipe/acc_pipe.v"
+      ],
+      "reimplDut": [
+        "plugin/rtl2spec/fixtures/d-spec/reimpl/acc_pipe/top.v"
+      ],
+      "wrapperO": "plugin/rtl2spec/fixtures/e1/dut_orig_accpipe.v",
+      "scenes": 6,
+      "expected": {
+        "compiled": true,
+        "matched": 6,
+        "recorded": "D-S5 首跑錄製(build/spec-eval/blind-first-run/first-run.json;禁手寫)"
+      }
+    },
+    {
+      "leg": "i2c_master-blind",
+      "design": "i2c_master",
+      "spec": "plugin/rtl2spec/fixtures/d-spec/i2c_master.spec.md",
+      "tb": "plugin/rtl2spec/fixtures/e1/tb_i2c.v",
+      "origDut": [
+        "corpus/e2e/59_i2c_master/i2c_master.v"
+      ],
+      "reimplDut": [
+        "plugin/rtl2spec/fixtures/d-spec/reimpl/i2c_master/top.v"
+      ],
+      "wrapperO": "plugin/rtl2spec/fixtures/e1/dut_orig_i2c.v",
+      "scenes": 11,
+      "expected": {
+        "compiled": true,
+        "matched": 11,
+        "recorded": "D-S5 首跑錄製(build/spec-eval/blind-first-run/first-run.json;禁手寫)"
+      }
+    }
+  ],
+  "mutprobe": [
+    {
+      "design": "counter8",
+      "variant": "counter-by-2",
+      "anchor": "else     q <= q + 1'b1;",
+      "replacement": "else     q <= q + 8'd2;",
+      "measured": {
+        "compiled": true,
+        "matched": 2
+      }
+    },
+    {
+      "design": "acc_pipe",
+      "variant": "capture-swap-xy",
+      "anchor": "x__input_flop <= x;",
+      "replacement": "x__input_flop <= y;",
+      "measured": {
+        "compiled": true,
+        "matched": 1
+      }
+    },
+    {
+      "design": "i2c_master",
+      "variant": "idle-scl-oe-flip",
+      "anchor": "ST_IDLE: begin\n          scl_oe <= 1'b0;",
+      "replacement": "ST_IDLE: begin\n          scl_oe <= 1'b1;",
+      "measured": {
+        "compiled": true,
+        "matched": 7
+      }
+    }
+  ]
+}

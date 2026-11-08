@@ -18,7 +18,7 @@ import { sumRules, countGaps, renderRulebookMarkdown, renderGapsMarkdown } from 
 import { fileURLToPath } from 'node:url';
 
 const SERVER_NAME = 'rtl2spec';
-const SERVER_VERSION = '0.5.0';
+const SERVER_VERSION = '0.6.0';
 const PROTOCOL_LATEST = '2025-11-25';
 const PROTOCOL_SUPPORTED = [
   '2025-11-25',
@@ -96,7 +96,7 @@ function loadSource(args) {
   return { error: 'either `path` or `source` is required' };
 }
 
-// ---- 工具面(§6.1 五工具;C-S2 新增 rtl_tb_plan,ADR-0013 D-C11 修訂) ----
+// ---- 工具面(§6.1 五工具;C-S2 新增 rtl_tb_plan;D-S3 新增 rtl_spec_lint=spec 前端 D 弧) ----
 
 const TOOLS = [
   {
@@ -223,6 +223,27 @@ const TOOLS = [
         return toolError(String(parsed.error ?? 'tb_plan failed'));
       }
       return ok(parsed, null); // {ok:true,plan,template_v}=核心幀原樣轉出(零語義)
+    },
+  },
+  {
+    name: 'rtl_spec_lint',
+    description:
+      'Lint a high-level spec markdown file (spec-format:1 grammar, D-arc): seven checks — spec-format/module/ports/behavior ids (B\\d+)/check forms (guard/transition/sequence/relation) with required fields/decl completeness (value-side identifiers ⊆ ports∪params∪states∪derived)/scenarios (SCENE<n>). Empty findings = clean; each finding is a human-readable line prefixed by check number ①..⑦.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        path: { type: 'string', description: 'spec markdown file path (relative to cwd)' },
+        source: { type: 'string', description: 'spec markdown text (used when path is absent)' },
+        name: { type: 'string', description: 'virtual file name for inline `source`' },
+      },
+      required: [],
+    },
+    call(args) {
+      const loaded = loadSource(args);
+      if (loaded.error) return toolError(loaded.error);
+      const json = api.rtl_spec_spec_lint(loaded.name, loaded.source);
+      const findings = JSON.parse(json);
+      return ok({ findings, count: findings.length }, null);
     },
   },
   {

@@ -69,3 +69,60 @@
    守衛形先例);②23 場景逐腿編譯+運行+逐場景 diff;③verdict JSON+報告 md
    寫只落 plugin/rtl2spec/build/reimpl-eval/(直調不進 regress);
    ④消融點數字按切片分段輸出(S1/S2/S3+抄寫通道),禁混報。
+
+## 5. D 弧盲寫採樣(D-S5;2026-11-08;RTL2SPEC-D-PLAN §4 D-S5/§6;append-only)
+
+- **執行者/模型**:rust-cad-suite D 弧實作輪實作員子代理(工作流 script 逐切片
+  派工);模型=GLM-5.3-Flash(account:zai-individual-coding-plan;與 E1 原始輪/
+  復原力弧同一家族)。採樣形=代理會話內直出(非 API 溫度採樣,參數不可釘——
+  §0 同款誠實邊界);單次採樣 n=1,無多樣本。
+- **盲隔離邊界(誠實揭露,§0 同款加重形)**:本輪 agent 在 D-S4(mutprobe 錨點
+  選取)已讀過原版 DUT 原文——counter.v 與 acc_pipe.v 全文、i2c_master.v 部分
+  (頭部 27..60 行/復位塊 80..90 行/IDLE case 103..120 行)。盲寫執行時僅以
+  spec 檔全文為規範輸入(未重開 DUT 原文),**但盲隔離弱於 E1 原始輪的獨立
+  對話**;三腿 matched 數字僅輔助證據,永不進確定性閘(機械面=iverilog 編譯+
+  場景 diff,run-spec-eval.sh 執法);泄漏核查只能證偽不能證真。
+- **盲寫 prompt 模板(逐字;`{...}`=實例化槽位)**:
+
+```text
+你是 RTL 設計工程師。以下是某個數位模組的「高級 spec」(markdown 節頭格式;
+由人寫就,描述該模組的接口契約與行為契約——你不曾見過其 RTL 原文)。請**只依據
+spec 內容**寫出一個行為合約的 Verilog-2001 模組,寫到檔案 {OUT}。
+
+spec:
+{SPEC_MD}
+
+硬性要求:
+1. 頂層模組名必須==spec 的 `module:` 欄;埠名/方向/類型/位寬逐字合 spec 的
+   `port:` 行(scalar=1 位;[N:0]/[PARAM-1:0] 按字面);param 行=module 級
+   parameter 缺省值。
+2. spec 的 `state:` 行=內部時序暫存(命名可自定落地,角色按行文);`derived:`
+   行=組合中間量。行為以 `## behavior` 條目為準(check 行=結構契約)。
+3. 上電初值:spec 未宣告復位面者,寄存器不定值(禁自加初始塊粉飾)。
+4. 只輸出模組本身;零 $display/$finish(公共 TB 觀測);Verilog-2001 可綜合子集。
+5. exit code 約定(rust-cad-suite §2.1):你的產出由 `rtl-spec` 系閘機械評測
+   (iverilog 編譯成敗+公共 TB 場景 diff);場景契約=`## scenarios`。
+```
+
+- **凍結產物(入庫=凍結工件,禁手改;換檔=協議事件)**:
+
+| 設計 | 產物 | sha256 |
+|---|---|---|
+| counter8 | fixtures/d-spec/reimpl/counter8/top.v | a8f312589ccb6cf3adb18a4bd405b7d940d1fc41504f4af9d0f532379b6a46b4 |
+| acc_pipe | fixtures/d-spec/reimpl/acc_pipe/top.v | cce7d19e435c4a5b3311299ad667ce2a8bad5fc76935ab2e42061da99bd4ee94 |
+| i2c_master | fixtures/d-spec/reimpl/i2c_master/top.v | 6f5ed9fc597c97c622cffba4b3b38f6f82c8697cabe19f478d8a5d56e5965470 |
+
+- **首跑錄製(expected 來源;禁手寫)**:測量面=iverilog -g2001(tb+wrapperO+DUT)
+  +tbproto.sceneBlocks 逐場景 diff,工件=build/spec-eval/blind-first-run/
+  (first-run.json+out_*.txt)。實測:counter8 6/6、acc_pipe 6/6、i2c_master 11/11
+  (三腿 compiled=true;expected.{compiled,matched}=錄製產生,已入 legs.json
+  `recorded` 標注)。
+- **i2c 誠實推斷點(規則面未覆,由 spec 散文/狀態機必然性推得;產物註釋同標)**:
+  ①done 單拍脈衝的清零面=散文「done 在每字節 ACK 結束拍置一拍」(規則面僅
+  B070 置 1/B018 復位);②half 1→0 翻回由狀態機推進必然性(規則面僅
+  B058/B069 覆 0→1);③命令鎖存置 case 之後(散文「tip=1 期間寫入者排隊」=
+  鎖存覆寫消費為隊列語義)。
+- **機械執行**:`bash plugin/rtl2spec/run-spec-eval.sh`(iverilog 守衛缺場 exit 2;
+  6 腿=3 自對拍+3 盲寫對 expected 逐字+mutprobe 3 條全紅;verdict/報告寫只落
+  build/spec-eval/;直調不進 regress)。D 腿數字分段:自對拍段(判別力基準)
+  與盲寫段(輔助證據)分列禁混報。

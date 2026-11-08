@@ -14,6 +14,18 @@ export function rtl_scan_gaps_rtlil(name: string, source: string): string;
 export function rtl_scan_gaps_sv(name: string, source: string): string;
 
 /**
+ * spec 七查 lint 面(D-S3):findings 緊湊字串陣列(與 CLI `spec lint`
+ * stdout byte-equal——run-spec-cli-parity spec 腿判據)。
+ */
+export function rtl_spec_spec_lint(name: string, source: string): string;
+
+/**
+ * spec 檔解析面(D-S3):name 沿導出形(解析零名消費;SpecDoc.name 自檔
+ * 頭 `# spec:`);回傳=spec_json;Err(現無產出點)→ `{"error":…}` 幀。
+ */
+export function rtl_spec_spec_parse(name: string, source: string): string;
+
+/**
  * Package identity (matches plugin manifest `version`).
  */
 export function rtl_spec_version(): string;
@@ -41,6 +53,8 @@ export interface InitOutput {
     readonly rtl_extract_rules_sv: (a: number, b: number, c: number, d: number, e: number) => [number, number];
     readonly rtl_scan_gaps_rtlil: (a: number, b: number, c: number, d: number) => [number, number];
     readonly rtl_scan_gaps_sv: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly rtl_spec_spec_lint: (a: number, b: number, c: number, d: number) => [number, number];
+    readonly rtl_spec_spec_parse: (a: number, b: number, c: number, d: number) => [number, number];
     readonly rtl_spec_version: () => [number, number];
     readonly rtl_tb_plan_rtlil: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => [number, number];
     readonly rtl_tb_plan_sv: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number, i: number) => [number, number];

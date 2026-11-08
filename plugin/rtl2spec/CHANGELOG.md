@@ -6,6 +6,26 @@
 類別/破口類/工具);patch=缺陷修復與文檔。git tag 慣例=`rtl2spec-v<X.Y.Z>`
 (打 tag 由 user 定,弧內禁 commit 見 AGENTS)。
 
+## [0.6.0] - 2026-11-08(未發布;弧內禁 commit)
+
+### Added(D spec 前端弧 D-S0..D-S3;RTL2SPEC-D-PLAN/ADR-0014 草案)
+
+- MCP 新工具 `rtl_spec_lint`(本版):高級 spec markdown 七查 lint——收
+  {path|source, name},回 {findings, count}(findings=人讀診斷行,①..⑦
+  前綴標查號;空陣列=clean)。面零語義(裝載 wasm→編幀),語義全在核心
+  `crates/rtl-spec::spec`(10.7 三面一路)。
+- wasm 導出 `rtl_spec_spec_parse`/`rtl_spec_spec_lint`(D-S3):字串進出零
+  js_sys;lint 輸出與 CLI `rtl-spec spec lint` stdout byte-equal
+  (run-spec-cli-parity spec 腿判據)。
+- SERVER_VERSION 0.5.0→0.6.0(plugin.json/CHANGELOG 同輪一致,semver 同步律);
+  run-mcp-e2e 斷言 19→21(tools/list 5→6 工具+rtl_spec_lint 正負兩斷言)。
+- 核心新增(D-S1,隨本版 wasm 載出):spec 檔格式(RTL2SPEC-D-PLAN §3,R1-4
+  行級文法+check 行四收形)、parse_spec_md/spec_lint 七查/spec_json;
+  fixtures/d-spec/ 三正樣語料(counter8 2 條/acc_pipe 9 條/i2c_master 94 條)。
+- CLI(rtl-spec bin,D-S2):agent 唯一接口,analyze/extract/gaps/tb+spec
+  parse/lint 子命令;JSON-first+exit code 四值(0/1/2/3)+--help 工作流配方
+  (CLI-AGENT 憲法,ADR-0014 草案)。
+
 ## [0.5.0] - 2026-11-07(未發布;弧內禁 commit,版本號由收尾弧 S4 生效)
 
 ### Added(C 閉環收尾弧 S0..S4;RTL2SPEC-PLUGIN §20/RTL2SPEC-FINISH-PLAN)
