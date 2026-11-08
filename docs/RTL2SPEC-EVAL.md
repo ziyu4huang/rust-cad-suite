@@ -1,9 +1,9 @@
 # rtl2spec 真實評測擴面報告(§16.4;機械生成禁手改)
 
-- 日期:2026-11-07
+- 日期:2026-11-08
 - 命令行:`bash plugin/rtl2spec/run-realworld-eval.sh`(機械生成禁手改)
-- 工具鏈:bun v26.3.0、wasm ABI 0.1.0、wasm sha256 `66518257be803ebd70c62fd284c09f8b78b83425b8300244ef79e8da4b3d707d`
-- 耗時:98ms(單 bun 進程循環 353 檔);語料零 GPL(yosys-simple/sv-tests=ISC、corpus=repo MIT、spec-i2c=MIT 乾淨室、xls=Apache-2.0 載體)
+- 工具鏈:bun v26.3.0、wasm ABI 0.1.0、wasm sha256 `fe64d518cbcde3d1f0f53b38a160e0926d078ee507840c94c4fb4e1d119b600f`
+- 耗時:91ms(單 bun 進程循環 353 檔);語料零 GPL(yosys-simple/sv-tests=ISC、corpus=repo MIT、spec-i2c=MIT 乾淨室、xls=Apache-2.0 載體)
 - 判據鏈:per-file 三檔分類(design-rules/design-sparse/skip-perr/skip-tb);閘級硬 FAIL=trap/JSON 不可解析/design-rules 檔 V4/V5-①②④ 敗/V5-③ 指紋重複(L1+L2 全量)/成功呼叫≠檔數。V1(≥3)/V2/V3 為報告列不設單檔 FAIL(擴面集失敗條件=結構性違例而非產量);13 檔驗證集 V1..V6 閾值閘另行執法不動(run-rtl-validation.sh)。
 
 ## 閘級判據表

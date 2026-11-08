@@ -3946,3 +3946,149 @@ fsm r0「2 行失配」實為 **1 行 2 鍵**(SCENE5 打印 4 的 rb/gb);sincos 
   不拒設計」屬門檻變更。
 - 觀察:i2c D 腿丟殺 8 個(勘誤 1)是 D 腿異步復位觀測缺口,未處理。
 - ryosys equiv_* 核心實現=註冊里程碑(PLAN.md RY-EQUIV),未承諾編號。
+
+---
+
+## §21 D spec 前端(2026-11-08;D-S0..D-S6;RTL2SPEC-D-PLAN/ADR-0014;append-only)
+
+規劃檔=docs/RTL2SPEC-D-PLAN.md(審查員只讀該檔+其引用代碼行);CLI-AGENT 憲法
+四條=用戶 2026-11-08 定調,立法=ADR-0014+AGENTS 10.13+SKILL「CLI-AGENT 憲法
+增補」節。§0..§20 零刪改。
+
+### 21.1 D-S0=D-c3 修復(corpus_lint 同行 `#` 關窗)
+
+- 手術:crates/vl-difftest/tests/corpus_lint.rs 原 :80-95 `closed` 空操作死代碼
+  (空循環/自賦值/空 if,16 行)整段刪除(刪前印出全文+首尾錨點,10.6);同行
+  `#`/`@(` 關窗=`window_open = cut == tail.len()`(現 :85),跨行擴展循環包進
+  `if window_open`(:88)——同行 `#` 前語句仍在窗內,既有 bad 形仍 1 finding。
+- 雙 fixture 判別力:race_lint_same_line_delay_closes_window_for_following_lines
+  (正樣 `@(posedge clk); #1; ld = 1;` 後仍有 `q = 3;` 行→零違例;修前此形
+  1 假陽性)+race_lint_in_window_race_still_red(同行寫/後續行窗內寫各恰 1)。
+- 負向探針實跑:臨時移除關窗賦值(還原無條件擴展)→正樣測試 FAILED exit 101,
+  finding=`line 5: blocking write to \`q\``(=D-c3 假陽性本體)後還原。
+- 閘:`cargo test -p vl-difftest --test corpus_lint` 5 測試全綠(新舊≥4;既有
+  三測試零 regress;corpus 現狀零違例)。REGISTRY D-c3 條同輪改「已清償
+  (D-S0,2026-11-08)」;tblint.mjs:10「換行形=已登記差異」注記自此陳舊
+  (JS selfcheck 判 JS 側值不受影響,由本節統一注記清償)。
+
+### 21.2 D-S1=spec 格式核心(crates/rtl-spec/src/spec.rs)
+
+- SpecDoc(name/spec_format/module/params/ports/states/derived/assumes/behavior/
+  scenarios)+parse_spec_md(永不 panic、對任何 &str 全容錯,劣化面全走 lint;
+  Err=SpecError 當前無產出點,供未來 invariant 文法與 CLI 錯誤面)+spec_lint
+  七查+spec_json(緊湊形鍵序 byte-exact)。文法 SSOT=D-PLAN §3(R1-4 行級五條
+  +check 行四收形,sequence 無 anchor;rsplit " when " 切分)。
+- ⑥ decl_lint=crate::lint::collect_idents+EXCLUDE 排除表(欄位鍵/check/五形名/
+  posedge/negedge/true/false;`-` 與數值字面量由詞法面天然不收),缺集 BTreeSet
+  字典序。
+- 測試 13 條(spec_tests.rs):三正樣逐欄位對拍(2/9/94 條+i2c 10 param/17 port/
+  11 state/derived cnt_end/散文不成條目/續行併入/### 跨節連續/async=true)+
+  七查負樣各觸發恰好 1 條對應 finding+零誤報形(FULL:async=true+derived 引用+
+  parametric width+sized 字面量)+spec_json byte-exact 釘死。
+- 修復實錄:①effects `←` 切割初版 find+byte 切片對多位元組字元 panic(改
+  split_once);②測試字串 `\` 續行吞下一行前導空白=結構行失縮進(改 raw
+  string 逐字縮進)。
+
+### 21.3 D-S2=rtl-spec bin 骨架(agent 唯一接口)
+
+- Cargo.toml [[bin]]+src/bin/rtl-spec.rs 薄 main(vl-cli 同款)+lib.rs
+  `#[cfg(not(target_arch = "wasm32"))] pub mod cli;`(host-only)。子命令
+  analyze/extract/gaps/tb;JSON-first(stdout=raw JSON 無尾隨換行與 wasm 導出
+  byte-equal)+exit code 四值+`--help` 工作流配方+每子命令自解釋;旗標按命令
+  白名單嚴格解析(--flag value 與 --flag=value 兩形);spec 未實現=exit 2 帶
+  milestone D-S3 指針(鐵則 3 形)。
+- cli 測試 13 條:四值 exit/byte-equal with 核心 API(含默認 max-rules=
+  DEFAULT_MAX_RULES=256 與 wasm 0=默認契約同形)/TB1 幀 exit 1/--emit-v 寫檔
+  ==tb_template_v/md 形==render_markdown/--help 配方關鍵字。
+- 新閘 run-spec-cli-parity.sh+scripts/spec-cli-parity.mjs(§5.1):守衛 bin+pkg
+  +bun 缺場 exit 2(實證:bin 移除→SKIP guard+真實 exit 2);D8 同款陳舊防線
+  (6 傳遞依賴目錄 find -newer→重建+同步);11 腿 byte-equal。負向探針=CLI
+  渲染面改動(默認 max_rules 256→1)→閘 FAIL exit 1(extract-sv-def 截斷至
+  1545B+extract-rtlil 同路徑紅)後還原 11/11。
+- host-only 實證:dist wasm sha 終值不變(cli 不入 wasm 面)。
+
+### 21.4 D-S3=spec 三面跟隨(CLI spec 子命令+wasm 導出+MCP 工具+conformance 重錄)
+
+- CLI:spec stub 換真子命令 spec parse(spec_json)/spec lint(spec_lint_json;
+  exit 0=clean/1=findings,stderr 帶 N findings 提示);cli 測試 14 條。
+- wasm:rtl_spec_spec_parse/rtl_spec_spec_lint(字串進出零 js_sys;Err→
+  {"error":…} 防禦幀)+host 測試;導出面 9→11 fns;server.d.ts 手寫型別契約面
+  同輪跟隨。核心單一源:spec_lint_json(spec.rs)——三面 byte-equal 禁自拼。
+- MCP:dist/server.mjs SERVER_VERSION 0.5.0→0.6.0+新工具 rtl_spec_lint(收
+  {path|source}→回 {findings,count},面零語義);plugin.json/CHANGELOG semver
+  同輪一致;run-mcp-e2e 斷言 19→21(②tools/list exactly 6+⑫正樣 counter8
+  findings 空+⑬負樣 broken spec count≥1 ①..⑦ 起首)。
+- parity 擴 spec 腿:17/17 byte-equal(3 設計×parse/lint)。
+- **wasm sha 變更清償**:66518257→bcfddea0(D-S1)→fe64d518(D-S3 新導出);
+  conformance 全量重錄 `--record --slice D-S3`(exit 0,34/34 admitted,
+  mutants=863 eligible=794 killed=544 equivalent=69 unruled_killed=84=與 C 弧
+  已提交數字逐項一致)。對賬:閘自產 record-diff-D-S3.md(逐設計 tb.v 不變/
+  expected.txt 行級差 0/數字恒等)+獨立剝欄對賬(逐 record.json flatten 比對
+  HEAD:剝 tb.simMs/provenance.date 後每檔恰 1 項 diff=provenance.wasmSha256,
+  零其他變更);默認模式復跑 PASS 34/34+「PASS 證據頁 byte 相等」(DRIFT 鏈
+  conformance-eval.mjs:911 清償)。
+- 首錄試跑 exit 2:slice 正則硬編 C-S 前綴→寬化 ^(C|D)-S[0-9]+(-[a-z0-9]+)?$
+  (標籤僅快照/record-diff 命名,零判據語義;D 弧 G 程序同款屬計畫明令)。
+
+### 21.5 D-S4=評測床接線(run-spec-eval.sh+scripts/spec-eval.mjs)
+
+- 形沿 reimpl-eval:iverilog -g2001+tbproto run 看門狗+sceneBlocks 塊 diff;
+  腿表=fixtures/d-spec/legs.json(斷言規格手寫合法,路徑 repo 根相對);接線
+  契約 R1-2(spec.module SSOT=spec 檔經 rtl_spec_spec_parse;DUT 檔含
+  `module <spec.module>`=啟動斷言,不過 exit 1 帶 spec.module+wrapperO 提示);
+  守衛 iverilog 缺場 exit 2/腿產物缺 exit 3;寫只落 build/spec-eval/;直調
+  不進 regress(D-S6 收編)。
+- 首批腿=自對拍 3 腿(reimplDut==origDut):counter8 6/6、acc_pipe 6/6、
+  i2c_master 11/11(判 runner 判別力+TB 場景解析)。
+- mutprobe(負探針=TB 判別力自證 10.12):每設計一條內聯確定性變異(anchor
+  運行期 count==1 斷言):counter8/counter-by-2→2/6、acc_pipe/capture-swap-xy
+  →1/6、i2c_master/idle-scl-oe-flip→7/11,全紅;measured 錄入 legs.json,
+  閘每輪重測必復現(漂移即紅)。
+- 閘負探針實跑:iverilog 缺場(PATH 限縮)→exit 2;legs expected 改 5→閘紅
+  exit 1;還原 exit 0。
+- 修復實錄:①compileArgs 二次 R() 雙前綴(reimplDut 已 map(R) 再於 compileArgs
+  map(R))——路徑契約改 push 原值+註釋釘死;②i2c 首選變異錨(IDLE scl_o 值
+  翻轉)落不可觀測洞(oe=0 時 o 不影響總線電平,matched=11/11 未紅)→換
+  scl_oe 使能翻轉(7/11 紅)=「不可觀測=非判別」實例化。
+- 證據頁 spec-eval-report.md 起生成(默認落 build/;--record 寫已提交頁)。
+
+### 21.6 D-S5=盲寫採樣凍結
+
+- 三盲寫 top.v 凍結入 fixtures/d-spec/reimpl/<design>/top.v:counter8(
+  a8f31258…)/acc_pipe(cce7d19e…)/i2c_master(6f5ed9fc…);來源=spec 全文+
+  §2.1 出口約定(協議=REIMPL-PROTOCOL §5 append-only:身份/模型 GLM-5.3-Flash/
+  採樣形=代理會話直出 n=1/prompt 模板逐字/盲隔離揭露=D-S4 曾讀 DUT 原文作
+  mutprobe 錨點,數字僅輔助證據)。
+- i2c 誠實推斷點(產物註釋同標):①done 單拍脈衝清零面=散文「置一拍」;
+  ②half 1→0=狀態機推進必然性;③命令鎖存置 case 後=隊列語義。
+- 首跑錄製(expected 來源=build/spec-eval/blind-first-run/first-run.json):
+  counter8-blind 6/6、acc_pipe-blind 6/6、i2c_master-blind 11/11(三腿
+  compiled=true;expected 錄入 legs.json 帶 recorded 標注)。三腿 compiled
+  全敗停弧信號未觸發。
+- 閘:run-spec-eval.sh PASS 6 腿(3 自對拍+3 盲寫對 expected 逐字)+mutprobe
+  3 條全紅;--record --slice D-S5 證據頁刷新 6 腿形。
+
+### 21.7 D-S6=正典一次性寫入+閘收編(本節)
+
+- 正典四件:ADR-0014(CLI-AGENT 憲法 D1..D4+spec 格式 SSOT+凍結採樣律+開放項
+  invariant 文法/behavior≥1);AGENTS 10.13;SKILL「CLI-AGENT 憲法增補」節;
+  REGISTRY 終核(D-c3 已清償終核+Crates 表 cli 面行+D 弧已知未決小節)。
+- regress S7 rtl2spec 塊收編兩新閘(雙守衛降級形):spec-cli-parity(守衛=bin+
+  pkg+bun)/spec-eval(守衛=iverilog 缺場 exit 2 SKIP;收編=直調不進 regress
+  的例外形,§5.2 收編條款)。
+- 證據頁保鮮上線:spec-eval.mjs 頁命令行 canonical 化(模式無關,conformance
+  同形——D-S4 邊界注記的清償)+默認模式與已提交頁 byte 比對(陳舊/手改=
+  exit 1;負探針實跑:手改一字符→exit 1 帶「陳舊或手改」+重錄提示,還原
+  exit 0)。--record --slice <D-Sn> 才寫已提交頁。
+
+### 21.8 已知未決與邊界
+
+- D-c7(行內賦值延遲抽象等價=TB 強化死鎖)沿 10.12:D 弧不觸等價腿。
+- spec `invariant` 形未立文法(parse 遇之=finding ⑤;立文法=ADR-0014 修訂
+  事件)。
+- 「## behavior ≥1」未入七查枚舉(①..⑦),零條目 spec 可過 lint——待 ADR
+  修訂裁決(D-S6 時點未收)。
+- spec-eval 證據頁命令行=canonical 模式無關形(與 conformance 同款);頁面
+  保鮮只護 spec-eval 面,conformance/report 面各自已有閘。
+- 盲寫數字(6/6、6/6、11/11)=輔助證據欄(盲隔離揭露見 REIMPL-PROTOCOL §5);
+  禁把「盲寫全綠」包裝成 spec 質量達標(無 oracle 契約沿 ADR-0012 D2/D5)。

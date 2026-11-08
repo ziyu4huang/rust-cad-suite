@@ -10,8 +10,8 @@
 | `rcs-diag` | spans/source map/診斷/caret 渲染(suite 共享) | 0 | verilator 的 %Error 輸出層 | 渲染 golden 測試 |
 | `analyzer-core` | 統一分析 API(`analyze`+`Analysis` 投影視圖)+ASP/1 codec+§13 報告編碼(10.7 core-first 語義層) | vl-syntax,ry-ir,rcs-diag | —(自建,無 oracle) | `cargo test -p analyzer-core` 34 pass+1 ignored(json 17+api 13+codec 向量 4;2026-11-03 收平輪實測);`bun test`(同 fixtures 12);ADR-0011 |
 | `analyzer-server` | bin `analyzerd`:UDS 面(握手/幀循環/ops/停機/殘留清理),零語義 | analyzer-core | —(自建) | `cargo test -p analyzer-server` 15 測(單測 3+回環 12;2026-11-03 收平輪實測);regress S5 `analyzer smoke` 塊 |
-| `rtl-spec` | RTL 行為規則書提取(reset/fsm/handshake/timing/arithmetic/counter/memory/protocol/param 九類)+破口掃描 G1..G7+結構投影摘要+測試計劃 tb_plan 與模板 TB(tbplan.rs,C 弧 C-S2;TbError 十一條硬錯 milestone TB1)+手寫 JSON writer(只寫不讀,鍵序=寫出序 byte-exact)+markdown 渲染;語義姿態=永不 panic、錯誤進結果;走 analyzer-core 逃逸口,**不擴前弧**(ADR-0012 D1) | analyzer-core,vl-syntax,ry-ir,rcs-diag | —(自建,無 oracle;質量閘=V1..V6 機械判據+獨立評審員) | `cargo test -p rtl-spec` 59 pass(2026-11-07 C-S6 實跑套件行:unit 5[含 lint 3]+rtlil 2+sv_rules 41[含 C-S1 兩測]+tbplan 11;2026-11-04 版本 26 測已過時),含 G8 dead_branch/S8 確定性錨);`bash plugin/rtl2spec/run-rtl-validation.sh`(13 檔 V1..V6 全過,Σrules=325);`bash plugin/rtl2spec/run-golden-regression.sh`(37 檔×2 golden 逐位元組)+`bash plugin/rtl2spec/run-gap-fixtures.sh`(G1..G7 矩陣;兩閘 regress S11 收編)+`bash plugin/rtl2spec/run-realworld-eval.sh`(353 檔分層評測→docs/RTL2SPEC-EVAL.md);正典=docs/RTL2SPEC-PLUGIN.md |
-| `rtl-spec-wasm` | wasm face(cdylib):9 導出(JSON 字串進出,analyze/extract/scan/tb_plan×sv|rtlil 面+version;C-S2 7→9),零 js_sys,`--target web`+顯式位元組 init(ADR-0012 D3) | rtl-spec,wasm-bindgen | —(自建) | `cargo test -p rtl-spec-wasm` 2 測(host 面);smoke.mjs bun+node 雙運行時各 18 斷言、9 路 wasm↔native byte parity(2026-11-07 C-S2 實測:新增 tb_plan sv 正樣/TB1 負樣/.il 三路);dist 裝載由兩插件閘驗(D8:閘驗出貨物) |
+| `rtl-spec` | RTL 行為規則書提取(reset/fsm/handshake/timing/arithmetic/counter/memory/protocol/param 九類)+破口掃描 G1..G7+結構投影摘要+測試計劃 tb_plan 與模板 TB(tbplan.rs,C 弧 C-S2;TbError 十一條硬錯 milestone TB1)+手寫 JSON writer(只寫不讀,鍵序=寫出序 byte-exact)+markdown 渲染+D 弧 spec 前端(spec.rs parse_spec_md/spec_lint 七查/spec_json/spec_lint_json 三面 byte-equal 單一源;cli bin `rtl-spec`=agent 唯一接口,ADR-0014);語義姿態=永不 panic、錯誤進結果;走 analyzer-core 逃逸口,**不擴前弧**(ADR-0012 D1) | analyzer-core,vl-syntax,ry-ir,rcs-diag | —(自建,無 oracle;質量閘=V1..V6 機械判據+獨立評審員) | `cargo test -p rtl-spec` 81 pass(2026-11-08 D-S6 實跑套件行:lib 14[cli 13+1 spec 子命令測]+spec_tests 13+rtlil 2+sv_rules 41+tbplan 11);`bash plugin/rtl2spec/run-spec-cli-parity.sh`(CLI↔wasm byte-equal 17 腿)+`bash plugin/rtl2spec/run-spec-eval.sh`(6 腿對 expected 逐字+mutprobe 3 條全紅+證據頁保鮮;兩閘 regress S7 收編,ADR-0014),含 G8 dead_branch/S8 確定性錨);`bash plugin/rtl2spec/run-rtl-validation.sh`(13 檔 V1..V6 全過,Σrules=325);`bash plugin/rtl2spec/run-golden-regression.sh`(37 檔×2 golden 逐位元組)+`bash plugin/rtl2spec/run-gap-fixtures.sh`(G1..G7 矩陣;兩閘 regress S11 收編)+`bash plugin/rtl2spec/run-realworld-eval.sh`(353 檔分層評測→docs/RTL2SPEC-EVAL.md);正典=docs/RTL2SPEC-PLUGIN.md |
+| `rtl-spec-wasm` | wasm face(cdylib):11 導出(JSON 字串進出,analyze/extract/scan/tb_plan×sv|rtlil 面+spec parse/lint[D-S3]+version;C-S2 7→9,D-S3 →11),零 js_sys,`--target web`+顯式位元組 init(ADR-0012 D3) | rtl-spec,wasm-bindgen | —(自建) | `cargo test -p rtl-spec-wasm` 3 測(host 面;D-S3 +spec 導出測);smoke.mjs bun+node 雙運行時各 18 斷言、9 路 wasm↔native byte parity(2026-11-07 C-S2 實測:新增 tb_plan sv 正樣/TB1 負樣/.il 三路);dist 裝載由兩插件閘驗(D8:閘驗出貨物) |
 | `vl-syntax` | pp+lexer+parser+AST(V2005);ANSI 端口組解析=新組重置 net/reg/signed/range、僅方向跨組繼承(D-c2 修復,ADR-0013 D-C13;七向量前端單測 frontend.rs) | rcs-diag | VPreproc/V3Parser | lexer 12 + frontend 18 測試(含 d_c2_ansi_group_reset_seven_vectors;2026-11-07 C-S2 實測);E2E 全語料過解析閘 |
 | `vl-sim` | 4-state 值/求值/展開/事件調度器(值域已提取=`vl-values`,src/value.rs 為 shim re-export;wait/fork/force 族硬錯自 parse 級遷 build 級,M7/M8 文字逐臂保留 interp.rs:1767-1785) | vl-syntax, rcs-diag, vl-values | VCSD/eval/scheduling | value 8 測試;sim_gate 2(counter8+fulladd byte-diff);e2e 59/59 零漂移 |
 | `vl-cli` | bin `rverilator`(--version/-E/--lint-only/--dump-ast/--binary/--top-module) | 上全部 | verilator driver | 未知旗標=錯 exit1(對抗審 #8) |
@@ -292,11 +292,18 @@
     width 0→1+parametric true→false]/partsel 16[全 signed true→false])+PROVENANCE 13 行,對賬工件
     build/golden-leafdiff-C-S2.txt;gaps 37 檔零變;G4 74/74;STATS 零位移(contract 面不入規則計數)。
     L1 非釘選 retime 1 葉與 corpus/sv-tests 零差=規劃輪材料,本片未單獨複核(EVAL 指紋 1212/dup=0 不變)。
-- **D-c3 corpus_lint R1 同行 `#` 不關窗**:crates/vl-difftest/tests/corpus_lint.rs:80-95
-  的 `closed` 為空操作(`let closed = true; if closed { }`),`@(posedge ..)` 後同行
-  `#1;` 不終止競爭窗=換行形假陽性(§19.3.3 TB-R1x 條實跑證據)。corpus 現狀零違例不受
-  影響;改的是 vl-difftest 測試側 lint,本弧範圍外不修 Rust 側(§19.13-8,用戶裁決);
-  C 弧 TB lint 自帶 TB-R1x 判據。
+- **D-c3 corpus_lint R1 同行 `#` 不關窗 — 已清償(D-S0,2026-11-08;D-S6 終核)**:crates/vl-difftest/tests/corpus_lint.rs
+  的 `closed` 空操作死代碼(原 :80-95,空循環/自賦值/空 if)整段刪除;同行 `#`/`@(` 關窗=
+  `window_open = cut == tail.len()`(crates/vl-difftest/tests/corpus_lint.rs:85),跨行擴展循環
+  包進 `if window_open`(:88)——同行 `#` 前語句仍在窗內,既有 bad 形 `@(posedge clk); ld = 1;`
+  仍 1 finding。雙 fixture 判別力(10.12 鐵律):正樣 race_lint_same_line_delay_closes_window_for_following_lines
+  (`@(posedge clk); #1; ld = 1;` 後仍有 `q = 3;` 行→零違例;修前此形 1 假陽性)、
+  負樣 race_lint_in_window_race_still_red(同行寫/後續行窗內寫各恰 1)。負向探針實跑=臨時還原
+  無條件擴展→正樣測試 FAILED(exit 101,finding=`line 5: blocking write to `q``)後還原。
+  閘=`cargo test -p vl-difftest --test corpus_lint` 5 測試全綠(既有三測試零 regress;corpus
+  現狀零違例零擾動)。效果注記:Rust 側換行形自本修復起=0,與 C 弧 TB-R1x 文檔語義(第五向量 0)
+  一致;tblint.mjs:10「換行形=已登記差異 D-c3」注記自此陳舊(JS selfcheck 判 JS 側值不受影響),
+  正典注記 D-S6 統一清償。
 - **D-c4 contract 負數下標定寬範圍報 parametric**:partsel_test006/007 的 `[31:-32]`
   (corpus-external/yosys-simple/partsel.v:92/:94/:104)在 contract 報 `width 0+
   parametric:true`(實為 64 位定寬)【本輪 dist wasm 實探】;tb_plan 對其以 TB1 拒收=
@@ -315,3 +322,14 @@
   提交→killed 全母體自檢紅(REJECTED exit 1)」——與 eqverdict 恆矛盾的變異永不可殺,**已入庫設計的 TB 永久不可強化**
   (殺傷率表面 3/5、實際可殺 3/10)。與 §20.8 operators `$pow` 待裁是同一政策問題(能力邊界時等價腿是否不適用)且多出
   「入庫後凍結」維度。狀態=未裁,方向保守(不假放行);裁決前該類設計維持現狀,新強化 TB 逐案對賬。
+### D 弧已知未決(2026-11-08 D-S6 終核登記;10.5 先登記)
+
+- **spec invariant 形文法未立**:parse 遇 `check(invariant)`=finding ⑤(form ∉
+  四收形),文法待有語料再立(立時=ADR-0014 修訂事件)。
+- **「## behavior ≥1」未入 spec_lint 七查枚舉**:零條目 spec 可過 lint
+  (①..⑦ 無此項);是否收查=ADR-0014 開放項待裁。
+- **spec-eval 證據頁命令行=canonical 模式無關形**(D-S6 裁,沿 conformance
+  同款);--record 與默認模式產 byte 相同頁面。
+- **i2c mutprobe 不可觀測錨教訓**(D-S4 實錄):oe=0 時 o 值翻轉不影響總線
+  電平=TB 不可觀測(11/11 未紅),換 scl_oe 使能翻轉後 7/11 紅——「變異落點
+  可觀測性」先於「變異語義」。
