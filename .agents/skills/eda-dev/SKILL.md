@@ -365,3 +365,32 @@ GUI 產物=可 diff SVG(golden byte-diff),點陣 canvas 波形=違例;
 - **收尾(2026-11-07 收尾弧 S4;RTL2SPEC-PLUGIN §20)**:插件 0.5.0(四點一致);conformance 默認模式加 wasm sha 保持斷言(record 的
   provenance.wasmSha256 必==dist wasm);run-plugin-check ⑤e/⑤f=欠條清償閘(§20.5 釘選全表==pinned-files.list,解析器 1 正 4 負自證;
   FINISH-PLAN 無「[欠]」)。弧末遺留:D-c5/D-c6、operators 政策待裁、i2c D 腿丟殺 8(§20.8)。
+
+## CLI-AGENT 憲法增補(2026-11-08;D-S0..D-S6;ADR-0014;立法=AGENTS 10.13)
+
+- **`rtl-spec` CLI 用法(先 `--help`)**:工作流配方內嵌於頂層 `--help`——
+  spec 撰寫→`spec parse`/`spec lint`→盲寫 top.v→`extract` 對拍→`tb` 生成→
+  conformance 評測。stdout=raw JSON(無尾隨換行,與 wasm 導出 byte-equal);
+  人讀診斷在 stderr,自帶下一步提示——**先讀 stderr 再動作**。
+- **exit code 四值**:0=成功;1=域內失敗(findings/被測紅/驗證不過;spec lint
+  findings>0 也走 1,findings 陣列仍在 stdout 供解析);2=用法或環境缺
+  (未知旗標/缺參數/守衛缺場);3=輸入檔不存在。禁止把 1 混報成 2。
+- **子命令面**:analyze/extract(--lang/--max-rules/--format)/gaps/tb
+  (--module 必填;--emit-v 必須顯式 --out=默認零 FS 寫)/spec parse|lint。
+  未實現=exit 2 帶里程碑指針。
+- **spec 檔格式**:markdown 節頭逐字(`# spec:`/`- spec-format: 1`/`- module:`/
+  `param:`/`port:`/`state:`/`derived:`/`assumes:`/`## behavior`(B\d+ 條目恰 1
+  條 check 行,四收形 guard/transition/sequence/relation;sequence 無 anchor)/
+  `## scenarios`(SCENE<n>));正樣抄形=plugin/rtl2spec/fixtures/d-spec/ 三檔。
+  lint 七查⑥=值側標識符 ⊆ ports∪params∪states∪derived(findings 前綴
+  ①..⑦=查號)。
+- **凍結律**:fixtures/d-spec/reimpl/<design>/top.v=凍結工件禁手改(sha 釘
+  REIMPL-PROTOCOL §5;換檔=協議事件);legs.json expected=首跑錄製禁手寫,
+  mutprobe measured=實測;盲寫數字=輔助證據(自對拍/盲寫分列禁混報)。
+- **閘**:`bash plugin/rtl2spec/run-spec-cli-parity.sh`(CLI↔wasm byte-equal,
+  CLI 渲染面改動必紅)+`bash plugin/rtl2spec/run-spec-eval.sh`(iverilog 缺場
+  exit 2;證據頁保鮮=spec-eval-report.md byte 比對,手改/陳舊=exit 1;重錄=
+  --record --slice <D-Sn>)——兩閘已收編 regress S7。
+- **wasm sha 變更=conformance 全量重錄**(對賬=剝 tb.simMs/provenance.date 後
+  唯一 diff=provenance.wasmSha256);伺服器版本=plugin.json/CHANGELOG/
+  SERVER_VERSION 四點一致(run-plugin-check ①執法)。

@@ -406,3 +406,40 @@
   pinned-files.list、FINISH-PLAN 無「[欠]」)。跨切片欠條一律寫成可機檢標記並配清償閘,禁口頭欠帳。
 - **閘落點**:run-conformance-eval=總閘直調不進 regress(評測層分鐘級;收編重議條件=提供 ≤30s --quick
   子集後經 ADR-0013 修訂);C 弧已知未決(D-c1..D-c4)與本案張力=REGISTRY「C 弧已知未決」小節,禁靜默。
+
+## 10.13 CLI-AGENT 與 spec 前端紀律(2026-11-08;D-S0..D-S6 一弧;ADR-0014;正典=SKILL「CLI-AGENT 憲法增補」節)
+
+- **CLI=agent 唯一接口(`rtl-spec` bin;ADR-0014 D1/D2)**:JSON-first——資料
+  子命令 stdout=raw JSON(**無尾隨換行**,與 wasm 導出 byte-equal=parity 閘
+  判據),人讀診斷走 stderr 且自帶下一步可執行提示;exit code 四值(0=成功,
+  1=域內失敗,2=用法或環境缺,3=輸入檔不存在);self-contain——`--help` 頂部
+  攜完整工作流配方,每子命令 `--help` 自解釋。未實現子命令=帶里程碑指針硬錯
+  exit 2(§3 同款;實錄=spec stub 至 D-S3)。
+- **委派形裁決(ADR-0014 D3)**:閘/評測類子命令=spawn 既有 runner 轉發 exit
+  +JSON 封套,**禁 Rust 側重實現 JS 判據**(鎖③獨立重算面,雙實現=漂移)。
+- **三面一路與單一源**:新能力先落 rtl-spec 核心(永不 panic、錯誤進結果),
+  CLI/wasm/MCP 同弧跟隨,單一面實現=違例;`spec_lint_json`=三面 byte-equal
+  單一源,禁各面自拼。
+- **spec 格式釘檔**:SSOT=RTL2SPEC-D-PLAN §3(markdown 節頭逐字;check 行四收
+  形,sequence 無 anchor 欄;md.rs 發射面/trim writer 與 spec 文法不可互推、
+  變動不溯及);spec_lint 七查⑥=decl_lint 只掃值側(值側標識符 ⊆
+  ports∪params∪states∪derived,排除表含 true/false);**改 spec 文法=
+  ADR-0014 修訂事件**(先改 SSOT 再改解析器與 fixtures,對賬禁悄悄改語義)。
+- **凍結律**:fixtures/d-spec/reimpl/<design>/top.v 入庫=凍結工件禁手改
+  (sha256 釘 REIMPL-PROTOCOL §5;換檔=協議事件);legs.json=斷言規格
+  (expected 首跑錄製禁手寫;mutprobe measured=實測,漂移即紅);fixtures/d-spec
+  子樹內容類型放寬=自著 spec md/legs.json/凍結 top.v——顯式例外沿 10.12 形
+  不得默認;外部語料與 GPL 仍禁入。
+- **盲寫採樣=輔助證據**:身份/參數/prompt 逐字 append-only(REIMPL-PROTOCOL
+  §5,含盲隔離揭露);LLM 腿永不進確定性閘(10.11/10.12 沿用);自對拍段與
+  盲寫段數字分列禁混報。
+- **wasm sha 變更=conformance 全量重錄語義事件**(DRIFT 鏈):重錄對賬判據=
+  逐 record.json 剝 tb.simMs/provenance.date 後唯一允許 diff=
+  provenance.wasmSha256(D-S3 實錄 34/34 零語義漂移)。
+- **機械閘=regress S7 兩閘(D-S6 收編;雙守衛降級形)**:run-spec-cli-parity
+  (守衛=bin+pkg+bun;CLI↔wasm byte-equal 17 腿,渲染面改動必紅)+
+  run-spec-eval(守衛=iverilog 缺場 exit 2 SKIP;legs.json 接線斷言+場景 diff
+  對 expected 逐字+mutprobe 全紅+**證據頁保鮮**=spec-eval-report.md 默認模式
+  byte 比對,陳舊/手改=exit 1)。
+- **四層對照**:①閘=上兩閘 ②正典=SKILL「CLI-AGENT 憲法增補」節 ③本節
+  ④證據頁=plugin/rtl2spec/spec-eval-report.md(機械生成禁手改)。
